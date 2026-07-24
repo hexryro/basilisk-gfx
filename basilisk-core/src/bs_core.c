@@ -53,6 +53,7 @@ bs_Instance* _bs_instance_ = NULL;
 bs_IO _bs_io_ = { 0 };
 bs_Context* _bs_context_ = { 0 };
 int _bs_image_index_ = 0;
+bs_Callbacks _bs_callbacks_ = { 0 };
 
 bs_List _bs_physical_devices_ = { .unit_size = sizeof(bs_PhysicalDevice) };
 
@@ -64,6 +65,7 @@ BSAPI bs_Config* _bs_config() { return &_bs_config_; }
 BSAPI bs_Scope* _bs_scope() { return &_bs_scope_; }
 BSAPI bs_IO* _bs_io() { return &_bs_io_; }
 BSAPI bs_Context* _bs_context() { return _bs_context_; }
+BSAPI bs_Callbacks* _bs_callbacks() { return &_bs_callbacks_; }
 
 BSAPI void _bsi_nameHandle(bs_U64 handle, bs_U32 type, char* name, int name_length) {
     PFN_vkSetDebugUtilsObjectNameEXT pfn_vkSetDebugUtilsObjectNameEXT =
@@ -174,7 +176,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL _bs_debugCallback(
         _bs_warn(message->value, message->len);
     }
     else {
-        _bs_warnF("%s\n", data->pMessage);
+        _bs_warnF("%s", data->pMessage);
     }
 
     // _bs_free(message);
@@ -216,7 +218,7 @@ static bool _bs_checkValidationLayerSupport() {
 	    }
 
         if (!found) {
-            _bs_warnF("Vulkan validation layer %s is not supported\n", validation_layers[i]);
+            _bs_warnF("Vulkan validation layer %s is not supported", validation_layers[i]);
             found_all = false;
         }
     }
@@ -263,11 +265,11 @@ static void _bs_prepareInstance() {
         _bs_instance_->extensions.surface_type = BS_SURFACE_TYPE_X11;
 #endif
     else if (BS_ADD_INSTANCE_EXTENSION(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME)) {
-        _bs_warnF("Only off-screen rendering is available\n");
+        _bs_warnF("Only off-screen rendering is available");
         _bs_instance_->extensions.surface_type = BS_SURFACE_TYPE_HEADLESS;
     }
     else {
-        _bs_warnF("No instance surface extension found\n");
+        _bs_warnF("No instance surface extension found");
     }
     BS_ADD_INSTANCE_EXTENSION(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     BS_ADD_INSTANCE_EXTENSION(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
@@ -308,7 +310,7 @@ static void _bs_prepareInstance() {
 
     result = vkCreateInstance(&ci, NULL, &_bs_instance_->instance);
     if (result != VK_SUCCESS) {
-        _bs_criticalF("Failed to create instance (Vulkan result %d)\n", result);
+        _bs_criticalF("Failed to create instance (Vulkan result %d)", result);
         return;
     }
 
@@ -372,7 +374,7 @@ BSAPI void _bs_load(
     if (!_bs_instance_->single_times_queue) {
         bs_Object* object = BS_QUEUE(-1, 0, 0);
         if (_bs_queue(object, BS_QUEUE_TRANSFER_BIT | BS_QUEUE_COMPUTE_BIT | BS_QUEUE_SINGLE_TIMES_BIT) != BS_RESULT_OK) {
-            _bs_critical(BS_CONSTANT_STRING("Failed to create single times queue\n"));
+            _bs_critical(BS_CONSTANT_STRING("Failed to create single times queue"));
             return;
         }
 
@@ -512,7 +514,7 @@ BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFl
     buffer->num_bytes = num_bytes;
 
     if (usage_flags & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT && num_bytes > 65536) {
-        _bs_warnF("Buffer %d of size %d exceeds maximum UBO size of 65536 bytes\n", buffer->head.id, num_bytes);
+        _bs_warnF("Buffer %d of size %d exceeds maximum UBO size of 65536 bytes", buffer->head.id, num_bytes);
         return BS_RESULT_GENERAL_ERROR;
     }
 
@@ -671,7 +673,7 @@ BSAPI void _bs_stageImage(bs_Buffer* buffer, bs_Format format, bs_ivec2 dim, con
         case BS_FORMAT_R8G8B8A8_SRGB: size *= 4; break;
         case BS_FORMAT_R8G8B8A8_UNORM: size *= 4; break;
         default:
-            _bs_warnF("Failed to stage image data, format %d is not supported\n", format); // TODO: serialize format
+            _bs_warnF("Failed to stage image data, format %d is not supported", format); // TODO: serialize format
             return;
     }
 
@@ -704,7 +706,17 @@ BSAPI void _bs_destroyBuffer(bs_Buffer* buffer) {
 }
 
 BSAPI void _val_bs_copyAsync(bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, bs_U32 src_offset, bs_U32 num_bytes) {
-    BS_VALIDATE(num_bytes < src->num_bytes,,);
+    int src_swap = (src->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
+    int dst_swap = (dst->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
+
+    BS_VALIDATE(src->_[src_swap].vk_buffer != NULL,,);
+    BS_VALIDATE(dst->_[dst_swap].vk_buffer != NULL,,);
+
+    if (num_bytes == BS_U32_MAX)
+        num_bytes = BS_MIN(dst->num_bytes, src->num_bytes);
+
+    BS_VALIDATE(num_bytes > 0,,);
+    BS_VALIDATE(num_bytes < src->num_bytes, , );
 
     _bs_copyAsync(src, dst, dst_offset, src_offset, num_bytes);
 }
@@ -1549,7 +1561,7 @@ BSAPI bs_Result _bs_pushBatch(bs_Batch* batch, bs_U32 num_indices, bs_U32 num_ve
     Vertex buffer
     */
     batch->vertex_buffer = BS_BUFFER(-1, 0, object_flags);
-    result = _bs_buffer(BS_BUFFER(-1, 0, object_flags), vertex_size,
+    result = _bs_buffer(batch->vertex_buffer, vertex_size,
         usage_flags | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         0);
@@ -1708,7 +1720,7 @@ BSAPI bs_Result _bs_renderer(bs_Object* object, bs_RendererBits flags) {
   */
 BSAPI void _val_bs_output(bs_Renderer* renderer, bs_Output output) {
     BS_VALIDATE(renderer->num_outputs < BS_MAX_ATTACHMENTS_COUNT, , );
-    BS_VALIDATE(output.image->head.source_id == BS_OBJECT_IMAGE, , );
+    BS_VALIDATE(output.image->head.type == BS_OBJECT_IMAGE, , );
 
     return _bs_output(renderer, output);
 }
@@ -1723,7 +1735,7 @@ BSAPI void _bs_output(bs_Renderer* renderer, bs_Output output) {
 BSAPI void _val_bs_input(bs_Renderer* renderer, bs_Input input) {
     BS_VALIDATE(renderer->num_inputs < BS_MAX_ATTACHMENTS_COUNT,,);
     BS_VALIDATE(input.image != NULL,,);
-    BS_VALIDATE(input.image->head.source_id == BS_OBJECT_IMAGE,,);
+    BS_VALIDATE(input.image->head.type == BS_OBJECT_IMAGE,,);
 
     return _bs_input(renderer, input);
 }
@@ -1860,7 +1872,7 @@ BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
     VkResult result = vkCreateRenderPass(_bs_instance_->device, &render_pass_ci, NULL, &renderer->render_pass);
 
     if (result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkCreateRenderPass", result,);
+        BS_WARN_VULKAN_ERROR("vkCreateRenderPass", result, "");
         return _bs_convertVulkanResult(result);
     }
 
@@ -1904,7 +1916,7 @@ BSAPI bs_Result _bs_framebuffer(bs_Renderer* renderer, bs_ivec2 dim) {
 
         vk_result = vkCreateFramebuffer(_bs_instance_->device, &framebuf_ci, NULL, &renderer->_[i].framebuffer);
         if (vk_result != VK_SUCCESS) {
-            BS_WARN_VULKAN_ERROR("vkCreateFramebuffer", vk_result,);
+            BS_WARN_VULKAN_ERROR("vkCreateFramebuffer", vk_result, "");
             return _bs_convertVulkanResult(vk_result);
         }
     }
@@ -2137,7 +2149,7 @@ BSAPI void _bs_dispatchAsync(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z
    *============================================================================*/
 
 BSAPI void _bs_rayTrace(bs_RayTracer* ray_tracer, bs_Pipeline* pipeline, bs_U32 width, bs_U32 height, bs_U32 depth) {
-    _bs_warnF("_bs_rayTrace has not been implemented yet\n");
+    _bs_warnF("_bs_rayTrace has not been implemented yet");
     /*
     VkCommandBuffer command_buffer = bsi_fetchCommands();
 
@@ -2654,7 +2666,7 @@ BSAPI bs_Result _bs_queue(bs_Object* object, bs_QueueBits flags) {
     VkCommandBuffer command_buffer_result[3] = { 0 };
     vk_result = vkAllocateCommandBuffers(_bs_instance_->device, &alloc_i, command_buffer_result);
     if (vk_result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkAllocateCommandBuffers", vk_result,);
+        BS_WARN_VULKAN_ERROR("vkAllocateCommandBuffers", vk_result, "");
         return _bs_convertVulkanResult(vk_result);
     }
 
@@ -2763,13 +2775,13 @@ BSAPI bs_Result _bs_stall(bs_Queue* queue) {
 
     result = vkWaitForFences(_bs_instance_->device, 1, &queue->_[swap].fence, VK_TRUE, BS_TIMEOUT);
     if (result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkWaitForFences", result,);
+        BS_WARN_VULKAN_ERROR("vkWaitForFences", result, "");
         return _bs_convertVulkanResult(result);
     }
 
     result = vkResetFences(_bs_instance_->device, 1, &queue->_[swap].fence);
     if (result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkResetFences", result, );
+        BS_WARN_VULKAN_ERROR("vkResetFences", result, "");
         return _bs_convertVulkanResult(result);
     }
 
@@ -2786,7 +2798,7 @@ BSAPI bs_Result _bs_poll(bs_Queue* queue) {
         result = vkResetFences(_bs_instance_->device, 1, &queue->_[swap].fence);
 
         if (result != VK_SUCCESS) {
-            BS_WARN_VULKAN_ERROR("vkResetFences", result, );
+            BS_WARN_VULKAN_ERROR("vkResetFences", result, "");
             return _bs_convertVulkanResult(result);
         }
 
@@ -2964,7 +2976,7 @@ BSAPI void _bs_acquire() {
         return;
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-        BS_WARN_VULKAN_ERROR("vkAcquireNextImageKHR", result,);
+        BS_WARN_VULKAN_ERROR("vkAcquireNextImageKHR", result, "");
     }
 }
 
@@ -3016,7 +3028,7 @@ void bsi_resizeObjects() {
 BSAPI void _val_bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues_count) {
     for (int i = 0; i < wait_queues_count; i++) {
         BS_VALIDATE(wait_queues[i] != NULL,,);
-        BS_VALIDATE(wait_queues[i]->head.source_id == BS_OBJECT_QUEUE,,);
+        BS_VALIDATE(wait_queues[i]->head.type == BS_OBJECT_QUEUE,,);
     }
 
     _bs_present(queue, wait_queues, wait_queues_count);
@@ -3047,7 +3059,7 @@ BSAPI void _bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
         _bs_critical(BS_CONSTANT_STRING("Window was resized"));
     else if (result != VK_SUCCESS)
-        _bs_warn(BS_CONSTANT_STRING("Failed to present swapchain image\n"));
+        _bs_warn(BS_CONSTANT_STRING("Failed to present swapchain image"));
 
     _bs_context_->frame = (_bs_context_->frame + 1) % _bs_context_->frames_in_flight;
     _bs_context_->image_acquired = false;

@@ -62,11 +62,11 @@ static void _bs_createSurface() {
         result = vkCreateHeadlessSurfaceEXT(_bs_instance_->instance, &ci, NULL, &_bs_context_->surface);
     }
     else {
-        _bs_warnF("Surface type %d is not supported\n", _bs_instance_->extensions.surface_type);
+        _bs_warnF("Surface type %d is not supported", _bs_instance_->extensions.surface_type);
     }
 
     if (result != VK_SUCCESS) {
-        _bs_warnF("Failed to create surface for window \"%s\" (Vulkan result = %d)\n", _bs_context_->title, result);
+        _bs_warnF("Failed to create surface for window \"%s\" (Vulkan result = %d)", _bs_context_->title, result);
     }
 }
 
@@ -81,7 +81,7 @@ BSAPI void _bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_ha
         if (data)
             memcpy(destination, &data, procedures[i].size);
         else if (procedures[i].is_required) {
-            _bs_warnF("Failed to query procedure \"%s\"\n", procedures[i].func);
+            _bs_warnF("Failed to query procedure \"%s\"", procedures[i].func);
         }
 
         destination += procedures[i].size;
@@ -154,7 +154,7 @@ static void _bs_readQueueFamilies(bs_PhysicalDevice* physical_device) {
         VkBool32 supports_present = false;
         result = vkGetPhysicalDeviceSurfaceSupportKHR(physical_device->vk_device, i, _bs_context_->surface, &supports_present);
         if (result != VK_SUCCESS) {
-            BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceSupportKHR", result,);
+            BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceSupportKHR", result, "");
             continue;
         }
 
@@ -173,7 +173,7 @@ static void _bs_readSurfaceFormats(bs_PhysicalDevice* physical_device) {
     bs_U32 surface_formats_count;
     result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device->vk_device, _bs_context_->surface, &surface_formats_count, NULL);
     if (result != VK_SUCCESS) {
-        BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR", result,);
+        BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR", result, "");
         return;
     }
 
@@ -183,7 +183,7 @@ static void _bs_readSurfaceFormats(bs_PhysicalDevice* physical_device) {
     VkSurfaceFormatKHR* formats = bs_alloca(surface_formats_count * sizeof(VkSurfaceFormatKHR));
     result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device->vk_device, _bs_context_->surface, &surface_formats_count, formats);
     if (result != VK_SUCCESS) {
-        BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR", result, );
+        BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR", result, "");
         return;
     }
 
@@ -209,7 +209,7 @@ static void _bs_preparePhysicalDevice() {
     bs_U32 num_devices = 0;
     vkEnumeratePhysicalDevices(_bs_instance_->instance, &num_devices, NULL);
     if (num_devices == 0) {
-        _bs_critical(BS_CONSTANT_STRING("No GPU with Vulkan support was found\n"));
+        _bs_critical(BS_CONSTANT_STRING("No GPU with Vulkan support was found"));
         return;
     }
 
@@ -259,13 +259,13 @@ static void _bs_queryPhysicalDevice(VkQueueFlags required_flags, bool supports_p
             if (queue_family->queue_flags & required_flags && queue_family->supports_present == supports_present) {
                 *out_queue_family = queue_family;
                 *out_device = physical_device;
-                _bs_infoF("Physical device \"%s\", queue family %d was picked\n", physical_device->name, j);
+                _bs_infoF("Physical device \"%s\", queue family %d was picked", physical_device->name, j);
                 return;
             }
         }
     }
 
-    _bs_critical(BS_CONSTANT_STRING("No GPU with graphics and present support was found\n"));
+    _bs_critical(BS_CONSTANT_STRING("No GPU with graphics and present support was found"));
 }
 
 
@@ -355,7 +355,7 @@ static void _bs_prepareLogicalDevice() {
             if (_bs_features_.ray_tracing && i >= 1 && i <= 8) // todo something about this
                 _bs_features_.ray_tracing = false;
 
-            _bs_warnF("Extension \"%s\" is not supported\n", extensions[i]);
+            _bs_warnF("Extension \"%s\" is not supported", extensions[i]);
         }
     }
 
@@ -449,7 +449,7 @@ static void _bs_querySwapchainFormat(VkFormat candidates[], int candidates_count
         }
     }
 
-    _bs_critical(BS_CONSTANT_STRING("Failed to query swapchain surface format\n"));
+    _bs_critical(BS_CONSTANT_STRING("Failed to query swapchain surface format"));
 }
 
 static void _bs_querySwapchainMode(VkPresentModeKHR candidates[], int candidates_count) {
@@ -471,7 +471,7 @@ static void _bs_querySwapchainMode(VkPresentModeKHR candidates[], int candidates
         }
     }
 
-    _bs_critical(BS_CONSTANT_STRING("Failed to query swapchain present mode\n"));
+    _bs_critical(BS_CONSTANT_STRING("Failed to query swapchain present mode"));
 }
 
 static void _bs_prepareSwapchain() {
@@ -539,7 +539,7 @@ static void _bs_prepareSwapchain() {
 
     result = vkCreateSwapchainKHR(_bs_instance_->device, &swapchain_ci, NULL, &_bs_context_->swapchain);
     if (result != VK_SUCCESS) {
-        _bs_warnF("Failed to create swapchain for window \"%s\"\n", _bs_context_->title);
+        _bs_warnF("Failed to create swapchain for window \"%s\"", _bs_context_->title);
         return;
     }
 
@@ -548,10 +548,10 @@ static void _bs_prepareSwapchain() {
      */
     VkImage images[3];
     vkGetSwapchainImagesKHR(_bs_instance_->device, _bs_context_->swapchain, &_bs_context_->frames_in_flight, images);
-    _bs_infoF("Swapchain\n  Format: %d\n  Mode: %d\n  Images: %d\n", swapchain_ci.imageFormat, swapchain_ci.presentMode, _bs_context_->frames_in_flight);
+    _bs_infoF("Swapchain\n  Format: %d\n  Mode: %d\n  Images: %d", swapchain_ci.imageFormat, swapchain_ci.presentMode, _bs_context_->frames_in_flight);
 
     if (_bs_context_->swapchain_image == NULL)
-        _bs_context_->swapchain_image = BS_OBJECT(bs_Image, -1, 0, _bs_context_->frames_in_flight, BS_OBJECT_HAS_SWAPS_BIT);
+        _bs_context_->swapchain_image = BS_OBJECT(bs_Image, -1, 0, _bs_context_->frames_in_flight, BS_OBJECT_HAS_SWAPS_BIT, BS_OBJECT_IMAGE);
 
     memcpy(_bs_context_->swapchain_image->image, &image, sizeof(image));
 
@@ -573,7 +573,7 @@ static void _bs_prepareSwapchain() {
 
         result = vkCreateImageView(_bs_instance_->device, &image_view_ci, NULL, &_bs_context_->swapchain_image->image->_[i].vk_image_view);
         if (result != VK_SUCCESS) {
-            _bs_warnF("Failed to create swapchain image view for window \"%s\"\n", _bs_context_->title);
+            _bs_warnF("Failed to create swapchain image view for window \"%s\"", _bs_context_->title);
         }
     }
 
@@ -587,7 +587,7 @@ static void _bs_prepareSwapchain() {
     for (int i = 0; i < _bs_context_->frames_in_flight; i++) {
         result = vkCreateSemaphore(_bs_instance_->device, &semaphore_ci, NULL, &_bs_context_->_[i].semaphore);
         if (result != VK_SUCCESS) {
-            _bs_warnF("Failed to create swapchain semaphore for window \"%s\"\n", _bs_context_->title);
+            _bs_warnF("Failed to create swapchain semaphore for window \"%s\"", _bs_context_->title);
         }
     }
 }
@@ -604,7 +604,7 @@ BSAPI bs_Result _bs_timeZoneBias(int* out) {
 
 	DWORD time_zone_id = 0;
 	if ((time_zone_id = GetTimeZoneInformation(&info)) == TIME_ZONE_ID_INVALID) {
-		_bs_warnF("GetTimeZoneInformation failed (GetLastError() = %d)\n", GetLastError());
+		_bs_warnF("GetTimeZoneInformation failed (GetLastError() = %d)", GetLastError());
 		return _bs_convertWin32Error(GetLastError());
 	}
 
@@ -669,7 +669,7 @@ BSAPI bool _bs_isLaterThan(const bs_DateTime* a, const bs_DateTime* b) {
 }
 
 BSAPI void _bs_setCursor(bs_CursorIcon icon) {
-	_bs_warnF("_bs_setCursor has not been implemented yet\n");
+	_bs_warnF("_bs_setCursor has not been implemented yet");
 	/*
 	if (_bs_context_->cursor_icons[icon].handle == NULL)
 		_bs_context_->cursor_icons[icon].handle = LoadCursor(NULL, _bs_wnd.cursor_icons[icon].id);
@@ -689,7 +689,7 @@ BSAPI void _bs_maximizeWindow() {
 #ifdef _WIN32
 	ShowWindow(_bs_context_->hwnd, SW_SHOWMAXIMIZED);
 #else
-	_bs_warnF("_bs_maximizeWindow has not been implemented for this OS yet\n");
+	_bs_warnF("_bs_maximizeWindow has not been implemented for this OS yet");
 #endif
 }
 
@@ -697,7 +697,7 @@ BSAPI void _bs_minimizeWindow() {
 #ifdef _WIN32
 	ShowWindow(_bs_context_->hwnd, SW_SHOWMINIMIZED);
 #else
-	_bs_warnF("_bs_minimizeWindow has not been implemented for this OS yet\n");
+	_bs_warnF("_bs_minimizeWindow has not been implemented for this OS yet");
 #endif
 }
 
@@ -772,7 +772,7 @@ BSAPI bs_ivec2 _bs_windowPosition() {
     };
 
 #elif defined(__APPLE__)
-    _bs_warnF("_bs_windowPosition has not been implemented for macOS yet\n");
+    _bs_warnF("_bs_windowPosition has not been implemented for macOS yet");
     return (bs_ivec2) { 0, 0 };
 #else
     return (bs_ivec2) { 0, 0 };

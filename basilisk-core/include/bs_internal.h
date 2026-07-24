@@ -52,34 +52,37 @@ extern struct bs_Procs {
 
 #ifdef _WIN32
 #define BS_WARN_WIN32_PATH(function, path)                           \
-    bs_warnF("%s at %s:%d: %s failed for \"%s\" (Win32 error %lu = \"%s\")\n", __func__, __FILE__, __LINE__, function, path, GetLastError(), bs_serializeWin32Error(GetLastError()))
+    _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_VALIDATION_ERROR, _bs_convertWin32Error(GetLastError()), GetLastError(), __func__, __FILE__, __LINE__, "")
 #endif
 
 #define BS_WARN_ERRNO_PATH(function, path)                           \
-    bs_warnF("%s at %s:%d: %s failed for \"%s\" (errno %d = \"%s\")\n", __func__, __FILE__, __LINE__, function, path, errno, bs_serializeErrno())
+    _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_VALIDATION_ERROR, _bs_convertErrno(errno), errno, __func__, __FILE__, __LINE__, "")
 
 #define BS_VALIDATE(condition, ret, format, ...)                     \
     if (!(condition)) {                                              \
-        bs_warnF(BS_PRINT_COLOR("[CORE] [VAL]", BS_PRINT_RED) " %s " BS_PRINT_COLOR("in", BS_PRINT_CYAN) " %s " BS_PRINT_COLOR("at", BS_PRINT_CYAN) " %s:%d\n" __VA_OPT__(format) "\n", #condition, __func__, __FILE__, __LINE__ __VA_OPT__(,) __VA_ARGS__); \
+        _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_VALIDATION_ERROR, BS_RESULT_VALIDATION_ERROR, BS_RESULT_VALIDATION_ERROR, __func__, __FILE__, __LINE__, "%s" format, #condition __VA_OPT__(, ) __VA_ARGS__); \
         return ret;                                                  \
     }
 
 #define BS_WARN_VULKAN_ERROR(function, code, format, ...)            \
-    bs_warnF("%s at %s:%d: %s failed" __VA_OPT__(", ") format " (Vulkan result %d)\n", __func__, __FILE__, __LINE__, function __VA_OPT__(,) __VA_ARGS__, code)
+    _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_VALIDATION_ERROR, _bs_convertVulkanResult(code), code, __func__, __FILE__, __LINE__, format __VA_OPT__(, ) __VA_ARGS__)
 
 #define BS_CRITICAL_VULKAN_ERROR(function, code, format, ...)        \
-    bs_warnF("%s at %s:%d: %s failed" __VA_OPT__(", ") format " (Vulkan result %d)\n", __func__, __FILE__, __LINE__, function __VA_OPT__(,) __VA_ARGS__, code)
+    _bs_criticalF(format __VA_OPT__(, ) __VA_ARGS__)
 
 #define BS_VALIDATE_OBJECT_TYPE(object, source_id, _return)          \
     BS_VALIDATE(((bs_ObjectSource*)bs_fetchUnit(bs_objectSources(), source_id))->type == source_id, _return,,)
 
 #define BS_WARN_INVALID_MAGIC(resource_type, path)                   \
-    bs_warnF("%s at %s:%d: Invalid magic for %s \"%s\"\n", __func__, __FILE__, __LINE__, resource_type, path)
+    _bs_criticalF("Invalid magic for %s \"%s\"", resource_type, path)
+   // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, BS_RESULT_CORRUPTED, BS_RESULT_CORRUPTED, __func__, __FILE__, __LINE__, "Invalid magic for %s \"%s\"", resource_type, path)
 
 #define BS_WARN_UNSUPPORTED_VERSION(resource_type, path)             \
-    bs_warnF("%s at %s:%d: Unsupported version for %s \"%s\"\n", __func__, __FILE__, __LINE__, resource_type, path)
+    _bs_criticalF("Unsupported version for %s \"%s\"", resource_type, path)
+   // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, BS_RESULT_CORRUPTED, BS_RESULT_CORRUPTED, __func__, __FILE__, __LINE__, "Unsupported version for %s \"%s\"", resource_type, path)
 
 #define BS_WARN_YYJSON_ERROR(function, code, format, ...)            \
-    bs_warnF("%s at %s:%d: %s failed" __VA_OPT__(", ") format " (yyjson result %d)\n", __func__, __FILE__, __LINE__, function __VA_OPT__(, ) __VA_ARGS__, code)
+    _bs_criticalF(format __VA_OPT__(, ) __VA_ARGS__)
+   // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, _bs_convertYyjsonError(code), code, __func__, __FILE__, __LINE__, format __VA_OPT__(, ) __VA_ARGS__)
 
 #endif

@@ -52,7 +52,7 @@ static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
         bs_Binding* binding = bind_set->bindings + i;
 
         if (binding->stages == 0) {
-            _bs_warnF("Failed to push descriptor layouts for binding (%d, %d), binding has no shader stages\n", bind_set->slot, binding->slot);
+            _bs_warnF("Failed to push descriptor layouts for binding (%d, %d), binding has no shader stages", bind_set->slot, binding->slot);
             continue;
         }
         
@@ -71,7 +71,7 @@ static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
     VkDescriptorSetLayout layout = VK_NULL_HANDLE;
     result = vkCreateDescriptorSetLayout(_bs_instance_->device, &layout_i, NULL, &layout);
     if (result != VK_SUCCESS) {
-        _bs_warnF("Failed to create descriptor set layout for bind set %d (Vulkan result = %d)\n", bind_set->slot, result);
+        _bs_warnF("Failed to create descriptor set layout for bind set %d (Vulkan result = %d)", bind_set->slot, result);
         _bs_free(layout_bindings);
         return VK_NULL_HANDLE;
     }
@@ -103,7 +103,7 @@ static VkDescriptorSet _bs_pushDescriptorSet(bs_BindSet* bind_set, VkDescriptorS
     VkDescriptorSet set = VK_NULL_HANDLE;
     result = vkAllocateDescriptorSets(_bs_instance_->device, &alloc_i, &set);
     if (result != VK_SUCCESS) {
-        _bs_warnF("Failed to create descriptor set for bind set %d (Vulkan result = %d)\n", bind_set->slot, result);
+        _bs_warnF("Failed to create descriptor set for bind set %d (Vulkan result = %d)", bind_set->slot, result);
         return VK_NULL_HANDLE;
     }
 
@@ -170,7 +170,7 @@ static void _bs_pushDescriptorPools() {
 
     VkResult result = vkCreateDescriptorPool(_bs_instance_->device, &pool_i, NULL, &descriptor_pool);
     if (result != VK_SUCCESS) {
-        _bs_warnF("vkCreateDescriptorPool failed (Vulkan result = %d)\n", result);
+        _bs_warnF("vkCreateDescriptorPool failed (Vulkan result = %d)", result);
         return;
     }
 
@@ -329,8 +329,8 @@ BSAPI bs_Result _val_bs_bindImages(bs_U32 bind_set_slot, bs_U32 bind_point_slot,
         BS_VALIDATE(descriptor->image != NULL, BS_RESULT_VALIDATION_ERROR,);
         BS_VALIDATE(descriptor->sampler != NULL, BS_RESULT_VALIDATION_ERROR,);
 
-        BS_VALIDATE(descriptor->image->head.source_id == BS_OBJECT_IMAGE, BS_RESULT_VALIDATION_ERROR,);
-        BS_VALIDATE(descriptor->sampler->head.source_id == BS_OBJECT_SAMPLER, BS_RESULT_VALIDATION_ERROR,);
+        BS_VALIDATE(descriptor->image->head.type == BS_OBJECT_IMAGE, BS_RESULT_VALIDATION_ERROR,);
+        BS_VALIDATE(descriptor->sampler->head.type == BS_OBJECT_SAMPLER, BS_RESULT_VALIDATION_ERROR,);
     }
 
     BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, images_count) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR, );
@@ -428,7 +428,7 @@ BSAPI bs_Result _val_bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 
 }
 
 BSAPI bs_Result _bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_RayTracer** ray_tracers, int ray_tracers_count) {
-    _bs_warn(BS_CONSTANT_STRING("_bs_bindAccelerationStructures has not been implemented yet\n"));
+    _bs_warn(BS_CONSTANT_STRING("_bs_bindAccelerationStructures has not been implemented yet"));
     return BS_RESULT_NOT_IMPLEMENTED;
 }
 
@@ -553,6 +553,8 @@ BSAPI void _bs_loadBinding(bs_Binding* binding, int bind_set, int bind_point, in
     binding->set = bind_set;
     binding->size = header->size;
     binding->stages = header->shader_stages;
+
+    _bs_instance_->bindings_count++;
 }
 
 static int _bs_loadPackageBindings(bs_Package* package, int package_id) {
@@ -564,13 +566,13 @@ static int _bs_loadPackageBindings(bs_Package* package, int package_id) {
 
         char* bind_set_string = strchr(resource_header->name, '/');
         if (bind_set_string == NULL) {
-            bs_warnF("Binding \"%s\" has a missing bind set\n", resource_header->name);
+            bs_warnF("Binding \"%s\" has a missing bind set", resource_header->name);
             continue;
         }
 
         char* bind_point_string = strchr(bind_set_string + 1, '/');
         if (bind_point_string == NULL) {
-            bs_warnF("Binding \"%s\" has a missing bind point\n", resource_header->name);
+            bs_warnF("Binding \"%s\" has a missing bind point", resource_header->name);
             continue;
         }
 
@@ -663,6 +665,24 @@ BSAPI void _bs_loadBindings() {
     }
 
    /**
+    Logging
+    */
+    static bs_String* s;
+    for (int i = 0; i < _bs_instance_->bind_sets_count; i++) {
+        bs_BindSet* bind_set = _bs_instance_->bind_sets + i;
+
+        s = bs_appendStringF(s, "Bind set %d", bind_set->slot);
+
+        for (int j = 0; j < bind_set->bindings_count; j++) {
+            bs_Binding* binding = bind_set->bindings + j;
+            s = bs_appendStringF(s, "    Binding %d", binding->slot);
+
+        }
+    }
+
+    bs_log(s->value, s->len);
+
+   /**
     Create lookup table
     */
     /*
@@ -731,7 +751,7 @@ static inline bs_Format _bs_convertFormatFromBaseType(VkFormat format, bs_U32 si
     } break;
     }
 
-    _bs_warnF("Failed to convert base format %d of invalid size %d\n", format, size);
+    _bs_warnF("Failed to convert base format %d of invalid size %d", format, size);
     return BS_FORMAT_UNDEFINED;
 }
 
@@ -807,7 +827,7 @@ BSAPI bs_Result _bs_shader(int package_id, const char* name, bs_U32 flags, bs_Re
         }
         
         if (result->format == 0) {
-            _bs_warnF("Attribute (location %d) from shader \"%s\" has not been configured, please configure with _bs_configureAttribute(...)\n", name);
+            _bs_warnF("Attribute (location %d) from shader \"%s\" has not been configured, please configure with _bs_configureAttribute(...)", name);
             return BS_RESULT_INVALID_STATE; // TODO invalid config or sum
         }
     }
@@ -831,7 +851,7 @@ BSAPI bs_Result _bs_shader(int package_id, const char* name, bs_U32 flags, bs_Re
 
     VkResult vk_result = vkCreateShaderModule(_bs_instance_->device, &shader_ci, NULL, &shader.vk_module);
     if (vk_result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkCreateShaderModule", vk_result,);
+        BS_WARN_VULKAN_ERROR("vkCreateShaderModule", vk_result, "");
         return _bs_convertVulkanResult(vk_result);
     }
 
@@ -1013,7 +1033,7 @@ static bs_Pipeline* _bs_preparePipeline(bs_PipelineType type, bs_U64 hash, bs_Pi
 
     // TODO this can be improved with new object system
     if (!existing) {
-        existing = _bs_object(-1, 0, sizeof(bs_Pipeline), BS_SWAP_SIZE(bs_Pipeline), init.shaders_count, 0)->head;
+        existing = _bs_object(-1, 0, sizeof(bs_Pipeline), BS_SWAP_SIZE(bs_Pipeline), init.shaders_count, 0, -1)->head;
         _bs_pushBack(_bs_pipelines_ + type, &existing);
     }
 
@@ -1064,7 +1084,7 @@ BSAPI bs_Result _bs_computePipeline(bs_Shader* compute_shader, bs_PipelineFlags 
     const char* cyan = (_bs_args_.color_log ? BS_PRINT_CYAN : "");
     const char* reset = (_bs_args_.color_log ? BS_PRINT_RESET : "");
 
-    _bs_infoF("%s%" PRIx64 "%s %s\n", blue, pipeline->hash, reset, reset);
+    _bs_infoF("%s%" PRIx64 "%s %s", blue, pipeline->hash, reset, reset);
 
     return BS_RESULT_OK;
 }
@@ -1106,7 +1126,7 @@ BSAPI bs_Result _val_bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out)
     bool is_dynamic_renderer = _bs_rendererIsDynamic(_bs_scope_.renderer);
     if (!is_dynamic_renderer) {
         BS_VALIDATE(descriptor->subpass < _bs_scope_.renderer->num_subpasses, BS_RESULT_VALIDATION_ERROR,
-            "Pipeline subpass (%d) falls outside renderer (%d) subpass count (%d)\n",
+            "Pipeline subpass (%d) falls outside renderer (%d) subpass count (%d)",
             descriptor->subpass,
             _bs_scope_.renderer->head.id,
             _bs_scope_.renderer->num_subpasses);
@@ -1353,7 +1373,7 @@ BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
 
     char* vs_name = vs ? vs->resource->name : NULL;
     char* fs_name = fs ? fs->resource->name : NULL;
-    _bs_infoF(BS_PRINT_COLOR("%" PRIx64, BS_PRINT_BLUE_BRIGHT) BS_PRINT_COLOR(" %s", BS_PRINT_CYAN) " -> " BS_PRINT_COLOR("%s", BS_PRINT_CYAN) "\n",
+    _bs_infoF(BS_PRINT_COLOR("%" PRIx64, BS_PRINT_BLUE_BRIGHT) BS_PRINT_COLOR(" %s", BS_PRINT_CYAN) " -> " BS_PRINT_COLOR("%s", BS_PRINT_CYAN),
         pipeline->hash,
         vs_name,
         fs_name);
@@ -1443,7 +1463,7 @@ BSAPI bs_Result _bs_rayTracingPipeline(bs_RayTracePipelineHash* pipeline_hash, b
     const char* cyan = (_bs_args_.color_log ? BS_PRINT_CYAN : "");
     const char* reset = (_bs_args_.color_log ? BS_PRINT_RESET : "");
 
-    _bs_infoF("%s%" PRIx64 "%s\n", blue, pipeline->hash, reset);
+    _bs_infoF("%s%" PRIx64 "%s", blue, pipeline->hash, reset);
 
     /**
      Binding table

@@ -58,6 +58,7 @@
 	<typedefs>
         <typedef><type>int</type><name>(__cdecl* bs_ThreadFunction)(void*)</name></typedef>
         <typedef><type>void</type><name>(__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
@@ -99,6 +100,21 @@
 	</typedefs>
 	
 	<enums>
+		<enum name="bs_Library">
+			<line><name>BS_LIBRARY_UNDEFINED</name></line>
+			<line><name>BS_LIBRARY_BASILISK</name></line>
+			<line><name>BS_LIBRARY_YYJSON</name></line>
+			<line><name>BS_LIBRARY_LODEPNG</name></line>
+			<line><name>BS_LIBRARY_VULKAN</name></line>
+			<line><name>BS_LIBRARY_WIN32</name></line>
+			<line><name>BS_LIBRARIES_COUNT</name></line>
+		</enum>
+		<enum name="bs_MessageLevel">
+			<line><name>BS_MESSAGE_INFO</name></line>
+			<line><name>BS_MESSAGE_WARNING</name></line>
+			<line><name>BS_MESSAGE_VALIDATION_ERROR</name></line>
+			<line><name>BS_MESSAGE_LEVELS_COUNT</name></line>
+		</enum>
 		<enum name="bs_Result">
 			<line><name>BS_RESULT_OK</name></line>
 			<line><name>BS_RESULT_WAITING</name></line>
@@ -520,7 +536,10 @@
 			<name>#define BS_QUAT_IDENTITY</name>
 			<line>(bs_vec4) { 0.0, 0.0, 0.0, 1.0 }</line>
 		</macro>
-		
+
+		<macro><name>#define BS_LOG_QUEUE_SIZE</name><line>10</line></macro>
+		<macro><name>#define BS_MAX_LOG_SIZE</name><line>1024</line></macro>
+
 		<macro><name>#define BS_I8_MIN</name><line>(bs_I8)(-127 - 1)</line></macro>
 		<macro><name>#define BS_I16_MIN</name><line>(bs_I16)(-32767 - 1)</line></macro>
 		<macro><name>#define BS_I32_MIN</name><line>(bs_I32)(-2147483647 - 1)</line></macro>
@@ -687,20 +706,21 @@
         <macro><name>#define BS_SWAP_SIZE(type)</name><line>(sizeof(*((type*)NULL)-&gt;_))</line></macro>
         <macro><name>#define BS_SWAPS_COUNT(flags)</name><line>((flags &amp; BS_OBJECT_HAS_SWAPS_BIT) ? bs_context()-&gt;frames_in_flight : 1)</line></macro>
         <macro>
-            <name>#define BS_OBJECT(type, source_id, id, swaps_count, flags)</name>
-            <line>    bs_object(source_id, id, sizeof(type), BS_SWAP_SIZE(type), swaps_count, flags)</line>
+            <name>#define BS_OBJECT(type, source_id, id, swaps_count, flags, object_type)</name>
+            <line>    bs_object(source_id, id, sizeof(type), BS_SWAP_SIZE(type), swaps_count, flags, object_type)</line>
         </macro>
-        <macro><name>#define BS_CONTEXT(source_id, id, flags)</name><line>BS_OBJECT(bs_Context, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_IMAGE(source_id, id, flags)</name><line>BS_OBJECT(bs_Image, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_SAMPLER(source_id, id, flags)</name><line>BS_OBJECT(bs_Sampler, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_RENDERER(source_id, id, flags)</name><line>BS_OBJECT(bs_Renderer, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_BATCH(source_id, id, flags)</name><line>BS_OBJECT(bs_Batch, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_QUEUE(source_id, id, flags)</name><line>BS_OBJECT(bs_Queue, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_BUFFER(source_id, id, flags)</name><line>BS_OBJECT(bs_Buffer, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_PIPELINE(source_id, id, flags)</name><line>BS_OBJECT(bs_Pipeline, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_RAY_TRACER(source_id, id, flags)</name><line>BS_OBJECT(bs_RayTracer, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_ATLAS(source_id, id, flags)</name><line>BS_OBJECT(bs_Atlas, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
-        <macro><name>#define BS_FONT(source_id, id, flags)</name><line>BS_OBJECT(bs_Font, source_id, id, BS_SWAPS_COUNT(flags), flags)</line></macro>
+        <macro><name>#define BS_CONTEXT(source_id, id, flags)</name><line>BS_OBJECT(bs_Context, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_CONTEXT)</line></macro>
+        <macro><name>#define BS_IMAGE(source_id, id, flags)</name><line>BS_OBJECT(bs_Image, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_IMAGE)</line></macro>
+        <macro><name>#define BS_SAMPLER(source_id, id, flags)</name><line>BS_OBJECT(bs_Sampler, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_SAMPLER)</line></macro>
+        <macro><name>#define BS_RENDERER(source_id, id, flags)</name><line>BS_OBJECT(bs_Renderer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_RENDERER)</line></macro>
+        <macro><name>#define BS_BATCH(source_id, id, flags)</name><line>BS_OBJECT(bs_Batch, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_BATCH)</line></macro>
+        <macro><name>#define BS_QUEUE(source_id, id, flags)</name><line>BS_OBJECT(bs_Queue, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_QUEUE)</line></macro>
+        <macro><name>#define BS_BUFFER(source_id, id, flags)</name><line>BS_OBJECT(bs_Buffer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_BUFFER)</line></macro>
+        <macro><name>#define BS_PIPELINE(source_id, id, flags)</name><line>BS_OBJECT(bs_Pipeline, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_PIPELINE)</line></macro>
+        <macro><name>#define BS_RAY_TRACER(source_id, id, flags)</name><line>BS_OBJECT(bs_RayTracer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_RAY_TRACER)</line></macro>
+        <macro><name>#define BS_ATLAS(source_id, id, flags)</name><line>BS_OBJECT(bs_Atlas, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_ATLAS)</line></macro>
+        <macro><name>#define BS_FONT(source_id, id, flags)</name><line>BS_OBJECT(bs_Font, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_FONT)</line></macro>
+		
         <macro><name>#define BS_NUM_STRIKES_RULE</name><line>(1)</line></macro>
         <macro><name>#define BS_QUERY_FORCE_CREATE</name><line>(1 &lt;&lt; 31)</line></macro>
         <macro><name>#define BS_QUERY_ALLOW_NULL</name><line>(1 &lt;&lt; 30)</line></macro>
@@ -1106,6 +1126,7 @@
         <structure name="bs_Header">
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>source_id</name></field>
+            <field><type>bs_ObjectType</type><name>type</name></field>
         </structure>
         <structure name="bs_Object">
             <field><type>bs_U32</type><name>flags</name></field>
@@ -2009,6 +2030,22 @@
             <field><type>bs_U32</type><name>shader_group_base_alignment</name></field>
             <field><type>bs_U32</type><name>min_acceleration_structure_scratch_offset_alignment</name></field>
         </structure>
+		
+		<structure name="bs_Callbacks">
+			<field><type>bs_MessageCallbackFunction</type><name>log</name></field>
+		</structure>
+
+		<structure name="bs_LogQueueItem">
+			<field><type>bs_MessageCallbackFunction</type><name>log</name></field>
+			<field><type>bs_Library</type><name>library</name></field>
+			<field><type>bs_MessageLevel</type><name>level</name></field>
+			<field><type>bs_Result</type><name>result</name></field>
+			<field><type>int</type><name>code</name></field>
+			<field><type>const char*</type><name>function</name></field>
+			<field><type>const char*</type><name>file</name></field>
+			<field><type>int</type><name>line</name></field>
+			<field><type>char</type><name>message</name><size>BS_MAX_LOG_SIZE</size></field>
+		</structure>
     </structures>
 
 	<externs>
@@ -2023,10 +2060,19 @@
 		<extern><type>bs_Context*</type><name>bs_context</name></extern>
 		<extern><type>int</type><name>bs_image_index</name></extern>
 		<extern><type>bs_List</type><name>bs_physical_devices</name></extern>
+		<extern><type>bs_Callbacks</type><name>bs_callbacks</name></extern>
 	</externs>
 	
     <functions>
 		<validationTemplate/>
+		
+		<function name="bs_callbacks">
+			<return>bs_Callbacks*</return>
+		</function>
+		
+		<variadicStringTemplate name="bs_writeLogFile">
+			<return>void</return>
+		</variadicStringTemplate>
 		
         <vectorTemplate>
             <n>2</n>
@@ -2324,7 +2370,6 @@
             <body>    return roundf(v);</body>
         </function>
 		
-		
         <function name="bs_abs">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
@@ -2417,7 +2462,11 @@
             <return>bs_vec3</return>
             <param><type>const bs_vec3*</type><name>rgb</name></param>
         </function>
-		
+
+		<function name="bs_convertYyjsonResult">
+            <return>bs_Result</return>
+            <param><type>int</type><name>code</name></param>
+        </function>
         <function name="bs_convertVulkanResult">
             <return>bs_Result</return>
             <param><type>int</type><name>code</name></param>
@@ -3353,8 +3402,7 @@
 		</function>
 		<variadicStringTemplate name="bs_logWithTimestamp">
 			<return>void</return>
-            <param><type>const char*</type><name>type</name></param>
-            <param><assert>type_len &gt;= 0</assert><type>int</type><name>type_len</name></param>
+            <param><type>bs_MessageLevel</type><name>level</name></param>
         </variadicStringTemplate>
         <variadicStringTemplate name="bs_log" string="message">
 			<return>void</return>
@@ -3842,6 +3890,7 @@
             <param><type>size_t</type><name>flexible_size</name></param>
             <param><type>int</type><name>flexible_count</name></param>
             <param><type>bs_U32</type><name>flags</name></param>
+            <param><type>bs_ObjectType</type><name>object_type</name></param>
         </function>
         <function name="bs_packages">
             <return>bs_List*</return>

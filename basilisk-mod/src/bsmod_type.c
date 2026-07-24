@@ -159,8 +159,7 @@ BSMODAPI bs_Result _bsmod_saveType(bsgfx_TypeId id, char* comment, int comment_l
 	if (result != BS_RESULT_OK)
 		return result;
 
-
-	bs_logWithTimestamp(BS_INFO_HEADER, sizeof(BS_INFO_HEADER) - 1, comment, comment_length);
+	bs_logWithTimestamp(BS_MESSAGE_INFO, comment, comment_length);
 
 	return BS_RESULT_OK;
 }

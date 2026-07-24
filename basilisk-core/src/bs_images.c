@@ -208,7 +208,7 @@ BSAPI void _bs_transition(bs_Image* image, int index, bs_ImageLayout old_layout,
         dst_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
     }
     else {
-        _bs_warnF("Unknown layout transition %s -> %s\n", bs_serializeImageLayout(old_layout), bs_serializeImageLayout(new_layout));
+        _bs_warnF("Unknown layout transition %s -> %s", bs_serializeImageLayout(old_layout), bs_serializeImageLayout(new_layout));
     }
 
     vkCmdPipelineBarrier(
@@ -290,7 +290,7 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
     bs_U32 memory_type = 0;
     result = _bs_queryMemoryType(mem_req.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &memory_type);
     if (result != BS_RESULT_OK) {
-        _bs_warnF("Failed to query memory type for image (%d, %d)\n", source_id, id);
+        _bs_warnF("Failed to query memory type for image (%d, %d)", source_id, id);
         return result;
     }
 
@@ -433,15 +433,15 @@ BSAPI bs_Result _bs_savePng(char* data, bs_ivec2 dim, bs_PngType type, char* pat
     case BS_PNG_GREY_ALPHA: error = lodepng_encode_file(path, data, dim.x, dim.y, LCT_GREY_ALPHA, 8); break;
     case BS_PNG_RGBA: error = lodepng_encode_file(path, data, dim.x, dim.y, LCT_RGBA, 8); break;
     default:
-        _bs_warnF("Unsupported bs_PngType %d for png \"%s\"\n", type, path);
+        _bs_warnF("Unsupported bs_PngType %d for png \"%s\"", type, path);
     };
 
     if (error != 0) {
-        _bs_warnF("Failed to save png \"%s\", lodepng error:\n%s\n", path, lodepng_error_text(error));
+        _bs_warnF("Failed to save png \"%s\", lodepng error:\n%s", path, lodepng_error_text(error));
         return BS_RESULT_FAILED_TO_WRITE;
     }
 
-    _bs_infoF("Saved a PNG of size %d x %d to %s\n", dim.x, dim.y, path);
+    _bs_infoF("Saved a PNG of size %d x %d to %s", dim.x, dim.y, path);
 
     return BS_RESULT_OK;
 }
@@ -455,13 +455,13 @@ BSAPI bs_Result _bs_inspectPng(bs_PngData* out_png_data, char* path, int path_le
 
     error = lodepng_load_file(&data, out_png_data->size, path);
     if (error) {
-        _bs_warnF("Failed to read png file \"%s\", lodepng error:\n%s\n", path, lodepng_error_text(error));
+        _bs_warnF("Failed to read png file \"%s\", lodepng error:\n%s", path, lodepng_error_text(error));
         return BS_RESULT_FAILED_TO_READ;
     }
 
     error = lodepng_inspect(out_png_data->width, out_png_data->height, &state, data, out_png_data->size);
     if (error) {
-        _bs_warnF("Failed to inspect png \"%s\", lodepng error:\n%s\n", path, lodepng_error_text(error));
+        _bs_warnF("Failed to inspect png \"%s\", lodepng error:\n%s", path, lodepng_error_text(error));
         free(data);
         return BS_RESULT_FAILED_TO_INSPECT;
     }
@@ -483,12 +483,12 @@ BSAPI bs_Result _bs_loadPngData(char* data, size_t size, int channels_count, bs_
     case 3: error = lodepng_decode24(&out->data, &out->width, &out->height, data, size); break;
     case 4: error = lodepng_decode32(&out->data, &out->width, &out->height, data, size); break;
     default: 
-        _bs_warnF("Failed to load png data, unsupported channels_count %d\n", channels_count);
+        _bs_warnF("Failed to load png data, unsupported channels_count %d", channels_count);
         return BS_RESULT_INVALID_PARAM;
     }
 
     if (error) {
-        _bs_warnF("Failed to load png data, lodepng error:\n%s\n", lodepng_error_text(error));
+        _bs_warnF("Failed to load png data, lodepng error:\n%s", lodepng_error_text(error));
         free(data);
         return BS_RESULT_FAILED_TO_INSPECT;
     }
@@ -509,12 +509,12 @@ BSAPI bs_Result _bs_loadPng(const char* path, int channels_count, bs_PngData* ou
     case 3: error = lodepng_decode24_file(&out->data, &out->width, &out->height, path); break;
     case 4: error = lodepng_decode32_file(&out->data, &out->width, &out->height, path); break;
     default: 
-        _bs_warnF("Failed to load png file \"%s\", unsupported channels_count %d\n", path, channels_count);
+        _bs_warnF("Failed to load png file \"%s\", unsupported channels_count %d", path, channels_count);
         return BS_RESULT_INVALID_PARAM;
     }
 
     if (error) {
-        _bs_warnF("Failed to load png file \"%s\", lodepng error:\n%s\n", path, lodepng_error_text(error));
+        _bs_warnF("Failed to load png file \"%s\", lodepng error:\n%s", path, lodepng_error_text(error));
         return BS_RESULT_FAILED_TO_READ;
     }
 
@@ -1039,17 +1039,17 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
 
     bs_BatlHeader* header = data;
     if (header->magic != BS_BATL_MAGIC) {
-        _bs_warnF("Atlas resource \"%s\" is corrupted, invalid magic number\n", resource_name);
+        _bs_warnF("Atlas resource \"%s\" is corrupted, invalid magic number", resource_name);
         return BS_RESULT_CORRUPTED;
     }
 
     if (header->version != 1) {
-        _bs_warnF("Atlas resource \"%s\" has an unsupported version (%d)\n", resource_name, header->version);
+        _bs_warnF("Atlas resource \"%s\" has an unsupported version (%d)", resource_name, header->version);
         return BS_RESULT_NOT_SUPPORTED;
     }
 
     if (header->channels_count != 4) {
-        _bs_warnF("Atlas resource \"%s\" has an unsupported amount of channels (%d)\n", resource_name, header->channels_count);
+        _bs_warnF("Atlas resource \"%s\" has an unsupported amount of channels (%d)", resource_name, header->channels_count);
         return BS_RESULT_NOT_SUPPORTED;
     }
 
@@ -1081,7 +1081,7 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
         atlas->mapped = _bs_malloc(atlas->count * sizeof(*atlas->mapped));
         result = _bs_mapBuffer(atlas->buffer, atlas->count * sizeof(*atlas->mapped));
         if (result != BS_RESULT_OK) {
-            _bs_warnF("Failed to map buffer for atlas \"%s\"\n", resource_name);
+            _bs_warnF("Failed to map buffer for atlas \"%s\"", resource_name);
             return result;
         }
     }

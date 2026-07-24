@@ -105,24 +105,24 @@ BSMODAPI bs_Result _bsmod_iniPackage(const char* package_name) {
 
 	int chunks_count = 0;
 
-	for (int i = 0; i < (bpak->len - 1);) {
+	for (int i = sizeof(bs_PackageHeader); i < (bpak->len - 1);) {
 		bs_ResourceHeader* header = bpak->value + i;
 		i += sizeof(header->header);
 		if (i >= bpak->len) {
-			bs_warnF("Package \"%s\" has corrupted data\n", package_name); // TODO: bsmod warn
+			bs_criticalF("Package \"%s\" has corrupted data", package_name); // TODO: bsmod warn
 			return BS_RESULT_CORRUPTED;
 		}
 
 		char* name = bpak->value + i;
 		i += header->header.name_length + 1;
 		if (i >= bpak->len) {
-			bs_warnF("Package \"%s\" has corrupted data\n", package_name); // TODO: bsmod warn
+			bs_criticalF("Package \"%s\" has corrupted data", package_name); // TODO: bsmod warn
 			return BS_RESULT_CORRUPTED;
 		}
 
 		char* end = strchr(name, '\n');
 		if (!end) {
-			bs_warnF("Package \"%s\" has corrupted data\n", package_name); // TODO: bsmod warn
+			bs_criticalF("Package \"%s\" has corrupted data", package_name); // TODO: bsmod warn
 			return BS_RESULT_CORRUPTED;
 		}
 		end[0] = '\0';
@@ -180,7 +180,7 @@ BSMODAPI bs_Result _bsmod_packResource(bs_ResourceType type, unsigned char* data
 	bsmod_Package* package = _bsmod_ensurePackage(package_name);
 
 	bsmod_Resource* resource = _bsmod_ensureResource(package, resource_name);
-	resource->type = type;
+	resource->header.type = type;
 
 	bsmod_Chunk* chunk = bs_fetchUnit(&package->chunks, resource->header.chunk);
 	
@@ -390,8 +390,8 @@ end:
 }
 
 static int _bsmod_compareResource(const bsmod_Resource* a, const bsmod_Resource* b) {
-	if (a->type < b->type) return -1;
-	else if (a->type > b->type) return 1;
+	if (a->header.type < b->header.type) return -1;
+	else if (a->header.type > b->header.type) return 1;
 	return 0;
 }
 
@@ -451,8 +451,8 @@ BSMODAPI bs_Result _bsmod_savePackage(const char* name) {
 	for (int i = 0; i < package->resources.count; i++) {
 		bsmod_Resource* resource = bs_fetchUnit(&package->resources, i);
 
-		if (last_type != resource->type) {
-			last_type = resource->type;
+		if (last_type != resource->header.type) {
+			last_type = resource->header.type;
 			header.resource_type_offsets[last_type].offset = i;
 		}
 
@@ -489,7 +489,7 @@ BSMODAPI bs_Result _bsmod_savePackage(const char* name) {
 	for (int i = 0; i < package->resources.count; i++) {
 		bsmod_Resource* resource = bs_fetchUnit(&package->resources, i);
 		if (resource->has_changes) {
-			result = _bsmod_loadResource(resource->type, package_id, resource->name);
+			result = _bsmod_loadResource(resource->header.type, package_id, resource->name);
 			resource->has_changes = false;
 		}
 	}

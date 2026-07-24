@@ -165,7 +165,11 @@ typedef struct bs_Context bs_Context;
 typedef struct bs_Args bs_Args;
 typedef struct bs_Features bs_Features;
 typedef struct bs_Props bs_Props;
+typedef struct bs_Callbacks bs_Callbacks;
+typedef struct bs_LogQueueItem bs_LogQueueItem;
 
+typedef enum bs_Library bs_Library;
+typedef enum bs_MessageLevel bs_MessageLevel;
 typedef enum bs_Result bs_Result;
 typedef enum bs_IniFlag bs_IniFlag;
 typedef enum bs_ImageFilter bs_ImageFilter;
@@ -454,6 +458,12 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_QUAT_IDENTITY                                             \
     (bs_vec4) { 0.0, 0.0, 0.0, 1.0 }
 
+#define BS_LOG_QUEUE_SIZE                                            \
+    10
+
+#define BS_MAX_LOG_SIZE                                              \
+    1024
+
 #define BS_I8_MIN                                                    \
     (bs_I8)(-127 - 1)
 
@@ -731,41 +741,41 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_SWAPS_COUNT(flags)                                        \
     ((flags & BS_OBJECT_HAS_SWAPS_BIT) ? bs_context()->frames_in_flight : 1)
 
-#define BS_OBJECT(type, source_id, id, swaps_count, flags)           \
-        bs_object(source_id, id, sizeof(type), BS_SWAP_SIZE(type), swaps_count, flags)
+#define BS_OBJECT(type, source_id, id, swaps_count, flags, object_type) \
+        bs_object(source_id, id, sizeof(type), BS_SWAP_SIZE(type), swaps_count, flags, object_type)
 
 #define BS_CONTEXT(source_id, id, flags)                             \
-    BS_OBJECT(bs_Context, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Context, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_CONTEXT)
 
 #define BS_IMAGE(source_id, id, flags)                               \
-    BS_OBJECT(bs_Image, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Image, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_IMAGE)
 
 #define BS_SAMPLER(source_id, id, flags)                             \
-    BS_OBJECT(bs_Sampler, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Sampler, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_SAMPLER)
 
 #define BS_RENDERER(source_id, id, flags)                            \
-    BS_OBJECT(bs_Renderer, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Renderer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_RENDERER)
 
 #define BS_BATCH(source_id, id, flags)                               \
-    BS_OBJECT(bs_Batch, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Batch, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_BATCH)
 
 #define BS_QUEUE(source_id, id, flags)                               \
-    BS_OBJECT(bs_Queue, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Queue, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_QUEUE)
 
 #define BS_BUFFER(source_id, id, flags)                              \
-    BS_OBJECT(bs_Buffer, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Buffer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_BUFFER)
 
 #define BS_PIPELINE(source_id, id, flags)                            \
-    BS_OBJECT(bs_Pipeline, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Pipeline, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_PIPELINE)
 
 #define BS_RAY_TRACER(source_id, id, flags)                          \
-    BS_OBJECT(bs_RayTracer, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_RayTracer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_RAY_TRACER)
 
 #define BS_ATLAS(source_id, id, flags)                               \
-    BS_OBJECT(bs_Atlas, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Atlas, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_ATLAS)
 
 #define BS_FONT(source_id, id, flags)                                \
-    BS_OBJECT(bs_Font, source_id, id, BS_SWAPS_COUNT(flags), flags)
+    BS_OBJECT(bs_Font, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_FONT)
 
 #define BS_NUM_STRIKES_RULE                                          \
     (1)
@@ -1315,6 +1325,7 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 
 typedef int (__cdecl* bs_ThreadFunction)(void*);
 typedef void (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
+typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -1349,6 +1360,23 @@ typedef bs_U32 bs_AnimationFlags;
 typedef bs_U32 bs_SaveJsonBits;
 typedef void (*bs_Callback)();
 typedef BS_VERTEX_DECLARATION_STRUCTURE() bs_VertexDeclaration;
+enum bs_Library {
+    BS_LIBRARY_UNDEFINED,
+    BS_LIBRARY_BASILISK,
+    BS_LIBRARY_YYJSON,
+    BS_LIBRARY_LODEPNG,
+    BS_LIBRARY_VULKAN,
+    BS_LIBRARY_WIN32,
+    BS_LIBRARIES_COUNT,
+};
+
+enum bs_MessageLevel {
+    BS_MESSAGE_INFO,
+    BS_MESSAGE_WARNING,
+    BS_MESSAGE_VALIDATION_ERROR,
+    BS_MESSAGE_LEVELS_COUNT,
+};
+
 enum bs_Result {
     BS_RESULT_OK,
     BS_RESULT_WAITING,
@@ -2305,6 +2333,7 @@ struct bs_Range {
 struct bs_Header {
     int id;
     int source_id;
+    bs_ObjectType type;
 };
 
 struct bs_Object {
@@ -3178,10 +3207,10 @@ struct bs_Instance {
     bool descriptor_pool_needs_update;
     bool alive;
     bs_vec2 screen_cursor;
-    //struct {
-    //    int* bindings;
-    //    int bind_set;
-    //}* descriptor_lookup;
+    struct {
+        int* bindings;
+        int bind_set;
+    }* descriptor_lookup;
     struct {
         bs_SurfaceType surface_type;
     } extensions;
@@ -3291,6 +3320,22 @@ struct bs_Props {
     bs_U32 min_acceleration_structure_scratch_offset_alignment;
 };
 
+struct bs_Callbacks {
+    bs_MessageCallbackFunction log;
+};
+
+struct bs_LogQueueItem {
+    bs_MessageCallbackFunction log;
+    bs_Library library;
+    bs_MessageLevel level;
+    bs_Result result;
+    int code;
+    const char* function;
+    const char* file;
+    int line;
+    char message[BS_MAX_LOG_SIZE];
+};
+
  /**
   @return void
   */
@@ -3302,6 +3347,42 @@ bs_enableValidation();
   */
 BSAPI void
 bs_disableValidation();
+
+ /**
+  @return bs_Callbacks*
+  */
+BSAPI bs_Callbacks*
+bs_callbacks();
+
+ /**
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bs_writeLogFile(
+    char* value,
+    int value_length);
+
+ /**
+  @param format
+  @param args
+  @return void
+  */
+BSAPI void
+bs_writeLogFileV(
+    char* format,
+    va_list args);
+
+ /**
+  @param format
+  @param ...
+  @return void
+  */
+BSAPI void
+bs_writeLogFileF(
+    char* format,
+     ...);
 
  /**
   @param a
@@ -4392,6 +4473,14 @@ bs_hsvToRgb(
 BSAPI bs_vec3
 bs_rgbToHsv(
     const bs_vec3* rgb);
+
+ /**
+  @param code
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_convertYyjsonResult(
+    int code);
 
  /**
   @param code
@@ -6894,44 +6983,38 @@ BSAPI void
 bs_logEndOfSection();
 
  /**
-  @param type
-  @param type_len
+  @param level
   @param value
   @param value_length
   @return void
   */
 BSAPI void
 bs_logWithTimestamp(
-    const char* type,
-    int type_len,
+    bs_MessageLevel level,
     char* value,
     int value_length);
 
  /**
-  @param type
-  @param type_len
+  @param level
   @param format
   @param args
   @return void
   */
 BSAPI void
 bs_logWithTimestampV(
-    const char* type,
-    int type_len,
+    bs_MessageLevel level,
     char* format,
     va_list args);
 
  /**
-  @param type
-  @param type_len
+  @param level
   @param format
   @param ...
   @return void
   */
 BSAPI void
 bs_logWithTimestampF(
-    const char* type,
-    int type_len,
+    bs_MessageLevel level,
     char* format,
      ...);
 
@@ -8306,6 +8389,7 @@ bs_idName(
   @param flexible_size
   @param flexible_count
   @param flags
+  @param object_type
   @return bs_Object*
   */
 BSAPI bs_Object*
@@ -8315,7 +8399,8 @@ bs_object(
     size_t size,
     size_t flexible_size,
     int flexible_count,
-    bs_U32 flags);
+    bs_U32 flags,
+    bs_ObjectType object_type);
 
  /**
   @return bs_List*
@@ -9522,5 +9607,6 @@ BSAPI extern bs_Scope _bs_scope_;
 BSAPI extern bs_Context* _bs_context_;
 BSAPI extern int _bs_image_index_;
 BSAPI extern bs_List _bs_physical_devices_;
+BSAPI extern bs_Callbacks _bs_callbacks_;
 
 #endif

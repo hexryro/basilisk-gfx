@@ -159,7 +159,6 @@
 			<field><type>bs_ResourceHeaderData</type><name>header</name></field>
 			<field><type>char*</type><name>name</name></field>
 			<field><type>bool</type><name>has_changes</name></field>
-			<field><type>bs_ResourceType</type><name>type</name></field>
 		</structure>
 
 		<structure name="bsmod_DraggingParams">

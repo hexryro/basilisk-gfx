@@ -76,6 +76,35 @@ void bs_disableValidation()
     _bs_setFunctions(definitions, NULL);
 }
 
+bs_Callbacks* bs_callbacks()
+{
+    return next.bs_callbacks();
+}
+
+void bs_writeLogFile(
+    char* value, 
+    int value_length)
+{
+    next.bs_writeLogFile(value, value_length);
+}
+
+void bs_writeLogFileV(
+    char* format, 
+    va_list args)
+{
+    next.bs_writeLogFileV(format, args);
+}
+
+void bs_writeLogFileF(
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    next.bs_writeLogFileV(format, args);
+    va_end(args);
+}
+
 void bs_v2Add(
     const bs_vec2* a, 
     const bs_vec2* b, 
@@ -819,6 +848,12 @@ bs_vec3 bs_rgbToHsv(
     const bs_vec3* rgb)
 {
     return next.bs_rgbToHsv(rgb);
+}
+
+bs_Result bs_convertYyjsonResult(
+    int code)
+{
+    return next.bs_convertYyjsonResult(code);
 }
 
 bs_Result bs_convertVulkanResult(
@@ -2573,32 +2608,29 @@ void bs_logEndOfSection()
 }
 
 void bs_logWithTimestamp(
-    const char* type, 
-    int type_len, 
+    bs_MessageLevel level, 
     char* value, 
     int value_length)
 {
-    next.bs_logWithTimestamp(type, type_len, value, value_length);
+    next.bs_logWithTimestamp(level, value, value_length);
 }
 
 void bs_logWithTimestampV(
-    const char* type, 
-    int type_len, 
+    bs_MessageLevel level, 
     char* format, 
     va_list args)
 {
-    next.bs_logWithTimestampV(type, type_len, format, args);
+    next.bs_logWithTimestampV(level, format, args);
 }
 
 void bs_logWithTimestampF(
-    const char* type, 
-    int type_len, 
+    bs_MessageLevel level, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    next.bs_logWithTimestampV(type, type_len, format, args);
+    next.bs_logWithTimestampV(level, format, args);
     va_end(args);
 }
 
@@ -3618,9 +3650,10 @@ bs_Object* bs_object(
     size_t size, 
     size_t flexible_size, 
     int flexible_count, 
-    bs_U32 flags)
+    bs_U32 flags, 
+    bs_ObjectType object_type)
 {
-    return next.bs_object(source_id, id, size, flexible_size, flexible_count, flags);
+    return next.bs_object(source_id, id, size, flexible_size, flexible_count, flags, object_type);
 }
 
 bs_List* bs_packages()

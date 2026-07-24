@@ -34,6 +34,26 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+void _bs_writeLogFileV(
+    char* format, 
+    va_list args)
+{
+    int _length = bs_formatStringLength(format, args);
+    char* _formatted = bs_alloca(_length + 1);
+    vsnprintf(_formatted, _length + 1, format, args);
+    _bs_writeLogFile(_formatted, _length);
+}
+
+void _bs_writeLogFileF(
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    _bs_writeLogFileV(format, args);
+    va_end(args);
+}
+
 void _bs_beginCommentV(
     char* format, 
     va_list args)
@@ -343,26 +363,24 @@ void _bs_logSectionF(
 }
 
 void _bs_logWithTimestampV(
-    const char* type, 
-    int type_len, 
+    bs_MessageLevel level, 
     char* format, 
     va_list args)
 {
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    _bs_logWithTimestamp(type, type_len, _formatted, _length);
+    _bs_logWithTimestamp(level, _formatted, _length);
 }
 
 void _bs_logWithTimestampF(
-    const char* type, 
-    int type_len, 
+    bs_MessageLevel level, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    _bs_logWithTimestampV(type, type_len, format, args);
+    _bs_logWithTimestampV(level, format, args);
     va_end(args);
 }
 

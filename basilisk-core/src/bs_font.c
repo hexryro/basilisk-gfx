@@ -378,9 +378,9 @@ BSAPI void _bs_readKernTable(bs_TTF* ttf) {
         case 1:
         case 2:
         case 3:
-            _bs_warnF("KERN format %d is not supported\n", format);
+            _bs_warnF("KERN format %d is not supported", format);
         default:
-            _bs_warnF("KERN format %d is not between 0..4\n", format);
+            _bs_warnF("KERN format %d is not between 0..4", format);
         }
     }
 }
@@ -547,7 +547,7 @@ static bs_Result _bs_cmapFormat4(bs_TTF* ttf, bs_Glyph* glyph, char* subtable) {
     }
 
     if (index == -1) {
-        _bs_warnF("Couldn't find format4 glyph index for glyph %d in font \"%s\"\n", glyph->code, ttf->name);
+        _bs_warnF("Couldn't find format4 glyph index for glyph %d in font \"%s\"", glyph->code, ttf->name);
         return BS_RESULT_FAILED_TO_QUERY;
     }
 
@@ -596,7 +596,7 @@ static bool _bs_readCmapTable(bs_TTF* ttf, bs_Glyph* glyph) {
     }
 
     if (subtable_offset == -1) {
-        _bs_warnF("Font \"%s\" has an unsupported encoding type, only Unicode is supported\n", ttf->name);
+        _bs_warnF("Font \"%s\" has an unsupported encoding type, only Unicode is supported", ttf->name);
         return false;
     }
 
@@ -606,7 +606,7 @@ static bool _bs_readCmapTable(bs_TTF* ttf, bs_Glyph* glyph) {
     switch (format) {
     case 4: _bs_cmapFormat4(ttf, glyph, subtable); break;
     default: 
-        _bs_warnF("TTF format %d has not been implemented yet\n", format);
+        _bs_warnF("TTF format %d has not been implemented yet", format);
         return false;
     }
 
@@ -872,12 +872,12 @@ BSAPI bs_Result _bs_loadFont(bs_Object* object, int package_id, const char* reso
 
     bs_BfntHeader* header = resource->data->value;
     if (header->magic != 0x746E6662) {
-        _bs_warnF("Font \"%s\" is corrupted\n", resource_name);
+        _bs_warnF("Font \"%s\" is corrupted", resource_name);
         return BS_RESULT_CORRUPTED;
     }
 
     if (header->version != 1) {
-        _bs_warnF("Font version %d is not supported\n", header->version);
+        _bs_warnF("Font version %d is not supported", header->version);
         return BS_RESULT_NOT_SUPPORTED;
     }
 

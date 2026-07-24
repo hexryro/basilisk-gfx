@@ -38,6 +38,10 @@
 #include <vulkan.h>
 #include <stdarg.h>
 
+typedef bs_Callbacks*(__stdcall* PFN_bs_callbacks)();
+typedef void(__stdcall* PFN_bs_writeLogFile)(char* value, int value_length);
+typedef void(__stdcall* PFN_bs_writeLogFileV)(char* format, va_list args);
+typedef void(__stdcall* PFN_bs_writeLogFileF)(char* format, ...);
 typedef void(__stdcall* PFN_bs_v2Mid)(const bs_vec2* a, const bs_vec2* b, bs_vec2* out);
 typedef void(__stdcall* PFN_bs_v3Mid)(const bs_vec3* a, const bs_vec3* b, bs_vec3* out);
 typedef bs_mat4x3(__stdcall* PFN_bs_m4x3)(const bs_mat4* m);
@@ -52,6 +56,7 @@ typedef void(__stdcall* PFN_bs_fitAabb)(const bs_Aabb* aabb, const bs_vec2* size
 typedef void(__stdcall* PFN_bs_quad)(const bs_vec3* position, const bs_vec2* dimensions, bs_Quad* out);
 typedef bs_vec3(__stdcall* PFN_bs_hsvToRgb)(const bs_vec3* hsv);
 typedef bs_vec3(__stdcall* PFN_bs_rgbToHsv)(const bs_vec3* rgb);
+typedef bs_Result(__stdcall* PFN_bs_convertYyjsonResult)(int code);
 typedef bs_Result(__stdcall* PFN_bs_convertVulkanResult)(int code);
 typedef bs_Result(__stdcall* PFN_bs_convertWin32Error)(int code);
 typedef const char*(__stdcall* PFN_bs_serializeWin32Error)(int code);
@@ -279,9 +284,9 @@ typedef void(__stdcall* PFN_bs_logSection)(char* value, int value_length);
 typedef void(__stdcall* PFN_bs_logSectionV)(char* format, va_list args);
 typedef void(__stdcall* PFN_bs_logSectionF)(char* format, ...);
 typedef void(__stdcall* PFN_bs_logEndOfSection)();
-typedef void(__stdcall* PFN_bs_logWithTimestamp)(const char* type, int type_len, char* value, int value_length);
-typedef void(__stdcall* PFN_bs_logWithTimestampV)(const char* type, int type_len, char* format, va_list args);
-typedef void(__stdcall* PFN_bs_logWithTimestampF)(const char* type, int type_len, char* format, ...);
+typedef void(__stdcall* PFN_bs_logWithTimestamp)(bs_MessageLevel level, char* value, int value_length);
+typedef void(__stdcall* PFN_bs_logWithTimestampV)(bs_MessageLevel level, char* format, va_list args);
+typedef void(__stdcall* PFN_bs_logWithTimestampF)(bs_MessageLevel level, char* format, ...);
 typedef void(__stdcall* PFN_bs_log)(char* message, int message_length);
 typedef void(__stdcall* PFN_bs_logV)(char* format, va_list args);
 typedef void(__stdcall* PFN_bs_logF)(char* format, ...);
@@ -417,7 +422,7 @@ typedef bs_Mesh*(__stdcall* PFN_bs_queryMesh)(bs_Model* model, const char * name
 typedef bs_Mesh*(__stdcall* PFN_bs_queryMeshHash)(bs_Model* model, bs_U64 hash);
 typedef bs_Material*(__stdcall* PFN_bs_queryMaterial)(bs_Model* model, const char* name);
 typedef const char*(__stdcall* PFN_bs_idName)(bs_U32 source_id, bs_U32 id);
-typedef bs_Object*(__stdcall* PFN_bs_object)(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags);
+typedef bs_Object*(__stdcall* PFN_bs_object)(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type);
 typedef bs_List*(__stdcall* PFN_bs_packages)();
 typedef bs_List*(__stdcall* PFN_bs_objectSources)();
 typedef void(__stdcall* PFN_bs_destroyResource)(bs_Resource* resource);
@@ -534,6 +539,10 @@ typedef bs_Result(__stdcall* PFN_bs_deleteDirectoryV)(char* format, va_list args
 typedef bs_Result(__stdcall* PFN_bs_deleteDirectoryF)(char* format, ...);
 
 typedef struct {
+    PFN_bs_callbacks bs_callbacks;
+    PFN_bs_writeLogFile bs_writeLogFile;
+    PFN_bs_writeLogFileV bs_writeLogFileV;
+    PFN_bs_writeLogFileF bs_writeLogFileF;
     PFN_bs_v2Mid bs_v2Mid;
     PFN_bs_v3Mid bs_v3Mid;
     PFN_bs_m4x3 bs_m4x3;
@@ -548,6 +557,7 @@ typedef struct {
     PFN_bs_quad bs_quad;
     PFN_bs_hsvToRgb bs_hsvToRgb;
     PFN_bs_rgbToHsv bs_rgbToHsv;
+    PFN_bs_convertYyjsonResult bs_convertYyjsonResult;
     PFN_bs_convertVulkanResult bs_convertVulkanResult;
     PFN_bs_convertWin32Error bs_convertWin32Error;
     PFN_bs_serializeWin32Error bs_serializeWin32Error;
@@ -1030,6 +1040,10 @@ typedef struct {
     PFN_bs_deleteDirectoryF bs_deleteDirectoryF;
 } bs_FunctionTable;
 
+BSAPI bs_Callbacks* _bs_callbacks();
+BSAPI void _bs_writeLogFile(char* value, int value_length);
+BSAPI void _bs_writeLogFileV(char* format, va_list args);
+BSAPI void _bs_writeLogFileF(char* format,  ...);
 BSAPI void _bs_v2Mid(const bs_vec2* a, const bs_vec2* b, bs_vec2* out);
 BSAPI void _bs_v3Mid(const bs_vec3* a, const bs_vec3* b, bs_vec3* out);
 BSAPI bs_mat4x3 _bs_m4x3(const bs_mat4* m);
@@ -1044,6 +1058,7 @@ BSAPI void _bs_fitAabb(const bs_Aabb* aabb, const bs_vec2* size, const bs_vec4* 
 BSAPI void _bs_quad(const bs_vec3* position, const bs_vec2* dimensions, bs_Quad* out);
 BSAPI bs_vec3 _bs_hsvToRgb(const bs_vec3* hsv);
 BSAPI bs_vec3 _bs_rgbToHsv(const bs_vec3* rgb);
+BSAPI bs_Result _bs_convertYyjsonResult(int code);
 BSAPI bs_Result _bs_convertVulkanResult(int code);
 BSAPI bs_Result _bs_convertWin32Error(int code);
 BSAPI const char* _bs_serializeWin32Error(int code);
@@ -1271,9 +1286,9 @@ BSAPI void _bs_logSection(char* value, int value_length);
 BSAPI void _bs_logSectionV(char* format, va_list args);
 BSAPI void _bs_logSectionF(char* format,  ...);
 BSAPI void _bs_logEndOfSection();
-BSAPI void _bs_logWithTimestamp(const char* type, int type_len, char* value, int value_length);
-BSAPI void _bs_logWithTimestampV(const char* type, int type_len, char* format, va_list args);
-BSAPI void _bs_logWithTimestampF(const char* type, int type_len, char* format,  ...);
+BSAPI void _bs_logWithTimestamp(bs_MessageLevel level, char* value, int value_length);
+BSAPI void _bs_logWithTimestampV(bs_MessageLevel level, char* format, va_list args);
+BSAPI void _bs_logWithTimestampF(bs_MessageLevel level, char* format,  ...);
 BSAPI void _bs_log(char* message, int message_length);
 BSAPI void _bs_logV(char* format, va_list args);
 BSAPI void _bs_logF(char* format,  ...);
@@ -1409,7 +1424,7 @@ BSAPI bs_Mesh* _bs_queryMesh(bs_Model* model, const char * name);
 BSAPI bs_Mesh* _bs_queryMeshHash(bs_Model* model, bs_U64 hash);
 BSAPI bs_Material* _bs_queryMaterial(bs_Model* model, const char* name);
 BSAPI const char* _bs_idName(bs_U32 source_id, bs_U32 id);
-BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags);
+BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type);
 BSAPI bs_List* _bs_packages();
 BSAPI bs_List* _bs_objectSources();
 BSAPI void _bs_destroyResource(bs_Resource* resource);
@@ -1528,6 +1543,10 @@ BSAPI bs_Result _bs_deleteDirectoryF(char* format,  ...);
 static inline bs_FunctionTable* _bs_getFunctions() {
     static bs_FunctionTable functions;
 
+    functions.bs_callbacks = _bs_callbacks;
+    functions.bs_writeLogFile = _bs_writeLogFile;
+    functions.bs_writeLogFileV = _bs_writeLogFileV;
+    functions.bs_writeLogFileF = _bs_writeLogFileF;
     functions.bs_v2Mid = _bs_v2Mid;
     functions.bs_v3Mid = _bs_v3Mid;
     functions.bs_m4x3 = _bs_m4x3;
@@ -1542,6 +1561,7 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_quad = _bs_quad;
     functions.bs_hsvToRgb = _bs_hsvToRgb;
     functions.bs_rgbToHsv = _bs_rgbToHsv;
+    functions.bs_convertYyjsonResult = _bs_convertYyjsonResult;
     functions.bs_convertVulkanResult = _bs_convertVulkanResult;
     functions.bs_convertWin32Error = _bs_convertWin32Error;
     functions.bs_serializeWin32Error = _bs_serializeWin32Error;

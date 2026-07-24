@@ -45,6 +45,8 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
         (LPCSTR)(&_val_bs_getFunctions),
         &module);
 
+    functions.bs_callbacks = (PFN_bs_callbacks)GetProcAddress(module, "_val_bs_callbacks");
+    functions.bs_writeLogFile = (PFN_bs_writeLogFile)GetProcAddress(module, "_val_bs_writeLogFile");
     functions.bs_v2Mid = (PFN_bs_v2Mid)GetProcAddress(module, "_val_bs_v2Mid");
     functions.bs_v3Mid = (PFN_bs_v3Mid)GetProcAddress(module, "_val_bs_v3Mid");
     functions.bs_m4x3 = (PFN_bs_m4x3)GetProcAddress(module, "_val_bs_m4x3");
@@ -59,6 +61,7 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_quad = (PFN_bs_quad)GetProcAddress(module, "_val_bs_quad");
     functions.bs_hsvToRgb = (PFN_bs_hsvToRgb)GetProcAddress(module, "_val_bs_hsvToRgb");
     functions.bs_rgbToHsv = (PFN_bs_rgbToHsv)GetProcAddress(module, "_val_bs_rgbToHsv");
+    functions.bs_convertYyjsonResult = (PFN_bs_convertYyjsonResult)GetProcAddress(module, "_val_bs_convertYyjsonResult");
     functions.bs_convertVulkanResult = (PFN_bs_convertVulkanResult)GetProcAddress(module, "_val_bs_convertVulkanResult");
     functions.bs_convertWin32Error = (PFN_bs_convertWin32Error)GetProcAddress(module, "_val_bs_convertWin32Error");
     functions.bs_serializeWin32Error = (PFN_bs_serializeWin32Error)GetProcAddress(module, "_val_bs_serializeWin32Error");

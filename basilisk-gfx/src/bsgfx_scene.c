@@ -271,7 +271,7 @@ static void _bsgfx_loadResources() {
     bs_batch(mesh_instance_batch, sizeof(bs_U32), $vs_bsgfx_mesh_instanced(), 0);
     bs_batch(bone_instance_batch, sizeof(bs_U32), $vs_bsgfx_bone_instanced(), BS_BATCH_RAY_TRACEABLE);
 
-    if (mesh_instance_batch && bs_canPushBatch(mesh_instance_batch)) {
+    if (mesh_instance_batch && bs_canPushBatch(mesh_instance_batch->batch)) {
         _bsgfx_instanceType(BSGFX_INSTANCE_TYPE_MESH, BSGFX_MESH_INSTANCE_COUNT, BSGFX_SET_MESH_INSTANCES, BSGFX_BINDING_MESH_INSTANCES);
         _bsgfx_instanceType(BSGFX_INSTANCE_TYPE_MESH_STATIC, BSGFX_MESH_STATIC_INSTANCE_COUNT, BSGFX_SET_MESH_STATIC_INSTANCES, BSGFX_BINDING_MESH_STATIC_INSTANCES);
     }

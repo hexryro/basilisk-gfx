@@ -170,7 +170,7 @@ BSAPI void* _bs_malloc(bs_U64 size) {
     void* p = malloc(size);
 
     if (!p) {
-        _bs_criticalF("malloc(%lld) returned NULL\n", size);
+        _bs_criticalF("malloc(%lld) returned NULL", size);
         return NULL;
     }
 
@@ -192,7 +192,7 @@ BSAPI void* _bs_calloc(bs_U64 num_units, bs_U64 unit_size) {
     void* p = calloc(num_units, unit_size);
 
     if (!p) {
-        _bs_criticalF("calloc(%lld, %lld) returned NULL\n", num_units, unit_size);
+        _bs_criticalF("calloc(%lld, %lld) returned NULL", num_units, unit_size);
         return NULL;
     }
 
@@ -212,7 +212,7 @@ BSAPI void* _bs_realloc(void* p, bs_U64 size) {
     p = realloc(p, size);
 
     if (!p) {
-        _bs_warnF("realloc(%lld) returned NULL\n", size);
+        _bs_warnF("realloc(%lld) returned NULL", size);
         return NULL;
     }
 
@@ -728,8 +728,8 @@ BSAPI int _bs_numDirectories(char* directory, int directory_length) {
 }
 
 #else
-BSAPI bs_Result _bs_foreachFile(bs_ForeachDocumentFunction x, const char* directory) { _bs_warnF("_bs_foreachFile not implemented on this platform\n"); return BS_RESULT_NOT_IMPLEMENTED; }
-BSAPI bs_Result _bs_foreachDirectory(bs_ForeachDocumentFunction x, const char* directory) { _bs_warnF("_bs_foreachDirectory not implemented on this platform\n"); return BS_RESULT_NOT_IMPLEMENTED; }
+BSAPI bs_Result _bs_foreachFile(bs_ForeachDocumentFunction x, const char* directory) { _bs_warnF("_bs_foreachFile not implemented on this platform"); return BS_RESULT_NOT_IMPLEMENTED; }
+BSAPI bs_Result _bs_foreachDirectory(bs_ForeachDocumentFunction x, const char* directory) { _bs_warnF("_bs_foreachDirectory not implemented on this platform"); return BS_RESULT_NOT_IMPLEMENTED; }
 #endif
 
    /**
@@ -747,7 +747,7 @@ BSAPI char* _bs_fileName(const char* path) {
 BSAPI char* _bs_fileExtension(const char* path) {
     char* dot = strrchr(path, '.');
     if (!dot || dot == path || dot[1] == '/' || dot[1] == '\\') {
-        _bs_warnF("%s: Path \"%s\" does not have a file extension\n", __func__, path);
+        _bs_warnF("%s: Path \"%s\" does not have a file extension", __func__, path);
         return NULL;
     }
     return dot + 1;
@@ -1000,7 +1000,7 @@ BSAPI bs_Result _bs_loadFileChunk(long offset, size_t size, bs_String** out, cha
     buffer->len = bytes_read;
 
     if (bytes_read != size) {
-        _bs_warnF("Read %lld/%lld bytes from \"%s\" at offset %lld\n", bytes_read, size, path, offset);
+        _bs_warnF("Read %lld/%lld bytes from \"%s\" at offset %lld", bytes_read, size, path, offset);
         return BS_RESULT_FAILED_TO_READ;
     }
 
@@ -1027,7 +1027,7 @@ BSAPI bs_Result _bs_deleteFile(char* path, int path_length) {
     }
 #endif
 
-    _bs_infoF("Deleted file %s\n", path);
+    _bs_infoF("Deleted file %s", path);
     return BS_RESULT_OK;
 }
 
@@ -1088,7 +1088,7 @@ static inline bs_Result _bs_writeFile(const char* mode, char* data, bs_U32 data_
         fwrite(data, data_len, 1, file);
     fclose(file);
 
-    _bs_infoF("Saved %d bytes to %s\n", data_len, path);
+    _bs_infoF("Saved %d bytes to %s", data_len, path);
     return BS_RESULT_OK;
 }
 
@@ -1140,12 +1140,12 @@ BSAPI bs_GUID _bs_stringToGuid(const char* string) {
 
     HRESULT hr = CLSIDFromString(formatted, &guid);
     if (FAILED(hr)) {
-        _bs_warnF("CLSIDFromString failed for string \"%s\" (HRESULT %lx)\n", string, hr);
+        _bs_warnF("CLSIDFromString failed for string \"%s\" (HRESULT %lx)", string, hr);
         return (bs_GUID) { 0 };
     }
 #else
     if (uuid_parse(str, &guid) != 0) {
-        _bs_warnF("uuid_parse failed for string \"%s\"\n", string);
+        _bs_warnF("uuid_parse failed for string \"%s\"", string);
         return (bs_GUID) { 0 };
     }
 #endif
@@ -1159,7 +1159,7 @@ BSAPI bs_GUID _bs_guid() {
 #ifdef _WIN32
     HRESULT hr = CoCreateGuid(&guid);
     if (FAILED(hr)) {
-        _bs_warnF("CoCreateGuid failed (HRESULT %lx)\n", hr);
+        _bs_warnF("CoCreateGuid failed (HRESULT %lx)", hr);
         return (bs_GUID) { 0 };
     }
 #else
@@ -1215,7 +1215,7 @@ BSAPI bs_U64 _bs_toULong(const char* str) {
     bs_I64 v = strtol(str, &o, 10);
 
     if (v < 0) {
-        _bs_warnF("Expected unsigned value for \"%s\"\n", str);
+        _bs_warnF("Expected unsigned value for \"%s\"", str);
         return BS_U64_MAX;
     }
 
@@ -1312,14 +1312,14 @@ BSAPI void _bs_findExecutablePaths() {
 
     len -= len - i - 1;
     _bs_io_.executable->len = len;
-    _bs_infoF("Executable path = (\"%s\")\n", exe_path);
+    _bs_infoF("Executable path = (\"%s\")", exe_path);
 }
 
 BSAPI void _bs_findRelativePath() {
     char path[MAX_PATH]; // todo check if this can be more than max path
     int len = GetCurrentDirectory(MAX_PATH, path);
     if (len == 0) {
-        _bs_warnF("_bs_findRelativePath -> GetCurrentDirectory failed with error %lu\n", GetLastError());
+        _bs_warnF("_bs_findRelativePath -> GetCurrentDirectory failed with error %lu", GetLastError());
         return;
     }
 
@@ -1338,7 +1338,7 @@ BSAPI char* _bs_appdataPath() {
     HRESULT result = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &wpath);
 
     if (result != S_OK) {
-        _bs_warnF("_bs_appdataPath -> SHGetKnownFolderPath failed with HRESULT %lx\n", result);
+        _bs_warnF("_bs_appdataPath -> SHGetKnownFolderPath failed with HRESULT %lx", result);
         return NULL;
     }
 
@@ -1370,10 +1370,10 @@ BSAPI void _bs_copyToClipboard(char* s, int len) {
     SetClipboardData(CF_TEXT, mem);
     CloseClipboard();
 
-    _bs_infoF("Copied %s to the clipboard\n", s);
+    _bs_infoF("Copied %s to the clipboard", s);
 }
 #else
 BSAPI void _bs_copyToClipboard(char* s, int len) {
-    _bs_warnF("_bs_copyToClipboard has not been implemented for this OS yet\n");
+    _bs_warnF("_bs_copyToClipboard has not been implemented for this OS yet");
 }
 #endif

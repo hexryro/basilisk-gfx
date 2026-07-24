@@ -125,7 +125,7 @@ BSAPI bs_Result _bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out
     }
 
     if (!existing) {
-        _bs_warnF("Failed to query resource \"%s\" in package \"%s\"\n", resource_name, package->path);
+        _bs_warnF("Failed to query resource \"%s\" in package \"%s\"", resource_name, package->path);
         return BS_RESULT_FAILED_TO_QUERY;
     }
 
@@ -145,7 +145,7 @@ BSAPI bs_Result _bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out
     );
 
     if (result == BS_RESULT_OK) {
-        _bs_infoF("Loaded resource \"%s\"\n", resource_name);
+        _bs_infoF("Loaded resource \"%s\"", resource_name);
         *out = existing->resource;
     }
 
@@ -168,7 +168,7 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
     }
 
     if (package_header->resources_count <= 0) {
-        bs_warnF("%s at %s:%d: No resources in package \"%s\"\n", __func__, __FILE__, __LINE__, path);
+        bs_warnF("%s at %s:%d: No resources in package \"%s\"", __func__, __FILE__, __LINE__, path);
         return BS_RESULT_CORRUPTED;
     }
 
@@ -190,7 +190,7 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
 
     existing = old;
 
-    _bs_infoF("Loading package \"%s\"\n", path_dup);
+    _bs_infoF("Loading package \"%s\"", path_dup);
     if (!existing) {
         id = _bs_packages()->count;
         existing = _bs_pushBack(_bs_packages(), &(bs_Package) {
@@ -372,9 +372,9 @@ static inline void _bs_logObjectCreated(bs_U32 source_id, bs_U32 id) {
     const char* object_type_name = _bs_objectTypeName(source->type);
 
     if (_bs_args_.color_log)
-        _bs_infoF(BS_PRINT_GREEN "+" BS_PRINT_RESET " (%d) %s " BS_PRINT_CYAN "%s\n" BS_PRINT_RESET, id, object_type_name, source->ids[id].name);
+        _bs_infoF(BS_PRINT_GREEN "+" BS_PRINT_RESET " (%d) %s " BS_PRINT_CYAN "%s" BS_PRINT_RESET, id, object_type_name, source->ids[id].name);
     else
-        _bs_infoF("+ (%d) %s %s\n", id, object_type_name, source->ids[id].name);
+        _bs_infoF("+ (%d) %s %s", id, object_type_name, source->ids[id].name);
 }
 
 static inline void _bs_logObjectUpdated(bs_U32 source_id, bs_U32 id) {
@@ -384,9 +384,9 @@ static inline void _bs_logObjectUpdated(bs_U32 source_id, bs_U32 id) {
     const char* object_type_name = _bs_objectTypeName(source->type);
 
     if (_bs_args_.color_log)
-        _bs_infoF(BS_PRINT_YELLOW "/" BS_PRINT_RESET  " (%d) %s " BS_PRINT_CYAN "%s\n" BS_PRINT_RESET, id, object_type_name, source->ids[id].name);
+        _bs_infoF(BS_PRINT_YELLOW "/" BS_PRINT_RESET  " (%d) %s " BS_PRINT_CYAN "%s" BS_PRINT_RESET, id, object_type_name, source->ids[id].name);
     else
-        _bs_infoF("/ (%d) %s %s\n", id, object_type_name, source->ids[id].name);
+        _bs_infoF("/ (%d) %s %s", id, object_type_name, source->ids[id].name);
 }
 
 static inline void _bs_logObjectUnchanged(bs_U32 source_id, bs_U32 id) {
@@ -460,7 +460,7 @@ static bs_Object* _bs_update(bs_U32 source_id, bs_U32 id, int size, int swap_siz
     return object;
 }
 
-BSAPI bs_Object* _val_bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_array_size, int flexible_count, bs_U32 flags) {
+BSAPI bs_Object* _val_bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_array_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type) {
     if (source_id != BS_U32_MAX) {
         BS_VALIDATE_SOURCE(source_id, NULL);
     }
@@ -470,17 +470,20 @@ BSAPI bs_Object* _val_bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t
 
     BS_VALIDATE(flexible_count >= 0, NULL,);
 
-    return _bs_object(source_id, id, size, flexible_array_size, flexible_count, flags);
+    return _bs_object(source_id, id, size, flexible_array_size, flexible_count, flags, object_type);
 }
 
-BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_array_size, int flexible_count, bs_U32 flags) {
+BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_array_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type) {
+    bs_Object* result;
     if (source_id == BS_U32_MAX) {
-        return _bs_allocateObject(size, flexible_array_size, flexible_count, flags);
+        result = _bs_allocateObject(size, flexible_array_size, flexible_count, flags);
+        result->head->type = object_type;
+        return result;
     }
 
     bs_ObjectSource* source = _bs_fetchObjectSource(source_id);
 
-    bs_Object* result = source->ids[id].object;
+    result = source->ids[id].object;
 
     if (!_bs_shouldLoadId(source_id, id))
         return NULL;
@@ -495,6 +498,7 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
 
     if (!_bs_exists(source_id, id)) {
         result = source->ids[id].object = _bs_allocateObject(size, flexible_array_size, flexible_count, flags);
+        result->head->type = object_type;
         result->head->id = id;
         result->head->source_id = source_id;
 

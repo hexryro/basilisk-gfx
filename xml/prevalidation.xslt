@@ -109,7 +109,7 @@
 						<xsl:value-of select="/registry/functionPrefixCaps"/>
 						<xsl:text>VALIDATE(</xsl:text>
 						<xsl:value-of select="name"/>
-						<xsl:text>->head.source_id == </xsl:text>
+						<xsl:text>->head.type == </xsl:text>
 						<xsl:value-of select="$objectType"/>
 						<xsl:text>, </xsl:text>
 						<xsl:value-of select="$returnValue"/>

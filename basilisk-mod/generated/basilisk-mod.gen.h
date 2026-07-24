@@ -191,7 +191,6 @@ struct bsmod_Resource {
     bs_ResourceHeaderData header;
     char* name;
     bool has_changes;
-    bs_ResourceType type;
 };
 
 struct bsmod_DraggingParams {

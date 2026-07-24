@@ -456,7 +456,7 @@ static int _bs_queryAnimation(bs_Model* model, char* name) {
 BSAPI bs_Result _bs_loadAnimation(bs_Model* model, const char* name, bs_Animation* out) {
     int animation_id = _bs_queryAnimation(model, name);
     if (animation_id == -1) {
-        _bs_warnF("Failed to query animation \"%s\"\n", name);
+        _bs_warnF("Failed to query animation \"%s\"", name);
         return BS_RESULT_FAILED_TO_QUERY;
     }
 
@@ -515,7 +515,7 @@ BSAPI bs_Result _bs_loadAnimation(bs_Model* model, const char* name, bs_Animatio
         }
         else {
             // bet my life this wont ever happen
-            _bs_warnF("Animation \"%s\" has an invalid path type \"%s\"\n", name, path);
+            _bs_warnF("Animation \"%s\" has an invalid path type \"%s\"", name, path);
             return BS_RESULT_CORRUPTED;
         }
     }
@@ -740,7 +740,7 @@ BSAPI bs_Result _bs_model(int package_id, const char* name, bs_U32 flags, bs_Res
         bs_U32 length;
     }* header = resource->data->value;
     if (header->magic != 0x46546C67) {
-        _bs_warnF("%s: Invalid magic for model \"%s\"\n", __func__, name);
+        _bs_warnF("%s: Invalid magic for model \"%s\"", __func__, name);
         return BS_RESULT_CORRUPTED;
     }
     
@@ -767,7 +767,7 @@ BSAPI bs_Result _bs_model(int package_id, const char* name, bs_U32 flags, bs_Res
             gltf = resource->data->value + offset + sizeof(*chunk);
         }
         else {
-            _bs_warnF("%s: Unknown chunk type 0x%08X\n", __func__, chunk->type);
+            _bs_warnF("%s: Unknown chunk type 0x%08X", __func__, chunk->type);
             return BS_RESULT_CORRUPTED;
         }
 
@@ -775,7 +775,7 @@ BSAPI bs_Result _bs_model(int package_id, const char* name, bs_U32 flags, bs_Res
     }
 
     if (!json.doc) {
-        _bs_warnF("%s: missing JSON chunk\n", __func__);
+        _bs_warnF("%s: missing JSON chunk", __func__);
         return BS_RESULT_GENERAL_ERROR;
     }
     
