@@ -363,11 +363,6 @@ bs_Result bsmod_compileShader(
     return next.bsmod_compileShader(path, name, package);
 }
 
-bs_Queue* bsmod_onQueue()
-{
-    return next.bsmod_onQueue();
-}
-
 void bsmod_queueRasterize(
     const char* package, 
     const char* name, 

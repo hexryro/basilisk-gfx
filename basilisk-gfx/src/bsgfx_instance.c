@@ -462,6 +462,9 @@ BSGFXAPI void _bsgfx_tickInstances() {
 		return;
 
 	bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
+	if (!_bs_bufferIsMapped(metadata_buffer))
+		return;
+
 	bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
 
 	for (int i = 0; i < BSGFX_INSTANCE_TYPE_COUNT; i++) {
@@ -567,18 +570,18 @@ static inline int _bsgfx_instanceLineSubtype(bs_vec3 start, bs_vec3 end, bs_RGBA
 		.color = BS_V4((float)color.r / 255.0, (float)color.g / 255.0, (float)color.b / 255.0, (float)color.a / 255.0)
 	};
 
-	return _bsgfx_instance(subtype, &data, sizeof(data), 0, 0, 0, 0);
+	return bsgfx_instance(subtype, &data, sizeof(data), 0, 0, 0, 0);
 }
 
  /**
   Push constants
   */
 BSGFXAPI int _bsgfx_instanceMesh(int subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material) {
-	return _bsgfx_instance(subtype, data, sizeof(bsgfx_MeshInstance), flags, 0, id, material);
+	return bsgfx_instance(subtype, data, sizeof(bsgfx_MeshInstance), flags, 0, id, material);
 }
 
 BSGFXAPI int _bsgfx_instanceBoneMesh(int subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material) {
-	return _bsgfx_instance(subtype, data, sizeof(bsgfx_BoneInstance), flags, 0, id, material);
+	return bsgfx_instance(subtype, data, sizeof(bsgfx_BoneInstance), flags, 0, id, material);
 }
 
 BSGFXAPI int _bsgfx_instanceDepthlessLine(bs_vec3 start, bs_vec3 end, bs_RGBA color) {
@@ -622,11 +625,11 @@ BSGFXAPI int _bsgfx_instanceSphere(bs_vec3 position, float radius) {
 	bs_m4Translate(&transform, &position, &transform);
 	bs_m4Scale(&transform, &BS_V3(radius, radius, radius), &transform);
 
-	return _bsgfx_instance(_bsgfx_subtypes()[BSGFX_SUBTYPE_SPHERE_MESH], &transform, sizeof(bs_mat4), 0, 0, 0, 0);
+	return bsgfx_instance(_bsgfx_subtypes()[BSGFX_SUBTYPE_SPHERE_MESH], &transform, sizeof(bs_mat4), 0, 0, 0, 0);
 }
 
 BSGFXAPI int _bsgfx_instanceCone(bs_mat4 transform, float radius, bs_U32 flags, int id, int material) {
-	return _bsgfx_instance(_bsgfx_subtypes()[BSGFX_SUBTYPE_CONE_MESH], &transform, sizeof(bs_mat4), flags, 0, id, material);
+	return bsgfx_instance(_bsgfx_subtypes()[BSGFX_SUBTYPE_CONE_MESH], &transform, sizeof(bs_mat4), flags, 0, id, material);
 }
 
 BSGFXAPI int _bsgfx_instancePoint(bs_vec3 position, bs_RGBA color, float size) {
@@ -640,7 +643,7 @@ BSGFXAPI int _bsgfx_instancePoint(bs_vec3 position, bs_RGBA color, float size) {
 		.color = _bsgfx_convertColor(color),
 	};
 
-	return _bsgfx_instance(_bsgfx_subtypes()[BSGFX_SUBTYPE_POINT], &data, sizeof(data), 0, 0, 0, 0);
+	return bsgfx_instance(_bsgfx_subtypes()[BSGFX_SUBTYPE_POINT], &data, sizeof(data), 0, 0, 0, 0);
 }
 
 BSGFXAPI int _bsgfx_instanceQuad(int subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material) {
@@ -650,7 +653,7 @@ BSGFXAPI int _bsgfx_instanceQuad(int subtype, bs_mat4x3 transform, bs_vec4 coord
 		.coords = coords.zw,
 	};
 
-	return _bsgfx_instance(subtype, &tmp, sizeof(tmp), flags, 0, id, material);
+	return bsgfx_instance(subtype, &tmp, sizeof(tmp), flags, 0, id, material);
 }
 
 BSGFXAPI int _bsgfx_instanceAtlas(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material) {
@@ -663,7 +666,7 @@ BSGFXAPI int _bsgfx_instanceAtlas(int subtype, bs_mat4x3 transform, int texture,
 		.coords = coords.zw,
 	};
 
-	return _bsgfx_instance(subtype, &tmp, sizeof(tmp), flags, 0, id, material);
+	return bsgfx_instance(subtype, &tmp, sizeof(tmp), flags, 0, id, material);
 }
 
 BSGFXAPI int _bsgfx_instanceAtlasFlipped(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material) {
@@ -677,7 +680,7 @@ BSGFXAPI int _bsgfx_instanceAtlasFlipped(int subtype, bs_mat4x3 transform, int t
 		.coords = coords.zw,
 	};
 
-	return _bsgfx_instance(subtype, &tmp, sizeof(tmp), flags, 0, id, material);
+	return bsgfx_instance(subtype, &tmp, sizeof(tmp), flags, 0, id, material);
 }
 
 BSGFXAPI void _bsgfx_instanceDepthlessCircle(const bs_mat4* transform, int segments, float radius, bs_RGBA color, bs_Range* out) {

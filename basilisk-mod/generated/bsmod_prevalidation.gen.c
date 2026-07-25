@@ -246,10 +246,6 @@ BSMODAPI bs_Result _preval_bsmod_compileShader(char* path, char* name, char* pac
     return next.bsmod_compileShader(path, name, package);
 }
 
-BSMODAPI bs_Queue* _preval_bsmod_onQueue() {
-    return next.bsmod_onQueue();
-}
-
 BSMODAPI void _preval_bsmod_queueRasterize(const char* package, const char* name, bs_Callback callback) {
     BSMOD_VALIDATE(package != NULL, ,);
     BSMOD_VALIDATE(name != NULL, ,);
@@ -554,7 +550,6 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_updateShaderReferences = _preval_bsmod_updateShaderReferences;
     functions.bsmod_iniCompiler = _preval_bsmod_iniCompiler;
     functions.bsmod_compileShader = _preval_bsmod_compileShader;
-    functions.bsmod_onQueue = _preval_bsmod_onQueue;
     functions.bsmod_queueRasterize = _preval_bsmod_queueRasterize;
     functions.bsmod_pollRasterizer = _preval_bsmod_pollRasterizer;
     functions.bsmod_beginRasterize = _preval_bsmod_beginRasterize;

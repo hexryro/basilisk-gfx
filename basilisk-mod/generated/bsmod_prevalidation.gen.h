@@ -82,7 +82,6 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_updateShaderReferences = (PFN_bsmod_updateShaderReferences)GetProcAddress(module, "_preval_bsmod_updateShaderReferences");
     functions.bsmod_iniCompiler = (PFN_bsmod_iniCompiler)GetProcAddress(module, "_preval_bsmod_iniCompiler");
     functions.bsmod_compileShader = (PFN_bsmod_compileShader)GetProcAddress(module, "_preval_bsmod_compileShader");
-    functions.bsmod_onQueue = (PFN_bsmod_onQueue)GetProcAddress(module, "_preval_bsmod_onQueue");
     functions.bsmod_queueRasterize = (PFN_bsmod_queueRasterize)GetProcAddress(module, "_preval_bsmod_queueRasterize");
     functions.bsmod_pollRasterizer = (PFN_bsmod_pollRasterizer)GetProcAddress(module, "_preval_bsmod_pollRasterizer");
     functions.bsmod_beginRasterize = (PFN_bsmod_beginRasterize)GetProcAddress(module, "_preval_bsmod_beginRasterize");

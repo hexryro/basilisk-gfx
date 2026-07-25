@@ -72,6 +72,5 @@ void main() {
     float aa = fwidth(dist);
     float alpha = 1.0 - smoothstep(0.0, aa, dist);
     out_color.a *= alpha;
-
     out_color = vec4(1.0);
 }

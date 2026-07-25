@@ -377,6 +377,11 @@
 
     <macros>
 		<macro>
+			<name>#define BS_CONFIGURE_SOURCE(sources, index, count, ids)</name>
+			<line>sources[index] = bs_configureSource(index, count, (const char* []) { ids(BS_STRING_GEN) })</line>
+		</macro>
+
+		<macro>
 			<name>#define BS_RGBA(r, g, b, a)</name>
 			<line>(bs_RGBA) { r, g, b, a }</line>
 		</macro>
@@ -401,8 +406,13 @@
 		<macro><name>#define BS_2PI</name><line>(3.14159265359 * 2.0)</line></macro>
 		<macro><name>#define BS_MIN(a, b)</name><line>(((a)&lt;(b))?(a):(b))</line></macro>
 		<macro><name>#define BS_MAX(a, b)</name><line>(((a)&gt;(b))?(a):(b))</line></macro>
+		
 		<macro><name>#define BS_ENUM_GEN(ENUM)</name><line>ENUM,</line></macro>
 		<macro><name>#define BS_STRING_GEN(STRING)</name><line>#STRING,</line></macro>
+		
+		<macro><name>#define BS_GENERATE_ENUM(ENUM)</name><line>enum { ENUM(BS_ENUM_GEN) }</line></macro>
+		<macro><name>#define BS_GENERATE_STRINGS(STRING)</name><line>(const char* []) { STRING(BS_STRING_GEN) }</line></macro>
+		
 		<macro comment="Count the number of variadic arguments in a macro\nUsed like __VA_NARG__(__VA_ARGS__)">
 			<name>#ifndef __VA_NARG__</name>
 		</macro>

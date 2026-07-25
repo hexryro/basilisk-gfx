@@ -45,21 +45,19 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
         &module);
 
     functions.bsgfx_defaultPipelineHash = (PFN_bsgfx_defaultPipelineHash)GetProcAddress(module, "_preval_bsgfx_defaultPipelineHash");
+    functions.bsgfx_renderTileIcons = (PFN_bsgfx_renderTileIcons)GetProcAddress(module, "_preval_bsgfx_renderTileIcons");
+    functions.bsgfx_renderAtlasIcons = (PFN_bsgfx_renderAtlasIcons)GetProcAddress(module, "_preval_bsgfx_renderAtlasIcons");
+    functions.bsgfx_renderLineModel = (PFN_bsgfx_renderLineModel)GetProcAddress(module, "_preval_bsgfx_renderLineModel");
+    functions.bsgfx_renderLines = (PFN_bsgfx_renderLines)GetProcAddress(module, "_preval_bsgfx_renderLines");
+    functions.bsgfx_renderPoints = (PFN_bsgfx_renderPoints)GetProcAddress(module, "_preval_bsgfx_renderPoints");
+    functions.bsgfx_renderAtlas = (PFN_bsgfx_renderAtlas)GetProcAddress(module, "_preval_bsgfx_renderAtlas");
+    functions.bsgfx_renderPrimitiveTiles = (PFN_bsgfx_renderPrimitiveTiles)GetProcAddress(module, "_preval_bsgfx_renderPrimitiveTiles");
+    functions.bsgfx_swapBufferBindings = (PFN_bsgfx_swapBufferBindings)GetProcAddress(module, "_preval_bsgfx_swapBufferBindings");
     functions.bsgfx_requiredForShadowVolumes = (PFN_bsgfx_requiredForShadowVolumes)GetProcAddress(module, "_preval_bsgfx_requiredForShadowVolumes");
     functions.bsgfx_requiredForStencilShadows = (PFN_bsgfx_requiredForStencilShadows)GetProcAddress(module, "_preval_bsgfx_requiredForStencilShadows");
     functions.bsgfx_requiredForTransparency = (PFN_bsgfx_requiredForTransparency)GetProcAddress(module, "_preval_bsgfx_requiredForTransparency");
     functions.bsgfx_currentScene = (PFN_bsgfx_currentScene)GetProcAddress(module, "_preval_bsgfx_currentScene");
     functions.bsgfx_loadScene = (PFN_bsgfx_loadScene)GetProcAddress(module, "_preval_bsgfx_loadScene");
-    functions.bsgfx_contexts = (PFN_bsgfx_contexts)GetProcAddress(module, "_preval_bsgfx_contexts");
-    functions.bsgfx_images = (PFN_bsgfx_images)GetProcAddress(module, "_preval_bsgfx_images");
-    functions.bsgfx_samplers = (PFN_bsgfx_samplers)GetProcAddress(module, "_preval_bsgfx_samplers");
-    functions.bsgfx_buffers = (PFN_bsgfx_buffers)GetProcAddress(module, "_preval_bsgfx_buffers");
-    functions.bsgfx_batches = (PFN_bsgfx_batches)GetProcAddress(module, "_preval_bsgfx_batches");
-    functions.bsgfx_renderers = (PFN_bsgfx_renderers)GetProcAddress(module, "_preval_bsgfx_renderers");
-    functions.bsgfx_queues = (PFN_bsgfx_queues)GetProcAddress(module, "_preval_bsgfx_queues");
-    functions.bsgfx_rayTracers = (PFN_bsgfx_rayTracers)GetProcAddress(module, "_preval_bsgfx_rayTracers");
-    functions.bsgfx_atlases = (PFN_bsgfx_atlases)GetProcAddress(module, "_preval_bsgfx_atlases");
-    functions.bsgfx_fonts = (PFN_bsgfx_fonts)GetProcAddress(module, "_preval_bsgfx_fonts");
     functions.bsgfx_validateSubtype = (PFN_bsgfx_validateSubtype)GetProcAddress(module, "_preval_bsgfx_validateSubtype");
     functions.bsgfx_validateInstanceType = (PFN_bsgfx_validateInstanceType)GetProcAddress(module, "_preval_bsgfx_validateInstanceType");
     functions.bsgfx_worldToScreen = (PFN_bsgfx_worldToScreen)GetProcAddress(module, "_preval_bsgfx_worldToScreen");
@@ -73,7 +71,6 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     functions.bsgfx_highlightMaterial = (PFN_bsgfx_highlightMaterial)GetProcAddress(module, "_preval_bsgfx_highlightMaterial");
     functions.bsgfx_unhighlightMaterial = (PFN_bsgfx_unhighlightMaterial)GetProcAddress(module, "_preval_bsgfx_unhighlightMaterial");
     functions.bsgfx_tickMaterials = (PFN_bsgfx_tickMaterials)GetProcAddress(module, "_preval_bsgfx_tickMaterials");
-    functions.bsgfx_pipeline = (PFN_bsgfx_pipeline)GetProcAddress(module, "_preval_bsgfx_pipeline");
     functions.bsgfx_sweepCollisions = (PFN_bsgfx_sweepCollisions)GetProcAddress(module, "_preval_bsgfx_sweepCollisions");
     functions.bsgfx_collider = (PFN_bsgfx_collider)GetProcAddress(module, "_preval_bsgfx_collider");
     functions.bsgfx_applyCollisions = (PFN_bsgfx_applyCollisions)GetProcAddress(module, "_preval_bsgfx_applyCollisions");

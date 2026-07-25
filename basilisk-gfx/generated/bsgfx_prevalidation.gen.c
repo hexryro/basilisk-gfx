@@ -53,6 +53,40 @@ BSGFXAPI bs_PipelineHash _preval_bsgfx_defaultPipelineHash() {
     return next.bsgfx_defaultPipelineHash();
 }
 
+BSGFXAPI void _preval_bsgfx_renderTileIcons() {
+    next.bsgfx_renderTileIcons();
+}
+
+BSGFXAPI void _preval_bsgfx_renderAtlasIcons() {
+    next.bsgfx_renderAtlasIcons();
+}
+
+BSGFXAPI void _preval_bsgfx_renderLineModel(const bs_mat4* camera, int subtype, bool skip_depth_test) {
+    BSGFX_VALIDATE(camera != NULL, ,);
+    next.bsgfx_renderLineModel(camera, subtype, skip_depth_test);
+}
+
+BSGFXAPI void _preval_bsgfx_renderLines(const bs_mat4* camera, int subtype, bool skip_depth_test) {
+    BSGFX_VALIDATE(camera != NULL, ,);
+    next.bsgfx_renderLines(camera, subtype, skip_depth_test);
+}
+
+BSGFXAPI void _preval_bsgfx_renderPoints() {
+    next.bsgfx_renderPoints();
+}
+
+BSGFXAPI void _preval_bsgfx_renderAtlas() {
+    next.bsgfx_renderAtlas();
+}
+
+BSGFXAPI void _preval_bsgfx_renderPrimitiveTiles() {
+    next.bsgfx_renderPrimitiveTiles();
+}
+
+BSGFXAPI void _preval_bsgfx_swapBufferBindings() {
+    next.bsgfx_swapBufferBindings();
+}
+
 BSGFXAPI void _preval_bsgfx_requiredForShadowVolumes(bs_PipelineHash* inout) {
     BSGFX_VALIDATE(inout != NULL, ,);
     next.bsgfx_requiredForShadowVolumes(inout);
@@ -75,46 +109,6 @@ BSGFXAPI bsgfx_Scene* _preval_bsgfx_currentScene() {
 BSGFXAPI void _preval_bsgfx_loadScene(const char* name) {
     BSGFX_VALIDATE(name != NULL, ,);
     next.bsgfx_loadScene(name);
-}
-
-BSGFXAPI int _preval_bsgfx_contexts() {
-    return next.bsgfx_contexts();
-}
-
-BSGFXAPI int _preval_bsgfx_images() {
-    return next.bsgfx_images();
-}
-
-BSGFXAPI int _preval_bsgfx_samplers() {
-    return next.bsgfx_samplers();
-}
-
-BSGFXAPI int _preval_bsgfx_buffers() {
-    return next.bsgfx_buffers();
-}
-
-BSGFXAPI int _preval_bsgfx_batches() {
-    return next.bsgfx_batches();
-}
-
-BSGFXAPI int _preval_bsgfx_renderers() {
-    return next.bsgfx_renderers();
-}
-
-BSGFXAPI int _preval_bsgfx_queues() {
-    return next.bsgfx_queues();
-}
-
-BSGFXAPI int _preval_bsgfx_rayTracers() {
-    return next.bsgfx_rayTracers();
-}
-
-BSGFXAPI int _preval_bsgfx_atlases() {
-    return next.bsgfx_atlases();
-}
-
-BSGFXAPI int _preval_bsgfx_fonts() {
-    return next.bsgfx_fonts();
 }
 
 BSGFXAPI bool _preval_bsgfx_validateSubtype(const char* library_name, int subtype) {
@@ -180,10 +174,6 @@ BSGFXAPI void _preval_bsgfx_unhighlightMaterial(int material_id) {
 
 BSGFXAPI void _preval_bsgfx_tickMaterials() {
     next.bsgfx_tickMaterials();
-}
-
-BSGFXAPI void _preval_bsgfx_pipeline() {
-    next.bsgfx_pipeline();
 }
 
 BSGFXAPI void _preval_bsgfx_sweepCollisions(float sweep_radius, const bs_vec3* position) {
@@ -682,21 +672,19 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     static bsgfx_FunctionTable functions = { 0 };
 
     functions.bsgfx_defaultPipelineHash = _preval_bsgfx_defaultPipelineHash;
+    functions.bsgfx_renderTileIcons = _preval_bsgfx_renderTileIcons;
+    functions.bsgfx_renderAtlasIcons = _preval_bsgfx_renderAtlasIcons;
+    functions.bsgfx_renderLineModel = _preval_bsgfx_renderLineModel;
+    functions.bsgfx_renderLines = _preval_bsgfx_renderLines;
+    functions.bsgfx_renderPoints = _preval_bsgfx_renderPoints;
+    functions.bsgfx_renderAtlas = _preval_bsgfx_renderAtlas;
+    functions.bsgfx_renderPrimitiveTiles = _preval_bsgfx_renderPrimitiveTiles;
+    functions.bsgfx_swapBufferBindings = _preval_bsgfx_swapBufferBindings;
     functions.bsgfx_requiredForShadowVolumes = _preval_bsgfx_requiredForShadowVolumes;
     functions.bsgfx_requiredForStencilShadows = _preval_bsgfx_requiredForStencilShadows;
     functions.bsgfx_requiredForTransparency = _preval_bsgfx_requiredForTransparency;
     functions.bsgfx_currentScene = _preval_bsgfx_currentScene;
     functions.bsgfx_loadScene = _preval_bsgfx_loadScene;
-    functions.bsgfx_contexts = _preval_bsgfx_contexts;
-    functions.bsgfx_images = _preval_bsgfx_images;
-    functions.bsgfx_samplers = _preval_bsgfx_samplers;
-    functions.bsgfx_buffers = _preval_bsgfx_buffers;
-    functions.bsgfx_batches = _preval_bsgfx_batches;
-    functions.bsgfx_renderers = _preval_bsgfx_renderers;
-    functions.bsgfx_queues = _preval_bsgfx_queues;
-    functions.bsgfx_rayTracers = _preval_bsgfx_rayTracers;
-    functions.bsgfx_atlases = _preval_bsgfx_atlases;
-    functions.bsgfx_fonts = _preval_bsgfx_fonts;
     functions.bsgfx_validateSubtype = _preval_bsgfx_validateSubtype;
     functions.bsgfx_validateInstanceType = _preval_bsgfx_validateInstanceType;
     functions.bsgfx_worldToScreen = _preval_bsgfx_worldToScreen;
@@ -711,7 +699,6 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_highlightMaterial = _preval_bsgfx_highlightMaterial;
     functions.bsgfx_unhighlightMaterial = _preval_bsgfx_unhighlightMaterial;
     functions.bsgfx_tickMaterials = _preval_bsgfx_tickMaterials;
-    functions.bsgfx_pipeline = _preval_bsgfx_pipeline;
     functions.bsgfx_sweepCollisions = _preval_bsgfx_sweepCollisions;
     functions.bsgfx_collider = _preval_bsgfx_collider;
     functions.bsgfx_applyCollisions = _preval_bsgfx_applyCollisions;

@@ -1,0 +1,409 @@
+#include <basilisk-mod.h>
+#include <bsmod_cache.h>
+#include <basilisk_pipeline.h>
+
+void basilisk_renderDepthlessLines() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_line_instanced();
+    hash.shaders[1] = $fs_bsgfx_color();
+    hash.topology_type = BS_PRIMITIVE_TOPOLOGY_LINE_LIST;
+    hash.skip_depth_test = true;
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        bs_beginComment(BS_CONSTANT_STRING("[BSMOD] Lines (Depthless)"));
+
+        bs_setLineWidth(4.0);
+        bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_LINE_DEPTHLESS], pipeline);
+        bs_setLineWidth(1.0);
+
+        bs_endComment();
+    }
+}
+
+void basilisk_renderLines() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_line_instanced();
+    hash.shaders[1] = $fs_bsgfx_color();
+    hash.topology_type = BS_PRIMITIVE_TOPOLOGY_LINE_LIST;
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        bs_beginComment(BS_CONSTANT_STRING("[BSMOD] Lines"));
+
+        bs_setLineWidth(4.0);
+        bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_LINE], pipeline);
+        bs_setLineWidth(1.0);
+
+        bs_endComment();
+    }
+}
+
+void basilisk_renderPoints() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_point_instanced();
+    hash.shaders[1] = $fs_bsgfx_color();
+    hash.topology_type = BS_PRIMITIVE_TOPOLOGY_POINT_LIST;
+    hash.skip_depth_test = true;
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+
+        bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_POINT], pipeline);
+    }
+}
+
+void basilisk_renderCones() {
+    if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
+        return;
+
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    bs_beginComment(BS_CONSTANT_STRING("Cones"));
+
+    bs_Object* atlas_object = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY);
+
+    struct {
+        bs_mat4 camera;
+        bs_vec4 uv;
+    } mesh_push_const = {
+        .camera = poser()->camera.result,
+        .uv = bs_atlasCoordinates(atlas_object->atlas, bs_queryAtlas(atlas_object->atlas, "white")),
+    };
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_mesh_instanced();
+    hash.shaders[1] = $fs_bsgfx_model();
+    hash.skip_depth_test = true;
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+
+        bs_pushConstant(pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_CONE_MESH], pipeline);
+    }
+}
+
+void basilisk_renderUIPost() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_color_percentage();
+    hash.shaders[1] = $fs_bsgfx_lo_res_ui_post_0();
+    bsgfx_requiredForTransparency(&hash);
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        struct {
+            bs_mat4 inv_proj;
+            bs_vec3 selected_color;
+            float elapsed;
+            bs_vec3 light_direction;
+            float pad;
+            bs_vec2 resolution;
+        } push_const = {
+            .selected_color = BS_V3(1.0, 1.0, 1.0),
+            .elapsed = bs_elapsedTime(),
+            .light_direction = poser()->sun_direction,
+            .resolution = BS_V2_MUL_S(BS_IV2_TO_V2(bs_resolution()), 0.5),
+        };
+        bs_m4Inverse(&poser()->camera.proj, &push_const.inv_proj);
+
+        //  bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
+        bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)->batch, pipeline, 6, 6, 0, 1);
+    }
+}
+
+void basilisk_renderSelectedTile() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_tile_static();
+    hash.shaders[1] = $fs_bsgfx_tile_selected();
+    hash.skip_depth_test = true;
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        struct {
+            bs_mat4 camera;
+        } push_const = {
+            .camera = poser()->camera.result,
+        };
+
+        bs_beginComment(BS_CONSTANT_STRING("Selected Tiles"));
+
+        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
+        bs_render(bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_TILE)->batch, pipeline, 0, BS_U32_MAX, 0, 1);
+
+        bs_endComment();
+    }
+}
+
+void basilisk_renderTiles() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_quad_instanced();
+    hash.shaders[1] = $fs_bsgfx_tile_screen();
+    bsgfx_requiredForTransparency(&hash);
+    hash.stencil_front = (bs_StencilOperation){
+        .fail_op = BS_STENCIL_OP_KEEP,
+        .pass_op = BS_STENCIL_OP_KEEP,
+        .depth_fail_op = BS_STENCIL_OP_KEEP,
+        .compare_op = BS_COMPARE_OP_EQUAL,
+        .compare_mask = 0xFF,
+        .write_mask = 0x00,
+        .reference = 2, // TODO
+    };
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+
+        bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_TILE_ICON], pipeline);
+    }
+}
+
+void basilisk_renderFontSubtype(int subtype, bsgfx_Id font_id, bs_Shader* fragment_shader) {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    // bs_Object* font_object = bs_fetch(BSGFX_FONTS, font_id)->head;
+    bs_Shader* vertex_shader = $vs_bsgfx_quad_instanced();
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = vertex_shader;
+    hash.shaders[1] = fragment_shader;
+    bsgfx_requiredForTransparency(&hash);
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bsgfx_renderSubtype(subtype, pipeline);
+    }
+}
+
+void basilisk_renderPrefabOutlines() {
+    if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
+        return;
+
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_mesh_instanced();
+    hash.shaders[0] = $fs_bsgfx_model();
+    hash.polygon_type = BS_POLYGON_MODE_LINE;
+    hash.skip_depth_test = true;
+    hash.cull_type = bsgfx_settings()->cull_backfaces ? BS_CULL_MODE_BACK_BIT : BS_CULL_MODE_NONE;
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        bs_beginComment(BS_CONSTANT_STRING("Prefabs"));
+
+        bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
+        struct {
+            bs_mat4 camera;
+            bs_vec4 uv;
+        } mesh_push_const = {
+            .camera = poser()->camera.result,
+            .uv = $BSGFX_ATLAS_ANY_white()->coords,
+        };
+
+        bs_pushConstant(pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
+        bsgfx_renderPrefabs(pipeline, BSGFX_PREFAB_SUBTYPE_MESH_POLYGON_OUTLINE);
+
+        bs_endComment();
+    }
+
+}
+
+void basilisk_renderRoundedQuads() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
+    hash.shaders[1] = $fs_bsgfx_atlas_rounded();
+    bsgfx_requiredForTransparency(&hash);
+    hash.stencil_front = (bs_StencilOperation){
+        .fail_op = BS_STENCIL_OP_KEEP,
+        .pass_op = BS_STENCIL_OP_KEEP,
+        .depth_fail_op = BS_STENCIL_OP_KEEP,
+        .compare_op = BS_COMPARE_OP_EQUAL,
+        .compare_mask = 0xFF,
+        .write_mask = 0x00,
+    };
+
+    hash.stencil_back = (bs_StencilOperation){
+        .fail_op = BS_STENCIL_OP_KEEP,
+        .pass_op = BS_STENCIL_OP_KEEP,
+        .depth_fail_op = BS_STENCIL_OP_KEEP,
+        .compare_op = BS_COMPARE_OP_EQUAL,
+        .compare_mask = 0xFF,
+        .write_mask = 0x00,
+    };
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        struct {
+            bs_mat4 camera;
+            float elapsed;
+            float padding;
+            bs_vec2 resolution;
+            float border_radius;
+        } push_const = {
+            .camera = poser()->screen_camera.result,
+            .elapsed = bs_elapsedTime(),
+            .resolution = BS_IV2_TO_V2(bs_resolution()),
+            .border_radius = 5.0,
+        };
+
+        bs_beginComment(BS_CONSTANT_STRING("Rounded Quads"));
+
+        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_ATLAS_ICON], pipeline);
+
+        bs_endComment();
+    }
+}
+
+void basilisk_renderUI() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
+    hash.shaders[1] = $fs_bsgfx_ui();
+    bsgfx_requiredForTransparency(&hash);
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        struct {
+            bs_mat4 camera;
+            float elapsed;
+            float padding;
+            bs_vec2 resolution;
+            float border_radius;
+        } push_const = {
+            .camera = poser()->screen_camera.result,
+            .elapsed = bs_elapsedTime(),
+            .resolution = BS_IV2_TO_V2(bs_resolution()),
+        };
+
+        bs_beginComment(BS_CONSTANT_STRING("UI"));
+
+        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], pipeline);
+
+        bs_endComment();
+    }
+}
+
+void basilisk_renderUISolid() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
+    hash.shaders[1] = $fs_bsgfx_ui_color();
+    bsgfx_requiredForTransparency(&hash);
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        struct {
+            bs_mat4 camera;
+            float elapsed;
+            float padding;
+            bs_vec2 resolution;
+            float border_radius;
+        } push_const = {
+            .camera = poser()->screen_camera.result,
+            .elapsed = bs_elapsedTime(),
+            .resolution = BS_IV2_TO_V2(bs_resolution()),
+        };
+
+        bs_beginComment(BS_CONSTANT_STRING("UI (Color only)"));
+
+        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR], pipeline);
+
+        bs_endComment();
+    }
+}
+
+void basilisk_renderUIStencil() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
+    hash.shaders[1] = $fs_bsgfx_ui();
+    bsgfx_requiredForTransparency(&hash);
+
+    hash.stencil_front = (bs_StencilOperation){
+        .fail_op = BS_STENCIL_OP_KEEP,
+        .pass_op = BS_STENCIL_OP_KEEP,
+        .depth_fail_op = BS_STENCIL_OP_KEEP,
+        .compare_op = BS_COMPARE_OP_EQUAL,
+        .compare_mask = 0xFF,
+        .write_mask = 0x00,
+        .reference = 2, // TODO
+    };
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        struct {
+            bs_mat4 camera;
+            float elapsed;
+            float padding;
+            bs_vec2 resolution;
+            float border_radius;
+        } push_const = {
+            .camera = poser()->screen_camera.result,
+            .elapsed = bs_elapsedTime(),
+            .resolution = BS_IV2_TO_V2(bs_resolution()),
+        };
+
+        bs_beginComment(BS_CONSTANT_STRING("UI Stencil"));
+
+        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_STENCIL], pipeline);
+
+        bs_endComment();
+    }
+}
+
+void basilisk_renderDither() {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
+    hash.shaders[1] = $fs_bsgfx_dither();
+    bsgfx_requiredForTransparency(&hash);
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        struct {
+            bs_mat4 camera;
+            float elapsed;
+            float padding;
+            bs_vec2 resolution;
+            float border_radius;
+        } push_const = {
+            .camera = poser()->screen_camera.result,
+            .elapsed = bs_elapsedTime(),
+            .resolution = BS_IV2_TO_V2(bs_resolution()),
+        };
+
+        bs_beginComment(BS_CONSTANT_STRING("Dither"));
+
+        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_DITHER], pipeline);
+
+        bs_endComment();
+    }
+}

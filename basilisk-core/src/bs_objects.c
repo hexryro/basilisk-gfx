@@ -278,6 +278,9 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
     BS_VALIDATE(id < ((bs_ObjectSource*)_bs_fetchUnit(_bs_objectSources(), source_id))->ids_count, _return,)
 
 BSAPI int _bs_configureSource(bs_ObjectType type, int count, const char** names) {
+    if (count == 0)
+        return -1;
+
     bs_ObjectSource source = {
         .type = type,
         .ids = _bs_calloc(count, sizeof(struct bs_ObjectId)),

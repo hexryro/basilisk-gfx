@@ -26,7 +26,7 @@
 #ifndef BSGFX_CACHE_H
 #define BSGFX_CACHE_H
 
-#include <basilisk-gfx.gen.h>
+#include <basilisk-gfx.h>
 
 #define BSGFX_CACHE_SHADER(path, type)                                                          \
     inline bs_Shader* $##path() {                                                               \

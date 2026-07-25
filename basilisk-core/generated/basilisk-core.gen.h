@@ -223,6 +223,9 @@ typedef enum bs_BindType bs_BindType;
 typedef enum bs_BindTypeIndex bs_BindTypeIndex;
 typedef enum bs_VkObjectType bs_VkObjectType;
 
+#define BS_CONFIGURE_SOURCE(sources, index, count, ids)              \
+    sources[index] = bs_configureSource(index, count, (const char* []) { ids(BS_STRING_GEN) })
+
 #define BS_RGBA(r, g, b, a)                                          \
     (bs_RGBA) { r, g, b, a }
 
@@ -267,6 +270,12 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 
 #define BS_STRING_GEN(STRING)                                        \
     #STRING,
+
+#define BS_GENERATE_ENUM(ENUM)                                       \
+    enum { ENUM(BS_ENUM_GEN) }
+
+#define BS_GENERATE_STRINGS(STRING)                                  \
+    (const char* []) { STRING(BS_STRING_GEN) }
 
 #ifndef __VA_NARG__                                                  \
 

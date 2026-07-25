@@ -630,12 +630,6 @@ bsmod_compileShader(
     char* package);
 
  /**
-  @return bs_Queue*
-  */
-BSMODAPI bs_Queue*
-bsmod_onQueue();
-
- /**
   @param package
   @param name
   @param callback
@@ -1176,15 +1170,6 @@ bsmod_onDragTile(
 BSMODAPI extern bsmod_Callbacks _bsmod_callbacks_;
 BSMODAPI extern int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT];
 BSMODAPI extern bs_Json _bsmod_config_;
-BSMODAPI extern int _bsmod_images_;
-BSMODAPI extern int _bsmod_samplers_;
-BSMODAPI extern int _bsmod_buffers_;
-BSMODAPI extern int _bsmod_batches_;
-BSMODAPI extern int _bsmod_renderers_;
-BSMODAPI extern int _bsmod_queues_;
-BSMODAPI extern int _bsmod_ray_tracers_;
-BSMODAPI extern int _bsmod_fonts_;
-BSMODAPI extern int _bsmod_atlases_;
 BSMODAPI extern bool _bsmod_instance_grid_menu_;
 BSMODAPI extern bs_String* _bsmod_search_input_;
 BSMODAPI extern bsmod_SideMenuTab _bsmod_side_menu_tabs_[BSMOD_TABS_COUNT];

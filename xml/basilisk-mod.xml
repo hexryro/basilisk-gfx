@@ -186,15 +186,6 @@
 		<extern><type>bsmod_Callbacks</type><name>bsmod_callbacks</name></extern>
 		<extern><type>int</type><name>bsmod_subtypes</name><size>BSMOD_SUBTYPE_COUNT</size></extern>
 		<extern><type>bs_Json</type><name>bsmod_config</name></extern>
-		<extern><type>int</type><name>bsmod_images</name></extern>
-		<extern><type>int</type><name>bsmod_samplers</name></extern>
-		<extern><type>int</type><name>bsmod_buffers</name></extern>
-		<extern><type>int</type><name>bsmod_batches</name></extern>
-		<extern><type>int</type><name>bsmod_renderers</name></extern>
-		<extern><type>int</type><name>bsmod_queues</name></extern>
-		<extern><type>int</type><name>bsmod_ray_tracers</name></extern>
-		<extern><type>int</type><name>bsmod_fonts</name></extern>
-		<extern><type>int</type><name>bsmod_atlases</name></extern>
 		<extern><type>bool</type><name>bsmod_instance_grid_menu</name></extern>
 		<extern><type>bs_String*</type><name>bsmod_search_input</name></extern>
 		<extern><type>bsmod_SideMenuTab</type><name>bsmod_side_menu_tabs</name><size>BSMOD_TABS_COUNT</size></extern>
@@ -377,10 +368,6 @@
 			<param><type>char*</type><name>name</name></param>
 			<param><type>char*</type><name>package</name></param>
 		</function>
-		<function name="bsmod_onQueue">
-			<return>bs_Queue*</return>
-		</function>
-
 		<function name="bsmod_queueRasterize">
 			<return>void</return>
 			<param><type>const char*</type><name>package</name></param>

@@ -230,10 +230,10 @@ static struct {
 } _bsmod_queued_rasterization = { 0 };
 
 BSMODAPI void _bsmod_queueRasterize(const char* package, const char* name, bs_Callback callback) {
-    if (!bs_exists(_bsmod_queues_, BSMOD_QUEUE_GRAPHICS_RASTERIZATION))
+    if (!bs_exists(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION))
         return;
 
-    bs_Queue* post_queue = bs_fetch(_bsmod_queues_, BSMOD_QUEUE_GRAPHICS_RASTERIZATION)->queue;
+    bs_Queue* post_queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION)->queue;
     bs_enqueue(post_queue, callback);
 
    // bs_except(BSX_DEVICE_LOST);
@@ -246,10 +246,10 @@ BSMODAPI void _bsmod_queueRasterize(const char* package, const char* name, bs_Ca
 }
 
 BSMODAPI void _bsmod_pollRasterizer() {
-    if (!bs_exists(_bsmod_queues_, BSMOD_QUEUE_GRAPHICS_RASTERIZATION))
+    if (!bs_exists(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION))
         return;
 
-    bs_Queue* post_queue = bs_fetch(_bsmod_queues_, BSMOD_QUEUE_GRAPHICS_RASTERIZATION)->queue;
+    bs_Queue* post_queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION)->queue;
 
     if (bs_poll(post_queue) != BS_RESULT_WAITING) { // idk if it should check BS_RESULT_OK or not
         bsmod_AtlasPacker packer = _bsmod_createAtlasPacker();

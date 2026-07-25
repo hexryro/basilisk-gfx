@@ -78,7 +78,7 @@ static void _bsmod_directoryWidget(bs_List* widgets, const char* name, int inden
         .type = BSGFX_WIDGET_ICON,
         .align_height = align_height,
         .icon = {
-            .atlas = bs_fetch(_bsmod_atlases_, BSMOD_ATLAS_UI)->atlas,
+            .atlas = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_UI)->atlas,
             .atlas_subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
             .type = BSGFX_ICON_ATLAS,
             .name = "minimize",
@@ -96,7 +96,7 @@ static void _bsmod_directoryWidget(bs_List* widgets, const char* name, int inden
         .type = BSGFX_WIDGET_ICON,
         .align_height = align_height,
         .icon = {
-            .atlas = bs_fetch(_bsmod_atlases_, BSMOD_ATLAS_UI)->atlas,
+            .atlas = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_UI)->atlas,
             .atlas_subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
             .type = BSGFX_ICON_ATLAS,
             .name = "folder",
@@ -364,7 +364,7 @@ static bool _bsmod_instanceAtlasPreview(bsgfx_Widget* widget, bsgfx_GridParams g
     bsmod_GridPreviewParams* params = widget->params;
     grid.index = params->sorted_ids[grid.index].id;
 
-    bs_Atlas* atlas = bs_fetch(bsgfx_atlases(), params->object_id)->atlas;
+    bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, params->object_id)->atlas;
 
     // special case
     if (params->object_id == BSMOD_ATLAS_MATERIAL_ICONS) {
@@ -413,7 +413,7 @@ static bool _bsmod_instanceImageArrayPreview(bsgfx_Widget* widget, bsgfx_GridPar
     bsmod_GridPreviewParams* params = widget->params;
     grid.index = params->sorted_ids[grid.index].id;
 
-    bs_Image* image = bs_fetch(_bsmod_images_, params->object_id)->image;
+    bs_Image* image = bs_fetch(BSMOD_IMAGES, params->object_id)->image;
     bs_mat4x3 matrix = bsgfx_matrix(
         BS_V3(grid.position->x, grid.position->y, 60.0),
         BS_V3(widget->grid.size.x, widget->grid.size.y, 0.0)
@@ -469,7 +469,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
   //  case BSMOD_DIRECTORY_PREFABS: widget.grid.count = bsgfx_prefabModel()->meshes_count; break;
   //  case BSMOD_DIRECTORY_TILES: widget.grid.count = bsgfx_tileTypes()->count; break;
     case BSMOD_DIRECTORY_PREFABS:
-        atlas = bs_fetch(_bsmod_atlases_, params.object_id = BSMOD_ATLAS_PREFAB_ICONS)->head;
+        atlas = bs_fetch(BSMOD_ATLASES, params.object_id = BSMOD_ATLAS_PREFAB_ICONS)->head;
         widget.grid.action = _bsmod_instanceAtlasPreview;
         widget.grid.count = atlas->count;
         params.subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_PREFAB_ICON];
@@ -477,7 +477,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
         break;
     case BSMOD_DIRECTORY_PRIMITIVES:
         //bs_Atlas* atlas = bs_fetch(BSMOD_ATLAS_MATERIAL_ICONS)->head;
-        atlas = bs_fetch(_bsmod_atlases_, params.object_id = BSMOD_ATLAS_PRIMITIVE_ICONS)->head;
+        atlas = bs_fetch(BSMOD_ATLASES, params.object_id = BSMOD_ATLAS_PRIMITIVE_ICONS)->head;
         widget.grid.count = atlas->count;
         widget.grid.action = _bsmod_instanceAtlasPreview;
         params.subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_PRIMITIVE_ICON];
@@ -493,7 +493,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
         scale = 2.0;
         break;
     case BSMOD_DIRECTORY_MATERIALS_CACHED: 
-        bs_Object* atlas_object = bs_fetch(_bsmod_atlases_, BSMOD_ATLAS_MATERIAL_ICONS);
+        bs_Object* atlas_object = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_MATERIAL_ICONS);
 
         if (atlas_object) {
             widget.grid.count = atlas_object->atlas->count;

@@ -1,8 +1,14 @@
 #include <basilisk-mod.h>
+#include <basilisk.h>
+#include <basilisk_pipeline.h>
 #include <bsgfx_cache.h>
 
 #include <windows.h>
 #include <stdio.h>
+
+Basilisk basilisk = {
+	.sources = { -1 },
+};
 
 volatile long has_performed_tracked_changes = 1;
 
@@ -15,19 +21,20 @@ static void onLoadScene() {
 }
 
 static bs_Queue* onQueue() {
-	bs_Queue* queue = bsmod_onQueue();
+	//bs_Queue* queue = bsmod_onQueue();
 
-	return queue;
+	return NULL;
 }
 
 static void onTick() {
-}
-
-static void onModTick() {
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
 
 	bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR], bs_m4x3(&transform), BS_V4(0.0, 0.0, 1.0, 1.0), 0, 0, 0);
+}
+
+static void onModTick() {
+
 }
 
 static void onIni() {
@@ -109,12 +116,23 @@ int main(int argc, char* argv[]) {
 		.ini = onIni,
 		.lateIni = onLateIni,
 		.tick = onTick,
+		.pipeline = basilisk_pipeline,
 	};
 
 	bsmod_Callbacks* mod_callbacks = bsmod_callbacks();
 	*mod_callbacks = (bsmod_Callbacks) {
 		.tick = onModTick,
 	};
+
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_IMAGE, BASILISK_IMAGES_COUNT, BASILISK_IMAGE_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_SAMPLER, BASILISK_SAMPLERS_COUNT, BASILISK_SAMPLER_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_BUFFER, BASILISK_BUFFERS_COUNT, BASILISK_BUFFER_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_QUEUE, BASILISK_QUEUES_COUNT, BASILISK_QUEUE_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_BATCH, BASILISK_BATCHES_COUNT, BASILISK_BATCH_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_RENDERER, BASILISK_RENDERERS_COUNT, BASILISK_RENDERER_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_RAY_TRACER, BASILISK_RAY_TRACERS_COUNT, BASILISK_RAY_TRACER_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_FONT, BASILISK_FONTS_COUNT, BASILISK_FONT_IDS);
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_ATLAS, BASILISK_ATLASES_COUNT, BASILISK_ATLAS_IDS);
 
 	bsgfx_ini("Basilisk", 1920, 1080, argc, argv);
 

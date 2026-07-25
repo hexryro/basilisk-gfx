@@ -74,6 +74,52 @@ bs_PipelineHash bsgfx_defaultPipelineHash()
     return next.bsgfx_defaultPipelineHash();
 }
 
+void bsgfx_renderTileIcons()
+{
+    next.bsgfx_renderTileIcons();
+}
+
+void bsgfx_renderAtlasIcons()
+{
+    next.bsgfx_renderAtlasIcons();
+}
+
+void bsgfx_renderLineModel(
+    const bs_mat4* camera, 
+    int subtype, 
+    bool skip_depth_test)
+{
+    next.bsgfx_renderLineModel(camera, subtype, skip_depth_test);
+}
+
+void bsgfx_renderLines(
+    const bs_mat4* camera, 
+    int subtype, 
+    bool skip_depth_test)
+{
+    next.bsgfx_renderLines(camera, subtype, skip_depth_test);
+}
+
+void bsgfx_renderPoints()
+{
+    next.bsgfx_renderPoints();
+}
+
+void bsgfx_renderAtlas()
+{
+    next.bsgfx_renderAtlas();
+}
+
+void bsgfx_renderPrimitiveTiles()
+{
+    next.bsgfx_renderPrimitiveTiles();
+}
+
+void bsgfx_swapBufferBindings()
+{
+    next.bsgfx_swapBufferBindings();
+}
+
 void bsgfx_requiredForShadowVolumes(
     bs_PipelineHash* inout)
 {
@@ -101,56 +147,6 @@ void bsgfx_loadScene(
     const char* name)
 {
     next.bsgfx_loadScene(name);
-}
-
-int bsgfx_contexts()
-{
-    return next.bsgfx_contexts();
-}
-
-int bsgfx_images()
-{
-    return next.bsgfx_images();
-}
-
-int bsgfx_samplers()
-{
-    return next.bsgfx_samplers();
-}
-
-int bsgfx_buffers()
-{
-    return next.bsgfx_buffers();
-}
-
-int bsgfx_batches()
-{
-    return next.bsgfx_batches();
-}
-
-int bsgfx_renderers()
-{
-    return next.bsgfx_renderers();
-}
-
-int bsgfx_queues()
-{
-    return next.bsgfx_queues();
-}
-
-int bsgfx_rayTracers()
-{
-    return next.bsgfx_rayTracers();
-}
-
-int bsgfx_atlases()
-{
-    return next.bsgfx_atlases();
-}
-
-int bsgfx_fonts()
-{
-    return next.bsgfx_fonts();
 }
 
 bool bsgfx_validateSubtype(
@@ -251,11 +247,6 @@ void bsgfx_unhighlightMaterial(
 void bsgfx_tickMaterials()
 {
     next.bsgfx_tickMaterials();
-}
-
-void bsgfx_pipeline()
-{
-    next.bsgfx_pipeline();
 }
 
 void bsgfx_sweepCollisions(

@@ -55,20 +55,12 @@ bsgfx_Application _bsgfx_app_;
 int _bsgfx_subtypes_[BSGFX_SUBTYPE_COUNT] = { 0 };
 
 // TODO: object configuration generation
-int _bsgfx_contexts_ = -1, _bsgfx_images_ = -1, _bsgfx_samplers_ = -1, _bsgfx_buffers_ = -1,
-_bsgfx_batches_ = -1, _bsgfx_renderers_ = -1, _bsgfx_ray_tracers_ = -1,
-_bsgfx_queues_ = -1, _bsgfx_atlases_ = -1, _bsgfx_fonts_ = -1;
 
-BSGFXAPI int _bsgfx_contexts() { return _bsgfx_contexts_; }
-BSGFXAPI int _bsgfx_images() { return _bsgfx_images_; }
-BSGFXAPI int _bsgfx_samplers() { return _bsgfx_samplers_; }
-BSGFXAPI int _bsgfx_buffers() { return _bsgfx_buffers_; }
-BSGFXAPI int _bsgfx_batches() { return _bsgfx_batches_; }
-BSGFXAPI int _bsgfx_renderers() { return _bsgfx_renderers_; }
-BSGFXAPI int _bsgfx_rayTracers() { return _bsgfx_ray_tracers_; }
-BSGFXAPI int _bsgfx_queues() { return _bsgfx_queues_; }
-BSGFXAPI int _bsgfx_atlases() { return _bsgfx_atlases_; }
-BSGFXAPI int _bsgfx_fonts() { return _bsgfx_fonts_; }
+static int _bsgfx_sources_[BS_OBJECT_TYPE_COUNT] = { -1 };
+
+int bsgfx_fetchSource(bs_ObjectType type) {
+    return _bsgfx_sources_[type];
+}
 
 BSGFXAPI bsgfx_Scene* _bsgfx_currentScene() {
     return &_bsgfx_current_scene_;
@@ -99,17 +91,16 @@ BSGFXAPI struct Poser* _poser() {
 }
 
 static void _bsgfx_configure() {
-    // TODO: object configuration generation
-    _bsgfx_contexts_ = bs_configureSource(BS_OBJECT_CONTEXT, BSGFX_IMAGES_COUNT, (const char* []) { BSGFX_IMAGE_IDS(BS_STRING_GEN) });
-    _bsgfx_images_ = bs_configureSource(BS_OBJECT_IMAGE, BSGFX_IMAGES_COUNT, (const char*[]) { BSGFX_IMAGE_IDS(BS_STRING_GEN) });
-    _bsgfx_samplers_ = bs_configureSource(BS_OBJECT_SAMPLER, BSGFX_SAMPLERS_COUNT, (const char* []) { BSGFX_SAMPLER_IDS(BS_STRING_GEN) });
-    _bsgfx_buffers_ = bs_configureSource(BS_OBJECT_BUFFER, BSGFX_BUFFERS_COUNT, (const char* []) { BSGFX_BUFFER_IDS(BS_STRING_GEN) });
-    _bsgfx_queues_ = bs_configureSource(BS_OBJECT_QUEUE, BSGFX_QUEUES_COUNT, (const char* []) { BSGFX_QUEUE_IDS(BS_STRING_GEN) });
-    _bsgfx_batches_ = bs_configureSource(BS_OBJECT_BATCH, BSGFX_BATCHES_COUNT, (const char* []) { BSGFX_BATCH_IDS(BS_STRING_GEN) });
-    _bsgfx_renderers_ = bs_configureSource(BS_OBJECT_RENDERER, BSGFX_RENDERERS_COUNT, (const char* []) { BSGFX_RENDERER_IDS(BS_STRING_GEN) });
-    _bsgfx_ray_tracers_ = bs_configureSource(BS_OBJECT_RAY_TRACER, BSGFX_RAY_TRACERS_COUNT, (const char* []) { BSGFX_RAY_TRACER_IDS(BS_STRING_GEN) });
-    _bsgfx_fonts_ = bs_configureSource(BS_OBJECT_FONT, BSGFX_FONTS_COUNT, (const char* []) { BSGFX_FONT_IDS(BS_STRING_GEN) });
-    _bsgfx_atlases_ = bs_configureSource(BS_OBJECT_ATLAS, BSGFX_ATLASES_COUNT, (const char* []) { BSGFX_ATLAS_IDS(BS_STRING_GEN) });
+  //  BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_CONTEXT, BSGFX_CONTEXTS_COUNT, BSGFX_CONTEXT_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_IMAGE, BSGFX_IMAGES_COUNT, BSGFX_IMAGE_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_SAMPLER, BSGFX_SAMPLERS_COUNT, BSGFX_SAMPLER_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_BUFFER, BSGFX_BUFFERS_COUNT, BSGFX_BUFFER_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_QUEUE, BSGFX_QUEUES_COUNT, BSGFX_QUEUE_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_BATCH, BSGFX_BATCHES_COUNT, BSGFX_BATCH_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_RENDERER, BSGFX_RENDERERS_COUNT, BSGFX_RENDERER_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_RAY_TRACER, BSGFX_RAY_TRACERS_COUNT, BSGFX_RAY_TRACER_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_FONT, BSGFX_FONTS_COUNT, BSGFX_FONT_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_ATLAS, BSGFX_ATLASES_COUNT, BSGFX_ATLAS_IDS);
 
     bs_configureAttribute("bsgfx_VolumeId", BS_FORMAT_R32_SFLOAT);
     bs_configureAttribute("bsgfx_Index", BS_FORMAT_R32_UINT);
@@ -117,22 +108,6 @@ static void _bsgfx_configure() {
    // static const char* strs[] = { BSGFX_FOREACH_ID(BSGFX_STRING_GEN) };
    // for (int i = 0; i < _BSGFX_NUM_OBJECTS; i++)
    //     bs_nameId(i, strs[i]);
-}
-
-static void _bsgfx_resize() {
-    bs_Renderer* lo_res = bs_fetch(BSGFX_RENDERERS, BSGFX_RENDERER_LO_RES)->renderer;
-    if (lo_res) {
-        bs_ivec2 lo_resolution = bs_resolution();
-        lo_resolution.x /= BSGFX_PIXEL_SCALE;
-        lo_resolution.y /= BSGFX_PIXEL_SCALE;
-
-        bs_resizeImage(bs_fetch(BSGFX_IMAGES, BSGFX_IMAGE_LO_RES_0_COLOR)->image, lo_resolution, 0);
-        bs_resizeImage(bs_fetch(BSGFX_IMAGES, BSGFX_IMAGE_LO_RES_0_DEPTH)->image, lo_resolution, 0);
-
-        bs_pushDescriptors();
-
-        bs_resizeRenderer(lo_res, lo_resolution);
-    }
 }
 
 void _bsgfx_tickMaterials();
@@ -186,7 +161,12 @@ static void _bsgfx_tick() {
 
     _bsgfx_tickInstances();
 
-    _bsgfx_pipeline();
+    if (_bsgfx_callbacks_.pipeline)
+        _bsgfx_callbacks_.pipeline();
+
+    _bsgfx_resetInstances();
+
+    //_bsgfx_pipeline();
     _bsgfx_tickMaterials();
 }
 

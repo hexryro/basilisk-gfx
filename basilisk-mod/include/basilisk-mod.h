@@ -34,4 +34,67 @@
         return ret;                                                  \
     }
 
+#define BSMOD_IMAGE_IDS(X)									\
+    X(BSMOD_IMAGE_DEPTH)                                    \
+    X(BSMOD_IMAGE_DEPTH_3D)                                 \
+    X(BSMOD_IMAGE_COLOR)                                    \
+    X(BSMOD_IMAGES_COUNT)
+
+#define BSMOD_SAMPLER_IDS(X)                                \
+	X(BSMOD_SAMPLERS_COUNT)
+
+#define BSMOD_BUFFER_IDS(X)                                 \
+	X(BSMOD_BUFFERS_COUNT)
+
+#define BSMOD_BATCH_IDS(X)									\
+    X(BSMOD_BATCH_TILE)                                     \
+    X(BSMOD_BATCHES_COUNT)
+
+#define BSMOD_RENDERER_IDS(X)								\
+    X(BSMOD_RENDERER)                                       \
+    X(BSMOD_RENDERER_3D)                                    \
+    X(BSMOD_RENDERERS_COUNT)
+
+#define BSMOD_QUEUE_IDS(X)									\
+    X(BSMOD_QUEUE_GRAPHICS)                                 \
+    X(BSMOD_QUEUE_GRAPHICS_RASTERIZATION)                   \
+    X(BSMOD_QUEUES_COUNT)
+
+#define BSMOD_RAY_TRACER_IDS(X) \
+	X(BSMOD_RAY_TRACERS_COUNT)
+
+#define BSMOD_ATLAS_IDS(X)                                  \
+    X(BSMOD_ATLAS_UI)                                       \
+    X(BSMOD_ATLAS_MATERIAL_ICONS)                           \
+    X(BSMOD_ATLAS_PRIMITIVE_ICONS)                          \
+    X(BSMOD_ATLAS_PREFAB_ICONS)                             \
+    X(BSMOD_ATLASES_COUNT)
+
+#define BSMOD_FONT_IDS(X)                                   \
+	X(BSMOD_FONTS_COUNT)
+
+BS_GENERATE_ENUM(BSMOD_IMAGE_IDS);
+BS_GENERATE_ENUM(BSMOD_SAMPLER_IDS);
+BS_GENERATE_ENUM(BSMOD_BUFFER_IDS);
+BS_GENERATE_ENUM(BSMOD_BATCH_IDS);
+BS_GENERATE_ENUM(BSMOD_RENDERER_IDS);
+BS_GENERATE_ENUM(BSMOD_QUEUE_IDS);
+BS_GENERATE_ENUM(BSMOD_RAY_TRACER_IDS);
+BS_GENERATE_ENUM(BSMOD_ATLAS_IDS);
+BS_GENERATE_ENUM(BSMOD_FONT_IDS);
+
+#define BSMOD_CONTEXTS bsmod_fetchSource(BS_OBJECT_CONTEXT)
+#define BSMOD_IMAGES bsmod_fetchSource(BS_OBJECT_IMAGE)
+#define BSMOD_SAMPLERS bsmod_fetchSource(BS_OBJECT_SAMPLER)
+#define BSMOD_BUFFERS bsmod_fetchSource(BS_OBJECT_BUFFER)
+#define BSMOD_BATCHES bsmod_fetchSource(BS_OBJECT_BATCH)
+#define BSMOD_RENDERERS bsmod_fetchSource(BS_OBJECT_RENDERER)
+#define BSMOD_QUEUES bsmod_fetchSource(BS_OBJECT_QUEUE)
+#define BSMOD_RAY_TRACERS bsmod_fetchSource(BS_OBJECT_RAY_TRACER)
+#define BSMOD_ATLASES bsmod_fetchSource(BS_OBJECT_ATLAS)
+
+BSMODAPI int
+bsmod_fetchSource(
+    bs_ObjectType type);
+
 #endif

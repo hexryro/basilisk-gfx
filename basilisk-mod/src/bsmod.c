@@ -23,6 +23,7 @@
   SOFTWARE.
   */ 
 
+#include <basilisk-gfx.h>
 #include <bsmod_internal.h>
 #include <bsmod_cache.h>
 #include <stdio.h>
@@ -45,9 +46,10 @@ Bsmod _bsmod_ = {
 
 bs_Json _bsmod_config_ = { 0 };
 
-int _bsmod_images_ = -1, _bsmod_samplers_ = -1, _bsmod_buffers_ = -1,
-    _bsmod_batches_ = -1, _bsmod_renderers_ = -1, _bsmod_ray_tracers_ = -1,
-    _bsmod_queues_ = -1, _bsmod_atlases_ = -1, _bsmod_fonts_ = -1;
+static int _bsmod_sources_[BS_OBJECT_TYPE_COUNT] = { -1 };
+int bsmod_fetchSource(bs_ObjectType type) {
+    return _bsmod_sources_[type];
+}
 
 volatile long _bsmod_has_performed_tracked_changes_ = 1;
 
@@ -138,7 +140,7 @@ BSMODAPI void _bsmod_onTick() {
         bsgfx_Primitive* primitive = bsgfx_get(BSGFX_TYPE_PRIMITIVE, _bsmod_.selected_tile_primitive);
 
         if (last_selected_type != _bsmod_.selected_type || last_selected_count != _bsmod_.selected_tiles.count) {
-            bs_Batch* batch = bs_fetch(_bsmod_batches_, BSMOD_BATCH_TILE)->batch;
+            bs_Batch* batch = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_TILE)->batch;
             bs_Scope last = *bs_getScope();
             bs_setScope(&(bs_Scope) { .queue = bs_singleTimesQueue() });
             bs_unpushBatch(batch);
@@ -387,15 +389,15 @@ BSMODAPI void _bsmod_onIni() {
         (LPCSTR)(&_bsmod_onIni),
         &_bsmod_.module);
 
-    _bsmod_images_ = bs_configureSource(BS_OBJECT_IMAGE, BSMOD_IMAGES_COUNT, (const char* []) { BSMOD_IMAGE_IDS(BS_STRING_GEN) });
-    _bsmod_samplers_ = bs_configureSource(BS_OBJECT_SAMPLER, BSMOD_SAMPLERS_COUNT, (const char* []) { BSMOD_SAMPLER_IDS(BS_STRING_GEN) });
-    _bsmod_buffers_ = bs_configureSource(BS_OBJECT_BUFFER, BSMOD_BUFFERS_COUNT, (const char* []) { BSMOD_BUFFER_IDS(BS_STRING_GEN) });
-    _bsmod_queues_ = bs_configureSource(BS_OBJECT_QUEUE, BSMOD_QUEUES_COUNT, (const char* []) { BSMOD_QUEUE_IDS(BS_STRING_GEN) });
-    _bsmod_batches_ = bs_configureSource(BS_OBJECT_BATCH, BSMOD_BATCHES_COUNT, (const char* []) { BSMOD_BATCH_IDS(BS_STRING_GEN) });
-    _bsmod_renderers_ = bs_configureSource(BS_OBJECT_RENDERER, BSMOD_RENDERERS_COUNT, (const char* []) { BSMOD_RENDERER_IDS(BS_STRING_GEN) });
-    _bsmod_ray_tracers_ = bs_configureSource(BS_OBJECT_RAY_TRACER, BSMOD_RAY_TRACERS_COUNT, (const char* []) { BSMOD_RAY_TRACER_IDS(BS_STRING_GEN) });
-    _bsmod_fonts_ = bs_configureSource(BS_OBJECT_FONT, BSMOD_FONTS_COUNT, (const char* []) { BSMOD_FONT_IDS(BS_STRING_GEN) });
-    _bsmod_atlases_ = bs_configureSource(BS_OBJECT_ATLAS, BSMOD_ATLASES_COUNT, (const char* []) { BSMOD_ATLAS_IDS(BS_STRING_GEN) });
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_IMAGE, BSMOD_IMAGES_COUNT, BSMOD_IMAGE_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_SAMPLER, BSMOD_SAMPLERS_COUNT, BSMOD_SAMPLER_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_BUFFER, BSMOD_BUFFERS_COUNT, BSMOD_BUFFER_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_QUEUE, BSMOD_QUEUES_COUNT, BSMOD_QUEUE_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_BATCH, BSMOD_BATCHES_COUNT, BSMOD_BATCH_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_RENDERER, BSMOD_RENDERERS_COUNT, BSMOD_RENDERER_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_RAY_TRACER, BSMOD_RAY_TRACERS_COUNT, BSMOD_RAY_TRACER_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_FONT, BSMOD_FONTS_COUNT, BSMOD_FONT_IDS);
+    BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_ATLAS, BSMOD_ATLASES_COUNT, BSMOD_ATLAS_IDS);
 
     _bsmod_onLoadVariables();
     _bsmod_loadShaderReferences();
@@ -420,16 +422,6 @@ BSMODAPI void _bsmod_onIni() {
     _bsmod_iniPackage(_bsmod_applicationContentPath());
     // _bsmod_iniLisk();
     _bsmod_iniCompiler();
-
-    bs_configureSource(BS_OBJECT_IMAGE, BSMOD_IMAGES_COUNT, (const char* []) { BSMOD_IMAGE_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_SAMPLER, BSMOD_SAMPLERS_COUNT, (const char* []) { BSMOD_SAMPLER_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_BUFFER, BSMOD_BUFFERS_COUNT, (const char* []) { BSMOD_BUFFER_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_QUEUE, BSMOD_QUEUES_COUNT, (const char* []) { BSMOD_QUEUE_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_BATCH, BSMOD_BATCHES_COUNT, (const char* []) { BSMOD_BATCH_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_RENDERER, BSMOD_RENDERERS_COUNT, (const char* []) { BSMOD_RENDERER_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_RAY_TRACER, BSMOD_RAY_TRACERS_COUNT, (const char* []) { BSMOD_RAY_TRACER_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_FONT, BSMOD_FONTS_COUNT, (const char* []) { BSMOD_FONT_IDS(BS_STRING_GEN) });
-    bs_configureSource(BS_OBJECT_ATLAS, BSMOD_ATLASES_COUNT, (const char* []) { BSMOD_ATLAS_IDS(BS_STRING_GEN) });
 }
 
 BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track
@@ -572,7 +564,7 @@ BSMODAPI void _bsmod_onLoad() {
         bs_framebuffer(renderer_object->renderer, resolution);
     }
 
-    bs_Object* renderer_3d = BS_RENDERER(_bsmod_renderers_, BSMOD_RENDERER_3D, BS_OBJECT_HAS_SWAPS_BIT);
+    bs_Object* renderer_3d = BS_RENDERER(BSMOD_RENDERERS, BSMOD_RENDERER_3D, BS_OBJECT_HAS_SWAPS_BIT);
     result = bs_renderer(renderer_3d, 0);
     if (result == BS_RESULT_OK) {
         bs_Object* depth = BS_IMAGE(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH_3D, 0);
