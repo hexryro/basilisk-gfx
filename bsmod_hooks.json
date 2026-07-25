@@ -5,7 +5,7 @@
         "package": "content/bsgfx",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-07-25 11:19:18",
+        "lastModified": "2026-07-25 21:10:00",
         "entries": [
             "project/basilisk-gfx/shaders/bsgfx.glsl",
             "project/basilisk-gfx/shaders/bsgfx_atlas.glsl",
@@ -142,7 +142,7 @@
         "package": "content/bsmod",
         "prefix": "fonts/",
         "callOnce": false,
-        "lastModified": "2026-04-19 15:46:30",
+        "lastModified": "2026-07-25 20:00:40",
         "entries": [
             "project/basilisk-mod/bmfont/arial_16.fnt",
             "project/basilisk-mod/bmfont/arial_16.png",

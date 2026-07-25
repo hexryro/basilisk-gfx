@@ -591,7 +591,7 @@ BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFl
 
 BSAPI bs_Result _val_bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
     BS_VALIDATE(num_bytes > 0, BS_RESULT_VALIDATION_ERROR, );
-    BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_BUFFER, BS_RESULT_VALIDATION_ERROR);
+  //  BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_BUFFER, BS_RESULT_VALIDATION_ERROR);
 
     return _bs_buffer(object, num_bytes, usage_flags, memory_flags, flags);
 }
@@ -1438,7 +1438,7 @@ static void _bs_nameBatch(bs_Object* object, const char* name) {
 }
 
 BSAPI bs_Result _val_bs_batch(bs_Object* object, int index_size, bs_Shader* shader, bs_BatchBits flags) {
-    BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_BATCH, BS_RESULT_VALIDATION_ERROR);
+ //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_BATCH, BS_RESULT_VALIDATION_ERROR);
     BS_VALIDATE(shader->num_attributes > 0, BS_RESULT_VALIDATION_ERROR,);
 
     return _bs_batch(object, index_size, shader, flags);
@@ -2637,7 +2637,7 @@ static void _bs_nameQueue(bs_Object* object, const char* name) {
 }
 
 BSAPI bs_Result _val_bs_queue(bs_Object* object, bs_QueueBits flags) {
-    BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_QUEUE, BS_RESULT_VALIDATION_ERROR);
+ //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_QUEUE, BS_RESULT_VALIDATION_ERROR);
 
     return _bs_queue(object, flags);
 }

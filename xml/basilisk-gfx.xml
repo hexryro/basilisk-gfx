@@ -1534,8 +1534,8 @@
 		<function name="bsgfx_instanceWidgets">
 			<return>bool</return>
 			<param><type>bsgfx_Menu</type><name>menu</name></param>
-			<param><type>bsgfx_TitleBar*</type><name>title_bar</name></param>
-			<param><type>bsgfx_MenuTabBar*</type><name>tab_bar</name></param>
+			<param nullable="true"><type>bsgfx_TitleBar*</type><name>title_bar</name></param>
+			<param nullable="true"><type>bsgfx_MenuTabBar*</type><name>tab_bar</name></param>
 		</function>
 		<function name="bsgfx_renderColorPickers"><return>void</return></function>
 	</functions>

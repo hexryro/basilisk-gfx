@@ -413,7 +413,7 @@ BSGFXAPI int _val_bsgfx_instance(int subtype, const char* data, int data_size, b
 	int instance_type = metadata->instance_subtypes[subtype].instance_type;
 	BSGFX_VALIDATE(_poser_->instance_buffers[instance_type] != NULL, 0, "Instance type %d has not been created or has no subtypes", instance_type);
 	BSGFX_VALIDATE(bs_bufferIsMapped(_poser_->instance_buffers[instance_type]), 0, "Instance type %d", instance_type);
-	BSGFX_VALIDATE(metadata->instance_types[instance_type].count >= metadata->instance_types[instance_type].allocated, 0, "Instance buffer of type %d is maxed out\n", instance_type);
+	BSGFX_VALIDATE(metadata->instance_types[instance_type].count < metadata->instance_types[instance_type].allocated, 0, "Instance buffer of type %d is maxed out\n", instance_type);
 
 	return _bsgfx_instance(subtype, data, data_size, flags, bone_index, id, material);
 }

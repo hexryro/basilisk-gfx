@@ -1042,9 +1042,9 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
 	case WM_SYSKEYUP:
 	case WM_SYSCHAR:
 		return 0;
-	case WM_SETCURSOR: {
-		// SetCursor(_bs_context_->cursor_icons[_bs_wnd.cursor_icon].handle);
-	} break;
+//	case WM_SETCURSOR: {
+//		// SetCursor(_bs_context_->cursor_icons[_bs_wnd.cursor_icon].handle);
+//	} break;
 	default: return DefWindowProc(hwnd, msg, w_param, l_param);
     }
     return 0;
@@ -1053,6 +1053,43 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
 BSAPI void _bs_moveWindow(int x, int y) {
     bs_ivec2 resolution = _bs_resolution();
 	SetWindowPos(_bs_context_->hwnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+}
+
+ /**
+  TODO: should probably build a system around this
+  */
+BSAPI void _bs_overrideTitleBar() {
+    bs_Context* context = _bs_context_;
+
+    SetWindowLong(context->hwnd, GWL_STYLE, 0);
+
+    COLORREF DARK_COLOR = 0x00000000;
+    BOOL SET_CAPTION_COLOR = SUCCEEDED(DwmSetWindowAttribute(
+        context->hwnd, DWMWA_CAPTION_COLOR,
+        &DARK_COLOR, sizeof(DARK_COLOR)));
+    SetWindowLong(context->hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
+
+    RECT rect;
+    GetWindowRect(context->hwnd, &rect);
+
+    SetWindowPos(
+        context->hwnd,
+        NULL,
+        rect.left,
+        rect.top,
+        rect.right - rect.left,
+        rect.bottom - rect.top,
+        SWP_FRAMECHANGED | SWP_NOACTIVATE
+    );
+
+    DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
+
+    DwmSetWindowAttribute(
+        context->hwnd,
+        DWMWA_WINDOW_CORNER_PREFERENCE,
+        &preference,
+        sizeof(preference)
+    );
 }
 
 BSAPI bs_Result _bs_window(bs_Context* context, bs_U32 width, bs_U32 height, const char* title) {
@@ -1067,6 +1104,15 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_U32 width, bs_U32 height, con
 
     const char class_name[] = "class";
     HINSTANCE hinstance = GetModuleHandle(0);
+
+    HICON hicon = (HICON)LoadImage(
+        NULL,
+        "content/icon.ico",
+        IMAGE_ICON,
+        0, 0,
+        LR_LOADFROMFILE | LR_DEFAULTSIZE
+    );
+
     WNDCLASSEX wc = {
         .cbSize = sizeof(WNDCLASSEX),
         .style = CS_OWNDC,
@@ -1074,12 +1120,12 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_U32 width, bs_U32 height, con
         .cbClsExtra = 0,
         .cbWndExtra = 0,
         .hInstance = hinstance,
-        .hIcon = LoadIcon(NULL, IDI_APPLICATION),
+        .hIcon = hicon ? hicon : LoadIcon(NULL, IDI_APPLICATION),
         .hCursor = LoadCursor(NULL, IDC_ARROW),
 		.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
 		.lpszMenuName = NULL,
         .lpszClassName = class_name,
-        .hIconSm = LoadIcon(NULL, IDI_APPLICATION),
+        //.hIconSm = LoadIcon(NULL, IDI_APPLICATION),
     };
 
     if (!RegisterClassEx(&wc)) {
@@ -1123,24 +1169,9 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_U32 width, bs_U32 height, con
      HDC hdc = GetDC(context->hwnd);
      int pixel_format = ChoosePixelFormat(hdc, &pixel_format_descriptor);
 	 SetPixelFormat(hdc, pixel_format, &pixel_format_descriptor);
-//	 SetWindowLong(_bs_wnd.hwnd, GWL_STYLE, 0);
-//
-//	 COLORREF DARK_COLOR = 0x00000000;
-//	 BOOL SET_CAPTION_COLOR = SUCCEEDED(DwmSetWindowAttribute(
-//		 _bs_wnd.hwnd, DWMWA_CAPTION_COLOR,
-//		 &DARK_COLOR, sizeof(DARK_COLOR)));
-	 //SetWindowLong(_bs_wnd.hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
 
-		//SetWindowPos(_bs_wnd.hwnd, 0, 0, 0, width, height, SWP_FRAMECHANGED); //some trick to redraw window ShowWindow(hwnd, SW_SHOW);
-
-	// DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
-	//
-	// DwmSetWindowAttribute(
-	//	 _bs_wnd.hwnd,
-	//	 DWMWA_WINDOW_CORNER_PREFERENCE,
-	//	 &preference,
-	//	 sizeof(preference)
-	// );
+     if (_bs_callbacks_.configureWindow)
+         _bs_callbacks_.configureWindow();
 
      ShowWindow(context->hwnd, SW_SHOW);
      UpdateWindow(context->hwnd);

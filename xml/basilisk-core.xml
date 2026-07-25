@@ -61,6 +61,7 @@
 		<typedef><type>void</type><name>(__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorCallbackFunction)()</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_WindowConfigurationCallbackFunction)()</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
@@ -2051,6 +2052,7 @@
 		<structure name="bs_Callbacks">
 			<field><type>bs_MessageCallbackFunction</type><name>log</name></field>
 			<field><type>bs_ValidationErrorCallbackFunction</type><name>error</name></field>
+			<field><type>bs_WindowConfigurationCallbackFunction</type><name>configureWindow</name></field>
 		</structure>
 
 		<structure name="bs_LogQueueItem">
@@ -4193,6 +4195,9 @@
             <param><type>int</type><name>x</name></param>
             <param><type>int</type><name>y</name></param>
         </function>
+		<function name="bs_overrideTitleBar">
+			<return>void</return>
+		</function>
         <function name="bs_window">
             <return>bs_Result</return>
             <param><type>bs_Context*</type><name>context</name></param>

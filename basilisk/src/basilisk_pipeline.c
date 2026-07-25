@@ -1,3 +1,28 @@
+
+ /**
+  MIT License
+  
+  Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+  */ 
+
 #include <basilisk-mod.h>
 #include <bsmod_cache.h>
 #include <basilisk_pipeline.h>
@@ -187,25 +212,14 @@ void basilisk_createRenderers() {
         bs_Object* hi_res_0_depth = BS_IMAGE(BASILISK_IMAGES, BASILISK_IMAGE_MAIN_OUTPUT_DEPTH, 0);
         if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT) == BS_RESULT_OK) {
 
-            /** subpass 0 */
             bs_output(hi_res->renderer, (bs_Output) {
                 .subpass = 0,
-                    .image = bs_context()->swapchain_image->image,
-                    .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
-                    .store_op = BS_ATTACHMENT_STORE_OP_STORE,
-                    .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
-                    .new_layout = BS_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                .image = bs_context()->swapchain_image->image,
+                .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
+                .store_op = BS_ATTACHMENT_STORE_OP_STORE,
+                .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
+                .new_layout = BS_IMAGE_LAYOUT_PRESENT_SRC_KHR,
             });
-
-            bs_output(hi_res->renderer, (bs_Output) {
-                .subpass = 0,
-                    .image = hi_res_0_depth->image,
-                    .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
-                    .store_op = BS_ATTACHMENT_STORE_OP_STORE,
-                    .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
-                    .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            });
-
             /** dependencies */
             bs_dependency(hi_res->renderer, -1, 0, BS_DEPENDENCY_BY_REGION_BIT,
                 BS_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,

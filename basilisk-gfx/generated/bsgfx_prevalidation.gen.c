@@ -659,8 +659,6 @@ BSGFXAPI void _preval_bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis
 }
 
 BSGFXAPI bool _preval_bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* title_bar, bsgfx_MenuTabBar* tab_bar) {
-    BSGFX_VALIDATE(title_bar != NULL, false,);
-    BSGFX_VALIDATE(tab_bar != NULL, false,);
     return next.bsgfx_instanceWidgets(menu, title_bar, tab_bar);
 }
 

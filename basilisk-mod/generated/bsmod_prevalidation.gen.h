@@ -44,6 +44,7 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
         (LPCSTR)(&_preval_bsmod_getFunctions),
         &module);
 
+    functions.bsmod_subtypes = (PFN_bsmod_subtypes)GetProcAddress(module, "_preval_bsmod_subtypes");
     functions.bsmod_callbacks = (PFN_bsmod_callbacks)GetProcAddress(module, "_preval_bsmod_callbacks");
     functions.bsmod_copyHoveringDataToBuffer = (PFN_bsmod_copyHoveringDataToBuffer)GetProcAddress(module, "_preval_bsmod_copyHoveringDataToBuffer");
     functions.bsmod_onIni = (PFN_bsmod_onIni)GetProcAddress(module, "_preval_bsmod_onIni");

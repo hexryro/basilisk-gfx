@@ -4060,6 +4060,11 @@ void bs_moveWindow(
     next.bs_moveWindow(x, y);
 }
 
+void bs_overrideTitleBar()
+{
+    next.bs_overrideTitleBar();
+}
+
 bs_Result bs_window(
     bs_Context* context, 
     bs_U32 width, 

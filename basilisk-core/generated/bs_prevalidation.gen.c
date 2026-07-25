@@ -2320,6 +2320,10 @@ BSAPI void _preval_bs_moveWindow(int x, int y) {
     next.bs_moveWindow(x, y);
 }
 
+BSAPI void _preval_bs_overrideTitleBar() {
+    next.bs_overrideTitleBar();
+}
+
 BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_U32 width, bs_U32 height, const char* title) {
     BS_VALIDATE(context != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(title != NULL, BS_RESULT_VALIDATION_ERROR,);
@@ -2929,6 +2933,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_scroll = _preval_bs_scroll;
     functions.bs_resizeWindow = _preval_bs_resizeWindow;
     functions.bs_moveWindow = _preval_bs_moveWindow;
+    functions.bs_overrideTitleBar = _preval_bs_overrideTitleBar;
     functions.bs_window = _preval_bs_window;
     functions.bs_device = _preval_bs_device;
     functions.bs_tick = _preval_bs_tick;

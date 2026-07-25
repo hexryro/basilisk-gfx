@@ -171,8 +171,6 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 	bs_Result bs_result;
 	spvc_result result;
 
-	bsmod_Resource* existing = _bsmod_queryResource(package, resource);
-
 	bs_BbndHeader header = {
 		.magic = BS_BBND_MAGIC,
 		.version = 1,
@@ -193,9 +191,10 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 	char* name = bs_alloca(len + 1);
 	snprintf(name, len + 1, "_bbnd/%d/%d", header.set, header.point);
 
+	bsmod_Resource* existing = _bsmod_queryResource(package, name);
 	if (existing) {
 		bsmod_Chunk* chunk = bs_fetchUnit(&package->chunks, existing->header.chunk);
-		bs_BbndHeader* existing_header = chunk->bin.data;
+		bs_BbndHeader* existing_header = chunk->bin.data + existing->header.offset;
 
 		if (existing_header->magic == BS_BBND_MAGIC) {
 			header.shader_stages |= existing_header->shader_stages;

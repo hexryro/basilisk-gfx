@@ -36,6 +36,7 @@
 #include <basilisk-mod.h>
 #include <windows.h>
 
+typedef const int*(__stdcall* PFN_bsmod_subtypes)();
 typedef bsmod_Callbacks*(__stdcall* PFN_bsmod_callbacks)();
 typedef void(__stdcall* PFN_bsmod_copyHoveringDataToBuffer)();
 typedef void(__stdcall* PFN_bsmod_onIni)();
@@ -134,6 +135,7 @@ typedef bool(__stdcall* PFN_bsmod_instanceTilePreview)(bsgfx_Widget* widget, bs_
 typedef void(__stdcall* PFN_bsmod_onDragTile)(bsmod_DraggingParams params);
 
 typedef struct {
+    PFN_bsmod_subtypes bsmod_subtypes;
     PFN_bsmod_callbacks bsmod_callbacks;
     PFN_bsmod_copyHoveringDataToBuffer bsmod_copyHoveringDataToBuffer;
     PFN_bsmod_onIni bsmod_onIni;
@@ -232,6 +234,7 @@ typedef struct {
     PFN_bsmod_onDragTile bsmod_onDragTile;
 } bsmod_FunctionTable;
 
+BSMODAPI const int* _bsmod_subtypes();
 BSMODAPI bsmod_Callbacks* _bsmod_callbacks();
 BSMODAPI void _bsmod_copyHoveringDataToBuffer();
 BSMODAPI void _bsmod_onIni();
@@ -332,6 +335,7 @@ BSMODAPI void _bsmod_onDragTile(bsmod_DraggingParams params);
 static inline bsmod_FunctionTable* _bsmod_getFunctions() {
     static bsmod_FunctionTable functions;
 
+    functions.bsmod_subtypes = _bsmod_subtypes;
     functions.bsmod_callbacks = _bsmod_callbacks;
     functions.bsmod_copyHoveringDataToBuffer = _bsmod_copyHoveringDataToBuffer;
     functions.bsmod_onIni = _bsmod_onIni;

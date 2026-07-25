@@ -191,6 +191,9 @@ static void _bs_pushDescriptorPools() {
 BSAPI void _val_bs_pushDescriptors() {
     for (int i = 0; i < _bs_instance_->bind_sets_count; i++) {
         bs_BindSet* bind_set = _bs_instance_->bind_sets + i;
+        if (!bind_set->needs_update)
+            continue;
+
         BS_VALIDATE(bind_set->vk_update_template != NULL,,);
     }
 
@@ -306,6 +309,8 @@ BSAPI bs_Result _bs_binding(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Des
         binding->location = bind_set->bound_descriptors_count * sizeof(bs_Descriptor);
         bind_set->bound_descriptors_count += descriptors_count;
        // binding->location = bind_set->descriptors_size;
+
+        bs_logWithTimestampF(BS_MESSAGE_INFO, BS_PRINT_COLOR("+", BS_PRINT_GREEN) " Binding %d, %d", bind_set_slot, bind_point_slot);
         binding->in_use = true;
     }
     memcpy(((unsigned char*)bind_set->descriptors) + binding->location, descriptors, descriptors_count * sizeof(bs_Descriptor));

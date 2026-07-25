@@ -194,6 +194,7 @@
 	<functions>
 		<validationTemplate/>
 
+		<function name="bsmod_subtypes"><return>const int*</return></function>
 		<function name="bsmod_callbacks">
 			<return>bsmod_Callbacks*</return>
 		</function>

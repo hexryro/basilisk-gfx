@@ -226,6 +226,12 @@ BSMODAPI void
 bsmod_disableValidation();
 
  /**
+  @return const int*
+  */
+BSMODAPI const int*
+bsmod_subtypes();
+
+ /**
   @return bsmod_Callbacks*
   */
 BSMODAPI bsmod_Callbacks*

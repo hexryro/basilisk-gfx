@@ -1337,6 +1337,7 @@ typedef void (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
 typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
 typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
 typedef void (__stdcall* bs_ValidationErrorCallbackFunction)();
+typedef void (__stdcall* bs_WindowConfigurationCallbackFunction)();
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -3336,6 +3337,7 @@ struct bs_Props {
 struct bs_Callbacks {
     bs_MessageCallbackFunction log;
     bs_ValidationErrorCallbackFunction error;
+    bs_WindowConfigurationCallbackFunction configureWindow;
 };
 
 struct bs_LogQueueItem {
@@ -8973,6 +8975,12 @@ BSAPI void
 bs_moveWindow(
     int x,
     int y);
+
+ /**
+  @return void
+  */
+BSAPI void
+bs_overrideTitleBar();
 
  /**
   @param context

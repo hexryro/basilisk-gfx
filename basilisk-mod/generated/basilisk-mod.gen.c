@@ -69,6 +69,11 @@ void bsmod_disableValidation()
     _bsmod_setFunctions(definitions, NULL);
 }
 
+const int* bsmod_subtypes()
+{
+    return next.bsmod_subtypes();
+}
+
 bsmod_Callbacks* bsmod_callbacks()
 {
     return next.bsmod_callbacks();

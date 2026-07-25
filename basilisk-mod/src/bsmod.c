@@ -55,6 +55,10 @@ volatile long _bsmod_has_performed_tracked_changes_ = 1;
 
 int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT] = { 0 };
 
+BSMODAPI const int* _bsmod_subtypes() {
+    return _bsmod_subtypes_;
+}
+
 bsmod_Callbacks _bsmod_callbacks_ = { 0 };
 
 BSMODAPI bsmod_Callbacks* _bsmod_callbacks() {
@@ -97,7 +101,7 @@ static void _bsmod_instanceAxisFace(
 }
 
 BSMODAPI void _bsmod_onTick() {
-    memset(&_bsmod_.queue, 0, sizeof(_bsmod_.queue));
+   // memset(&_bsmod_.queue, 0, sizeof(_bsmod_.queue));
 
   //  static float lisk_time = 0.0;
   //  lisk_time += bs_elapsedTime();
@@ -116,6 +120,7 @@ BSMODAPI void _bsmod_onTick() {
 
     }
 
+    return;
     if (bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_CURSOR_READS) && bs_bufferIsMapped(bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_CURSOR_READS)->buffer)) {
         _bsmod_readHoveringOutputs();
         _bsmod_readHoveringInstanceData();

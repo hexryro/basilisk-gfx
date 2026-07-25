@@ -104,7 +104,6 @@ static bs_Result _bsmod_loadBMFont(const char* path, bsmod_BMFont* out) {
 BSMODAPI bs_Result _bsmod_packBMFont(char* package_name, char* bmfont_path, char* png_path, char* resource_name, int resource_name_length) {
     bs_Result result;
 
-    int width = 0, height = 0;
     const int channels_count = 4;
 
     bsmod_BMFont font;
@@ -132,7 +131,7 @@ BSMODAPI bs_Result _bsmod_packBMFont(char* package_name, char* bmfont_path, char
     };
 
     const size_t total_size_excluding_binary = bfnt_size + batl_size;
-    const size_t atlas_size = width * height * channels_count;
+    const size_t atlas_size = png_data.width * png_data.height * channels_count;
     const size_t total_size = total_size_excluding_binary + atlas_size;
 
     unsigned char* bfnt = bs_malloc(total_size);
@@ -173,8 +172,8 @@ BSMODAPI bs_Result _bsmod_packBMFont(char* package_name, char* bmfont_path, char
         .magic = BS_BATL_MAGIC,
         .version = 1,
         .binary_offset = batl_size,
-        .width = width,
-        .height = height,
+        .width = png_data.width,
+        .height = png_data.height,
         .channels_count = channels_count,
         .images_count = font.char_count,
     };

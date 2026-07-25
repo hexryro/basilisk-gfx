@@ -520,7 +520,7 @@ BSAPI bs_Result _bs_loadPng(const char* path, int channels_count, bs_PngData* ou
 
 BSAPI bs_Result _val_bs_bitmapImage(bs_Object* object, unsigned char* image_data, bs_ivec2 dim, bs_Format format, bs_ImageBits flags) {
     if (object->image) {
-        BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_VALIDATION_ERROR);
+     //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_VALIDATION_ERROR);
     }
 
     return _bs_bitmapImage(object, image_data, dim, format, flags);
@@ -642,7 +642,7 @@ BSAPI void _bs_destroySampler(bs_Sampler* sampler) {
 }
 
 BSAPI bs_Result _val_bs_sampler(bs_Object* object, bs_ImageFilter filter, bs_SamplerBits flags) {
-    BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_SAMPLER, BS_RESULT_VALIDATION_ERROR);
+  //  BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_SAMPLER, BS_RESULT_VALIDATION_ERROR);
     return _bs_sampler(object, filter, flags);
 }
 
@@ -813,7 +813,7 @@ BSAPI void _bs_blit(bs_BlitOperation operation)  {
    *============================================================================*/
 
 BSAPI bs_Result _val_bs_loadImage(bs_Object* object, int package_id, bs_ImageBits flags, char* resource_name, char* resource_name_length) {
-    BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_OK);
+   // BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_OK);
 
     return _bs_loadImage(object, package_id, flags, resource_name, resource_name_length);
 }
@@ -992,7 +992,7 @@ BSAPI void _bs_destroyAtlas(bs_Atlas* atlas) {
 }
 
 BSAPI bs_Result _val_bs_loadAtlasMemory(bs_Object* object, int package_id, char* resource_name, char* data, bs_U32 flags) {
-    BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_ATLAS, BS_RESULT_VALIDATION_ERROR);
+ //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_ATLAS, BS_RESULT_VALIDATION_ERROR);
 
     return _bs_loadAtlasMemory(object, package_id, resource_name, data, flags);
 }

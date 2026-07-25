@@ -5,10 +5,7 @@
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
 #include "project/basilisk-gfx/shaders/bsgfx_quad.glsl"
 
-layout (location = BSGFX_LO_SUBPASS_0_OUT_COLOR) out vec4 out_color;
-layout (location = BSGFX_LO_SUBPASS_0_OUT_NORMAL) out vec4 out_normal;
-layout (location = BSGFX_LO_SUBPASS_0_OUT_INDEX) out uint out_index;
-layout (location = BSGFX_LO_SUBPASS_0_OUT_POSITION) out vec4 out_position;
+layout (location = 0) out vec4 out_color;
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec4 in_color;
@@ -34,13 +31,13 @@ layout(push_constant) uniform constants {
 
 void main() {
     out_color = vec4(in_normal, 1.0);
-    out_normal.xyz = in_normal;
-    out_normal.a = 0.0;
-    out_position = vec4(in_world_position, 1.0);
+    //out_normal.xyz = in_normal;
+    //out_normal.a = 0.0;
+  //  out_position = vec4(in_world_position, 1.0);
 
-    out_normal.xyz = in_normal;
-    if (out_normal.x != 0.0 || out_normal.y != 0.0 || out_normal.z != 0.0)
-        out_normal.a = 1.0;
+  // out_normal.xyz = in_normal;
+  // if (out_normal.x != 0.0 || out_normal.y != 0.0 || out_normal.z != 0.0)
+  //     out_normal.a = 1.0;
 
     out_color = in_color;
 
@@ -72,5 +69,4 @@ void main() {
     float aa = fwidth(dist);
     float alpha = 1.0 - smoothstep(0.0, aa, dist);
     out_color.a *= alpha;
-    out_color = vec4(1.0);
 }
