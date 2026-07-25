@@ -37,6 +37,7 @@
 #include <basilisk-core.h>
 #include <basilisk-gfx.h>
 
+typedef struct bsmod_Callbacks bsmod_Callbacks;
 typedef struct bsmod_TrackParams bsmod_TrackParams;
 typedef struct bsmod_QueueLoad bsmod_QueueLoad;
 typedef struct bsmod_AtlasPacker bsmod_AtlasPacker;
@@ -145,6 +146,10 @@ enum bsmod_SideMenuTabId {
     BSMOD_TABS_COUNT,
 };
 
+struct bsmod_Callbacks {
+    PFN_void tick;
+};
+
 struct bsmod_TrackParams {
     char* path;
     char* package;
@@ -219,6 +224,12 @@ bsmod_enableValidation();
   */
 BSMODAPI void
 bsmod_disableValidation();
+
+ /**
+  @return bsmod_Callbacks*
+  */
+BSMODAPI bsmod_Callbacks*
+bsmod_callbacks();
 
  /**
   @return void
@@ -1162,6 +1173,7 @@ BSMODAPI void
 bsmod_onDragTile(
     bsmod_DraggingParams params);
 
+BSMODAPI extern bsmod_Callbacks _bsmod_callbacks_;
 BSMODAPI extern int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT];
 BSMODAPI extern bs_Json _bsmod_config_;
 BSMODAPI extern int _bsmod_images_;

@@ -175,20 +175,22 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
     char* path_dup = strdup(path);
     bs_U64 hash = _bs_stringHash(path_dup);
 
-    bs_Package* existing = NULL, * old = NULL;
+    bs_Package* existing = NULL;
+    bs_ResourceHeader* old_headers = NULL;
+    int old_headers_count = 0;
     int id = -1;
     for (int i = 0; i < _bs_packages()->count; i++) {
         bs_Package* package = _bs_fetchUnit(_bs_packages(), i);
         if (package->path_hash == hash) {
-            old = package;
+            existing = package;
+            old_headers = package->resource_headers;
+            old_headers_count = package->resource_headers_count;
             id = i;
-            _bs_free(old->raw);
-            old->raw = NULL;
+            _bs_free(package->raw);
+            package->raw = NULL;
             break;
         }
     }
-
-    existing = old;
 
     _bs_infoF("Loading package \"%s\"", path_dup);
     if (!existing) {
@@ -237,13 +239,11 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
             .name = strdup(name),
         };
         
-        if (old) {
-            for (int j = 0; j < old->resource_headers_count; j++) {
-                bs_ResourceHeader* existing_header = old->resource_headers + j;
-                if (existing_header->header.name_hash == header->header.name_hash) {
-                    added->resource = existing_header->resource;
-                    break;
-                }
+        for (int j = 0; j < old_headers_count; j++) {
+            bs_ResourceHeader* existing_header = old_headers + j;
+            if (existing_header->header.name_hash == header->header.name_hash) {
+                added->resource = existing_header->resource;
+                break;
             }
         }
 
@@ -251,6 +251,10 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
     }
 
     *out = id;
+
+    if (old_headers) {
+        bs_free(old_headers);
+    }
 
     if (actual_resources_count != package_header->resources_count) {
         // Kinda critical but we'll see what happens, shouldn't happen though
@@ -502,8 +506,6 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
         result->head->id = id;
         result->head->source_id = source_id;
 
-        _bs_nameObject(result, _bs_idName(source_id, id));
-
         _bs_logObjectCreated(source_id, id);
 
         return result;
@@ -539,24 +541,4 @@ BSAPI void _bs_nameSampler(bs_Object* object, const char* name) {
     for (int i = 0; i < _bs_samplerSwapsCount(object->sampler); i++) {
         bsi_nameHandle(object->sampler->_[i].vk_sampler, VK_OBJECT_TYPE_SAMPLER, name, name_length);
     }
-}
-
-
-BSAPI void _bs_nameObject(bs_Object* object, const char* name) {
-    static bs_NameObjectFunction name_object_functions[BS_OBJECT_TYPE_COUNT] = {
-        [BS_OBJECT_IMAGE] = _bs_nameImage,
-        [BS_OBJECT_SAMPLER] = _bs_nameSampler,
-        [BS_OBJECT_BUFFER] = _bs_nameBuffer,
-        [BS_OBJECT_QUEUE] = _bs_nameQueue,
-        [BS_OBJECT_BATCH] = _bs_nameBatch,
-        [BS_OBJECT_RENDERER] = _bs_nameRenderer,
-        [BS_OBJECT_RAY_TRACER] = _bs_nameRayTracer,
-        //[BS_OBJECT_FONT] = _bs_nameFont,
-        //[BS_OBJECT_ATLAS] = _bs_nameAtlas,
-    };
-
-    if (name_object_functions[object->head->type])
-        name_object_functions[object->head->type](object, name);
-
-    object->head->name = name;
 }

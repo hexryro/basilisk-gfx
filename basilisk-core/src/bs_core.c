@@ -82,45 +82,6 @@ BSAPI void _bsi_nameHandle(bs_U64 handle, bs_U32 type, char* name, int name_leng
     pfn_vkSetDebugUtilsObjectNameEXT(_bs_instance_->device, &name_i);
 }
 
-static void _bs_nameBuffer(bs_Object* object, const char* name) {
-    int name_length = strlen(name);
-    object->buffer->flags |= BS_BUFFER_IS_NAMED;
-    for (int i = 0; i < _bs_bufferSwapsCount(object->buffer); i++)
-        bsi_nameHandle(object->buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
-}
-
-static void _bs_nameQueue(bs_Object* object, const char* name) {
-    int name_length = strlen(name);
-    //object->queue->flags |= BS_QUEUE_IS_NAMED;
-
-    bsi_nameHandle(object->queue->queue, VK_OBJECT_TYPE_QUEUE, name, name_length);
-
-    for (int i = 0; i < _bs_queueSwapsCount(object->queue); i++) {
-        bsi_nameHandle(object->queue->_[i].fence, VK_OBJECT_TYPE_FENCE, name, name_length);
-        bsi_nameHandle(object->queue->_[i].semaphore, VK_OBJECT_TYPE_SEMAPHORE, name, name_length);
-        bsi_nameHandle(object->queue->_[i].command_buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, name, name_length);
-    }
-}
-
-static void _bs_nameBatch(bs_Object* object, const char* name) {
-}
-
-static void _bs_nameRenderer(bs_Object* object, const char* name) {
-    int name_length = strlen(name);
-
-    bsi_nameHandle(object->renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, name, name_length);
-    for (int i = 0; i < _bs_rendererSwapsCount(object->renderer); i++) {
-        bsi_nameHandle(object->renderer->_[i].framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, name, name_length);
-    }
-}
-
-static void _bs_nameRayTracer(bs_Object* object, const char* name) {
-    int name_length = strlen(name);
-
-    bsi_nameHandle(object->ray_tracer->TLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
-    bsi_nameHandle(object->ray_tracer->BLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
-}
-
 BSAPI struct VkCommandBuffer_T* _bsi_fetchCommands() {
     if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT)
         _bs_resetQueue(_bs_scope_.queue);
@@ -523,6 +484,13 @@ BSAPI bool _bs_bufferIsMapped(bs_Buffer* buffer) {
     return buffer->_->data;
 }
 
+static void _bs_nameBuffer(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+    object->buffer->flags |= BS_BUFFER_IS_NAMED;
+    for (int i = 0; i < _bs_bufferSwapsCount(object->buffer); i++)
+        bsi_nameHandle(object->buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
+}
+
  /**
   Create Buffer
   */
@@ -615,7 +583,8 @@ BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFl
     if (flags & BS_BUFFER_PRE_MAP)
         _bs_mapBuffer(object->buffer, BS_U32_MAX);
 
-    _bs_nameBuffer(object);
+    const char* name = _bs_idName(object->head->source_id, object->head->id);
+    _bs_nameBuffer(object, name);
 
     return BS_RESULT_OK;
 }
@@ -1196,7 +1165,7 @@ BSAPI bs_Range _bs_pushQuad(
 
     _bs_ensureBatchSize(batch, 6, 4);
     _bs_pushIndices(batch, indices, sizeof(indices) / sizeof(*indices));
-    _bs_batchQuad(batch, &batch->vertices.count, &quad, color);
+    _bs_batchQuad(batch, &batch->vertices.count, quad, color);
 
     return _bs_batchRange(batch, index_offset);
 }
@@ -1465,6 +1434,9 @@ BSAPI bs_Attribute* _bs_queryAttribute(bs_Batch* batch, char* name, int name_len
     return NULL;
 }
 
+static void _bs_nameBatch(bs_Object* object, const char* name) {
+}
+
 BSAPI bs_Result _val_bs_batch(bs_Object* object, int index_size, bs_Shader* shader, bs_BatchBits flags) {
     BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_BATCH, BS_RESULT_VALIDATION_ERROR);
     BS_VALIDATE(shader->num_attributes > 0, BS_RESULT_VALIDATION_ERROR,);
@@ -1711,6 +1683,15 @@ BSAPI void _bs_destroyBatch(bs_Batch* batch) {
   /*==============================================================================
    * Renderer 
    *============================================================================*/
+
+static void _bs_nameRenderer(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+
+    bsi_nameHandle(object->renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, name, name_length);
+    for (int i = 0; i < _bs_rendererSwapsCount(object->renderer); i++) {
+        bsi_nameHandle(object->renderer->_[i].framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, name, name_length);
+    }
+}
 
 BSAPI bs_Result _bs_renderer(bs_Object* object, bs_RendererBits flags) {
     assert(object != NULL);
@@ -2165,6 +2146,13 @@ BSAPI void _bs_dispatchAsync(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z
   /*==============================================================================
    * Ray Tracing
    *============================================================================*/
+
+static void _bs_nameRayTracer(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+
+    bsi_nameHandle(object->ray_tracer->TLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+    bsi_nameHandle(object->ray_tracer->BLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+}
 
 BSAPI void _bs_rayTrace(bs_RayTracer* ray_tracer, bs_Pipeline* pipeline, bs_U32 width, bs_U32 height, bs_U32 depth) {
     _bs_warnF("_bs_rayTrace has not been implemented yet");
@@ -2632,6 +2620,22 @@ BSAPI int _bs_queueSwap(bs_Queue* queue) {
     return queue->flags & BSI_QUEUE_SWAPS_BIT ? _bs_context_->frame : 0;
 }
 
+static void _bs_nameQueue(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+    //object->queue->flags |= BS_QUEUE_IS_NAMED;
+
+    bsi_nameHandle(object->queue->queue, VK_OBJECT_TYPE_QUEUE, name, name_length);
+
+    for (int i = 0; i < _bs_queueSwapsCount(object->queue); i++) {
+        if (object->queue->_[i].fence)
+            bsi_nameHandle(object->queue->_[i].fence, VK_OBJECT_TYPE_FENCE, name, name_length);
+        if (object->queue->_[i].semaphore)
+            bsi_nameHandle(object->queue->_[i].semaphore, VK_OBJECT_TYPE_SEMAPHORE, name, name_length);
+        if (object->queue->_[i].command_buffer)
+            bsi_nameHandle(object->queue->_[i].command_buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, name, name_length);
+    }
+}
+
 BSAPI bs_Result _val_bs_queue(bs_Object* object, bs_QueueBits flags) {
     BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_QUEUE, BS_RESULT_VALIDATION_ERROR);
 
@@ -2738,7 +2742,8 @@ BSAPI bs_Result _bs_queue(bs_Object* object, bs_QueueBits flags) {
     }
     */
 
-    _bs_nameQueue(object);
+    const char* name = _bs_idName(object->head->source_id, object->head->id);
+    _bs_nameQueue(object, name);
 
     return BS_RESULT_OK;
 }

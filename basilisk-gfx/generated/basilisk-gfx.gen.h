@@ -463,7 +463,7 @@ typedef enum bsgfx_WidgetAdvanceType bsgfx_WidgetAdvanceType;
 typedef enum bsgfx_Id bsgfx_Id;
 typedef bs_U32 bsgfx_ColliderFlags;
 typedef void (__stdcall* PFN_void)();
-typedef bs_Queue* (__stdcall* PFN_bsmod_onQueue)();
+typedef bs_Queue* (__stdcall* PFN_bsgfx_onQueue)();
 typedef bs_U32 bsgfx_PrimitiveFlags;
 typedef bs_U32 bsgfx_SpawnerFlags;
 typedef void (__stdcall* PFN_bsgfx_TypeMapper)(void*, void*);
@@ -882,6 +882,7 @@ struct bsgfx_Callbacks {
     PFN_void ini;
     PFN_void lateIni;
     PFN_void loadScene;
+    PFN_bsgfx_onQueue queue;
 };
 
 struct bsgfx_Application {

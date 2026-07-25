@@ -1021,9 +1021,10 @@ BSAPI void _bs_tickWindow(bs_Callback tick, bs_Callback fixed_tick) {
 
 BSAPI void _bs_tick(bs_Callback tick, bs_Callback fixed_tick) {
     _bs_instance_->alive = true;
+    _bs_context_->timer = _bs_timer();
 
     while (_bs_instance_->alive) {
-        tick();
+        _bs_tickWindow(tick, fixed_tick);
     }
 }
 

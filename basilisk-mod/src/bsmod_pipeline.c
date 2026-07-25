@@ -95,6 +95,9 @@ static void _bsmod_renderPoints() {
 }
 
 static void _bsmod_renderCones() {
+    if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
+        return;
+
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -252,6 +255,9 @@ static void _bsmod_renderFontSubtype(int subtype, bsgfx_Id font_id, bs_Shader* f
 }
 
 static void _bsmod_renderPrefabOutlines() {
+    if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
+        return;
+
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 

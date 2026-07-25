@@ -113,6 +113,10 @@
 	</macros>
 
 	<structures>
+		<structure name="bsmod_Callbacks">
+			<field><type>PFN_void</type><name>tick</name></field>
+		</structure>
+
 		<structure name="bsmod_TrackParams">
 			<field><type>char*</type><name>path</name></field>
 			<field><type>char*</type><name>package</name></field>
@@ -179,6 +183,7 @@
 	</structures>
 
 	<externs>
+		<extern><type>bsmod_Callbacks</type><name>bsmod_callbacks</name></extern>
 		<extern><type>int</type><name>bsmod_subtypes</name><size>BSMOD_SUBTYPE_COUNT</size></extern>
 		<extern><type>bs_Json</type><name>bsmod_config</name></extern>
 		<extern><type>int</type><name>bsmod_images</name></extern>
@@ -197,6 +202,10 @@
 
 	<functions>
 		<validationTemplate/>
+
+		<function name="bsmod_callbacks">
+			<return>bsmod_Callbacks*</return>
+		</function>
 
 		<function name="bsmod_copyHoveringDataToBuffer">
 			<return>void</return>

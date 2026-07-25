@@ -356,7 +356,7 @@ static bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 		bs_Resource* existing_shader;
 		result = bs_queryResource(package_id, name, &existing_shader);
 		if (result == BS_RESULT_OK)
-			bs_shader(package_id, name, 0, NULL);
+			bs_shader(package_id, name, 0, &existing_shader);
 
 		break;
 	case BS_RESOURCE_MODEL:

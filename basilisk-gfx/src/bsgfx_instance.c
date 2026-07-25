@@ -340,8 +340,14 @@ BSGFXAPI void _val_bsgfx_renderSubtype(int subtype, bs_Pipeline* pipeline) {
 }
 
 BSGFXAPI void _bsgfx_renderSubtype(int subtype, bs_Pipeline* pipeline) {
+	if (subtype < 0)
+		return;
+
 	bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
 	bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
+
+	if (!bs_exists(metadata->instance_subtypes[subtype].batch_source_id, metadata->instance_subtypes[subtype].batch_id))
+		return;
 
 	bs_render(
 		bs_fetch(metadata->instance_subtypes[subtype].batch_source_id, metadata->instance_subtypes[subtype].batch_id)->batch, pipeline,

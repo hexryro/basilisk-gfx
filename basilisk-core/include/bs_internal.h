@@ -70,6 +70,7 @@ BSAPI void _bs_writeLogger(
 
 #define BS_VALIDATE(condition, ret, format, ...)                     \
     if (!(condition)) {                                              \
+        if (_bs_callbacks_.error) _bs_callbacks_.error();            \
         _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_VALIDATION_ERROR, BS_RESULT_VALIDATION_ERROR, BS_RESULT_VALIDATION_ERROR, __func__, __FILE__, __LINE__, "%s" format, #condition __VA_OPT__(, ) __VA_ARGS__); \
         return ret;                                                  \
     }

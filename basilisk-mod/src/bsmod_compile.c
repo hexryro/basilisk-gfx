@@ -263,7 +263,8 @@ BSMODAPI void _bsmod_onCompileShader(bsmod_TrackParams params) {
 			if (result != BS_RESULT_OK)
 				return;
 
-			bs_shader(package, variadic->value, 0, NULL);
+			bs_Resource* resource;
+			bs_shader(package, variadic->value, 0, &resource);
 		}
 	}
 

@@ -1327,6 +1327,7 @@ typedef int (__cdecl* bs_ThreadFunction)(void*);
 typedef void (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
 typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
 typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
+typedef void (__stdcall* bs_ValidationErrorCallbackFunction)();
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -3325,6 +3326,7 @@ struct bs_Props {
 
 struct bs_Callbacks {
     bs_MessageCallbackFunction log;
+    bs_ValidationErrorCallbackFunction error;
 };
 
 struct bs_LogQueueItem {
@@ -8346,16 +8348,6 @@ BSAPI const char*
 bs_idName(
     bs_U32 source_id,
     bs_U32 id);
-
- /**
-  @param object
-  @param name
-  @return void
-  */
-BSAPI void
-bs_nameObject(
-    bs_Object* object,
-    const char* name);
 
  /**
   @param head

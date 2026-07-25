@@ -366,7 +366,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_queryMeshHash = (PFN_bs_queryMeshHash)GetProcAddress(module, "_preval_bs_queryMeshHash");
     functions.bs_queryMaterial = (PFN_bs_queryMaterial)GetProcAddress(module, "_preval_bs_queryMaterial");
     functions.bs_idName = (PFN_bs_idName)GetProcAddress(module, "_preval_bs_idName");
-    functions.bs_nameObject = (PFN_bs_nameObject)GetProcAddress(module, "_preval_bs_nameObject");
     functions.bs_resetObject = (PFN_bs_resetObject)GetProcAddress(module, "_preval_bs_resetObject");
     functions.bs_object = (PFN_bs_object)GetProcAddress(module, "_preval_bs_object");
     functions.bs_packages = (PFN_bs_packages)GetProcAddress(module, "_preval_bs_packages");

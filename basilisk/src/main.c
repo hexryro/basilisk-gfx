@@ -6,7 +6,7 @@
 
 volatile long has_performed_tracked_changes = 1;
 
-static void basilisk_loadScene() {
+static void onLoadScene() {
 	$vs_bsgfx_mesh_color();
 	$fs_bsgfx_atlas();
 
@@ -14,9 +14,27 @@ static void basilisk_loadScene() {
 	bsmod_bindAtlases();
 }
 
-static void basilisk_tick() {
-	bsmod_onTick();
+static bs_Queue* onQueue() {
+	bs_Queue* queue = bsmod_onQueue();
 
+	return queue;
+}
+
+static void onTick() {
+}
+
+static void onModTick() {
+	bs_mat4 transform = BS_MAT4_IDENTITY;
+	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
+
+	bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR], bs_m4x3(&transform), BS_V4(0.0, 0.0, 1.0, 1.0), 0, 0, 0);
+}
+
+static void onIni() {
+	bsmod_onIni();
+
+	bsmod_onTrack();
+	bsmod_savePackage(BSGFX_CONTENT_PATH);
 }
 
 static DWORD WINAPI _bsmod_tickAsync(void* param) {
@@ -27,16 +45,7 @@ static DWORD WINAPI _bsmod_tickAsync(void* param) {
 		Sleep(1000);
 	}
 }
-
-static void basilisk_ini() {
-	bsmod_onIni();
-
-	bsmod_onTrack();
-	bsmod_savePackage(BSGFX_CONTENT_PATH);
-
-}
-
-static void basilisk_lateIni() {
+static void onLateIni() {
 	bsmod_onLateIni();
 
 	CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
@@ -44,7 +53,7 @@ static void basilisk_lateIni() {
 	bsgfx_loadScene("engine");
 }
 
-static void basilisk_onLog(const bs_LogQueueItem* item) {
+static void onLog(const bs_LogQueueItem* item) {
 	static const char* libraries[BS_LIBRARIES_COUNT] = {
 		[BS_LIBRARY_BASILISK] = "[BASILISK]",
 		[BS_LIBRARY_YYJSON] = "[YYJSON]",
@@ -78,6 +87,10 @@ static void basilisk_onLog(const bs_LogQueueItem* item) {
 	}
 }
 
+// hack to debug validation errors
+static void onError() {
+}
+
 int main(int argc, char* argv[]) {
 	bs_enableValidation();
 	bsgfx_enableValidation();
@@ -85,16 +98,22 @@ int main(int argc, char* argv[]) {
 
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {
-		.log = basilisk_onLog
+		.log = onLog,
+		.error = onError,
 	};
-
 
 	bsgfx_Callbacks* gfx_callbacks = bsgfx_callbacks();
 	*gfx_callbacks = (bsgfx_Callbacks) {
-		.loadScene = basilisk_loadScene,
-		.ini = basilisk_ini,
-		.lateIni = basilisk_lateIni,
-		.tick = basilisk_tick,
+		.queue = onQueue,
+		.loadScene = onLoadScene,
+		.ini = onIni,
+		.lateIni = onLateIni,
+		.tick = onTick,
+	};
+
+	bsmod_Callbacks* mod_callbacks = bsmod_callbacks();
+	*mod_callbacks = (bsmod_Callbacks) {
+		.tick = onModTick,
 	};
 
 	bsgfx_ini("Basilisk", 1920, 1080, argc, argv);

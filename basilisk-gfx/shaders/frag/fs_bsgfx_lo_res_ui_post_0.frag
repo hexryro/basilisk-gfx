@@ -15,7 +15,7 @@ void main() {
 
     vec3 color = texture(attachment_color, vec2(in_texture.x, 1.0 - in_texture.y)).rgb;
     out_color = vec4(1.0, 0.0, 1.0, 1.0);
-    out_color.rgb = color;
+   // out_color.rgb = color;
 
     
 }

@@ -49,6 +49,10 @@ const bsmod_FunctionTable* _preval_bsmod_setFunctions(const bsmod_FunctionTable*
     return &next;
 }
 
+BSMODAPI bsmod_Callbacks* _preval_bsmod_callbacks() {
+    return next.bsmod_callbacks();
+}
+
 BSMODAPI void _preval_bsmod_copyHoveringDataToBuffer() {
     next.bsmod_copyHoveringDataToBuffer();
 }
@@ -510,6 +514,7 @@ BSMODAPI void _preval_bsmod_onDragTile(bsmod_DraggingParams params) {
 bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     static bsmod_FunctionTable functions = { 0 };
 
+    functions.bsmod_callbacks = _preval_bsmod_callbacks;
     functions.bsmod_copyHoveringDataToBuffer = _preval_bsmod_copyHoveringDataToBuffer;
     functions.bsmod_onIni = _preval_bsmod_onIni;
     functions.bsmod_onLateIni = _preval_bsmod_onLateIni;

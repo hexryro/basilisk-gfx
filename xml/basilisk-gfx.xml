@@ -51,7 +51,7 @@
 		<typedef><type>bs_U32</type><name>bsgfx_ColliderFlags</name></typedef>
 
 		<typedef><type>void</type><name>(__stdcall* PFN_void)()</name></typedef>
-		<typedef><type>bs_Queue*</type><name>(__stdcall* PFN_bsmod_onQueue)()</name></typedef>
+		<typedef><type>bs_Queue*</type><name>(__stdcall* PFN_bsgfx_onQueue)()</name></typedef>
 
 		<typedef><type>bs_U32</type><name>bsgfx_PrimitiveFlags</name></typedef>
 		<typedef><type>bs_U32</type><name>bsgfx_SpawnerFlags</name></typedef>
@@ -791,6 +791,7 @@
 			<field><type>PFN_void</type><name>ini</name></field>
 			<field><type>PFN_void</type><name>lateIni</name></field>
 			<field><type>PFN_void</type><name>loadScene</name></field>
+			<field><type>PFN_bsgfx_onQueue</type><name>queue</name></field>
 		</structure>
 
 		<structure name="bsgfx_Application">

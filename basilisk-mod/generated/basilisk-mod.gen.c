@@ -69,6 +69,11 @@ void bsmod_disableValidation()
     _bsmod_setFunctions(definitions, NULL);
 }
 
+bsmod_Callbacks* bsmod_callbacks()
+{
+    return next.bsmod_callbacks();
+}
+
 void bsmod_copyHoveringDataToBuffer()
 {
     next.bsmod_copyHoveringDataToBuffer();

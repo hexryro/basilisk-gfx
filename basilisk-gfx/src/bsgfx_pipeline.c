@@ -619,8 +619,8 @@ BSGFXAPI void _bsgfx_pipeline() {
 
     if (compute_queue) {
        // Enqueue dispatch commands and block the CPU until completion
-        bs_enqueue(compute_queue, _bsgfx_computePipe);
-        bs_stall(compute_queue);
+    //    bs_enqueue(compute_queue, _bsgfx_computePipe);
+    //    bs_stall(compute_queue);
     }
 
    /** 
@@ -629,18 +629,21 @@ BSGFXAPI void _bsgfx_pipeline() {
     Blocks the CPU until completion
     */
     bs_awaitAcquisition();
-    if (compute_queue)
-        bs_awaitQueue(compute_queue, BS_PIPELINE_STAGE_VERTEX_INPUT_BIT);
+   // if (compute_queue)
+   //     bs_awaitQueue(compute_queue, BS_PIPELINE_STAGE_VERTEX_INPUT_BIT);
     bs_enqueue(graphics_queue, _bsgfx_graphicsPipe);
 
     bs_stall(graphics_queue);
 
-   // bs_Queue* bsmod_queue = NULL;
-   // if (_bsgfx_procs_.bsmod_onQueue)
-   //     bsmod_queue = _bsgfx_procs_.bsmod_onQueue();
+    bs_Queue* user_queue = NULL;
+    if (_bsgfx_callbacks_.queue)
+        user_queue = _bsgfx_callbacks_.queue();
 
-  //  bs_Queue* last_queue = bsmod_queue ? bsmod_queue : graphics_queue;
-    bs_Queue* last_queue = graphics_queue;
-    bs_present(last_queue, last_queue, NULL);
+    bs_Queue* last_queue = user_queue ? user_queue : graphics_queue;
+    bs_Queue* wait_queues[] = {
+        last_queue
+    };
+
+    bs_present(last_queue, wait_queues, sizeof(wait_queues) / sizeof(*wait_queues));
     _bsgfx_resetInstances();
 }

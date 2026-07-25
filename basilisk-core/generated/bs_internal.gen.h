@@ -419,7 +419,6 @@ typedef bs_Mesh*(__stdcall* PFN_bs_queryMesh)(bs_Model* model, const char * name
 typedef bs_Mesh*(__stdcall* PFN_bs_queryMeshHash)(bs_Model* model, bs_U64 hash);
 typedef bs_Material*(__stdcall* PFN_bs_queryMaterial)(bs_Model* model, const char* name);
 typedef const char*(__stdcall* PFN_bs_idName)(bs_U32 source_id, bs_U32 id);
-typedef void(__stdcall* PFN_bs_nameObject)(bs_Object* object, const char* name);
 typedef void(__stdcall* PFN_bs_resetObject)(bs_Header* head, size_t size);
 typedef bs_Object*(__stdcall* PFN_bs_object)(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type);
 typedef bs_List*(__stdcall* PFN_bs_packages)();
@@ -919,7 +918,6 @@ typedef struct {
     PFN_bs_queryMeshHash bs_queryMeshHash;
     PFN_bs_queryMaterial bs_queryMaterial;
     PFN_bs_idName bs_idName;
-    PFN_bs_nameObject bs_nameObject;
     PFN_bs_resetObject bs_resetObject;
     PFN_bs_object bs_object;
     PFN_bs_packages bs_packages;
@@ -1419,7 +1417,6 @@ BSAPI bs_Mesh* _bs_queryMesh(bs_Model* model, const char * name);
 BSAPI bs_Mesh* _bs_queryMeshHash(bs_Model* model, bs_U64 hash);
 BSAPI bs_Material* _bs_queryMaterial(bs_Model* model, const char* name);
 BSAPI const char* _bs_idName(bs_U32 source_id, bs_U32 id);
-BSAPI void _bs_nameObject(bs_Object* object, const char* name);
 BSAPI void _bs_resetObject(bs_Header* head, size_t size);
 BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type);
 BSAPI bs_List* _bs_packages();
@@ -1921,7 +1918,6 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_queryMeshHash = _bs_queryMeshHash;
     functions.bs_queryMaterial = _bs_queryMaterial;
     functions.bs_idName = _bs_idName;
-    functions.bs_nameObject = _bs_nameObject;
     functions.bs_resetObject = _bs_resetObject;
     functions.bs_object = _bs_object;
     functions.bs_packages = _bs_packages;

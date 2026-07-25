@@ -3616,13 +3616,6 @@ const char* bs_idName(
     return next.bs_idName(source_id, id);
 }
 
-void bs_nameObject(
-    bs_Object* object, 
-    const char* name)
-{
-    next.bs_nameObject(object, name);
-}
-
 void bs_resetObject(
     bs_Header* head, 
     size_t size)

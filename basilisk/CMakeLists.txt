@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 file(GLOB SOURCE_FILES "src/*.c")
+file(GLOB UI_FILES "src/ui/*.c")
 
 file(GLOB_RECURSE HEADER_FILES "include/*.h")
 file(GLOB PROJECT_FILES "./*" LIST_DIRECTORIES false)
@@ -13,6 +14,7 @@ file(GLOB XML_FILES "../xml/*.*")
 
 add_executable(${PROJECT_NAME}
     ${XML_FILES}
+    ${UI_FILES}
     ${SOURCE_FILES}
     ${HEADER_FILES}
 
@@ -25,6 +27,7 @@ set_property(TARGET ${PROJECT_NAME}
     "${CMAKE_SOURCE_DIR}/build/${PROJECT_NAME}/$<CONFIG>"
 )
 
+source_group("UI" FILES ${UI_FILES})
 source_group("Source Files" FILES ${SOURCE_FILES})
 source_group("Headers" FILES ${HEADER_FILES})
 source_group("Project Files" FILES ${PROJECT_FILES})

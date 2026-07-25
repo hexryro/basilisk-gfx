@@ -53,6 +53,12 @@ volatile long _bsmod_has_performed_tracked_changes_ = 1;
 
 int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT] = { 0 };
 
+bsmod_Callbacks _bsmod_callbacks_ = { 0 };
+
+BSMODAPI bsmod_Callbacks* _bsmod_callbacks() {
+    return &_bsmod_callbacks_;
+}
+
 static void _bsmod_instanceAxisFace(
     bsgfx_Primitive* primitive,
     int axis,
@@ -218,6 +224,9 @@ BSMODAPI void _bsmod_onTick() {
     end:
     last_selected_count = _bsmod_.selected_ids.count;
     last_selected_type = _bsmod_.selected_type;
+
+    if (_bsmod_callbacks_.tick)
+        _bsmod_callbacks_.tick();
 }
 
 BSMODAPI void _bsmod_onMap(bsgfx_TypeId type_id, int id) {

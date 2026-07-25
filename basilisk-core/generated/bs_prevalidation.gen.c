@@ -2016,12 +2016,6 @@ BSAPI const char* _preval_bs_idName(bs_U32 source_id, bs_U32 id) {
     return next.bs_idName(source_id, id);
 }
 
-BSAPI void _preval_bs_nameObject(bs_Object* object, const char* name) {
-    BS_VALIDATE(object != NULL, ,);
-    BS_VALIDATE(name != NULL, ,);
-    next.bs_nameObject(object, name);
-}
-
 BSAPI void _preval_bs_resetObject(bs_Header* head, size_t size) {
     BS_VALIDATE(head != NULL, ,);
     next.bs_resetObject(head, size);
@@ -2870,7 +2864,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_queryMeshHash = _preval_bs_queryMeshHash;
     functions.bs_queryMaterial = _preval_bs_queryMaterial;
     functions.bs_idName = _preval_bs_idName;
-    functions.bs_nameObject = _preval_bs_nameObject;
     functions.bs_resetObject = _preval_bs_resetObject;
     functions.bs_object = _preval_bs_object;
     functions.bs_packages = _preval_bs_packages;
