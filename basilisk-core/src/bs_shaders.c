@@ -347,7 +347,7 @@ BSAPI bs_Result _bs_bindImages(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_
 
         descriptors[i] = (bs_Descriptor) {
             .as_image = {
-                .vk_image_layout = (struct VkImageLayout_T*)descriptor->layout,
+                .vk_image_layout = (VkImageLayout)descriptor->layout,
                 .vk_image_view = descriptor->image->_[descriptor->image->flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frame : 0].vk_image_view,
                 .vk_sampler = descriptor->sampler ? descriptor->sampler->_->vk_sampler : VK_NULL_HANDLE,
                 .image = descriptor->image,
@@ -1014,24 +1014,23 @@ typedef struct {
     bs_PipelineFlags flags;
 } bs_ComputePipelineHash;
 
-static bs_Pipeline* _bs_preparePipeline(bs_PipelineType type, bs_U64 hash, bs_Pipeline init) {
+static bs_Pipeline* _bs_preparePipeline(bs_PipelineType type, bs_U64 hash, bs_Pipeline init, bool* already_exists) {
     if (_bs_pipelines_[type].capacity == 0)
         _bs_pipelines_[type] = _bs_list(sizeof(bs_Pipeline*), 64);
 
     bs_Pipeline* existing = _bs_queryPipeline(type, hash);
 
-    bool recreated = false;
     if (existing) {
         if (_bs_pipelineNeedsUpdating(existing)) {
             _bs_destroyPipeline(existing);
             existing->flags &= ~BS_PIPELINE_NEEDS_UPDATING;
-            recreated = true;
         }
-        else
+        else {
+            *already_exists = true;
             return existing;
+        }
     }
 
-    // TODO this can be improved with new object system
     if (!existing) {
         existing = _bs_object(-1, 0, sizeof(bs_Pipeline), BS_SWAP_SIZE(bs_Pipeline), init.shaders_count, 0, -1)->head;
         _bs_pushBack(_bs_pipelines_ + type, &existing);
@@ -1060,7 +1059,10 @@ BSAPI bs_Result _bs_computePipeline(bs_Shader* compute_shader, bs_PipelineFlags 
         .hash = hash,
     };
 
-    bs_Pipeline* pipeline = *out = _bs_preparePipeline(BS_PIPELINE_COMPUTE, hash, init);
+    bool already_exists = false;
+    bs_Pipeline* pipeline = *out = _bs_preparePipeline(BS_PIPELINE_COMPUTE, hash, init, &already_exists);
+    if (already_exists)
+        return BS_RESULT_OK;
 
     bs_result = _bs_createPipelineLayout(pipeline);
     if (bs_result != BS_RESULT_OK)
@@ -1152,7 +1154,11 @@ BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
     };
 
     bs_U64 hash = _bs_pipelineHash(descriptor);
-    bs_Pipeline* pipeline = *out = _bs_preparePipeline(BS_PIPELINE_GRAPHICS, hash, init);
+
+    bool already_exists = false;
+    bs_Pipeline* pipeline = *out = _bs_preparePipeline(BS_PIPELINE_GRAPHICS, hash, init, &already_exists);
+    if (already_exists)
+        return BS_RESULT_OK;
 
     VkGraphicsPipelineCreateInfo pipeline_ci = {
         .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -1420,7 +1426,10 @@ BSAPI bs_Result _bs_rayTracingPipeline(bs_RayTracePipelineHash* pipeline_hash, b
    // existing->_[3].shader = pipeline_hash->intersection_shader;
    // existing->_[4].shader = pipeline_hash->any_hit_shader;
 
-    bs_Pipeline* pipeline = _bs_preparePipeline(BS_PIPELINE_RAY_TRACE, hash, init);
+    bool already_exists = false;
+    bs_Pipeline* pipeline = *out = _bs_preparePipeline(BS_PIPELINE_RAY_TRACE, hash, init, &already_exists);
+    if (already_exists)
+        return BS_RESULT_OK;
 
     bs_result = _bs_createPipelineLayout(pipeline);
     if (bs_result != BS_RESULT_OK)

@@ -45,6 +45,11 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
         &module);
 
     functions.bs_callbacks = (PFN_bs_callbacks)GetProcAddress(module, "_preval_bs_callbacks");
+    functions.bs_imageSwapsCount = (PFN_bs_imageSwapsCount)GetProcAddress(module, "_preval_bs_imageSwapsCount");
+    functions.bs_samplerSwapsCount = (PFN_bs_samplerSwapsCount)GetProcAddress(module, "_preval_bs_samplerSwapsCount");
+    functions.bs_bufferSwapsCount = (PFN_bs_bufferSwapsCount)GetProcAddress(module, "_preval_bs_bufferSwapsCount");
+    functions.bs_queueSwapsCount = (PFN_bs_queueSwapsCount)GetProcAddress(module, "_preval_bs_queueSwapsCount");
+    functions.bs_rendererSwapsCount = (PFN_bs_rendererSwapsCount)GetProcAddress(module, "_preval_bs_rendererSwapsCount");
     functions.bs_writeLogFile = (PFN_bs_writeLogFile)GetProcAddress(module, "_preval_bs_writeLogFile");
     functions.bs_v2Mid = (PFN_bs_v2Mid)GetProcAddress(module, "_preval_bs_v2Mid");
     functions.bs_v3Mid = (PFN_bs_v3Mid)GetProcAddress(module, "_preval_bs_v3Mid");
@@ -96,8 +101,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_build = (PFN_bs_build)GetProcAddress(module, "_preval_bs_build");
     functions.bs_destroyRayTracer = (PFN_bs_destroyRayTracer)GetProcAddress(module, "_preval_bs_destroyRayTracer");
     functions.bs_dispatchAsync = (PFN_bs_dispatchAsync)GetProcAddress(module, "_preval_bs_dispatchAsync");
-    functions.bs_bufferSwaps = (PFN_bs_bufferSwaps)GetProcAddress(module, "_preval_bs_bufferSwaps");
-    functions.bs_nameBuffer = (PFN_bs_nameBuffer)GetProcAddress(module, "_preval_bs_nameBuffer");
     functions.bs_buffer = (PFN_bs_buffer)GetProcAddress(module, "_preval_bs_buffer");
     functions.bs_bufferIsMapped = (PFN_bs_bufferIsMapped)GetProcAddress(module, "_preval_bs_bufferIsMapped");
     functions.bs_bufferMap = (PFN_bs_bufferMap)GetProcAddress(module, "_preval_bs_bufferMap");
@@ -148,7 +151,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_pushMesh = (PFN_bs_pushMesh)GetProcAddress(module, "_preval_bs_pushMesh");
     functions.bs_batchModel = (PFN_bs_batchModel)GetProcAddress(module, "_preval_bs_batchModel");
     functions.bs_pushModel = (PFN_bs_pushModel)GetProcAddress(module, "_preval_bs_pushModel");
-    functions.bs_rendererSwapsCount = (PFN_bs_rendererSwapsCount)GetProcAddress(module, "_preval_bs_rendererSwapsCount");
     functions.bs_renderer = (PFN_bs_renderer)GetProcAddress(module, "_preval_bs_renderer");
     functions.bs_output = (PFN_bs_output)GetProcAddress(module, "_preval_bs_output");
     functions.bs_input = (PFN_bs_input)GetProcAddress(module, "_preval_bs_input");
@@ -170,7 +172,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_awaitAcquisition = (PFN_bs_awaitAcquisition)GetProcAddress(module, "_preval_bs_awaitAcquisition");
     functions.bs_enqueue = (PFN_bs_enqueue)GetProcAddress(module, "_preval_bs_enqueue");
     functions.bs_imageIndex = (PFN_bs_imageIndex)GetProcAddress(module, "_preval_bs_imageIndex");
-    functions.bs_queueSwapsCount = (PFN_bs_queueSwapsCount)GetProcAddress(module, "_preval_bs_queueSwapsCount");
     functions.bs_queue = (PFN_bs_queue)GetProcAddress(module, "_preval_bs_queue");
     functions.bs_destroyQueue = (PFN_bs_destroyQueue)GetProcAddress(module, "_preval_bs_destroyQueue");
     functions.bs_stallGPU = (PFN_bs_stallGPU)GetProcAddress(module, "_preval_bs_stallGPU");
@@ -191,7 +192,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_destroyFont = (PFN_bs_destroyFont)GetProcAddress(module, "_preval_bs_destroyFont");
     functions.bs_loadFont = (PFN_bs_loadFont)GetProcAddress(module, "_preval_bs_loadFont");
     functions.bs_image = (PFN_bs_image)GetProcAddress(module, "_preval_bs_image");
-    functions.bs_imageSwapsCount = (PFN_bs_imageSwapsCount)GetProcAddress(module, "_preval_bs_imageSwapsCount");
     functions.bs_transition = (PFN_bs_transition)GetProcAddress(module, "_preval_bs_transition");
     functions.bs_inspectPng = (PFN_bs_inspectPng)GetProcAddress(module, "_preval_bs_inspectPng");
     functions.bs_loadPngData = (PFN_bs_loadPngData)GetProcAddress(module, "_preval_bs_loadPngData");
@@ -210,7 +210,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_isStencilFormat = (PFN_bs_isStencilFormat)GetProcAddress(module, "_preval_bs_isStencilFormat");
     functions.bs_isDepthFormat = (PFN_bs_isDepthFormat)GetProcAddress(module, "_preval_bs_isDepthFormat");
     functions.bs_hasAlpha = (PFN_bs_hasAlpha)GetProcAddress(module, "_preval_bs_hasAlpha");
-    functions.bs_nameImage = (PFN_bs_nameImage)GetProcAddress(module, "_preval_bs_nameImage");
     functions.bs_destroySampler = (PFN_bs_destroySampler)GetProcAddress(module, "_preval_bs_destroySampler");
     functions.bs_sampler = (PFN_bs_sampler)GetProcAddress(module, "_preval_bs_sampler");
     functions.bs_loadAtlas = (PFN_bs_loadAtlas)GetProcAddress(module, "_preval_bs_loadAtlas");
@@ -367,6 +366,8 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_queryMeshHash = (PFN_bs_queryMeshHash)GetProcAddress(module, "_preval_bs_queryMeshHash");
     functions.bs_queryMaterial = (PFN_bs_queryMaterial)GetProcAddress(module, "_preval_bs_queryMaterial");
     functions.bs_idName = (PFN_bs_idName)GetProcAddress(module, "_preval_bs_idName");
+    functions.bs_nameObject = (PFN_bs_nameObject)GetProcAddress(module, "_preval_bs_nameObject");
+    functions.bs_resetObject = (PFN_bs_resetObject)GetProcAddress(module, "_preval_bs_resetObject");
     functions.bs_object = (PFN_bs_object)GetProcAddress(module, "_preval_bs_object");
     functions.bs_packages = (PFN_bs_packages)GetProcAddress(module, "_preval_bs_packages");
     functions.bs_objectSources = (PFN_bs_objectSources)GetProcAddress(module, "_preval_bs_objectSources");

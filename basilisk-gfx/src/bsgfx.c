@@ -137,7 +137,6 @@ static void _bsgfx_resize() {
 
 void _bsgfx_tickMaterials();
 static void _bsgfx_tick() {
-    return;
     _poser_->menu_blocked = false;
 
     static int timer;

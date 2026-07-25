@@ -110,7 +110,7 @@ static void _bsgfx_createRenderers() {
             [BSGFX_LO_SUBPASS_0_OUT_FLAGS] = lo_res_0_flags->image,
             [BSGFX_LO_SUBPASS_0_OUT_POSITION] = lo_res_0_position->image,
             [BSGFX_LO_SUBPASS_0_OUT_POSITION_LOCAL] = lo_res_0_position_local->image,
-            lo_res_0_depth,
+            lo_res_0_depth->image,
         };
 
         int subpass_0_inputs[] = {
@@ -164,7 +164,7 @@ static void _bsgfx_createRenderers() {
 
         bs_output(lo_res->renderer, (bs_Output) {
             .subpass = 1,
-            .image = lo_res_1_color,
+            .image = lo_res_1_color->image,
             .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
             .store_op = BS_ATTACHMENT_STORE_OP_STORE,
             .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,

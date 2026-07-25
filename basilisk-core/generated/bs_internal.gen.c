@@ -74,28 +74,6 @@ void _bs_beginCommentF(
     va_end(args);
 }
 
-void _bs_nameBufferV(
-    bs_Buffer* buffer, 
-    char* format, 
-    va_list args)
-{
-    int _length = bs_formatStringLength(format, args);
-    char* _formatted = bs_alloca(_length + 1);
-    vsnprintf(_formatted, _length + 1, format, args);
-    _bs_nameBuffer(buffer, _formatted, _length);
-}
-
-void _bs_nameBufferF(
-    bs_Buffer* buffer, 
-    char* format, 
-    ...)
-{
-    va_list args;
-    va_start(args, format);
-    _bs_nameBufferV(buffer, format, args);
-    va_end(args);
-}
-
 bs_Attribute* _bs_queryAttributeV(
     bs_Batch* batch, 
     char* format, 

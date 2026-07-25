@@ -59,6 +59,7 @@
         <typedef><type>int</type><name>(__cdecl* bs_ThreadFunction)(void*)</name></typedef>
         <typedef><type>void</type><name>(__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
@@ -1127,6 +1128,7 @@
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>source_id</name></field>
             <field><type>bs_ObjectType</type><name>type</name></field>
+            <field><type>const char*</type><name>name</name></field>
         </structure>
         <structure name="bs_Object">
             <field><type>bs_U32</type><name>flags</name></field>
@@ -1431,7 +1433,6 @@
             <field><type>bs_U32</type><name>subpass</name></field>
             <field><type>bs_U32</type><name>parent_subpass</name></field>
             <field><type>bs_U32</type><name>attachment</name></field>
-            <field><type>bs_Image*</type><name>image</name></field>
         </structure>
 		<structure name="bs_RendererSwaps">
 			<field><type>struct VkFramebuffer_T*</type><name>framebuffer</name></field>
@@ -1837,24 +1838,29 @@
 			<field><type>bs_ImageLayout</type><name>layout</name></field>
 		</structure>
 		<structure name="bs_Descriptor">
-            <field><type>int</type><name>object_type</name></field>
+            <structure type="union">
+                <structure instance="as_image">
+                    <field><type>struct VkSampler_T*</type><name>vk_sampler</name></field>
+                    <field><type>struct VkImageView_T*</type><name>vk_image_view</name></field>
+                    <field><type>enum VkImageLayout</type><name>vk_image_layout</name></field>
+					
+				    <field><type>bs_U32</type><name>padding</name></field>
+					
+				    <field><type>bs_Image*</type><name>image</name></field>
+                    <field><type>bs_Sampler*</type><name>sampler</name></field>
+                </structure>
+                <structure instance="as_buffer">
+                    <field><type>struct VkBuffer_T*</type><name>vk_buffer</name></field>
+                    <field><type>bs_U64</type><name>vk_offset</name></field>
+                    <field><type>bs_U64</type><name>vk_range</name></field>
+					
+                    <field><type>bs_Buffer*</type><name>buffer</name></field>
+                </structure>
+            </structure>
+			<field><type>int</type><name>object_type</name></field>
             <field><type>int</type><name>reserved</name></field>
             <field><type>int</type><name>bind_set</name></field>
             <field><type>int</type><name>bind_point</name></field>
-            <structure type="union">
-                <structure instance="as_image">
-                    <field><type>bs_Image*</type><name>image</name></field>
-                    <field><type>bs_Sampler*</type><name>sampler</name></field>
-                    <field><type>struct VkImageLayout_T*</type><name>vk_image_layout</name></field>
-                    <field><type>struct VkImageView_T*</type><name>vk_image_view</name></field>
-                    <field><type>struct VkSampler_T*</type><name>vk_sampler</name></field>
-                </structure>
-                <structure instance="as_buffer">
-                    <field><type>bs_Buffer*</type><name>buffer</name></field>
-                    <field><type>struct VkBuffer_T*</type><name>vk_buffer</name></field>
-                    <field><type>bs_U32</type><name>vk_range</name></field>
-                </structure>
-            </structure>
         </structure>
         <structure name="bs_Binding">
             <field><type>bs_U32</type><name>stages</name></field>
@@ -2069,7 +2075,35 @@
 		<function name="bs_callbacks">
 			<return>bs_Callbacks*</return>
 		</function>
+
+		<!-- Swaps count -->
+		<function name="bs_imageSwapsCount">
+            <return>int</return>
+            <param><type>bs_Image*</type><name>image</name></param>
+        </function>
 		
+		<function name="bs_samplerSwapsCount">
+            <return>int</return>
+            <param><type>bs_Sampler*</type><name>sampler</name></param>
+        </function>
+		
+		<function name="bs_bufferSwapsCount">
+            <return>int</return>
+            <param><type>bs_Buffer*</type><name>buffer</name></param>
+        </function>
+		
+		<function name="bs_queueSwapsCount">
+            <return>int</return>
+            <param><type>bs_Queue*</type><name>queue</name></param>
+        </function>
+				
+		<function name="bs_rendererSwapsCount">
+			<return>int</return>
+			<param><type>bs_Renderer*</type><name>renderer</name></param>
+        </function>
+
+		<!-- -->
+
 		<variadicStringTemplate name="bs_writeLogFile">
 			<return>void</return>
 		</variadicStringTemplate>
@@ -2662,14 +2696,6 @@
             <param><type>bs_U32</type><name>y</name></param>
             <param><type>bs_U32</type><name>z</name></param>
         </function>
-        <function name="bs_bufferSwaps">
-            <return>int</return>
-            <param><type>bs_Buffer*</type><name>buffer</name></param>
-        </function>
-        <variadicStringTemplate name="bs_nameBuffer">
-            <return>void</return>
-            <param><type>bs_Buffer*</type><name>buffer</name></param>
-        </variadicStringTemplate>
         <function name="bs_buffer">
             <return>bs_Result</return>
             <param><type>bs_Object*</type><name>object</name></param>
@@ -2854,10 +2880,6 @@
         <batchFunctionTemplate name="Model">
             <param><type>bs_Model*</type><name>model</name></param>
         </batchFunctionTemplate>
-        <function name="bs_rendererSwapsCount">
-            <return>int</return>
-            <param><type>bs_Renderer*</type><name>renderer</name></param>
-        </function>
         <function name="bs_renderer">
             <return>bs_Result</return>
             <param><type>bs_Object*</type><name>object</name></param>
@@ -2955,10 +2977,6 @@
         </function>
         <function name="bs_imageIndex">
             <return>int</return>
-        </function>
-        <function name="bs_queueSwapsCount">
-            <return>int</return>
-            <param><type>bs_Queue*</type><name>queue</name></param>
         </function>
         <function name="bs_queue">
             <return>bs_Result</return>
@@ -3059,10 +3077,6 @@
             <param><type>int</type><name>num_indices</name></param>
             <param><type>bs_Format</type><name>format</name></param>
             <param><type>bs_U32</type><name>flags</name></param>
-        </function>
-        <function name="bs_imageSwapsCount">
-            <return>int</return>
-            <param><type>bs_Image*</type><name>image</name></param>
         </function>
         <function name="bs_transition">
             <return>void</return>
@@ -3170,11 +3184,6 @@
         <function name="bs_hasAlpha">
             <return>bool</return>
             <param><type>bs_Format</type><name>format</name></param>
-        </function>
-        <function name="bs_nameImage">
-            <return>void</return>
-            <param><type>bs_Image*</type><name>image</name></param>
-            <param><type>const char*</type><name>name</name></param>
         </function>
         <function name="bs_destroySampler">
             <return>void</return>
@@ -3882,9 +3891,19 @@
             <param><type>bs_U32</type><name>source_id</name></param>
             <param><type>bs_U32</type><name>id</name></param>
         </function>
-        <function name="bs_object">
-            <return>bs_Object*</return>
-            <param><type>bs_U32</type><name>source_id</name></param>
+		<function name="bs_nameObject">
+			<return>void</return>
+			<param><type>bs_Object*</type><name>object</name></param>
+			<param><type>const char*</type><name>name</name></param>
+		</function>
+		<function name="bs_resetObject">
+			<return>void</return>
+			<param><type>bs_Header*</type><name>head</name></param>
+			<param><type>size_t</type><name>size</name></param>
+		</function>
+		<function name="bs_object">
+			<return>bs_Object*</return>
+			<param><type>bs_U32</type><name>source_id</name></param>
             <param><type>bs_U32</type><name>id</name></param>
             <param><type>size_t</type><name>size</name></param>
             <param><type>size_t</type><name>flexible_size</name></param>

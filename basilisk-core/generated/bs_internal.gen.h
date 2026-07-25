@@ -39,6 +39,11 @@
 #include <stdarg.h>
 
 typedef bs_Callbacks*(__stdcall* PFN_bs_callbacks)();
+typedef int(__stdcall* PFN_bs_imageSwapsCount)(bs_Image* image);
+typedef int(__stdcall* PFN_bs_samplerSwapsCount)(bs_Sampler* sampler);
+typedef int(__stdcall* PFN_bs_bufferSwapsCount)(bs_Buffer* buffer);
+typedef int(__stdcall* PFN_bs_queueSwapsCount)(bs_Queue* queue);
+typedef int(__stdcall* PFN_bs_rendererSwapsCount)(bs_Renderer* renderer);
 typedef void(__stdcall* PFN_bs_writeLogFile)(char* value, int value_length);
 typedef void(__stdcall* PFN_bs_writeLogFileV)(char* format, va_list args);
 typedef void(__stdcall* PFN_bs_writeLogFileF)(char* format, ...);
@@ -94,10 +99,6 @@ typedef void(__stdcall* PFN_bs_accelerateBatch)(bs_RayTracer* ray_tracer, bs_Bat
 typedef bs_Result(__stdcall* PFN_bs_build)(bs_RayTracer* ray_tracer);
 typedef void(__stdcall* PFN_bs_destroyRayTracer)(bs_RayTracer* ray_tracer);
 typedef void(__stdcall* PFN_bs_dispatchAsync)(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z);
-typedef int(__stdcall* PFN_bs_bufferSwaps)(bs_Buffer* buffer);
-typedef void(__stdcall* PFN_bs_nameBuffer)(bs_Buffer* buffer, char* value, int value_length);
-typedef void(__stdcall* PFN_bs_nameBufferV)(bs_Buffer* buffer, char* format, va_list args);
-typedef void(__stdcall* PFN_bs_nameBufferF)(bs_Buffer* buffer, char* format, ...);
 typedef bs_Result(__stdcall* PFN_bs_buffer)(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags);
 typedef bool(__stdcall* PFN_bs_bufferIsMapped)(bs_Buffer* buffer);
 typedef char*(__stdcall* PFN_bs_bufferMap)(bs_Buffer* buffer);
@@ -150,7 +151,6 @@ typedef void(__stdcall* PFN_bs_batchMesh)(bs_Batch* batch, bs_U32* offset, bs_Me
 typedef bs_Range(__stdcall* PFN_bs_pushMesh)(bs_Batch* batch, bs_Mesh* mesh);
 typedef void(__stdcall* PFN_bs_batchModel)(bs_Batch* batch, bs_U32* offset, bs_Model* model);
 typedef bs_Range(__stdcall* PFN_bs_pushModel)(bs_Batch* batch, bs_Model* model);
-typedef int(__stdcall* PFN_bs_rendererSwapsCount)(bs_Renderer* renderer);
 typedef bs_Result(__stdcall* PFN_bs_renderer)(bs_Object* object, bs_RendererBits flags);
 typedef void(__stdcall* PFN_bs_output)(bs_Renderer* renderer, bs_Output output);
 typedef void(__stdcall* PFN_bs_input)(bs_Renderer* renderer, bs_Input input);
@@ -172,7 +172,6 @@ typedef void(__stdcall* PFN_bs_awaitQueue)(bs_Queue* queue, bs_PipelineStage sta
 typedef void(__stdcall* PFN_bs_awaitAcquisition)();
 typedef void(__stdcall* PFN_bs_enqueue)(bs_Queue* queue, bs_Callback function);
 typedef int(__stdcall* PFN_bs_imageIndex)();
-typedef int(__stdcall* PFN_bs_queueSwapsCount)(bs_Queue* queue);
 typedef bs_Result(__stdcall* PFN_bs_queue)(bs_Object* object, bs_QueueBits flags);
 typedef void(__stdcall* PFN_bs_destroyQueue)(bs_Queue* queue);
 typedef void(__stdcall* PFN_bs_stallGPU)();
@@ -193,7 +192,6 @@ typedef bs_vec2(__stdcall* PFN_bs_textDimensions)(bs_Font* font, char* name, int
 typedef void(__stdcall* PFN_bs_destroyFont)(bs_Font* font);
 typedef bs_Result(__stdcall* PFN_bs_loadFont)(bs_Object* object, int package_id, const char* resource_name, const char* alphabet, float spacing, bs_U32 flags);
 typedef bs_Result(__stdcall* PFN_bs_image)(bs_Object* object, bs_ivec2 dim, int num_indices, bs_Format format, bs_U32 flags);
-typedef int(__stdcall* PFN_bs_imageSwapsCount)(bs_Image* image);
 typedef void(__stdcall* PFN_bs_transition)(bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout);
 typedef bs_Result(__stdcall* PFN_bs_inspectPng)(bs_PngData* out_png_data, char* path, int path_length);
 typedef bs_Result(__stdcall* PFN_bs_inspectPngV)(bs_PngData* out_png_data, char* format, va_list args);
@@ -218,7 +216,6 @@ typedef bs_Result(__stdcall* PFN_bs_loadImageF)(bs_Object* object, int package_i
 typedef bool(__stdcall* PFN_bs_isStencilFormat)(bs_Format format);
 typedef bool(__stdcall* PFN_bs_isDepthFormat)(bs_Format format);
 typedef bool(__stdcall* PFN_bs_hasAlpha)(bs_Format format);
-typedef void(__stdcall* PFN_bs_nameImage)(bs_Image* image, const char* name);
 typedef void(__stdcall* PFN_bs_destroySampler)(bs_Sampler* sampler);
 typedef bs_Result(__stdcall* PFN_bs_sampler)(bs_Object* object, bs_ImageFilter filter, bs_SamplerBits flags);
 typedef bs_Result(__stdcall* PFN_bs_loadAtlas)(bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length);
@@ -422,6 +419,8 @@ typedef bs_Mesh*(__stdcall* PFN_bs_queryMesh)(bs_Model* model, const char * name
 typedef bs_Mesh*(__stdcall* PFN_bs_queryMeshHash)(bs_Model* model, bs_U64 hash);
 typedef bs_Material*(__stdcall* PFN_bs_queryMaterial)(bs_Model* model, const char* name);
 typedef const char*(__stdcall* PFN_bs_idName)(bs_U32 source_id, bs_U32 id);
+typedef void(__stdcall* PFN_bs_nameObject)(bs_Object* object, const char* name);
+typedef void(__stdcall* PFN_bs_resetObject)(bs_Header* head, size_t size);
 typedef bs_Object*(__stdcall* PFN_bs_object)(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type);
 typedef bs_List*(__stdcall* PFN_bs_packages)();
 typedef bs_List*(__stdcall* PFN_bs_objectSources)();
@@ -540,6 +539,11 @@ typedef bs_Result(__stdcall* PFN_bs_deleteDirectoryF)(char* format, ...);
 
 typedef struct {
     PFN_bs_callbacks bs_callbacks;
+    PFN_bs_imageSwapsCount bs_imageSwapsCount;
+    PFN_bs_samplerSwapsCount bs_samplerSwapsCount;
+    PFN_bs_bufferSwapsCount bs_bufferSwapsCount;
+    PFN_bs_queueSwapsCount bs_queueSwapsCount;
+    PFN_bs_rendererSwapsCount bs_rendererSwapsCount;
     PFN_bs_writeLogFile bs_writeLogFile;
     PFN_bs_writeLogFileV bs_writeLogFileV;
     PFN_bs_writeLogFileF bs_writeLogFileF;
@@ -595,10 +599,6 @@ typedef struct {
     PFN_bs_build bs_build;
     PFN_bs_destroyRayTracer bs_destroyRayTracer;
     PFN_bs_dispatchAsync bs_dispatchAsync;
-    PFN_bs_bufferSwaps bs_bufferSwaps;
-    PFN_bs_nameBuffer bs_nameBuffer;
-    PFN_bs_nameBufferV bs_nameBufferV;
-    PFN_bs_nameBufferF bs_nameBufferF;
     PFN_bs_buffer bs_buffer;
     PFN_bs_bufferIsMapped bs_bufferIsMapped;
     PFN_bs_bufferMap bs_bufferMap;
@@ -651,7 +651,6 @@ typedef struct {
     PFN_bs_pushMesh bs_pushMesh;
     PFN_bs_batchModel bs_batchModel;
     PFN_bs_pushModel bs_pushModel;
-    PFN_bs_rendererSwapsCount bs_rendererSwapsCount;
     PFN_bs_renderer bs_renderer;
     PFN_bs_output bs_output;
     PFN_bs_input bs_input;
@@ -673,7 +672,6 @@ typedef struct {
     PFN_bs_awaitAcquisition bs_awaitAcquisition;
     PFN_bs_enqueue bs_enqueue;
     PFN_bs_imageIndex bs_imageIndex;
-    PFN_bs_queueSwapsCount bs_queueSwapsCount;
     PFN_bs_queue bs_queue;
     PFN_bs_destroyQueue bs_destroyQueue;
     PFN_bs_stallGPU bs_stallGPU;
@@ -694,7 +692,6 @@ typedef struct {
     PFN_bs_destroyFont bs_destroyFont;
     PFN_bs_loadFont bs_loadFont;
     PFN_bs_image bs_image;
-    PFN_bs_imageSwapsCount bs_imageSwapsCount;
     PFN_bs_transition bs_transition;
     PFN_bs_inspectPng bs_inspectPng;
     PFN_bs_inspectPngV bs_inspectPngV;
@@ -719,7 +716,6 @@ typedef struct {
     PFN_bs_isStencilFormat bs_isStencilFormat;
     PFN_bs_isDepthFormat bs_isDepthFormat;
     PFN_bs_hasAlpha bs_hasAlpha;
-    PFN_bs_nameImage bs_nameImage;
     PFN_bs_destroySampler bs_destroySampler;
     PFN_bs_sampler bs_sampler;
     PFN_bs_loadAtlas bs_loadAtlas;
@@ -923,6 +919,8 @@ typedef struct {
     PFN_bs_queryMeshHash bs_queryMeshHash;
     PFN_bs_queryMaterial bs_queryMaterial;
     PFN_bs_idName bs_idName;
+    PFN_bs_nameObject bs_nameObject;
+    PFN_bs_resetObject bs_resetObject;
     PFN_bs_object bs_object;
     PFN_bs_packages bs_packages;
     PFN_bs_objectSources bs_objectSources;
@@ -1041,6 +1039,11 @@ typedef struct {
 } bs_FunctionTable;
 
 BSAPI bs_Callbacks* _bs_callbacks();
+BSAPI int _bs_imageSwapsCount(bs_Image* image);
+BSAPI int _bs_samplerSwapsCount(bs_Sampler* sampler);
+BSAPI int _bs_bufferSwapsCount(bs_Buffer* buffer);
+BSAPI int _bs_queueSwapsCount(bs_Queue* queue);
+BSAPI int _bs_rendererSwapsCount(bs_Renderer* renderer);
 BSAPI void _bs_writeLogFile(char* value, int value_length);
 BSAPI void _bs_writeLogFileV(char* format, va_list args);
 BSAPI void _bs_writeLogFileF(char* format,  ...);
@@ -1096,10 +1099,6 @@ BSAPI void _bs_accelerateBatch(bs_RayTracer* ray_tracer, bs_Batch* batch);
 BSAPI bs_Result _bs_build(bs_RayTracer* ray_tracer);
 BSAPI void _bs_destroyRayTracer(bs_RayTracer* ray_tracer);
 BSAPI void _bs_dispatchAsync(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z);
-BSAPI int _bs_bufferSwaps(bs_Buffer* buffer);
-BSAPI void _bs_nameBuffer(bs_Buffer* buffer, char* value, int value_length);
-BSAPI void _bs_nameBufferV(bs_Buffer* buffer, char* format, va_list args);
-BSAPI void _bs_nameBufferF(bs_Buffer* buffer, char* format,  ...);
 BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags);
 BSAPI bool _bs_bufferIsMapped(bs_Buffer* buffer);
 BSAPI char* _bs_bufferMap(bs_Buffer* buffer);
@@ -1152,7 +1151,6 @@ BSAPI void _bs_batchMesh(bs_Batch* batch, bs_U32* offset, bs_Mesh* mesh);
 BSAPI bs_Range _bs_pushMesh(bs_Batch* batch, bs_Mesh* mesh);
 BSAPI void _bs_batchModel(bs_Batch* batch, bs_U32* offset, bs_Model* model);
 BSAPI bs_Range _bs_pushModel(bs_Batch* batch, bs_Model* model);
-BSAPI int _bs_rendererSwapsCount(bs_Renderer* renderer);
 BSAPI bs_Result _bs_renderer(bs_Object* object, bs_RendererBits flags);
 BSAPI void _bs_output(bs_Renderer* renderer, bs_Output output);
 BSAPI void _bs_input(bs_Renderer* renderer, bs_Input input);
@@ -1174,7 +1172,6 @@ BSAPI void _bs_awaitQueue(bs_Queue* queue, bs_PipelineStage stage);
 BSAPI void _bs_awaitAcquisition();
 BSAPI void _bs_enqueue(bs_Queue* queue, bs_Callback function);
 BSAPI int _bs_imageIndex();
-BSAPI int _bs_queueSwapsCount(bs_Queue* queue);
 BSAPI bs_Result _bs_queue(bs_Object* object, bs_QueueBits flags);
 BSAPI void _bs_destroyQueue(bs_Queue* queue);
 BSAPI void _bs_stallGPU();
@@ -1195,7 +1192,6 @@ BSAPI bs_vec2 _bs_textDimensions(bs_Font* font, char* name, int length);
 BSAPI void _bs_destroyFont(bs_Font* font);
 BSAPI bs_Result _bs_loadFont(bs_Object* object, int package_id, const char* resource_name, const char* alphabet, float spacing, bs_U32 flags);
 BSAPI bs_Result _bs_image(bs_Object* object, bs_ivec2 dim, int num_indices, bs_Format format, bs_U32 flags);
-BSAPI int _bs_imageSwapsCount(bs_Image* image);
 BSAPI void _bs_transition(bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout);
 BSAPI bs_Result _bs_inspectPng(bs_PngData* out_png_data, char* path, int path_length);
 BSAPI bs_Result _bs_inspectPngV(bs_PngData* out_png_data, char* format, va_list args);
@@ -1220,7 +1216,6 @@ BSAPI bs_Result _bs_loadImageF(bs_Object* object, int package_id, bs_ImageBits f
 BSAPI bool _bs_isStencilFormat(bs_Format format);
 BSAPI bool _bs_isDepthFormat(bs_Format format);
 BSAPI bool _bs_hasAlpha(bs_Format format);
-BSAPI void _bs_nameImage(bs_Image* image, const char* name);
 BSAPI void _bs_destroySampler(bs_Sampler* sampler);
 BSAPI bs_Result _bs_sampler(bs_Object* object, bs_ImageFilter filter, bs_SamplerBits flags);
 BSAPI bs_Result _bs_loadAtlas(bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length);
@@ -1424,6 +1419,8 @@ BSAPI bs_Mesh* _bs_queryMesh(bs_Model* model, const char * name);
 BSAPI bs_Mesh* _bs_queryMeshHash(bs_Model* model, bs_U64 hash);
 BSAPI bs_Material* _bs_queryMaterial(bs_Model* model, const char* name);
 BSAPI const char* _bs_idName(bs_U32 source_id, bs_U32 id);
+BSAPI void _bs_nameObject(bs_Object* object, const char* name);
+BSAPI void _bs_resetObject(bs_Header* head, size_t size);
 BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type);
 BSAPI bs_List* _bs_packages();
 BSAPI bs_List* _bs_objectSources();
@@ -1544,6 +1541,11 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     static bs_FunctionTable functions;
 
     functions.bs_callbacks = _bs_callbacks;
+    functions.bs_imageSwapsCount = _bs_imageSwapsCount;
+    functions.bs_samplerSwapsCount = _bs_samplerSwapsCount;
+    functions.bs_bufferSwapsCount = _bs_bufferSwapsCount;
+    functions.bs_queueSwapsCount = _bs_queueSwapsCount;
+    functions.bs_rendererSwapsCount = _bs_rendererSwapsCount;
     functions.bs_writeLogFile = _bs_writeLogFile;
     functions.bs_writeLogFileV = _bs_writeLogFileV;
     functions.bs_writeLogFileF = _bs_writeLogFileF;
@@ -1599,10 +1601,6 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_build = _bs_build;
     functions.bs_destroyRayTracer = _bs_destroyRayTracer;
     functions.bs_dispatchAsync = _bs_dispatchAsync;
-    functions.bs_bufferSwaps = _bs_bufferSwaps;
-    functions.bs_nameBuffer = _bs_nameBuffer;
-    functions.bs_nameBufferV = _bs_nameBufferV;
-    functions.bs_nameBufferF = _bs_nameBufferF;
     functions.bs_buffer = _bs_buffer;
     functions.bs_bufferIsMapped = _bs_bufferIsMapped;
     functions.bs_bufferMap = _bs_bufferMap;
@@ -1655,7 +1653,6 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_pushMesh = _bs_pushMesh;
     functions.bs_batchModel = _bs_batchModel;
     functions.bs_pushModel = _bs_pushModel;
-    functions.bs_rendererSwapsCount = _bs_rendererSwapsCount;
     functions.bs_renderer = _bs_renderer;
     functions.bs_output = _bs_output;
     functions.bs_input = _bs_input;
@@ -1677,7 +1674,6 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_awaitAcquisition = _bs_awaitAcquisition;
     functions.bs_enqueue = _bs_enqueue;
     functions.bs_imageIndex = _bs_imageIndex;
-    functions.bs_queueSwapsCount = _bs_queueSwapsCount;
     functions.bs_queue = _bs_queue;
     functions.bs_destroyQueue = _bs_destroyQueue;
     functions.bs_stallGPU = _bs_stallGPU;
@@ -1698,7 +1694,6 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_destroyFont = _bs_destroyFont;
     functions.bs_loadFont = _bs_loadFont;
     functions.bs_image = _bs_image;
-    functions.bs_imageSwapsCount = _bs_imageSwapsCount;
     functions.bs_transition = _bs_transition;
     functions.bs_inspectPng = _bs_inspectPng;
     functions.bs_inspectPngV = _bs_inspectPngV;
@@ -1723,7 +1718,6 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_isStencilFormat = _bs_isStencilFormat;
     functions.bs_isDepthFormat = _bs_isDepthFormat;
     functions.bs_hasAlpha = _bs_hasAlpha;
-    functions.bs_nameImage = _bs_nameImage;
     functions.bs_destroySampler = _bs_destroySampler;
     functions.bs_sampler = _bs_sampler;
     functions.bs_loadAtlas = _bs_loadAtlas;
@@ -1927,6 +1921,8 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_queryMeshHash = _bs_queryMeshHash;
     functions.bs_queryMaterial = _bs_queryMaterial;
     functions.bs_idName = _bs_idName;
+    functions.bs_nameObject = _bs_nameObject;
+    functions.bs_resetObject = _bs_resetObject;
     functions.bs_object = _bs_object;
     functions.bs_packages = _bs_packages;
     functions.bs_objectSources = _bs_objectSources;

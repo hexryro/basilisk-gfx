@@ -1326,6 +1326,7 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 typedef int (__cdecl* bs_ThreadFunction)(void*);
 typedef void (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
 typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
+typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -2334,6 +2335,7 @@ struct bs_Header {
     int id;
     int source_id;
     bs_ObjectType type;
+    const char* name;
 };
 
 struct bs_Object {
@@ -2669,7 +2671,6 @@ struct bs_Input {
     bs_U32 subpass;
     bs_U32 parent_subpass;
     bs_U32 attachment;
-    bs_Image* image;
 };
 
 struct bs_RendererSwaps {
@@ -3117,24 +3118,26 @@ struct bs_ImageDescriptor {
 };
 
 struct bs_Descriptor {
+    union {
+        struct {
+            struct VkSampler_T* vk_sampler;
+            struct VkImageView_T* vk_image_view;
+            enum VkImageLayout vk_image_layout;
+            bs_U32 padding;
+            bs_Image* image;
+            bs_Sampler* sampler;
+        }as_image;
+        struct {
+            struct VkBuffer_T* vk_buffer;
+            bs_U64 vk_offset;
+            bs_U64 vk_range;
+            bs_Buffer* buffer;
+        }as_buffer;
+    };
     int object_type;
     int reserved;
     int bind_set;
     int bind_point;
-    union {
-        struct {
-            bs_Image* image;
-            bs_Sampler* sampler;
-            struct VkImageLayout_T* vk_image_layout;
-            struct VkImageView_T* vk_image_view;
-            struct VkSampler_T* vk_sampler;
-        }as_image;
-        struct {
-            bs_Buffer* buffer;
-            struct VkBuffer_T* vk_buffer;
-            bs_U32 vk_range;
-        }as_buffer;
-    };
 };
 
 struct bs_Binding {
@@ -3353,6 +3356,46 @@ bs_disableValidation();
   */
 BSAPI bs_Callbacks*
 bs_callbacks();
+
+ /**
+  @param image
+  @return int
+  */
+BSAPI int
+bs_imageSwapsCount(
+    bs_Image* image);
+
+ /**
+  @param sampler
+  @return int
+  */
+BSAPI int
+bs_samplerSwapsCount(
+    bs_Sampler* sampler);
+
+ /**
+  @param buffer
+  @return int
+  */
+BSAPI int
+bs_bufferSwapsCount(
+    bs_Buffer* buffer);
+
+ /**
+  @param queue
+  @return int
+  */
+BSAPI int
+bs_queueSwapsCount(
+    bs_Queue* queue);
+
+ /**
+  @param renderer
+  @return int
+  */
+BSAPI int
+bs_rendererSwapsCount(
+    bs_Renderer* renderer);
 
  /**
   @param value
@@ -4889,50 +4932,6 @@ bs_dispatchAsync(
     bs_U32 z);
 
  /**
-  @param buffer
-  @return int
-  */
-BSAPI int
-bs_bufferSwaps(
-    bs_Buffer* buffer);
-
- /**
-  @param buffer
-  @param value
-  @param value_length
-  @return void
-  */
-BSAPI void
-bs_nameBuffer(
-    bs_Buffer* buffer,
-    char* value,
-    int value_length);
-
- /**
-  @param buffer
-  @param format
-  @param args
-  @return void
-  */
-BSAPI void
-bs_nameBufferV(
-    bs_Buffer* buffer,
-    char* format,
-    va_list args);
-
- /**
-  @param buffer
-  @param format
-  @param ...
-  @return void
-  */
-BSAPI void
-bs_nameBufferF(
-    bs_Buffer* buffer,
-    char* format,
-     ...);
-
- /**
   @param object
   @param num_bytes
   @param usage_flags
@@ -5579,14 +5578,6 @@ bs_pushModel(
     bs_Model* model);
 
  /**
-  @param renderer
-  @return int
-  */
-BSAPI int
-bs_rendererSwapsCount(
-    bs_Renderer* renderer);
-
- /**
   @param object
   @param flags
   @return bs_Result
@@ -5781,14 +5772,6 @@ bs_enqueue(
   */
 BSAPI int
 bs_imageIndex();
-
- /**
-  @param queue
-  @return int
-  */
-BSAPI int
-bs_queueSwapsCount(
-    bs_Queue* queue);
 
  /**
   @param object
@@ -5989,14 +5972,6 @@ bs_image(
     int num_indices,
     bs_Format format,
     bs_U32 flags);
-
- /**
-  @param image
-  @return int
-  */
-BSAPI int
-bs_imageSwapsCount(
-    bs_Image* image);
 
  /**
   @param image
@@ -6311,16 +6286,6 @@ bs_isDepthFormat(
 BSAPI bool
 bs_hasAlpha(
     bs_Format format);
-
- /**
-  @param image
-  @param name
-  @return void
-  */
-BSAPI void
-bs_nameImage(
-    bs_Image* image,
-    const char* name);
 
  /**
   @param sampler
@@ -8381,6 +8346,26 @@ BSAPI const char*
 bs_idName(
     bs_U32 source_id,
     bs_U32 id);
+
+ /**
+  @param object
+  @param name
+  @return void
+  */
+BSAPI void
+bs_nameObject(
+    bs_Object* object,
+    const char* name);
+
+ /**
+  @param head
+  @param size
+  @return void
+  */
+BSAPI void
+bs_resetObject(
+    bs_Header* head,
+    size_t size);
 
  /**
   @param source_id

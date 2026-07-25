@@ -81,6 +81,36 @@ bs_Callbacks* bs_callbacks()
     return next.bs_callbacks();
 }
 
+int bs_imageSwapsCount(
+    bs_Image* image)
+{
+    return next.bs_imageSwapsCount(image);
+}
+
+int bs_samplerSwapsCount(
+    bs_Sampler* sampler)
+{
+    return next.bs_samplerSwapsCount(sampler);
+}
+
+int bs_bufferSwapsCount(
+    bs_Buffer* buffer)
+{
+    return next.bs_bufferSwapsCount(buffer);
+}
+
+int bs_queueSwapsCount(
+    bs_Queue* queue)
+{
+    return next.bs_queueSwapsCount(queue);
+}
+
+int bs_rendererSwapsCount(
+    bs_Renderer* renderer)
+{
+    return next.bs_rendererSwapsCount(renderer);
+}
+
 void bs_writeLogFile(
     char* value, 
     int value_length)
@@ -1136,39 +1166,6 @@ void bs_dispatchAsync(
     next.bs_dispatchAsync(pipeline, x, y, z);
 }
 
-int bs_bufferSwaps(
-    bs_Buffer* buffer)
-{
-    return next.bs_bufferSwaps(buffer);
-}
-
-void bs_nameBuffer(
-    bs_Buffer* buffer, 
-    char* value, 
-    int value_length)
-{
-    next.bs_nameBuffer(buffer, value, value_length);
-}
-
-void bs_nameBufferV(
-    bs_Buffer* buffer, 
-    char* format, 
-    va_list args)
-{
-    next.bs_nameBufferV(buffer, format, args);
-}
-
-void bs_nameBufferF(
-    bs_Buffer* buffer, 
-    char* format, 
-    ...)
-{
-    va_list args;
-    va_start(args, format);
-    next.bs_nameBufferV(buffer, format, args);
-    va_end(args);
-}
-
 bs_Result bs_buffer(
     bs_Object* object, 
     bs_U32 num_bytes, 
@@ -1600,12 +1597,6 @@ bs_Range bs_pushModel(
     return next.bs_pushModel(batch, model);
 }
 
-int bs_rendererSwapsCount(
-    bs_Renderer* renderer)
-{
-    return next.bs_rendererSwapsCount(renderer);
-}
-
 bs_Result bs_renderer(
     bs_Object* object, 
     bs_RendererBits flags)
@@ -1746,12 +1737,6 @@ int bs_imageIndex()
     return next.bs_imageIndex();
 }
 
-int bs_queueSwapsCount(
-    bs_Queue* queue)
-{
-    return next.bs_queueSwapsCount(queue);
-}
-
 bs_Result bs_queue(
     bs_Object* object, 
     bs_QueueBits flags)
@@ -1890,12 +1875,6 @@ bs_Result bs_image(
     bs_U32 flags)
 {
     return next.bs_image(object, dim, num_indices, format, flags);
-}
-
-int bs_imageSwapsCount(
-    bs_Image* image)
-{
-    return next.bs_imageSwapsCount(image);
 }
 
 void bs_transition(
@@ -2113,13 +2092,6 @@ bool bs_hasAlpha(
     bs_Format format)
 {
     return next.bs_hasAlpha(format);
-}
-
-void bs_nameImage(
-    bs_Image* image, 
-    const char* name)
-{
-    next.bs_nameImage(image, name);
 }
 
 void bs_destroySampler(
@@ -3642,6 +3614,20 @@ const char* bs_idName(
     bs_U32 id)
 {
     return next.bs_idName(source_id, id);
+}
+
+void bs_nameObject(
+    bs_Object* object, 
+    const char* name)
+{
+    next.bs_nameObject(object, name);
+}
+
+void bs_resetObject(
+    bs_Header* head, 
+    size_t size)
+{
+    next.bs_resetObject(head, size);
 }
 
 bs_Object* bs_object(

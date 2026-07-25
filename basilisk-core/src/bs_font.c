@@ -837,12 +837,7 @@ BSAPI void _bs_destroyFont(bs_Font* font) {
     //	if (font->fragment_shader)
     //		_bs_destroyShader(font->fragment_shader);
 
-    // TODO: make generic
-    int id = font->head.id;
-    int source_id = font->head.source_id;
-    memset(font, 0, sizeof(bs_Font));
-    font->head.source_id = source_id;
-    font->head.id = id;
+    _bs_resetObject(&font->head, sizeof(bs_Font));
 }
 
 BSAPI void _bs_bindFont(bs_Font* font, bs_Sampler* sampler, int bind_set, int bind_point) {
@@ -883,6 +878,11 @@ BSAPI bs_Result _bs_loadFont(bs_Object* object, int package_id, const char* reso
 
     bs_Object* atlas_object = BS_ATLAS(-1, 0, 0);
     _bs_loadAtlasMemory(atlas_object, package_id, resource->name, resource->data->value + header->batl_offset, 0);
+    if (atlas_object->atlas->count <= 0) {
+        _bs_warnF("Font \"%s\" has 0 glyphs", resource_name);
+        _bs_destroyFont(font);
+        return BS_RESULT_ZERO_ALLOC;
+    }
 
     font->spacing = spacing;
     font->alphabet = alphabet;

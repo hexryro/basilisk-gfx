@@ -508,9 +508,12 @@ static void _bs_prepareSwapchain() {
 
     bs_ivec2 resolution = { capabilities.minImageExtent.width, capabilities.minImageExtent.height };
     bs_Image image = {
+        .head = {
+            .type = BS_OBJECT_IMAGE
+        },
         .flags = BS_IMAGE_SWAPS_BIT,
         .format = _bs_context_->surface_format.format,
-        .dim = resolution
+        .dim = resolution,
     };
 
     const int frames_in_flight_target = 2;

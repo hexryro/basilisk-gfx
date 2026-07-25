@@ -82,6 +82,45 @@ BSAPI void _bsi_nameHandle(bs_U64 handle, bs_U32 type, char* name, int name_leng
     pfn_vkSetDebugUtilsObjectNameEXT(_bs_instance_->device, &name_i);
 }
 
+static void _bs_nameBuffer(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+    object->buffer->flags |= BS_BUFFER_IS_NAMED;
+    for (int i = 0; i < _bs_bufferSwapsCount(object->buffer); i++)
+        bsi_nameHandle(object->buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
+}
+
+static void _bs_nameQueue(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+    //object->queue->flags |= BS_QUEUE_IS_NAMED;
+
+    bsi_nameHandle(object->queue->queue, VK_OBJECT_TYPE_QUEUE, name, name_length);
+
+    for (int i = 0; i < _bs_queueSwapsCount(object->queue); i++) {
+        bsi_nameHandle(object->queue->_[i].fence, VK_OBJECT_TYPE_FENCE, name, name_length);
+        bsi_nameHandle(object->queue->_[i].semaphore, VK_OBJECT_TYPE_SEMAPHORE, name, name_length);
+        bsi_nameHandle(object->queue->_[i].command_buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, name, name_length);
+    }
+}
+
+static void _bs_nameBatch(bs_Object* object, const char* name) {
+}
+
+static void _bs_nameRenderer(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+
+    bsi_nameHandle(object->renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, name, name_length);
+    for (int i = 0; i < _bs_rendererSwapsCount(object->renderer); i++) {
+        bsi_nameHandle(object->renderer->_[i].framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, name, name_length);
+    }
+}
+
+static void _bs_nameRayTracer(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+
+    bsi_nameHandle(object->ray_tracer->TLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+    bsi_nameHandle(object->ray_tracer->BLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+}
+
 BSAPI struct VkCommandBuffer_T* _bsi_fetchCommands() {
     if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT)
         _bs_resetQueue(_bs_scope_.queue);
@@ -476,18 +515,12 @@ BSAPI void _bs_setLineWidth(float width) {
    * Buffer
    *============================================================================*/
 
-BSAPI int _bs_bufferSwaps(bs_Buffer* buffer) {
+BSAPI int _bs_bufferSwapsCount(bs_Buffer* buffer) {
     return buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
 }
 
 BSAPI bool _bs_bufferIsMapped(bs_Buffer* buffer) {
     return buffer->_->data;
-}
-
-BSAPI void _bs_nameBuffer(bs_Buffer* buffer, char* name, int name_length) {
-    buffer->flags |= BS_BUFFER_IS_NAMED;
-    for (int i = 0; i < _bs_bufferSwaps(buffer); i++)
-        bsi_nameHandle(buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
 }
 
  /**
@@ -579,13 +612,10 @@ BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFl
             return _bs_convertVulkanResult(result);
     }
 
-    if (buffer->head.id) {
-        char* name = _bs_idName(buffer->head.source_id, buffer->head.id);
-        _bs_nameBuffer(object->buffer, name, strlen(name));
-    }
-
     if (flags & BS_BUFFER_PRE_MAP)
         _bs_mapBuffer(object->buffer, BS_U32_MAX);
+
+    _bs_nameBuffer(object);
 
     return BS_RESULT_OK;
 }
@@ -697,12 +727,7 @@ BSAPI void _bs_destroyBuffer(bs_Buffer* buffer) {
      //   _bs_pushDescriptors();
     }
 
-    // TODO: make generic
-    int id = buffer->head.id;
-    int source_id = buffer->head.source_id;
-    memset(buffer, 0, sizeof(bs_Buffer));
-    buffer->head.source_id = source_id;
-    buffer->head.id = id;
+    _bs_resetObject(&buffer->head, sizeof(bs_Buffer));
 }
 
 BSAPI void _val_bs_copyAsync(bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, bs_U32 src_offset, bs_U32 num_bytes) {
@@ -1552,7 +1577,6 @@ BSAPI bs_Result _bs_pushBatch(bs_Batch* batch, bs_U32 num_indices, bs_U32 num_ve
     }
 
     _bs_mapBuffer(batch->staging_buffer->buffer, vertex_size);
-    _bs_nameBuffer(batch->staging_buffer->buffer, "staging", sizeof("staging") - 1);
 
     if (bindings.staging_was_bound)
         _bs_bindBuffer(bindings.staging_bind_set, bindings.staging_binding, batch->staging_buffer->buffer);
@@ -1573,7 +1597,6 @@ BSAPI bs_Result _bs_pushBatch(bs_Batch* batch, bs_U32 num_indices, bs_U32 num_ve
 
     _bs_stageList(batch->staging_buffer->buffer, &batch->vertices);
     _bs_copyAsync(batch->staging_buffer->buffer, batch->vertex_buffer->buffer, 0, 0, BS_U32_MAX);
-    _bs_nameBuffer(batch->vertex_buffer->buffer, "vertex", sizeof("vertex") - 1);
 
     if (bindings.vertex_was_bound)
         _bs_bindBuffer(bindings.vertex_bind_set, bindings.vertex_binding, batch->vertex_buffer->buffer);
@@ -1596,7 +1619,6 @@ BSAPI bs_Result _bs_pushBatch(bs_Batch* batch, bs_U32 num_indices, bs_U32 num_ve
         }
 
         _bs_copyAsync(batch->staging_buffer->buffer, batch->index_buffer->buffer, 0, 0, BS_U32_MAX);
-        _bs_nameBuffer(batch->index_buffer->buffer, "index", sizeof("index") - 1);
     }
 
     if (bindings.index_was_bound)
@@ -1734,8 +1756,6 @@ BSAPI void _bs_output(bs_Renderer* renderer, bs_Output output) {
   */
 BSAPI void _val_bs_input(bs_Renderer* renderer, bs_Input input) {
     BS_VALIDATE(renderer->num_inputs < BS_MAX_ATTACHMENTS_COUNT,,);
-    BS_VALIDATE(input.image != NULL,,);
-    BS_VALIDATE(input.image->head.type == BS_OBJECT_IMAGE,,);
 
     return _bs_input(renderer, input);
 }
@@ -1783,7 +1803,9 @@ static int _bs_sortOutputs(const bs_Output* a, const bs_Output* b) {
 }
 
 BSAPI void _val_bs_renderPass(bs_Renderer* renderer) {
-    BS_VALIDATE(!renderer->render_pass, , "Renderer (%d) already has a render pass\n", renderer->head.id)
+    BS_VALIDATE(!renderer->render_pass, , "Renderer (%d) already has a render pass\n", renderer->head.id);
+
+    _bs_renderPass(renderer);
 }
 
 BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
@@ -1884,7 +1906,8 @@ BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
 }
 
 BSAPI void _val_bs_framebuffer(bs_Renderer* renderer, bs_ivec2 dim) {
-    BS_VALIDATE(renderer->_->framebuffer == NULL,, "Renderer (%d) already has a framebuffer\n", renderer->head.id);
+    BS_VALIDATE(renderer->_->framebuffer == NULL,, "Renderer \"%s\" already has a framebuffer", renderer->head.name);
+    BS_VALIDATE(renderer->render_pass != NULL,,);
 
     _bs_framebuffer(renderer, dim);
 }
@@ -2103,12 +2126,7 @@ BSAPI void _bs_destroyRenderer(bs_Renderer* renderer) {
 
     _bs_destroyFramebuffer(renderer);
 
-    // TODO: make generic
-    int id = renderer->head.id;
-    int source_id = renderer->head.source_id;
-    memset(renderer, 0, sizeof(bs_Renderer));
-    renderer->head.source_id = source_id;
-    renderer->head.id = id;
+    _bs_resetObject(&renderer->head, sizeof(bs_Renderer));
 }
 
 BSAPI void _bs_resizeRenderer(bs_Renderer* renderer, bs_ivec2 dim) {
@@ -2257,7 +2275,6 @@ static bs_Result _bs_buildBLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
         return result;
     }
 
-    _bs_nameBuffer(aabb_buffer->buffer, "AABB Buffer", sizeof("AABB Buffer") - 1);
     _bs_copyAsync(staging_buffer, aabb_buffer->buffer, 0, 0, BS_U32_MAX);
 
     bsi_fetchCommands();
@@ -2330,8 +2347,6 @@ static bs_Result _bs_buildBLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
         return result;
     }
 
-    _bs_nameBuffer(tracer->BLAS_buffer, "BLAS Buffer", sizeof("BLAS Buffer") - 1);
-
     VkAccelerationStructureCreateInfoKHR createInfo = { 
         .sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR,
         .type = build_info.type,
@@ -2356,8 +2371,6 @@ static bs_Result _bs_buildBLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
         _bs_destroyRayTracer(tracer);
         return result;
     }
-
-    _bs_nameBuffer(tracer->BLAS_scratch_buffer, "BLAS Scratch Buffer", sizeof("BLAS Scratch Buffer") - 1);
 
     build_info.dstAccelerationStructure = tracer->BLAS;
     build_info.scratchData.deviceAddress = _bs_bufferAddress(tracer->BLAS_scratch_buffer->_->vk_buffer);
@@ -2411,7 +2424,6 @@ static bs_Result _bs_buildTLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
         return result;
     }
 
-    _bs_nameBuffer(instance_buffer, "Instance Buffer", sizeof("Instance Buffer") - 1);
     memcpy(staging_buffer->_->data, &instance, sizeof(instance));
     _bs_copyAsync(staging_buffer, instance_buffer, 0, 0, sizeof(instance));
 
@@ -2472,8 +2484,6 @@ static bs_Result _bs_buildTLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
         return result;
     }
 
-    _bs_nameBuffer(tracer->TLAS_buffer, "TLAS Buffer", sizeof("TLAS Buffer") - 1);
-
     VkAccelerationStructureCreateInfoKHR createInfo = {
         .sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR,
         .type = build_info.type,
@@ -2503,7 +2513,6 @@ static bs_Result _bs_buildTLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
     }
 
     build_info.scratchData.deviceAddress = _bs_bufferAddress(tracer->TLAS_scratch_buffer->_->vk_buffer);
-    _bs_nameBuffer(tracer->TLAS_scratch_buffer, "TLAS Scratch Buffer", sizeof("TLAS Scratch Buffer") - 1);
 
     VkAccelerationStructureBuildRangeInfoKHR* p_range_info = &range_info;
 
@@ -2729,6 +2738,8 @@ BSAPI bs_Result _bs_queue(bs_Object* object, bs_QueueBits flags) {
     }
     */
 
+    _bs_nameQueue(object);
+
     return BS_RESULT_OK;
 }
 
@@ -2739,12 +2750,7 @@ BSAPI void _bs_destroyQueue(bs_Queue* queue) {
             vkDestroySemaphore(_bs_instance_->device, queue->_[i].semaphore, NULL);
     }
 
-    // TODO: make generic
-    int id = queue->head.id;
-    int source_id = queue->head.source_id;
-    memset(queue, 0, sizeof(bs_Queue));
-    queue->head.id = id;
-    queue->head.source_id = source_id;
+    _bs_resetObject(&queue->head, sizeof(bs_Queue));
 }
 
 BSAPI void _bs_awaitQueue(bs_Queue* queue, bs_PipelineStage stage) {

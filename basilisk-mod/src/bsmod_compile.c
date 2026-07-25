@@ -55,6 +55,8 @@ static bs_U32 _bsmod_readPushConstantSize(spvc_compiler compiler, spvc_resources
 
 	size_t struct_size = 0;
 	spvc_compiler_get_declared_struct_size(compiler, spirv_type, &struct_size);
+
+	return struct_size;
 }
 
 

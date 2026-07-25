@@ -184,7 +184,7 @@ BSAPI void _bs_logEndOfSection() {
 BSAPI void _bs_logWithTimestamp(bs_MessageLevel level, char* message, int message_len) {
     bs_DateTime dt = _bs_dateTime();
 
-    _bs_writeLogger(BS_LIBRARY_BASILISK, level, 0, 0, "", "", 0, "[%02d-%02d-%02d %02d:%02d:%02d %04d] %s",
+    _bs_writeLogger(BS_LIBRARY_BASILISK, level, 0, 0, NULL, NULL, 0, "[%02d-%02d-%02d %02d:%02d:%02d %04d] %s",
         dt.years, dt.months, dt.days, dt.hours, dt.minutes, dt.seconds, dt.milliseconds, message);
 }
 

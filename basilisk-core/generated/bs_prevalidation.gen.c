@@ -54,6 +54,36 @@ BSAPI bs_Callbacks* _preval_bs_callbacks() {
     return next.bs_callbacks();
 }
 
+BSAPI int _preval_bs_imageSwapsCount(bs_Image* image) {
+    BS_VALIDATE(image != NULL, 0,);
+    BS_VALIDATE(image->head.type == BS_OBJECT_IMAGE, 0,);
+    return next.bs_imageSwapsCount(image);
+}
+
+BSAPI int _preval_bs_samplerSwapsCount(bs_Sampler* sampler) {
+    BS_VALIDATE(sampler != NULL, 0,);
+    BS_VALIDATE(sampler->head.type == BS_OBJECT_SAMPLER, 0,);
+    return next.bs_samplerSwapsCount(sampler);
+}
+
+BSAPI int _preval_bs_bufferSwapsCount(bs_Buffer* buffer) {
+    BS_VALIDATE(buffer != NULL, 0,);
+    BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, 0,);
+    return next.bs_bufferSwapsCount(buffer);
+}
+
+BSAPI int _preval_bs_queueSwapsCount(bs_Queue* queue) {
+    BS_VALIDATE(queue != NULL, 0,);
+    BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, 0,);
+    return next.bs_queueSwapsCount(queue);
+}
+
+BSAPI int _preval_bs_rendererSwapsCount(bs_Renderer* renderer) {
+    BS_VALIDATE(renderer != NULL, 0,);
+    BS_VALIDATE(renderer->head.type == BS_OBJECT_RENDERER, 0,);
+    return next.bs_rendererSwapsCount(renderer);
+}
+
 BSAPI void _preval_bs_writeLogFile(char* value, int value_length) {
     BS_VALIDATE(value != NULL, ,);
     next.bs_writeLogFile(value, value_length);
@@ -359,26 +389,6 @@ BSAPI void _preval_bs_destroyRayTracer(bs_RayTracer* ray_tracer) {
 BSAPI void _preval_bs_dispatchAsync(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z) {
     BS_VALIDATE(pipeline != NULL, ,);
     next.bs_dispatchAsync(pipeline, x, y, z);
-}
-
-BSAPI int _preval_bs_bufferSwaps(bs_Buffer* buffer) {
-    BS_VALIDATE(buffer != NULL, 0,);
-    BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, 0,);
-    return next.bs_bufferSwaps(buffer);
-}
-
-BSAPI void _preval_bs_nameBuffer(bs_Buffer* buffer, char* value, int value_length) {
-    BS_VALIDATE(buffer != NULL, ,);
-    BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, ,);
-    BS_VALIDATE(value != NULL, ,);
-    next.bs_nameBuffer(buffer, value, value_length);
-}
-
-BSAPI void _preval_bs_nameBufferV(bs_Buffer* buffer, char* format, va_list args) {
-    BS_VALIDATE(buffer != NULL, ,);
-    BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, ,);
-    BS_VALIDATE(format != NULL, ,);
-    next.bs_nameBufferV(buffer, format, args);
 }
 
 BSAPI bs_Result _preval_bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
@@ -716,12 +726,6 @@ BSAPI bs_Range _preval_bs_pushModel(bs_Batch* batch, bs_Model* model) {
     return next.bs_pushModel(batch, model);
 }
 
-BSAPI int _preval_bs_rendererSwapsCount(bs_Renderer* renderer) {
-    BS_VALIDATE(renderer != NULL, 0,);
-    BS_VALIDATE(renderer->head.type == BS_OBJECT_RENDERER, 0,);
-    return next.bs_rendererSwapsCount(renderer);
-}
-
 BSAPI bs_Result _preval_bs_renderer(bs_Object* object, bs_RendererBits flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_renderer(object, flags);
@@ -838,12 +842,6 @@ BSAPI int _preval_bs_imageIndex() {
     return next.bs_imageIndex();
 }
 
-BSAPI int _preval_bs_queueSwapsCount(bs_Queue* queue) {
-    BS_VALIDATE(queue != NULL, 0,);
-    BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, 0,);
-    return next.bs_queueSwapsCount(queue);
-}
-
 BSAPI bs_Result _preval_bs_queue(bs_Object* object, bs_QueueBits flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_queue(object, flags);
@@ -953,12 +951,6 @@ BSAPI bs_Result _preval_bs_loadFont(bs_Object* object, int package_id, const cha
 BSAPI bs_Result _preval_bs_image(bs_Object* object, bs_ivec2 dim, int num_indices, bs_Format format, bs_U32 flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_image(object, dim, num_indices, format, flags);
-}
-
-BSAPI int _preval_bs_imageSwapsCount(bs_Image* image) {
-    BS_VALIDATE(image != NULL, 0,);
-    BS_VALIDATE(image->head.type == BS_OBJECT_IMAGE, 0,);
-    return next.bs_imageSwapsCount(image);
 }
 
 BSAPI void _preval_bs_transition(bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout) {
@@ -1085,13 +1077,6 @@ BSAPI bool _preval_bs_isDepthFormat(bs_Format format) {
 
 BSAPI bool _preval_bs_hasAlpha(bs_Format format) {
     return next.bs_hasAlpha(format);
-}
-
-BSAPI void _preval_bs_nameImage(bs_Image* image, const char* name) {
-    BS_VALIDATE(image != NULL, ,);
-    BS_VALIDATE(image->head.type == BS_OBJECT_IMAGE, ,);
-    BS_VALIDATE(name != NULL, ,);
-    next.bs_nameImage(image, name);
 }
 
 BSAPI void _preval_bs_destroySampler(bs_Sampler* sampler) {
@@ -2031,6 +2016,17 @@ BSAPI const char* _preval_bs_idName(bs_U32 source_id, bs_U32 id) {
     return next.bs_idName(source_id, id);
 }
 
+BSAPI void _preval_bs_nameObject(bs_Object* object, const char* name) {
+    BS_VALIDATE(object != NULL, ,);
+    BS_VALIDATE(name != NULL, ,);
+    next.bs_nameObject(object, name);
+}
+
+BSAPI void _preval_bs_resetObject(bs_Header* head, size_t size) {
+    BS_VALIDATE(head != NULL, ,);
+    next.bs_resetObject(head, size);
+}
+
 BSAPI bs_Object* _preval_bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type) {
     return next.bs_object(source_id, id, size, flexible_size, flexible_count, flags, object_type);
 }
@@ -2524,6 +2520,11 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     static bs_FunctionTable functions = { 0 };
 
     functions.bs_callbacks = _preval_bs_callbacks;
+    functions.bs_imageSwapsCount = _preval_bs_imageSwapsCount;
+    functions.bs_samplerSwapsCount = _preval_bs_samplerSwapsCount;
+    functions.bs_bufferSwapsCount = _preval_bs_bufferSwapsCount;
+    functions.bs_queueSwapsCount = _preval_bs_queueSwapsCount;
+    functions.bs_rendererSwapsCount = _preval_bs_rendererSwapsCount;
     functions.bs_writeLogFile = _preval_bs_writeLogFile;
     functions.bs_writeLogFileV = _preval_bs_writeLogFileV;
     functions.bs_v2Mid = _preval_bs_v2Mid;
@@ -2577,9 +2578,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_build = _preval_bs_build;
     functions.bs_destroyRayTracer = _preval_bs_destroyRayTracer;
     functions.bs_dispatchAsync = _preval_bs_dispatchAsync;
-    functions.bs_bufferSwaps = _preval_bs_bufferSwaps;
-    functions.bs_nameBuffer = _preval_bs_nameBuffer;
-    functions.bs_nameBufferV = _preval_bs_nameBufferV;
     functions.bs_buffer = _preval_bs_buffer;
     functions.bs_bufferIsMapped = _preval_bs_bufferIsMapped;
     functions.bs_bufferMap = _preval_bs_bufferMap;
@@ -2631,7 +2629,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_pushMesh = _preval_bs_pushMesh;
     functions.bs_batchModel = _preval_bs_batchModel;
     functions.bs_pushModel = _preval_bs_pushModel;
-    functions.bs_rendererSwapsCount = _preval_bs_rendererSwapsCount;
     functions.bs_renderer = _preval_bs_renderer;
     functions.bs_output = _preval_bs_output;
     functions.bs_input = _preval_bs_input;
@@ -2653,7 +2650,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_awaitAcquisition = _preval_bs_awaitAcquisition;
     functions.bs_enqueue = _preval_bs_enqueue;
     functions.bs_imageIndex = _preval_bs_imageIndex;
-    functions.bs_queueSwapsCount = _preval_bs_queueSwapsCount;
     functions.bs_queue = _preval_bs_queue;
     functions.bs_destroyQueue = _preval_bs_destroyQueue;
     functions.bs_stallGPU = _preval_bs_stallGPU;
@@ -2674,7 +2670,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_destroyFont = _preval_bs_destroyFont;
     functions.bs_loadFont = _preval_bs_loadFont;
     functions.bs_image = _preval_bs_image;
-    functions.bs_imageSwapsCount = _preval_bs_imageSwapsCount;
     functions.bs_transition = _preval_bs_transition;
     functions.bs_inspectPng = _preval_bs_inspectPng;
     functions.bs_inspectPngV = _preval_bs_inspectPngV;
@@ -2696,7 +2691,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_isStencilFormat = _preval_bs_isStencilFormat;
     functions.bs_isDepthFormat = _preval_bs_isDepthFormat;
     functions.bs_hasAlpha = _preval_bs_hasAlpha;
-    functions.bs_nameImage = _preval_bs_nameImage;
     functions.bs_destroySampler = _preval_bs_destroySampler;
     functions.bs_sampler = _preval_bs_sampler;
     functions.bs_loadAtlas = _preval_bs_loadAtlas;
@@ -2876,6 +2870,8 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_queryMeshHash = _preval_bs_queryMeshHash;
     functions.bs_queryMaterial = _preval_bs_queryMaterial;
     functions.bs_idName = _preval_bs_idName;
+    functions.bs_nameObject = _preval_bs_nameObject;
+    functions.bs_resetObject = _preval_bs_resetObject;
     functions.bs_object = _preval_bs_object;
     functions.bs_packages = _preval_bs_packages;
     functions.bs_objectSources = _preval_bs_objectSources;

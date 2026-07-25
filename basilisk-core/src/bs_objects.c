@@ -502,10 +502,61 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
         result->head->id = id;
         result->head->source_id = source_id;
 
+        _bs_nameObject(result, _bs_idName(source_id, id));
+
         _bs_logObjectCreated(source_id, id);
 
         return result;
     }
     else
         return _bs_update(source_id, id, size, flexible_array_size);
+}
+
+BSAPI void _bs_resetObject(bs_Header* head, size_t size) {
+    int id = head->id;
+    int source_id = head->source_id;
+    bs_ObjectType type = head->type;
+    memset(head, 0, size);
+    head->source_id = source_id;
+    head->id = id;
+    head->type = type;
+}
+
+ /**
+  Name object
+  */
+
+BSAPI void _bs_nameImage(bs_Object* object, const char* name) {
+    for (int i = 0; i < _bs_imageSwapsCount(object->image); i++) {
+        bsi_nameHandleF(object->image->_[i].vk_image, VK_OBJECT_TYPE_IMAGE, BS_PRINT_COLOR("%s", BS_PRINT_BLUE_BRIGHT), name);
+        bsi_nameHandleF(object->image->_[i].vk_image_view, VK_OBJECT_TYPE_IMAGE_VIEW, BS_PRINT_COLOR("%s (View)", BS_PRINT_BLUE_BRIGHT), name);
+        bsi_nameHandleF(object->image->_[i].vk_memory, VK_OBJECT_TYPE_DEVICE_MEMORY, BS_PRINT_COLOR("%s (Memory)", BS_PRINT_BLUE_BRIGHT), name);
+    }
+}
+
+BSAPI void _bs_nameSampler(bs_Object* object, const char* name) {
+    int name_length = strlen(name);
+    for (int i = 0; i < _bs_samplerSwapsCount(object->sampler); i++) {
+        bsi_nameHandle(object->sampler->_[i].vk_sampler, VK_OBJECT_TYPE_SAMPLER, name, name_length);
+    }
+}
+
+
+BSAPI void _bs_nameObject(bs_Object* object, const char* name) {
+    static bs_NameObjectFunction name_object_functions[BS_OBJECT_TYPE_COUNT] = {
+        [BS_OBJECT_IMAGE] = _bs_nameImage,
+        [BS_OBJECT_SAMPLER] = _bs_nameSampler,
+        [BS_OBJECT_BUFFER] = _bs_nameBuffer,
+        [BS_OBJECT_QUEUE] = _bs_nameQueue,
+        [BS_OBJECT_BATCH] = _bs_nameBatch,
+        [BS_OBJECT_RENDERER] = _bs_nameRenderer,
+        [BS_OBJECT_RAY_TRACER] = _bs_nameRayTracer,
+        //[BS_OBJECT_FONT] = _bs_nameFont,
+        //[BS_OBJECT_ATLAS] = _bs_nameAtlas,
+    };
+
+    if (name_object_functions[object->head->type])
+        name_object_functions[object->head->type](object, name);
+
+    object->head->name = name;
 }

@@ -223,6 +223,9 @@ static void _bsgfx_renderLines(const bs_mat4* camera, int subtype, bool skip_dep
 }
 
 static void _bsgfx_renderLineModel(const bs_mat4* camera, int subtype, bool skip_depth_test) {
+    if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
+        return;
+
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     hash.shaders[0] = $vs_bsgfx_mesh_instanced();
     hash.shaders[1] = $fs_bsgfx_color();
@@ -606,7 +609,7 @@ BSGFXAPI void _bsgfx_pipeline() {
     if (!bs_exists(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS))
         return;
 
-    bs_Queue* graphics_queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS);
+    bs_Queue* graphics_queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
     bs_Queue* compute_queue = bs_exists(BSGFX_QUEUES, BSGFX_QUEUE_COMPUTE) ? bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_COMPUTE)->queue : NULL;
     bs_setScope(&(bs_Scope) { 0 });
 

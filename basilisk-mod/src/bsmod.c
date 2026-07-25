@@ -539,7 +539,7 @@ BSMODAPI void _bsmod_onLoad() {
         });
 
         bs_Image* subpass_0_outputs[] = {
-            depth,
+            depth->image,
         };
 
         for (int i = 0; i < sizeof(subpass_0_outputs) / sizeof(*subpass_0_outputs); i++) {
@@ -579,10 +579,10 @@ BSMODAPI void _bsmod_onLoad() {
             .new_layout = BS_IMAGE_LAYOUT_PRESENT_SRC_KHR,
         });
 
-        bs_transition(depth, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
+        bs_transition(depth->image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
         bs_output(renderer_3d->renderer, (bs_Output) {
             .subpass = 0, 
-            .image = depth,
+            .image = depth->image,
             .load_op = BS_ATTACHMENT_LOAD_OP_LOAD,
             .store_op = BS_ATTACHMENT_STORE_OP_STORE,
             .old_layout = BS_IMAGE_LAYOUT_GENERAL,

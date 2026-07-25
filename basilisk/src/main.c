@@ -66,11 +66,16 @@ static void basilisk_onLog(const bs_LogQueueItem* item) {
 		[BS_MESSAGE_VALIDATION_ERROR] = BS_PRINT_COLOR("[VALIDATION]", BS_PRINT_RED),
 	};
 
-
 	printf("%s %s %s\n", libraries[item->library], levels_color[item->level], item->message);
+	if (item->function) {
+		printf("    at %s at %s:%d\n", item->function, item->file, item->line);
+	}
 #endif
 
 	bs_writeLogFileF("%s %s %s\n", libraries[item->library], levels[item->level], item->message);
+	if (item->function) {
+		bs_writeLogFileF("    at %s at %s:%d\n", item->function, item->file, item->line);
+	}
 }
 
 int main(int argc, char* argv[]) {

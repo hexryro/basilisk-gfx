@@ -225,14 +225,6 @@ BSAPI void _bs_transition(bs_Image* image, int index, bs_ImageLayout old_layout,
     }
 }
 
-BSAPI void _bs_nameImage(bs_Image* image, const char* name) {
-    for (int i = 0; i < _bs_imageSwapsCount(image); i++) {
-        bsi_nameHandleF(image->_[i].vk_image, VK_OBJECT_TYPE_IMAGE, BS_PRINT_COLOR("%s", BS_PRINT_BLUE_BRIGHT), name);
-        bsi_nameHandleF(image->_[i].vk_image_view, VK_OBJECT_TYPE_IMAGE_VIEW, BS_PRINT_COLOR("%s (View)", BS_PRINT_BLUE_BRIGHT), name);
-        bsi_nameHandleF(image->_[i].vk_memory, VK_OBJECT_TYPE_DEVICE_MEMORY, BS_PRINT_COLOR("%s (Memory)", BS_PRINT_BLUE_BRIGHT), name);
-    }
-}
-
 static inline bs_Result _bs_queryMemoryType(bs_U32 filter, VkMemoryPropertyFlags props, bs_U32* out) {
     VkPhysicalDeviceMemoryProperties mem_props;
     vkGetPhysicalDeviceMemoryProperties(_bs_context_->physical_device->vk_device, &mem_props);
@@ -337,9 +329,6 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
         BS_WARN_VULKAN_ERROR("vkCreateImageView", result, "(%d, %d)", source_id, id);
         return _bs_convertVulkanResult(vk_result);
     }
-
-    if (id != 0)
-        _bs_nameImage(image, _bs_idName(source_id, id));
 
     return BS_RESULT_OK;
 }
@@ -609,12 +598,7 @@ BSAPI void _bs_destroyImage(bs_Image* image) {
         image->_[i].vk_image_view = image->_[i].vk_image = image->_[i].vk_memory = 0;
     }
 
-    // TODO: make generic
-    int id = image->head.id;
-    int source_id = image->head.source_id;
-    memset(image, 0, sizeof(bs_Image));
-    image->head.source_id = source_id;
-    image->head.id = id;
+    _bs_resetObject(&image->head, sizeof(bs_Image));
 }
 
 BSAPI bs_Result _bs_resizeImage(bs_Image* image, bs_ivec2 dim, int num_indices) {
@@ -647,15 +631,14 @@ BSAPI bs_Result _bs_queryImageIndex(bs_Image* image, char* name, int* out) {
    * Sampler
    *============================================================================*/
 
+BSAPI int _bs_samplerSwapsCount(bs_Sampler* sampler) {
+    return sampler->flags & BS_SAMPLER_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
+}
+
 BSAPI void _bs_destroySampler(bs_Sampler* sampler) {
     vkDestroySampler(_bs_instance_->device, sampler->_->vk_sampler, NULL);
 
-    // TODO: make generic
-    int id = sampler->head.id;
-    int source_id = sampler->head.source_id;
-    memset(sampler, 0, sizeof(bs_Sampler));
-    sampler->head.id = id;
-    sampler->head.source_id = source_id;
+    _bs_resetObject(&sampler->head, sizeof(bs_Sampler));
 }
 
 BSAPI bs_Result _val_bs_sampler(bs_Object* object, bs_ImageFilter filter, bs_SamplerBits flags) {
@@ -911,7 +894,6 @@ BSAPI bs_Result _bs_loadImage(bs_Object* object, int package_id, bs_ImageBits fl
         data += pointer->name_length;
     }
 
-    _bs_nameImage(object->image, path);
    //_bs_destroyBuffer(buffer);
 
     resource->image = object->image;
@@ -1003,12 +985,7 @@ BSAPI void _bs_destroyAtlas(bs_Atlas* atlas) {
     if (atlas->image)
         _bs_destroyImage(atlas->image);
 
-    // TODO: make generic
-    int id = atlas->head.id;
-    int source_id = atlas->head.source_id;
-    memset(atlas, 0, sizeof(bs_Atlas));
-    atlas->head.source_id = source_id;
-    atlas->head.id = id;
+    _bs_resetObject(&atlas->head, sizeof(bs_Atlas));
 
     //if (atlas->buffer)
     //	_bs_destroyBuffer(atlas->buffer);
@@ -1064,8 +1041,6 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
         return result;
     }
 
-    _bs_nameImage(atlas->image, resource_name);
-
     //atlas->name = strdup(resource_name);
     atlas->count = header->images_count;
     atlas->unmapped = _bs_malloc(atlas->count * sizeof(*atlas->unmapped));
@@ -1073,10 +1048,13 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
     if (!old_buffer) {
         bs_Object* buffer_object = BS_BUFFER(-1, 0, 0);
         atlas->buffer = buffer_object->buffer;
-        _bs_buffer(atlas->buffer, atlas->count * sizeof(*atlas->mapped),
+        result = _bs_buffer(buffer_object, atlas->count * sizeof(*atlas->mapped),
             BS_BUFFER_USAGE_STORAGE_BUFFER_BIT | BS_BUFFER_USAGE_TRANSFER_DST_BIT | BS_BUFFER_USAGE_TRANSFER_SRC_BIT,
             BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             0);
+        if (result != BS_RESULT_OK) {
+            return result;
+        }
 
         atlas->mapped = _bs_malloc(atlas->count * sizeof(*atlas->mapped));
         result = _bs_mapBuffer(atlas->buffer, atlas->count * sizeof(*atlas->mapped));
