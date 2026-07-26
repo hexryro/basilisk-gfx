@@ -59,7 +59,6 @@ static void onTick() {
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
 
-	bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR], bs_m4x3(&transform), BS_V4(0.0, 0.0, 1.0, 1.0), 0, 0, 0);
 	basilisk_instanceTitleBarUI();
 }
 

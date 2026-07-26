@@ -5,7 +5,7 @@
         "package": "content/bsgfx",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-07-25 21:10:00",
+        "lastModified": "2026-07-26 12:01:31",
         "entries": [
             "project/basilisk-gfx/shaders/bsgfx.glsl",
             "project/basilisk-gfx/shaders/bsgfx_atlas.glsl",
@@ -114,12 +114,13 @@
         "package": "content/bsmod",
         "prefix": "",
         "callOnce": true,
-        "lastModified": "2026-07-22 19:14:10",
+        "lastModified": "2026-07-26 12:17:09",
         "entries": [
             "project/basilisk-mod/atlas/ui/circle.png",
             "project/basilisk-mod/atlas/ui/expand.png",
             "project/basilisk-mod/atlas/ui/folder.png",
             "project/basilisk-mod/atlas/ui/grid_hover.png",
+            "project/basilisk-mod/atlas/ui/icon.png",
             "project/basilisk-mod/atlas/ui/increment.png",
             "project/basilisk-mod/atlas/ui/instance.png",
             "project/basilisk-mod/atlas/ui/light.png",

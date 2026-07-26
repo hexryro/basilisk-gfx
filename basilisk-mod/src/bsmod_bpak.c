@@ -327,7 +327,7 @@ static bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 		if (resource && resource->atlas) {
 			for (int i = 0; i < sources->count; i++ ){
 				bs_ObjectSource* source = bs_fetchUnit(sources, i);
-				if (source->type == BS_OBJECT_IMAGE) {
+				if (source->type == BS_OBJECT_ATLAS) {
 					for (int j = 0; j < source->ids_count; j++) {
 						bs_Object* o = source->ids[j].object;
 						if (o && resource->atlas == o->atlas) {
@@ -345,6 +345,7 @@ static bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 			bs_Atlas* atlas_object = BS_ATLAS(existing_atlas->head.source_id, existing_atlas->head.id, BS_OBJECT_FORCE_DESTROY);
 			if (bs_loadAtlas(atlas_object, package_id, 0, name, strlen(name)) == BS_RESULT_OK) {
 				_bsmod_bindAtlases();
+				bs_pushDescriptors();
 			}
 		}
 		else {

@@ -1904,8 +1904,6 @@ static void _bsgfx_instanceTitleBar(bsgfx_Menu* menu, bsgfx_TitleBar* title_bar,
 }
 
 BSGFXAPI bool _bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* title_bar, bsgfx_MenuTabBar* tab_bar) {
-	if (tab_bar)
-		_bsgfx_instanceMenuTabs(&menu, tab_bar);
 
 	const int title_bar_height = 24.0;
 	if (title_bar) {

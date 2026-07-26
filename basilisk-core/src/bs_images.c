@@ -1056,8 +1056,10 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
             return result;
         }
 
-        atlas->mapped = _bs_malloc(atlas->count * sizeof(*atlas->mapped));
+        //atlas->mapped = _bs_malloc(atlas->count * sizeof(*atlas->mapped));
+        //memset(atlas->mapped, 0, atlas->count * sizeof(*atlas->mapped));
         result = _bs_mapBuffer(atlas->buffer, atlas->count * sizeof(*atlas->mapped));
+        atlas->mapped = _bs_bufferMap(atlas->buffer);
         if (result != BS_RESULT_OK) {
             _bs_warnF("Failed to map buffer for atlas \"%s\"", resource_name);
             return result;
@@ -1079,7 +1081,7 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
         atlas->unmapped[i].name_hash = _bs_stringHash(name);
         atlas->unmapped[i].category = pointer->category;
         atlas->mapped[i].x = pointer->x,
-        atlas->mapped[i].y = atlas->image->dim.y - pointer->y - atlas->mapped[i].h;
+        atlas->mapped[i].y = atlas->image->dim.y - pointer->y - pointer->h;
         atlas->mapped[i].w = pointer->w,
         atlas->mapped[i].h = pointer->h,
         atlas->mapped[i].split = 1;

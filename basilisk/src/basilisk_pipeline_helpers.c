@@ -306,7 +306,7 @@ void basilisk_renderUI() {
     hash = bsgfx_defaultPipelineHash();
     hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
     hash.shaders[1] = $fs_bsgfx_ui();
-    bsgfx_requiredForTransparency(&hash);
+  //  bsgfx_requiredForTransparency(&hash);
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
         struct {

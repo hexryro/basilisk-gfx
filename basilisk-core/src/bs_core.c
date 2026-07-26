@@ -448,9 +448,10 @@ BSAPI void _bs_clearDepthStencil(bs_U32 index, bs_ivec2 dim, float depth_value, 
 }
 
 BSAPI void _bs_clearColor(bs_U32 index, bs_ivec2 dim, bs_RGBA color) {
+    // TODO: union needs to match the attachment format
     _bs_clearAttachment(index, dim, VK_IMAGE_ASPECT_COLOR_BIT, (VkClearValue) { 
-        .color.uint32 = { 
-            [0] = color.r, [1] = color.g, [2] = color.b, [3] = color.a,
+        .color.float32 = { 
+            [0] = color.r / 255.0, [1] = color.g / 255.0, [2] = color.b / 255.0, [3] = color.a / 255.0,
         } 
     });
 }

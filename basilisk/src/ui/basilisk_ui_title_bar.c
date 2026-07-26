@@ -27,9 +27,29 @@
 #include <bsmod_cache.h>
 #include <basilisk.h>
 
+static void basilisk_addTitleBarUIWidgets(bs_List* widgets) {
+
+    bs_pushBack(widgets, &(bsgfx_Widget) {
+        .offset = { 0, 0, 0 },
+        .type = BSGFX_WIDGET_ICON,
+        .icon = {
+            .atlas = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_UI)->atlas,
+            .atlas_subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
+            .type = BSGFX_ICON_ATLAS,
+            .name = "icon",
+            .material_id = $bsmod_grey_120()->id,
+        },
+        .advance_flags = BSGFX_WIDGET_ADVANCE_APPLY_OFFSET,
+    });
+}
+
 void basilisk_instanceTitleBarUI() {
+    const bs_ivec2 resolution = bs_resolution();
+
     bs_vec3 position = { 0 };
-    bs_vec2 dimensions = { 256, 256 };
+    bs_vec2 dimensions = { resolution.x, 32 };
+
+    position.y = resolution.y;
 
 	const int width = 64;
     static int scroll;
@@ -39,25 +59,15 @@ void basilisk_instanceTitleBarUI() {
     tabs.count = 0;
     widgets.count = 0;
 
-    const int padding = 8;
+    const int padding = 4;
     bs_vec2 background_size = { dimensions.x - padding * 2, dimensions.y - padding * 2 };
 
     bs_pushBack(&widgets, &(bsgfx_Widget) {
-        .offset = { 0, -padding, 0 },
+        .offset = { padding, -padding, 0 },
         .advance_flags = BSGFX_WIDGET_ADVANCE_APPLY_OFFSET,
     });
 
-    bs_pushBack(&widgets, &(bsgfx_Widget) {
-        .type = BSGFX_WIDGET_BACKGROUND,
-        .background = {
-            .border_radius = BSMOD_DEFAULT_RADIUS,
-            .size = background_size,
-            .material_id = $bsmod_grey_61()->id,
-           // .outline_material_id = $bsmod_grey_30()->id,
-            .subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR],
-        },
-        .offset = { padding, 0.0, 0 },
-    });
+    basilisk_addTitleBarUIWidgets(&widgets);
 
     position.z += 10;
 
@@ -69,8 +79,6 @@ void basilisk_instanceTitleBarUI() {
         .spacing = 8.0,
         .widgets = widgets.data,
         .widgets_count = widgets.count,
-        .background_material_id_0 = $context_menu_title_bar_transparent_material()->id,
-        .background_material_id_1 = $context_menu_title_bar_material()->id,
         .untextured = {
             .dimensions = dimensions,
             .auto_scale_width = true,
@@ -79,8 +87,9 @@ void basilisk_instanceTitleBarUI() {
         },
         .blocked = false,
         .border_radius = BSMOD_DEFAULT_RADIUS,
-        .shadow_material_id = $bsmod_grey_61()->id,
-        .outline_material_id = $bsmod_grey_148()->id,
+        .background_material_id_0 = $bsmod_grey_91()->id
+       // .shadow_material_id = $bsmod_grey_61()->id,
+       // .outline_material_id = $bsmod_grey_148()->id,
     }, NULL,
     // &(bsgfx_TitleBar) {
     //    .name = "",

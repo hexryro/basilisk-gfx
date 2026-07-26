@@ -2109,7 +2109,10 @@ union bs_vec3 {
         float z;
     };
     bs_vec2 xy;
-    bs_vec2 yz;
+    struct {
+        float _x;
+        bs_vec2 yz;
+    };
 };
 
 union bs_vec4 {
@@ -2120,8 +2123,10 @@ union bs_vec4 {
         float z;
         float w;
     };
-    bs_vec2 xy;
-    bs_vec2 zw;
+    struct {
+        bs_vec2 xy;
+        bs_vec2 zw;
+    };
     bs_vec3 xyz;
 };
 
@@ -2141,7 +2146,10 @@ union bs_ivec3 {
         int z;
     };
     bs_ivec2 xy;
-    bs_ivec2 yz;
+    struct {
+        float _x;
+        bs_vec2 yz;
+    };
 };
 
 union bs_ivec4 {
@@ -2152,8 +2160,10 @@ union bs_ivec4 {
         int z;
         int w;
     };
-    bs_ivec2 xy;
-    bs_ivec2 zw;
+    struct {
+        bs_vec2 xy;
+        bs_vec2 zw;
+    };
     bs_ivec3 xyz;
 };
 
@@ -2518,10 +2528,10 @@ struct bs_BatlHeader {
 };
 
 struct bs_BatlPointer {
-    bs_U32 x;
-    bs_U32 y;
-    bs_U32 w;
-    bs_U32 h;
+    bs_I32 x;
+    bs_I32 y;
+    bs_I32 w;
+    bs_I32 h;
     bs_U32 name_length;
     bs_U32 flags;
     int category;

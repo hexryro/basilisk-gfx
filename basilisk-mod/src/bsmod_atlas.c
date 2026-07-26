@@ -178,6 +178,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 	stbrp_pack_rects(&ctx, packer->rects.data, packer->info.count);
 
 	const int padding = 0;
+	bs_BatlPointer* dbg = batl + pointer_offset; 
 	for (int i = 0; i < packer->info.count; i++) {
 		bsmod_TextureInfo* image = bs_fetchUnit(&packer->info, i);
 		stbrp_rect* rect = bs_fetchUnit(&packer->rects, i);

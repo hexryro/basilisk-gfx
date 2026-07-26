@@ -355,13 +355,12 @@ static void _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* packe
 	char* name = bs_fileName(info.path);
 	char* ext = bs_fileExtension(name);
 
-	int width = 0, height = 0;
 	size_t size = 0;
 
 	bs_PngData png_data;
 	if (bs_loadPng(info.path, 4, &png_data) == BS_RESULT_OK) {
 		ext[-1] = '\0';
-		_bsmod_packAtlasTexture(packer, name, png_data.data, width, height, 0);
+		_bsmod_packAtlasTexture(packer, name, png_data.data, png_data.width, png_data.height, 0);
 		ext[-1] = '.';
 	}
 

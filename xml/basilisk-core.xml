@@ -937,7 +937,10 @@
                 <field><type>float</type><name>z</name></field>
 			</structure>
             <field><type>bs_vec2</type><name>xy</name></field>
-            <field><type>bs_vec2</type><name>yz</name></field>
+			<structure>
+                <field><type>float</type><name>_x</name></field>
+                <field><type>bs_vec2</type><name>yz</name></field>
+			</structure>
         </structure>
         <structure type="union" name="bs_vec4">
             <field><type>float</type><name>a</name><size>4</size></field>
@@ -947,9 +950,11 @@
                 <field><type>float</type><name>z</name></field>
                 <field><type>float</type><name>w</name></field>
 			</structure>
-            <field><type>bs_vec2</type><name>xy</name></field>
-            <field><type>bs_vec2</type><name>zw</name></field>
-            <field><type>bs_vec3</type><name>xyz</name></field>
+			<structure>
+                <field><type>bs_vec2</type><name>xy</name></field>
+                <field><type>bs_vec2</type><name>zw</name></field>
+			</structure>
+			<field><type>bs_vec3</type><name>xyz</name></field>
         </structure>
         <structure type="union" name="bs_ivec2">
             <field><type>int</type><name>a</name><size>2</size></field>
@@ -966,7 +971,10 @@
                 <field><type>int</type><name>z</name></field>
 			</structure>
 			<field><type>bs_ivec2</type><name>xy</name></field>
-            <field><type>bs_ivec2</type><name>yz</name></field>
+			<structure>
+                <field><type>float</type><name>_x</name></field>
+                <field><type>bs_vec2</type><name>yz</name></field>
+			</structure>
         </structure>
         <structure type="union" name="bs_ivec4">
             <field><type>int</type><name>a</name><size>4</size></field>
@@ -976,8 +984,10 @@
                 <field><type>int</type><name>z</name></field>
                 <field><type>int</type><name>w</name></field>
 			</structure>
-			<field><type>bs_ivec2</type><name>xy</name></field>
-            <field><type>bs_ivec2</type><name>zw</name></field>
+			<structure>
+                <field><type>bs_vec2</type><name>xy</name></field>
+                <field><type>bs_vec2</type><name>zw</name></field>
+			</structure>
             <field><type>bs_ivec3</type><name>xyz</name></field>
         </structure>
         <structure type="union" name="bs_mat2">
@@ -1295,10 +1305,10 @@
             <field><type>bs_U32</type><name>reserved_0</name></field>
         </structure>
         <structure name="bs_BatlPointer">
-            <field><type>bs_U32</type><name>x</name></field>
-            <field><type>bs_U32</type><name>y</name></field>
-            <field><type>bs_U32</type><name>w</name></field>
-            <field><type>bs_U32</type><name>h</name></field>
+            <field><type>bs_I32</type><name>x</name></field>
+            <field><type>bs_I32</type><name>y</name></field>
+            <field><type>bs_I32</type><name>w</name></field>
+            <field><type>bs_I32</type><name>h</name></field>
             <field><type>bs_U32</type><name>name_length</name></field>
             <field><type>bs_U32</type><name>flags</name></field>
             <field><type>int</type><name>category</name></field>

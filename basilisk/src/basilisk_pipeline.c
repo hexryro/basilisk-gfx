@@ -95,6 +95,7 @@ static void basilisk_hiResSubpass0() {
     bs_beginComment(BS_CONSTANT_STRING("High Resolution Subpass 0"));
 
     bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
+    bs_clearColor(0, bs_resolution(), BS_RGBA(75, 75, 75, 255));
 
     basilisk_renderDepthlessLines();
     basilisk_renderPoints();
@@ -107,7 +108,7 @@ static void basilisk_hiResSubpass0() {
     basilisk_renderUIStencil();
     basilisk_renderDither();
     //  basilisk_renderFontSubtype(bsmod_subtypes()[BSMOD_SUBTYPE_FONT_CONSOLAS], BSGFX_FONT_ARIAL_16, $fs_bsgfx_font_arial());
-    bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
+  //  bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
     basilisk_renderTiles();
     bsgfx_renderPrimitives(poser()->screen_camera.result);
 
