@@ -107,7 +107,7 @@ static void basilisk_hiResSubpass0() {
     basilisk_renderUI();
     basilisk_renderUIStencil();
     basilisk_renderDither();
-    //  basilisk_renderFontSubtype(bsmod_subtypes()[BSMOD_SUBTYPE_FONT_CONSOLAS], BSGFX_FONT_ARIAL_16, $fs_bsgfx_font_arial());
+    basilisk_renderFontSubtype(bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF], BSGFX_FONT_SANS_SERIF_16, $fs_bsgfx_font_arial());
   //  bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
     basilisk_renderTiles();
     bsgfx_renderPrimitives(poser()->screen_camera.result);
@@ -212,6 +212,15 @@ void basilisk_createRenderers() {
         bs_ivec2 resolution = bs_resolution();
         bs_Object* hi_res_0_depth = BS_IMAGE(BASILISK_IMAGES, BASILISK_IMAGE_MAIN_OUTPUT_DEPTH, 0);
         if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT) == BS_RESULT_OK) {
+
+             bs_output(hi_res->renderer, (bs_Output) {
+                .subpass = 0,
+                .image = hi_res_0_depth->image,
+                .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
+                .store_op = BS_ATTACHMENT_STORE_OP_STORE,
+                .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
+                .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            });
 
             bs_output(hi_res->renderer, (bs_Output) {
                 .subpass = 0,

@@ -959,16 +959,16 @@ BSAPI void _preval_bs_transition(bs_Image* image, int index, bs_ImageLayout old_
     next.bs_transition(image, index, old_layout, new_layout);
 }
 
-BSAPI bs_Result _preval_bs_inspectPng(bs_PngData* out_png_data, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_peekPng(bs_PngData* out_png_data, char* path, int path_length) {
     BS_VALIDATE(out_png_data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_inspectPng(out_png_data, path, path_length);
+    return next.bs_peekPng(out_png_data, path, path_length);
 }
 
-BSAPI bs_Result _preval_bs_inspectPngV(bs_PngData* out_png_data, char* format, va_list args) {
+BSAPI bs_Result _preval_bs_peekPngV(bs_PngData* out_png_data, char* format, va_list args) {
     BS_VALIDATE(out_png_data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_inspectPngV(out_png_data, format, args);
+    return next.bs_peekPngV(out_png_data, format, args);
 }
 
 BSAPI bs_Result _preval_bs_loadPngData(char* data, size_t size, int channels_count, bs_PngData* out_png_data) {
@@ -2320,8 +2320,8 @@ BSAPI void _preval_bs_moveWindow(int x, int y) {
     next.bs_moveWindow(x, y);
 }
 
-BSAPI void _preval_bs_overrideTitleBar() {
-    next.bs_overrideTitleBar();
+BSAPI void _preval_bs_overrideTitleBar(int height) {
+    next.bs_overrideTitleBar(height);
 }
 
 BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_U32 width, bs_U32 height, const char* title) {
@@ -2458,6 +2458,25 @@ BSAPI int _preval_bs_numDirectories(char* path, int path_length) {
 BSAPI int _preval_bs_numDirectoriesV(char* format, va_list args) {
     BS_VALIDATE(format != NULL, 0,);
     return next.bs_numDirectoriesV(format, args);
+}
+
+BSAPI bs_Result _preval_bs_openFile(const char* mode, bs_File* out, char* path, int path_length) {
+    BS_VALIDATE(mode != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_openFile(mode, out, path, path_length);
+}
+
+BSAPI bs_Result _preval_bs_openFileV(const char* mode, bs_File* out, char* format, va_list args) {
+    BS_VALIDATE(mode != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_openFileV(mode, out, format, args);
+}
+
+BSAPI void _preval_bs_closeFile(bs_File* file) {
+    BS_VALIDATE(file != NULL, ,);
+    next.bs_closeFile(file);
 }
 
 BSAPI bs_Result _preval_bs_loadFile(bs_String** out, char* path, int path_length) {
@@ -2669,8 +2688,8 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_loadFont = _preval_bs_loadFont;
     functions.bs_image = _preval_bs_image;
     functions.bs_transition = _preval_bs_transition;
-    functions.bs_inspectPng = _preval_bs_inspectPng;
-    functions.bs_inspectPngV = _preval_bs_inspectPngV;
+    functions.bs_peekPng = _preval_bs_peekPng;
+    functions.bs_peekPngV = _preval_bs_peekPngV;
     functions.bs_loadPngData = _preval_bs_loadPngData;
     functions.bs_loadPng = _preval_bs_loadPng;
     functions.bs_bitmapImage = _preval_bs_bitmapImage;
@@ -2962,6 +2981,9 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_numFilesV = _preval_bs_numFilesV;
     functions.bs_numDirectories = _preval_bs_numDirectories;
     functions.bs_numDirectoriesV = _preval_bs_numDirectoriesV;
+    functions.bs_openFile = _preval_bs_openFile;
+    functions.bs_openFileV = _preval_bs_openFileV;
+    functions.bs_closeFile = _preval_bs_closeFile;
     functions.bs_loadFile = _preval_bs_loadFile;
     functions.bs_loadFileV = _preval_bs_loadFileV;
     functions.bs_loadFileChunk = _preval_bs_loadFileChunk;

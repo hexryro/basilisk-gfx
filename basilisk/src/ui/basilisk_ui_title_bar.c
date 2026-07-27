@@ -28,7 +28,6 @@
 #include <basilisk.h>
 
 static void basilisk_addTitleBarUIWidgets(bs_List* widgets) {
-
     bs_pushBack(widgets, &(bsgfx_Widget) {
         .offset = { 0, 0, 0 },
         .type = BSGFX_WIDGET_ICON,
@@ -39,11 +38,26 @@ static void basilisk_addTitleBarUIWidgets(bs_List* widgets) {
             .name = "icon",
             .material_id = $bsmod_grey_120()->id,
         },
+        .advance_flags = BSGFX_WIDGET_ADVANCE_RIGHT,
+    });
+
+    bs_pushBack(widgets, &(bsgfx_Widget) {
+        .offset = { 0, -24, 5 },
+        .type = BSGFX_WIDGET_BUTTON,
+        .button = {
+            .size = { 80.0, 80.0 },
+            .name = "test 123 abcdefghijklmnoprqsrutv",
+            .material = $bsmod_light_blue()->id,
+            .selected_material = $bsmod_light_blue()->id,
+        },
         .advance_flags = BSGFX_WIDGET_ADVANCE_APPLY_OFFSET,
     });
 }
 
 void basilisk_instanceTitleBarUI() {
+    if (!bs_exists(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16))
+        return;
+
     const bs_ivec2 resolution = bs_resolution();
 
     bs_vec3 position = { 0 };
@@ -74,8 +88,8 @@ void basilisk_instanceTitleBarUI() {
     static bool active_tab;
     bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
         .position = position,
-        .text_subtype = bsmod_subtypes()[BSMOD_SUBTYPE_FONT_CONSOLAS],
-        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head,
+        .text_subtype = bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF],
+        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16)->head,
         .spacing = 8.0,
         .widgets = widgets.data,
         .widgets_count = widgets.count,
@@ -87,7 +101,7 @@ void basilisk_instanceTitleBarUI() {
         },
         .blocked = false,
         .border_radius = BSMOD_DEFAULT_RADIUS,
-        .background_material_id_0 = $bsmod_grey_91()->id
+        .background_material_id_0 = $bsmod_grey_91()->id,
        // .shadow_material_id = $bsmod_grey_61()->id,
        // .outline_material_id = $bsmod_grey_148()->id,
     }, NULL,

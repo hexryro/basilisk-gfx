@@ -62,17 +62,6 @@ typedef enum bsmod_SideMenuTabId bsmod_SideMenuTabId;
 #define BSMOD_CONFIG_PATH                                            \
     "project/bsmod_config.json"
 
-enum {                                                               \
-    BSMOD_SUBTYPE_MATERIAL_ICON,                                     \
-    BSMOD_SUBTYPE_PRIMITIVE_ICON,                                    \
-    BSMOD_SUBTYPE_PREFAB_ICON,                                       \
-    BSMOD_SUBTYPE_TILE_ICON,                                         \
-    BSMOD_SUBTYPE_SPHERE_HIGH_QUALITY,                               \
-    BSMOD_SUBTYPE_FONT_CONSOLAS,                                     \
-    BSMOD_SUBTYPE_BILLBOARD,                                         \
-    BSMOD_SUBTYPE_COUNT,                                             \
-    };
-
 #define BSMOD_FOREACH_PROC(X)                                        \
     X(PFN_void, >_loadFonts)
 
@@ -1174,7 +1163,6 @@ bsmod_onDragTile(
     bsmod_DraggingParams params);
 
 BSMODAPI extern bsmod_Callbacks _bsmod_callbacks_;
-BSMODAPI extern int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT];
 BSMODAPI extern bs_Json _bsmod_config_;
 BSMODAPI extern bool _bsmod_instance_grid_menu_;
 BSMODAPI extern bs_String* _bsmod_search_input_;

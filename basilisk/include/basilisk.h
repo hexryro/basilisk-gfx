@@ -32,6 +32,8 @@ typedef struct {
 
 extern Basilisk basilisk;
 
+#define BASILISK_TITLE_BAR_HEIGHT 32
+
 #define BASILISK_IMAGE_IDS(X)								    \
     X(BASILISK_IMAGE_MAIN_OUTPUT_DEPTH)                         \
     X(BASILISK_IMAGE_MAIN_OUTPUT_COLOR)                         \

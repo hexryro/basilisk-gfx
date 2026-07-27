@@ -37,11 +37,29 @@ Basilisk basilisk = {
 
 volatile long has_performed_tracked_changes = 1;
 
+static void basilisk_loadFontCollection(bs_Object* object) {
+	bs_Sampler* nearest_sampler = bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler;
+
+	bs_Object* sans_serif_16 = BS_FONT(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16, 0);
+	result = bs_loadFont(sans_serif_16, _bsmod_.package, "fonts/sans-serif_16", BSGFX_ALPHABET_DEFAULT, 16.0, 0);
+	if (result == BS_RESULT_OK)
+		bs_bindFont(sans_serif_16->font, nearest_sampler, BSGFX_SET_FONTS, BSGFX_BINDING_FONT_SANS_SERIF);
+
+	bs_Object* quad_instanced_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_QUAD_INSTANCED);
+	bs_Range range = {
+		.num = 6, // single quad
+	};
+	_bsmod_subtypes_[BSMOD_SUBTYPE_FONT_SANS_SERIF] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instanced_batch->batch, 0, range);
+
+}
+
 static void onLoadScene() {
 	$vs_bsgfx_mesh_color();
 	$fs_bsgfx_atlas();
 
 	basilisk_createRenderers();
+
+	basilisk_loadFonts();
 
 	bsmod_onLoad();
 	bsmod_bindAtlases();
@@ -127,6 +145,10 @@ static void onLog(const bs_LogQueueItem* item) {
 static void onError() {
 }
 
+static void basilisk_configureWindow() {
+	bs_overrideTitleBar(BASILISK_TITLE_BAR_HEIGHT);
+}
+
 int main(int argc, char* argv[]) {
 	bs_enableValidation();
 	bsgfx_enableValidation();
@@ -136,7 +158,7 @@ int main(int argc, char* argv[]) {
 	*core_callbacks = (bs_Callbacks) {
 		.log = onLog,
 		.error = onError,
-		.configureWindow = bs_overrideTitleBar,
+		.configureWindow = basilisk_configureWindow,
 	};
 
 	bsgfx_Callbacks* gfx_callbacks = bsgfx_callbacks();

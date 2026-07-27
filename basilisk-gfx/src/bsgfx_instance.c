@@ -725,7 +725,7 @@ BSGFXAPI void _bsgfx_instanceText(int subtype, bs_Font* font, bsgfx_Text* params
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Translate(&transform, &params->position.xyz, &transform);
 	bs_m4Rotate(&transform, &BS_QUAT_IDENTITY, &transform);
-	bs_m4Scale(&transform, &BS_QUAT_IDENTITY, &transform);
+	bs_m4Scale(&transform, &scale, &transform);
 
 	bs_U32 flags;
 	float layout_scale = (params->scale / (float)font->units_per_em);

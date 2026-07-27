@@ -1886,30 +1886,30 @@ void bs_transition(
     next.bs_transition(image, index, old_layout, new_layout);
 }
 
-bs_Result bs_inspectPng(
+bs_Result bs_peekPng(
     bs_PngData* out_png_data, 
     char* path, 
     int path_length)
 {
-    return next.bs_inspectPng(out_png_data, path, path_length);
+    return next.bs_peekPng(out_png_data, path, path_length);
 }
 
-bs_Result bs_inspectPngV(
+bs_Result bs_peekPngV(
     bs_PngData* out_png_data, 
     char* format, 
     va_list args)
 {
-    return next.bs_inspectPngV(out_png_data, format, args);
+    return next.bs_peekPngV(out_png_data, format, args);
 }
 
-bs_Result bs_inspectPngF(
+bs_Result bs_peekPngF(
     bs_PngData* out_png_data, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = next.bs_inspectPngV(out_png_data, format, args);
+    bs_Result _return = next.bs_peekPngV(out_png_data, format, args);
     va_end(args);
     return _return;
 }
@@ -4060,9 +4060,10 @@ void bs_moveWindow(
     next.bs_moveWindow(x, y);
 }
 
-void bs_overrideTitleBar()
+void bs_overrideTitleBar(
+    int height)
 {
-    next.bs_overrideTitleBar();
+    next.bs_overrideTitleBar(height);
 }
 
 bs_Result bs_window(
@@ -4332,6 +4333,43 @@ int bs_numDirectoriesF(
     int _return = next.bs_numDirectoriesV(format, args);
     va_end(args);
     return _return;
+}
+
+bs_Result bs_openFile(
+    const char* mode, 
+    bs_File* out, 
+    char* path, 
+    int path_length)
+{
+    return next.bs_openFile(mode, out, path, path_length);
+}
+
+bs_Result bs_openFileV(
+    const char* mode, 
+    bs_File* out, 
+    char* format, 
+    va_list args)
+{
+    return next.bs_openFileV(mode, out, format, args);
+}
+
+bs_Result bs_openFileF(
+    const char* mode, 
+    bs_File* out, 
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    bs_Result _return = next.bs_openFileV(mode, out, format, args);
+    va_end(args);
+    return _return;
+}
+
+void bs_closeFile(
+    bs_File* file)
+{
+    next.bs_closeFile(file);
 }
 
 bs_Result bs_loadFile(

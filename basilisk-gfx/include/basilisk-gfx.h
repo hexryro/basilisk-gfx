@@ -109,14 +109,6 @@ BSGFXAPI extern bsgfx_Procedures _bsgfx_procs_;
     X(BSGFX_ATLASES_COUNT)
 
 #define BSGFX_FONT_IDS(X)                                            \
-    X(BSGFX_FONT_STANDARD)                                           \
-    X(BSGFX_FONT_SMALL)                                              \
-    X(BSGFX_FONT_TEMPLE)                                             \
-    X(BSGFX_FONT_CONSOLAS)                                           \
-    X(BSGFX_FONT_ARIAL_16)                                           \
-    X(BSGFX_FONT_ARIAL_24)                                           \
-    X(BSGFX_FONT_ARIAL_32)                                           \
-    X(BSGFX_FONT_ARIAL_48)                                           \
     X(BSGFX_FONTS_COUNT)
 
 BS_GENERATE_ENUM(BSGFX_IMAGE_IDS);

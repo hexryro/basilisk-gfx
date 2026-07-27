@@ -5,7 +5,7 @@
         "package": "content/bsgfx",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-07-26 12:01:31",
+        "lastModified": "2026-07-26 20:59:00",
         "entries": [
             "project/basilisk-gfx/shaders/bsgfx.glsl",
             "project/basilisk-gfx/shaders/bsgfx_atlas.glsl",
@@ -106,7 +106,7 @@
         "package": "content/bsgfx",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-07-21 06:55:29"
+        "lastModified": "2026-07-26 20:52:11"
     },
     {
         "path": "project/basilisk-mod/atlas/ui",
@@ -143,7 +143,7 @@
         "package": "content/bsmod",
         "prefix": "fonts/",
         "callOnce": false,
-        "lastModified": "2026-07-25 20:00:40",
+        "lastModified": "2026-07-26 21:07:32",
         "entries": [
             "project/basilisk-mod/bmfont/arial_16.fnt",
             "project/basilisk-mod/bmfont/arial_16.png",
@@ -154,7 +154,13 @@
             "project/basilisk-mod/bmfont/arial_48.fnt",
             "project/basilisk-mod/bmfont/arial_48.png",
             "project/basilisk-mod/bmfont/consolas_16.fnt",
-            "project/basilisk-mod/bmfont/consolas_16.png"
+            "project/basilisk-mod/bmfont/consolas_16.png",
+            "project/basilisk-mod/bmfont/sans-serif_16.fnt",
+            "project/basilisk-mod/bmfont/sans-serif_16.png",
+            "project/basilisk-mod/bmfont/sans-serif_24.fnt",
+            "project/basilisk-mod/bmfont/sans-serif_24.png",
+            "project/basilisk-mod/bmfont/sans-serif_32.fnt",
+            "project/basilisk-mod/bmfont/sans-serif_32.png"
         ]
     }
 ]

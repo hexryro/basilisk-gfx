@@ -738,6 +738,11 @@ BSAPI bs_ivec2 _bs_resolution() {
 }
 
 BSAPI bs_vec2 _bs_cursorPosition() {
+    bs_vec2 p = _bs_context_->cursor;
+    p.y = _bs_context_->swapchain_image->image->dim.y - p.y;
+
+    return p;
+
     bs_vec2 dim = { _bs_context_->swapchain_image->image->dim.x, _bs_context_->swapchain_image->image->dim.y };
     bs_vec2 pos;
 
@@ -903,9 +908,6 @@ BSAPI void _bs_tickWindow(bs_Callback tick, bs_Callback fixed_tick) {
 #ifdef _WIN32
     MSG msg;
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-
         switch (msg.message) {
         case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
 
@@ -942,6 +944,28 @@ BSAPI void _bs_tickWindow(bs_Callback tick, bs_Callback fixed_tick) {
             if (msg.wParam < 256)
                 BS_CLEAR_BIT(_bs_io_.keys, (bs_U32)msg.wParam);
         } break;
+        }
+
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    if (_bs_context_->title_bar_height > 0 && _bs_io_.left_clicked) {
+        bs_ivec2 resolution = bs_resolution();
+        bs_vec2 title_bar_position = { 0, resolution.y - _bs_context_->title_bar_height };
+        bs_vec2 title_bar_dimensions = { resolution.x, _bs_context_->title_bar_height };
+        bs_vec2 cursor = bs_cursorPosition();
+
+        bool hovering_title_bar = _bs_rectangleVsPoint(&title_bar_position, &title_bar_dimensions, &cursor);
+
+        if (hovering_title_bar) {
+            ReleaseCapture();
+            SendMessage(
+                bs_context()->hwnd,
+                WM_NCLBUTTONDOWN,
+                HTCAPTION,
+                0
+            );
         }
     }
 
@@ -1058,8 +1082,9 @@ BSAPI void _bs_moveWindow(int x, int y) {
  /**
   TODO: should probably build a system around this
   */
-BSAPI void _bs_overrideTitleBar() {
+BSAPI void _bs_overrideTitleBar(int height) {
     bs_Context* context = _bs_context_;
+    context->title_bar_height = height;
 
     SetWindowLong(context->hwnd, GWL_STYLE, 0);
 

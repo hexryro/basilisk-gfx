@@ -662,7 +662,9 @@ BSAPI bs_List _bs_list(int unit_size, int increment) {
      Iterate documents
      */
 #ifdef _WIN32
-static inline bs_Result _bs_iterateDocuments(int is_file, int(*x)(bs_FileInfo, void*), void* param, const char* directory, int directory_length) {
+static inline bs_Result _bs_iterateDocuments(int is_file, bs_ForeachDocumentFunction x, void* param, const char* directory, int directory_length) {
+    bs_Result result = BS_RESULT_OK;
+
     char path[MAX_PATH]; // TODO: is this fine
     path[0] = '\0';
 
@@ -690,13 +692,17 @@ static inline bs_Result _bs_iterateDocuments(int is_file, int(*x)(bs_FileInfo, v
             if (file_data.cFileName[0] == '.') continue;
             strcpy(path + directory_length, file_data.cFileName);
 
-            x((bs_FileInfo) {
+            result = x((bs_FileInfo) {
                 .path = path,
                 .size = ((size_t)file_data.nFileSizeHigh << 32) | file_data.nFileSizeLow,
             }, param);
+
+            if (result != BS_RESULT_OK)
+                goto end;
         }
     } while (FindNextFile(handle, &file_data));
 
+end:
     FindClose(handle);
 
     return BS_RESULT_OK;
@@ -710,11 +716,14 @@ BSAPI bs_Result _bs_foreachDirectory(bs_ForeachDocumentFunction x, void* param, 
     return _bs_iterateDocuments(false, x, param, directory, directory_length);
 }
 
-   /**
-    Document counting
-    */
+ /**
+  Document counting
+  */
+static inline bs_Result _bs_increment(bs_FileInfo info, void* i) { 
+    (*(int*)i)++; 
+    return BS_RESULT_OK; 
+}
 
-static inline void _bs_increment(bs_FileInfo info, void* i) { (*(int*)i)++; }
 BSAPI int _bs_numFiles(char* directory, int directory_length) {
     int i = 0;
     _bs_foreachFile(_bs_increment, (void*)&i, directory, directory_length);
@@ -970,6 +979,18 @@ static bs_String* _bs_loadFileFromHandle(FILE* file) {
     return string;
 }
 
+bs_Result _bs_openFile(const char* path, const char* mode, bs_File* out) {
+    FILE* file = fopen(path, mode);
+    if (!file) {
+        BS_WARN_ERRNO_PATH("fopen", path);
+        return _bs_convertErrno();
+    }
+}
+
+void _bs_closeFile(bs_File* file) {
+    fclose(file->handle);
+}
+
 BSAPI bs_Result _bs_loadFile(bs_String** out, char* path, int path_length) {
     FILE* file = fopen(path, "rb");
     if (!file) {
@@ -1031,8 +1052,9 @@ BSAPI bs_Result _bs_deleteFile(char* path, int path_length) {
     return BS_RESULT_OK;
 }
 
-static void _bs_doDeleteFile(bs_FileInfo file_info, int* path_length) {
+static bs_Result _bs_doDeleteFile(bs_FileInfo file_info, int* path_length) {
     _bs_deleteFile(file_info.path, *path_length);
+    return BS_RESULT_OK;
 }
 
 BSAPI bs_Result _bs_deleteDirectoryContents(char* path, int path_length) {

@@ -194,7 +194,7 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_loadFont = (PFN_bs_loadFont)GetProcAddress(module, "_val_bs_loadFont");
     functions.bs_image = (PFN_bs_image)GetProcAddress(module, "_val_bs_image");
     functions.bs_transition = (PFN_bs_transition)GetProcAddress(module, "_val_bs_transition");
-    functions.bs_inspectPng = (PFN_bs_inspectPng)GetProcAddress(module, "_val_bs_inspectPng");
+    functions.bs_peekPng = (PFN_bs_peekPng)GetProcAddress(module, "_val_bs_peekPng");
     functions.bs_loadPngData = (PFN_bs_loadPngData)GetProcAddress(module, "_val_bs_loadPngData");
     functions.bs_loadPng = (PFN_bs_loadPng)GetProcAddress(module, "_val_bs_loadPng");
     functions.bs_bitmapImage = (PFN_bs_bitmapImage)GetProcAddress(module, "_val_bs_bitmapImage");
@@ -453,6 +453,8 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_foreachDirectory = (PFN_bs_foreachDirectory)GetProcAddress(module, "_val_bs_foreachDirectory");
     functions.bs_numFiles = (PFN_bs_numFiles)GetProcAddress(module, "_val_bs_numFiles");
     functions.bs_numDirectories = (PFN_bs_numDirectories)GetProcAddress(module, "_val_bs_numDirectories");
+    functions.bs_openFile = (PFN_bs_openFile)GetProcAddress(module, "_val_bs_openFile");
+    functions.bs_closeFile = (PFN_bs_closeFile)GetProcAddress(module, "_val_bs_closeFile");
     functions.bs_loadFile = (PFN_bs_loadFile)GetProcAddress(module, "_val_bs_loadFile");
     functions.bs_loadFileChunk = (PFN_bs_loadFileChunk)GetProcAddress(module, "_val_bs_loadFileChunk");
     functions.bs_deleteFile = (PFN_bs_deleteFile)GetProcAddress(module, "_val_bs_deleteFile");

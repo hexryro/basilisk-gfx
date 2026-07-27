@@ -37,6 +37,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 typedef union bs_vec2 bs_vec2;
 typedef union bs_vec3 bs_vec3;
@@ -59,6 +60,7 @@ typedef struct bs_Quad bs_Quad;
 typedef struct bs_Plane bs_Plane;
 typedef struct bs_Box bs_Box;
 typedef struct bs_FileInfo bs_FileInfo;
+typedef struct bs_File bs_File;
 typedef struct bs_PngData bs_PngData;
 typedef struct bs_Procedure bs_Procedure;
 typedef struct bs_Timer bs_Timer;
@@ -1333,7 +1335,7 @@ typedef enum bs_VkObjectType bs_VkObjectType;
     0xB6
 
 typedef int (__cdecl* bs_ThreadFunction)(void*);
-typedef void (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
+typedef bs_Result (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
 typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
 typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
 typedef void (__stdcall* bs_ValidationErrorCallbackFunction)();
@@ -1777,6 +1779,7 @@ enum bs_ObjectType {
     BS_OBJECT_RAY_TRACER,
     BS_OBJECT_FONT,
     BS_OBJECT_ATLAS,
+    BSGFX_OBJECT_FONT_COLLECTION,
     BS_OBJECT_TYPE_COUNT,
 };
 
@@ -2256,6 +2259,10 @@ struct bs_Box {
 struct bs_FileInfo {
     char* path;
     size_t size;
+};
+
+struct bs_File {
+    FILE* handle;
 };
 
 struct bs_PngData {
@@ -3039,13 +3046,19 @@ struct bs_TTF {
 struct bs_BfntHeader {
     bs_U32 magic;
     bs_U32 version;
-    bs_U32 glyphs_count;
-    bs_U32 kerning_pairs_count;
-    bs_U32 line_height;
-    bs_U32 units_per_em;
-    bs_U32 size;
-    bs_U32 batl_offset;
+    bs_U32 sizes_count;
+    bs_U32 reserved;
+
     char ascii_table[256];
+
+    struct {
+        bs_U32 glyphs_count;
+        bs_U32 kerning_pairs_count;
+        bs_U32 line_height;
+        bs_U32 units_per_em;
+        bs_U32 size;
+        bs_U32 batl_offset;
+    } sizes[];
 };
 
 struct bs_BfntKerningPair {
@@ -3306,6 +3319,7 @@ struct bs_Context {
     bool lock_cursor_position;
     bool active;
     bs_CursorIcon cursor_icon;
+    int title_bar_height;
     bool paused;
     bool advance;
     struct VkSurfaceKHR_T* surface;
@@ -6017,7 +6031,7 @@ bs_transition(
   @return bs_Result
   */
 BSAPI bs_Result
-bs_inspectPng(
+bs_peekPng(
     bs_PngData* out_png_data,
     char* path,
     int path_length);
@@ -6029,7 +6043,7 @@ bs_inspectPng(
   @return bs_Result
   */
 BSAPI bs_Result
-bs_inspectPngV(
+bs_peekPngV(
     bs_PngData* out_png_data,
     char* format,
     va_list args);
@@ -6041,7 +6055,7 @@ bs_inspectPngV(
   @return bs_Result
   */
 BSAPI bs_Result
-bs_inspectPngF(
+bs_peekPngF(
     bs_PngData* out_png_data,
     char* format,
      ...);
@@ -8987,10 +9001,12 @@ bs_moveWindow(
     int y);
 
  /**
+  @param height
   @return void
   */
 BSAPI void
-bs_overrideTitleBar();
+bs_overrideTitleBar(
+    int height);
 
  /**
   @param context
@@ -9337,6 +9353,56 @@ BSAPI int
 bs_numDirectoriesF(
     char* format,
      ...);
+
+ /**
+  @param mode
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_openFile(
+    const char* mode,
+    bs_File* out,
+    char* path,
+    int path_length);
+
+ /**
+  @param mode
+  @param out
+  @param format
+  @param args
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_openFileV(
+    const char* mode,
+    bs_File* out,
+    char* format,
+    va_list args);
+
+ /**
+  @param mode
+  @param out
+  @param format
+  @param ...
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_openFileF(
+    const char* mode,
+    bs_File* out,
+    char* format,
+     ...);
+
+ /**
+  @param file
+  @return void
+  */
+BSAPI void
+bs_closeFile(
+    bs_File* file);
 
  /**
   @param out

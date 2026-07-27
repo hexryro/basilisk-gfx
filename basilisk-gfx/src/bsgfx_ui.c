@@ -1919,7 +1919,7 @@ BSGFXAPI bool _bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* title_bar,
 	bs_vec3 menu_start_position = menu.position, menu_position = menu.position;
 	float lowest_y = menu_start_position.y;
 	bs_vec2 cursor = bs_cursorPosition();
-	 
+
 	for (int i = 0; i < menu.widgets_count; i++) {
 		bsgfx_Widget* widget = menu.widgets + i;
 		if (widget->disabled)

@@ -435,7 +435,7 @@ BSAPI bs_Result _bs_savePng(char* data, bs_ivec2 dim, bs_PngType type, char* pat
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_inspectPng(bs_PngData* out_png_data, char* path, int path_length) {
+BSAPI bs_Result _bs_peekPng(bs_PngData* out_png_data, char* path, int path_length) {
     unsigned error;
     unsigned char* data = NULL;
 
@@ -455,6 +455,7 @@ BSAPI bs_Result _bs_inspectPng(bs_PngData* out_png_data, char* path, int path_le
         return BS_RESULT_FAILED_TO_INSPECT;
     }
 
+    free(data);
     return BS_RESULT_OK;
 }
 

@@ -97,4 +97,16 @@ BSMODAPI int
 bsmod_fetchSource(
     bs_ObjectType type);
 
+typedef enum {
+    BSMOD_SUBTYPE_MATERIAL_ICON,
+    BSMOD_SUBTYPE_PRIMITIVE_ICON,
+    BSMOD_SUBTYPE_PREFAB_ICON,
+    BSMOD_SUBTYPE_TILE_ICON,
+    BSMOD_SUBTYPE_SPHERE_HIGH_QUALITY,
+    BSMOD_SUBTYPE_BILLBOARD,
+    BSMOD_SUBTYPE_COUNT,
+} bsmod_Subtypes;
+
+BSMODAPI extern int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT];
+
 #endif

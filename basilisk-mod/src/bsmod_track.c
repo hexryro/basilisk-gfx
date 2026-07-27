@@ -351,7 +351,7 @@ BSMODAPI void _bsmod_onLoadTTF(bsmod_TrackParams params) {
 	//	_bsmod_procs.bsgfx_loadFonts();
 }
 
-static void _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* packer) {
+static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* packer) {
 	char* name = bs_fileName(info.path);
 	char* ext = bs_fileExtension(name);
 
@@ -364,6 +364,7 @@ static void _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* packe
 		ext[-1] = '.';
 	}
 
+	return BS_RESULT_OK;
 }
 
 BSMODAPI void _bsmod_onPackAtlas(bsmod_TrackParams params) {
@@ -523,13 +524,13 @@ BSMODAPI void _bsmod_onPackTextureArray(bsmod_TrackParams params) {
    * Tracker
    *============================================================================*/
 
-static void _bsmod_findLastModifiedFile(bs_FileInfo info, struct { bs_DateTime original_date; bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*out) {
+static bs_Result _bsmod_findLastModifiedFile(bs_FileInfo info, struct { bs_DateTime original_date; bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*out) {
 	bs_Result result;
 
 	bs_DateTime date_time;
 	result = bs_fileModifiedDate(&date_time, info.path, strlen(info.path));
 	if (result != BS_RESULT_OK)
-		return;
+		return BS_RESULT_OK; // keep the iteration going
 
 	char* cached = bs_checkStringPool(&_bsmod_string_pool, info.path);
 	bs_pushBack(out->entries, &cached);
@@ -541,10 +542,13 @@ static void _bsmod_findLastModifiedFile(bs_FileInfo info, struct { bs_DateTime o
 
 		bs_pushBack(out->changed_entries, &cached);
 	}
+
+	return BS_RESULT_OK;
 }
 
-static void _bsmod_findLastModifiedDirectory(bs_FileInfo info, struct { bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*result) {
+static bs_Result _bsmod_findLastModifiedDirectory(bs_FileInfo info, struct { bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*result) {
 	bs_foreachFile(_bsmod_findLastModifiedFile, result, info.path, strlen(info.path));
+	return BS_RESULT_OK;
 }
 
 static void _bsmod_trackDirectoryDifferences(const bs_List* changed, const bs_List* a, const bs_List* b, bs_List* out_differences) {

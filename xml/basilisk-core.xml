@@ -30,6 +30,7 @@
 			<include>stdarg.h</include>
 			<include>string.h</include>
 			<include>stdbool.h</include>
+			<include>stdio.h</include>
 		</trampolineHeader>
 		<internal>
 			<include>bs_internal.h</include>
@@ -57,7 +58,7 @@
 
 	<typedefs>
         <typedef><type>int</type><name>(__cdecl* bs_ThreadFunction)(void*)</name></typedef>
-        <typedef><type>void</type><name>(__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
+        <typedef><type>bs_Result</type><name>(__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorCallbackFunction)()</name></typedef>
@@ -359,6 +360,9 @@
 			<line><name>BS_OBJECT_RAY_TRACER</name></line>
 			<line><name>BS_OBJECT_FONT</name></line>
 			<line><name>BS_OBJECT_ATLAS</name></line>
+			
+			<line><name>BSGFX_OBJECT_FONT_COLLECTION</name></line>
+			
 			<line><name>BS_OBJECT_TYPE_COUNT</name></line>
 		</enum>
 		<enum name="bs_SurfaceType">
@@ -1067,6 +1071,9 @@
             <field><type>char*</type><name>path</name></field>
             <field><type>size_t</type><name>size</name></field>
         </structure>
+		<structure name="bs_File">
+			<field><type>FILE*</type><name>handle</name></field>
+		</structure>
         <structure name="bs_PngData">
             <field><type>int</type><name>width</name></field>
             <field><type>int</type><name>height</name></field>
@@ -2020,6 +2027,7 @@
             <field><type>bool</type><name>lock_cursor_position</name></field>
             <field><type>bool</type><name>active</name></field>
             <field><type>bs_CursorIcon</type><name>cursor_icon</name></field>
+            <field comment="For applications with a custom title bar"><type>int</type><name>title_bar_height</name></field>
 
             <field><type>bool</type><name>paused</name></field>
             <field><type>bool</type><name>advance</name></field>
@@ -3109,7 +3117,7 @@
             <param><type>bs_ImageLayout</type><name>old_layout</name></param>
             <param><type>bs_ImageLayout</type><name>new_layout</name></param>
         </function>
-		<variadicStringTemplate name="bs_inspectPng" string="path">
+		<variadicStringTemplate name="bs_peekPng" string="path">
             <return>bs_Result</return>
             <param><type>bs_PngData*</type><name>out_png_data</name></param>
         </variadicStringTemplate>
@@ -4207,6 +4215,7 @@
         </function>
 		<function name="bs_overrideTitleBar">
 			<return>void</return>
+            <param><type>int</type><name>height</name></param>
 		</function>
         <function name="bs_window">
             <return>bs_Result</return>
@@ -4294,6 +4303,17 @@
             <return>int</return>
         </variadicStringTemplate>
 
+		<variadicStringTemplate name="bs_openFile" string="path">
+            <return>bs_Result</return>
+            <param><type>const char*</type><name>mode</name></param>
+            <param><type>bs_File*</type><name>out</name></param>
+        </variadicStringTemplate>
+		
+		<function name="bs_closeFile">
+			<return>void</return>
+            <param><type>bs_File*</type><name>file</name></param>
+		</function>
+		
         <variadicStringTemplate name="bs_loadFile" string="path">
             <return>bs_Result</return>
             <param><type>bs_String**</type><name>out</name></param>

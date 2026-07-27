@@ -50,7 +50,7 @@ typedef struct {
 	size_t total_name_lengths;
 } bsmod_FileGatherParams;
 
-static void _bsmod_gatherFileInfo(bs_FileInfo info, bsmod_FileGatherParams* param) {
+static bs_Result _bsmod_gatherFileInfo(bs_FileInfo info, bsmod_FileGatherParams* param) {
 	char* file_extension = bs_fileExtension(info.path);
 
 	if (strcmp(file_extension, "png") == 0) {
@@ -67,7 +67,7 @@ static void _bsmod_gatherFileInfo(bs_FileInfo info, bsmod_FileGatherParams* para
 			bs_warnF("Image \"%s\" (w = %d, h = %d) could not be added to image array \"%s\" (w = %d, h = %d) due to mismatching dimensions\n",
 				info.path, width, height, param->resource_name, param->header->width, param->header->height);
 
-			return;
+			return BS_RESULT_OK;
 		}
 
 		file_extension[-1] = '\0';
@@ -83,6 +83,8 @@ static void _bsmod_gatherFileInfo(bs_FileInfo info, bsmod_FileGatherParams* para
 		param->total_images_size += result->size;
 		param->total_name_lengths += result->name_length + 2;
 	}
+
+	return BS_RESULT_OK;
 }
 
 BSMODAPI bs_Result _bsmod_packImageDirectory(char* directory_name, char* package_name, char* resource_name) {

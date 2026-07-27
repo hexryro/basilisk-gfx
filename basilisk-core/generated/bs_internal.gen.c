@@ -97,7 +97,7 @@ bs_Attribute* _bs_queryAttributeF(
     return _return;
 }
 
-bs_Result _bs_inspectPngV(
+bs_Result _bs_peekPngV(
     bs_PngData* out_png_data, 
     char* format, 
     va_list args)
@@ -105,17 +105,17 @@ bs_Result _bs_inspectPngV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bs_inspectPng(out_png_data, _formatted, _length);
+    return _bs_peekPng(out_png_data, _formatted, _length);
 }
 
-bs_Result _bs_inspectPngF(
+bs_Result _bs_peekPngF(
     bs_PngData* out_png_data, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = _bs_inspectPngV(out_png_data, format, args);
+    bs_Result _return = _bs_peekPngV(out_png_data, format, args);
     va_end(args);
     return _return;
 }
@@ -874,6 +874,31 @@ int _bs_numDirectoriesF(
     va_list args;
     va_start(args, format);
     int _return = _bs_numDirectoriesV(format, args);
+    va_end(args);
+    return _return;
+}
+
+bs_Result _bs_openFileV(
+    const char* mode, 
+    bs_File* out, 
+    char* format, 
+    va_list args)
+{
+    int _length = bs_formatStringLength(format, args);
+    char* _formatted = bs_alloca(_length + 1);
+    vsnprintf(_formatted, _length + 1, format, args);
+    return _bs_openFile(mode, out, _formatted, _length);
+}
+
+bs_Result _bs_openFileF(
+    const char* mode, 
+    bs_File* out, 
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    bs_Result _return = _bs_openFileV(mode, out, format, args);
     va_end(args);
     return _return;
 }

@@ -494,19 +494,6 @@ BSMODAPI void _bsmod_bindAtlases() {
 BSMODAPI void _bsmod_onLoad() {
     bs_Result result;
 
-    bs_Sampler* nearest_sampler = bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler;
-
-    bs_Object* font_object = BS_FONT(BSGFX_FONTS, BSGFX_FONT_ARIAL_16, 0);
-    result = bs_loadFont(font_object, _bsmod_.package, "fonts/consolas_16", BSGFX_ALPHABET_DEFAULT, 32.0, 0);
-    if (result == BS_RESULT_OK)
-        bs_bindFont(font_object->font, bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler, BSGFX_SET_FONTS, BSGFX_BINDING_FONT_ARIAL);
-
-    bs_Object* quad_instanced_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_QUAD_INSTANCED);
-    bs_Range range = {
-		.num = 6, // single quad
-	};
-	_bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instanced_batch->batch, 0, range);
-
     bs_Object* tile_batch_object = BS_BATCH(BSMOD_BATCHES, BSMOD_BATCH_TILE, 0);
     result = bs_batch(tile_batch_object, sizeof(int), $vs_bsgfx_tile_static(), BS_BATCH_KEEP_DATA);
     if (result == BS_RESULT_OK && bs_canPushBatch(tile_batch_object->batch)) {
