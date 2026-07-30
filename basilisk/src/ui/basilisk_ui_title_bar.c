@@ -55,8 +55,8 @@ static void basilisk_addTitleBarUIWidgets(bs_List* widgets) {
 }
 
 void basilisk_instanceTitleBarUI() {
-    if (!bs_exists(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16))
-        return;
+    //if (!bs_exists(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16))// TODO: text rewrite
+    //    return;
 
     const bs_ivec2 resolution = bs_resolution();
 
@@ -88,8 +88,8 @@ void basilisk_instanceTitleBarUI() {
     static bool active_tab;
     bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
         .position = position,
-        .text_subtype = bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF],
-        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16)->head,
+        //.text_subtype = bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF],// TODO: text rewrite
+        //.font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16)->head,// TODO: text rewrite
         .spacing = 8.0,
         .widgets = widgets.data,
         .widgets_count = widgets.count,

@@ -29,8 +29,8 @@
 BSMODAPI void _bsmod_instanceContextMenu(bs_List* widgets, bs_vec3 position, bs_vec2 size) {
     bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
         .position = position,
-        .text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS],
-        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head,
+        // .text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS], // TODO: text rewrite
+        // .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head, // TODO: text rewrite
         .spacing = 4.0,
         .widgets = widgets->data,
         .widgets_count = widgets->count,

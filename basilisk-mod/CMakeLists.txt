@@ -10,16 +10,7 @@ file(GLOB TYPE_FILES "src/types/*.*")
 
 file(GLOB UI_FILES "src/ui/*.*")
 
-file(GLOB UI_PREFAB_FILES "src/ui/prefab/*.*")
-file(GLOB UI_PRIMITIVE_FILES "src/ui/primitive/*.*")
-file(GLOB UI_INSTANCE_FILES "src/ui/instance/*.*")
-file(GLOB UI_TYPE_FILES "src/ui/type/*.*")
-file(GLOB UI_CONTEXT_FILES "src/ui/context/*.*")
-file(GLOB UI_MATERIAL_FILES "src/ui/material/*.*")
-file(GLOB UI_TILE_FILES "src/ui/tile/*.*")
-file(GLOB UI_GRID_FILES "src/ui/grid/*.*")
-file(GLOB UI_SIDE_FILES "src/ui/side/*.*")
-file(GLOB UI_LIGHT_FILES "src/ui/light/*.*")
+file(GLOB_RECURSE KB_FILES "${CMAKE_SOURCE_DIR}/external/kb/*.*")
 
 file(GLOB VS_SHADER_FILES "resources/shaders/vert/*.*")
 file(GLOB FS_SHADER_FILES "resources/shaders/frag/*.*")
@@ -34,17 +25,6 @@ add_library(${PROJECT_NAME} SHARED
     ${GENERATE_FILES}
 
     ${UI_FILES}
-
-    ${UI_PREFAB_FILES}
-    ${UI_PRIMITIVE_FILES}
-    ${UI_INSTANCE_FILESs}
-    ${UI_MATERIAL_FILES}
-    ${UI_TYPE_FILES}
-    ${UI_CONTEXT_FILES}
-    ${UI_TILE_FILES}
-    ${UI_GRID_FILES}
-    ${UI_SIDE_FILES}
-    ${UI_LIGHT_FILES}
 
     ${VS_SHADER_FILES}
     ${FS_SHADER_FILES}
@@ -93,6 +73,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src/
     ${CMAKE_SOURCE_DIR}/include/objects/
     levels/
+    ${CMAKE_SOURCE_DIR}/external/freetype/include
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE 
@@ -100,6 +81,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/glslang/build/glslang/Debug
     ${CMAKE_SOURCE_DIR}/external/glslang/build/SPIRV/Debug
     ${CMAKE_SOURCE_DIR}/external/SPIRV-Cross/build/Debug
+    ${CMAKE_SOURCE_DIR}/external/freetype/objs
 )
 
 if (MSVC)
@@ -122,4 +104,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     spirv-cross-cd optimized spirv-cross-cd
     spirv-cross-cored optimized spirv-cross-cored
     spirv-cross-glsld optimized spirv-cross-glsld
+    freetype
 )

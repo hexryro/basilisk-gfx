@@ -519,15 +519,7 @@ BSAPI bs_Result _bs_loadPng(const char* path, int channels_count, bs_PngData* ou
    * Image Creation
    *============================================================================*/
 
-BSAPI bs_Result _val_bs_bitmapImage(bs_Object* object, unsigned char* image_data, bs_ivec2 dim, bs_Format format, bs_ImageBits flags) {
-    if (object->image) {
-     //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_VALIDATION_ERROR);
-    }
-
-    return _bs_bitmapImage(object, image_data, dim, format, flags);
-}
-
-BSAPI bs_Result _bs_bitmapImage(bs_Object* object, unsigned char* image_data, bs_ivec2 dim, bs_Format format, bs_ImageBits flags) {
+BSAPI bs_Result _bs_bitmapImage(bs_Object* object, bs_ivec2 dim, bs_Format format, bs_ImageBits flags) {
     bs_Result result;
 
     if (!object->image)
@@ -545,32 +537,6 @@ BSAPI bs_Result _bs_bitmapImage(bs_Object* object, unsigned char* image_data, bs
     image->format = format;
     image->dim = dim;
 
-    int channels_count = _bs_hasAlpha(format) ? 4 : 3;
-    bs_U32 size = image->dim.x * image->dim.y * channels_count;
-
-   /**
-    Staging buffer
-    */
-    bs_Object* staging_buffer_object = BS_BUFFER(-1, 0, 0);
-    result = _bs_buffer(staging_buffer_object, size,
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        0);
-
-    if (result != BS_RESULT_OK) {
-        _bs_destroyImage(image);
-        return result;
-    }
-
-    result = _bs_mapBuffer(staging_buffer_object->buffer, size);
-    if (result != BS_RESULT_OK) {
-        _bs_destroyImage(image);
-        return result;
-    }
-
-    _bs_stageImage(staging_buffer_object->buffer, format, image->dim, image_data);
-    _bs_unmapBuffer(staging_buffer_object->buffer);
-
    /**
     Create image
     */
@@ -580,10 +546,6 @@ BSAPI bs_Result _bs_bitmapImage(bs_Object* object, unsigned char* image_data, bs
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
         VK_IMAGE_USAGE_SAMPLED_BIT,
         VK_IMAGE_ASPECT_COLOR_BIT);
-
-    _bs_transition(object->image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    _bs_copyBufferToImage(staging_buffer_object->buffer, object->image, 0, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    _bs_transition(object->image, 0, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
    // _bs_destroyBuffer(staging_buffer); // queue this or sum shit idk how to deal with this
 
@@ -1035,8 +997,8 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
 
     atlas->image = image_object->image;
 
-    unsigned char* bmp = data + header->binary_offset;
-    result = _bs_bitmapImage(image_object, bmp, (bs_ivec2) { header->width, header->height }, BS_FORMAT_R8G8B8A8_UNORM, 0);
+    result = _bs_bitmapImage(image_object, (bs_ivec2) { header->width, header->height }, BS_FORMAT_R8G8B8A8_UNORM, 0);
+
     if (result != BS_RESULT_OK) {
         _bs_destroyAtlas(object->atlas);
         return result;
@@ -1060,7 +1022,7 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
         //atlas->mapped = _bs_malloc(atlas->count * sizeof(*atlas->mapped));
         //memset(atlas->mapped, 0, atlas->count * sizeof(*atlas->mapped));
         result = _bs_mapBuffer(atlas->buffer, atlas->count * sizeof(*atlas->mapped));
-        atlas->mapped = _bs_bufferMap(atlas->buffer);
+        atlas->mapped =_bs_bufferMap(atlas->buffer);
         if (result != BS_RESULT_OK) {
             _bs_warnF("Failed to map buffer for atlas \"%s\"", resource_name);
             return result;
@@ -1073,8 +1035,8 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
 
     unsigned char* offset = data + sizeof(bs_BatlHeader);
     for (int i = 0; i < atlas->count; i++) {
-        bs_BatlPointer* pointer = offset;
-        offset += sizeof(bs_BatlPointer);
+        bs_BatlImage* pointer = offset;
+        offset += sizeof(bs_BatlImage);
         char* name = offset;
         offset += pointer->name_length + sizeof("\n");
 
@@ -1089,6 +1051,39 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
         atlas->mapped[i].coords = _bs_calculateAtlasCoordinates(atlas, i, 0);
         atlas->mapped[i].flags = pointer->flags;
     }
+
+    bs_U32 size = header->width * header->height * header->channels_count;
+
+    bs_Object* staging_buffer_object = BS_BUFFER(-1, 0, 0);
+    result = _bs_buffer(staging_buffer_object, size,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        0);
+
+    if (result != BS_RESULT_OK) {
+        _bs_destroyAtlas(object->atlas);
+        return result;
+    }
+
+    result = _bs_mapBuffer(staging_buffer_object->buffer, size);
+    if (result != BS_RESULT_OK) {
+        _bs_destroyAtlas(object->atlas);
+        return result;
+    }
+
+    const size_t page_size = header->width * header->height * header->channels_count;
+    size_t abc = offset - data;
+ 
+    for (int i = 0; i < header->pages_count; i++) {
+        _bs_stageImage(staging_buffer_object->buffer, BS_FORMAT_R8G8B8A8_UNORM, BS_IV2(header->width, header->height), offset);
+
+        _bs_transition(atlas->image, i, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _bs_copyBufferToImage(staging_buffer_object->buffer, atlas->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _bs_transition(atlas->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        offset += page_size;
+    }
+    _bs_unmapBuffer(staging_buffer_object->buffer);
 
     return BS_RESULT_OK;
 }

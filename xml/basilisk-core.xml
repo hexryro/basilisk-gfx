@@ -1304,14 +1304,14 @@
         <structure name="bs_BatlHeader">
             <field><type>bs_U32</type><name>magic</name></field>
             <field><type>bs_U32</type><name>version</name></field>
-            <field><type>bs_U32</type><name>images_count</name></field>
             <field><type>bs_U32</type><name>width</name></field>
             <field><type>bs_U32</type><name>height</name></field>
             <field><type>bs_U32</type><name>channels_count</name></field>
-            <field><type>bs_U32</type><name>binary_offset</name></field>
+            <field><type>bs_U32</type><name>pages_count</name></field>
+            <field><type>bs_U32</type><name>images_count</name></field>
             <field><type>bs_U32</type><name>reserved_0</name></field>
         </structure>
-        <structure name="bs_BatlPointer">
+        <structure name="bs_BatlImage">
             <field><type>bs_I32</type><name>x</name></field>
             <field><type>bs_I32</type><name>y</name></field>
             <field><type>bs_I32</type><name>w</name></field>
@@ -1319,7 +1319,7 @@
             <field><type>bs_U32</type><name>name_length</name></field>
             <field><type>bs_U32</type><name>flags</name></field>
             <field><type>int</type><name>category</name></field>
-            <field><type>bs_U32</type><name>reserved_1</name></field>
+            <field><type>bs_U32</type><name>page</name></field>
         </structure>
         <structure name="bs_AtlasTexture">
             <field><type>bs_vec4</type><name>coords</name></field>
@@ -1687,91 +1687,10 @@
             <field><type>bs_U16</type><name>advance_width</name></field>
             <field><type>bs_I16</type><name>left_side_bearing</name></field>
         </structure>
-        <structure name="bs_GlyfPt">
-            <field><type>bs_I16 x,</type><name>y</name></field>
-            <field><type>bool</type><name>on_curve</name></field>
-        </structure>
-        <structure name="bs_Glyph">
-            <field><type>int</type><name>index</name></field>
-            <field><type>bs_U16</type><name>num_points</name></field>
-            <field><type>bs_U16</type><name>num_contours</name></field>
-            <field><type>bs_I16 x_min,</type><name>x_max</name></field>
-            <field><type>bs_I16 y_min,</type><name>y_max</name></field>
-            <field><type>bs_U16*</type><name>contours</name></field>
-            <field><type>bs_GlyfPt*</type><name>coords</name></field>
-            <field><type>bs_vec2</type><name>tex_coord</name></field>
-            <field><type>bs_vec2</type><name>tex_offset</name></field>
-            <field><type>int</type><name>width</name></field>
-            <field><type>int</type><name>height</name></field>
-            <field><type>bs_U16</type><name>pairs_count</name></field>
-            <field><type>bs_U16</type><name>pairs_offset</name></field>
-            <field><type>bs_LongHorMetric</type><name>long_hor_metric</name></field>
-            <structure type="union">
-                <field><type>bs_U16</type><name>code</name></field>
-                <field><type>char</type><name>ascii</name></field>
-            </structure>
-        </structure>
-        <structure name="bs_Head">
-            <field><type>char*</type><name>buf</name></field>
-            <field><type>int</type><name>units_per_em</name></field>
-            <field><type>bs_I16</type><name>index_to_loc_format</name></field>
-        </structure>
-        <structure name="bs_Maxp">
-            <field><type>char*</type><name>buf</name></field>
-            <field><type>bs_U16</type><name>num_glyphs</name></field>
-        </structure>
-        <structure name="bs_Hhea">
-            <field><type>char*</type><name>buf</name></field>
-            <field><type>bs_U16</type><name>num_of_long_hor_metrics</name></field>
-        </structure>
-        <structure name="bs_Hmtx">
-            <field><type>char*</type><name>buf</name></field>
-        </structure>
-        <structure name="bs_Loca">
-            <field><type>char*</type><name>buf</name></field>
-        </structure>
-        <structure name="bs_Glyf">
-            <field><type>char*</type><name>buf</name></field>
-        </structure>
-        <structure name="bs_Cmap">
-            <field><type>char*</type><name>buf</name></field>
-            <field><type>bs_U32</type><name>offset</name></field>
-            <field><type>int</type><name>num_subtables</name></field>
-            <field><type>char*</type><name>subtable</name></field>
-            <field><type>bs_U16</type><name>format</name></field>
-            <field><type>bs_U16</type><name>length</name></field>
-            <field><type>bs_U16</type><name>seg_count_x2</name></field>
-            <field><type>bs_U16</type><name>search_range</name></field>
-            <field><type>bs_U16</type><name>entry_selector</name></field>
-            <field><type>bs_U16</type><name>range_shift</name></field>
-            <field><type>bs_U16*</type><name>format_data</name></field>
-            <field><type>bs_U16*</type><name>end_code</name></field>
-            <field><type>bs_U16*</type><name>start_code</name></field>
-            <field><type>bs_I16*</type><name>id_delta</name></field>
-            <field><type>bs_U16*</type><name>id_range_offset</name></field>
-        </structure>
-        <structure name="bs_KerningPair">
+		<structure name="bs_KerningPair">
             <field><type>int</type><name>right_index</name></field>
             <field><type>bs_U16</type><name>right</name></field>
             <field><type>bs_I16</type><name>value</name></field>
-        </structure>
-        <structure name="bs_TTF">
-            <field><type>bs_Header</type><name>header</name></field>
-            <field><type>bs_U32</type><name>offset</name></field>
-            <field><type>bs_String*</type><name>buffer</name></field>
-            <field><type>const char*</type><name>name</name></field>
-            <field><type>const char*</type><name>alphabet</name></field>
-            <field><type>bs_List</type><name>glyphs</name></field>
-            <field><type>bs_List</type><name>kerning_pairs</name></field>
-            <field><type>bs_U16</type><name>table_count</name></field>
-            <field><type>int</type><name>x_offset</name></field>
-            <field><type>int</type><name>y_offset</name></field>
-            <field><type>bs_Head</type><name>head</name></field>
-            <field><type>bs_Maxp</type><name>maxp</name></field>
-            <field><type>bs_Hhea</type><name>hhea</name></field>
-            <field><type>bs_Hmtx</type><name>hmtx</name></field>
-            <field><type>bs_Loca</type><name>loca</name></field>
-            <field><type>bs_Glyf</type><name>glyf</name></field>
         </structure>
         <structure name="bs_BfntHeader">
             <field><type>bs_U32</type><name>magic</name></field>
@@ -2103,7 +2022,7 @@
 	
     <functions>
 		<validationTemplate/>
-		
+
 		<function name="bs_callbacks">
 			<return>bs_Callbacks*</return>
 		</function>
@@ -3052,30 +2971,6 @@
             <return>void</return>
             <param><type>bs_Callback</type><name>function</name></param>
         </function>
-        <function name="bs_glyph" section="bs_font.h">
-            <return>void</return>
-            <param><type>bs_TTF*</type><name>ttf</name></param>
-            <param><type>bs_U16</type><name>code</name></param>
-        </function>
-        <function name="bs_ttf">
-            <return>bs_Result</return>
-            <param><type>bs_TTF*</type><name>existing</name></param>
-            <param><type>const char*</type><name>path</name></param>
-            <param><type>bs_U32</type><name>flags</name></param>
-        </function>
-        <function name="bs_rasterizeGlyph">
-            <return>void</return>
-            <param><type>bs_TTF*</type><name>font</name></param>
-            <param><type>bs_Glyph*</type><name>glyph</name></param>
-            <param><assert>width &gt; 0</assert><type>int</type><name>width</name></param>
-            <param><assert>height &gt; 0</assert><type>int</type><name>height</name></param>
-            <param><type>char*</type><name>out_bmp</name></param>
-            <param><assert>scale &gt; 0.0f</assert><type>float</type><name>scale</name></param>
-        </function>
-        <function name="bs_readKernTable">
-            <return>void</return>
-            <param><type>bs_TTF*</type><name>ttf</name></param>
-        </function>
         <function name="bs_bindFont">
             <return>void</return>
             <param><type>bs_Font*</type><name>font</name></param>
@@ -3133,14 +3028,6 @@
             <param><type>const char*</type><name>path</name></param>
             <param><type>int</type><name>channels_count</name></param>
             <param><type>bs_PngData*</type><name>out_png_data</name></param>
-        </function>
-        <function name="bs_bitmapImage">
-            <return>bs_Result</return>
-            <param><type>bs_Object*</type><name>existing_object</name></param>
-            <param><type>unsigned char*</type><name>image_data</name></param>
-            <param><type>bs_ivec2</type><name>dim</name></param>
-            <param><type>bs_Format</type><name>format</name></param>
-            <param><type>bs_ImageBits</type><name>flags</name></param>
         </function>
         <variadicStringTemplate name="bs_savePng" string="path">
 			<return>bs_Result</return>

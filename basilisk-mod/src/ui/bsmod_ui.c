@@ -240,8 +240,8 @@ BSMODAPI void _bsmod_instanceBackgroundMenu(bs_vec3 position, bs_vec2 dimensions
 
     bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
         .position = position,
-        .text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS],
-        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head,
+        //.text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS], // TODO: text rewrite
+        //.font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head, // TODO: text rewrite
         .spacing = 4.0,
         .widgets = NULL,
         .widgets_count = 0,
@@ -259,7 +259,7 @@ BSMODAPI void _bsmod_instanceBackgroundMenu(bs_vec3 position, bs_vec2 dimensions
     }, & (bsgfx_TitleBar) {
         .name = "Window",
         .border_radius = BSMOD_DEFAULT_RADIUS,
-        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head,
+        //.font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head, // TODO: text rewrite
         .material_id = $white_material()->id,
         .button_hovering_material_id = $bsmod_red()->id,
         .button_icon_material_id = $bsmod_grey_120()->id,

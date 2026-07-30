@@ -264,6 +264,6 @@ BSMODAPI void _bsmod_pollRasterizer() {
             }
         }
 
-        _bsmod_packAtlas(&packer, 2048, 2048, _bsmod_queued_rasterization.package, _bsmod_queued_rasterization.name);
+        _bsmod_packAtlas(&packer, 2048, 2048, _bsmod_queued_rasterization.package, _bsmod_queued_rasterization.name, false);
     }
 }

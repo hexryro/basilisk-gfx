@@ -34,33 +34,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-bs_Result _bsmod_packBMFontV(
-    char* package_name, 
-    char* bmfont_path, 
-    char* png_path, 
-    char* format, 
-    va_list args)
-{
-    int _length = bs_formatStringLength(format, args);
-    char* _formatted = bs_alloca(_length + 1);
-    vsnprintf(_formatted, _length + 1, format, args);
-    return _bsmod_packBMFont(package_name, bmfont_path, png_path, _formatted, _length);
-}
-
-bs_Result _bsmod_packBMFontF(
-    char* package_name, 
-    char* bmfont_path, 
-    char* png_path, 
-    char* format, 
-    ...)
-{
-    va_list args;
-    va_start(args, format);
-    bs_Result _return = _bsmod_packBMFontV(package_name, bmfont_path, png_path, format, args);
-    va_end(args);
-    return _return;
-}
-
 bs_Result _bsmod_packResourceV(
     bs_ResourceType type, 
     unsigned char* data, 

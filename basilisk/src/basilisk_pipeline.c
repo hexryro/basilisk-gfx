@@ -107,7 +107,7 @@ static void basilisk_hiResSubpass0() {
     basilisk_renderUI();
     basilisk_renderUIStencil();
     basilisk_renderDither();
-    basilisk_renderFontSubtype(bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF], BSGFX_FONT_SANS_SERIF_16, $fs_bsgfx_font_arial());
+    //basilisk_renderFontSubtype(bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF], BSGFX_FONT_SANS_SERIF_16, $fs_bsgfx_font_arial()); // TODO: text rewrite
   //  bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
     basilisk_renderTiles();
     bsgfx_renderPrimitives(poser()->screen_camera.result);

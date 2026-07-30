@@ -1041,6 +1041,12 @@ BSGFXAPI void
 bsgfx_disableValidation();
 
  /**
+  @return void
+  */
+BSGFXAPI void
+bsgfx_test();
+
+ /**
   @return bs_PipelineHash
   */
 BSGFXAPI bs_PipelineHash

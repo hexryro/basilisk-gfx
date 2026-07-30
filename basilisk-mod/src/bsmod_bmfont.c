@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+  /*
 typedef struct {
     int id;
     int x, y;
@@ -43,17 +44,26 @@ typedef struct {
     int amount;
 } bsmod_BMKerning;
 
+#define BSMOD_MAX_BMFONT_ATLAS_NAME_LENGTH 128
+
 typedef struct {
     int size;
 
-    bsmod_BMChar* chars;
     int chars_count;
-
-    bsmod_BMKerning* kerning_pairs;
     int kerning_pairs_count;
 
     int line_height;
     int base;
+
+    int pages_count;
+
+    int atlas_width;
+    int atlas_height;
+
+    bsmod_BMChar* chars;
+    bsmod_BMKerning* kerning_pairs;
+
+    char atlas_path[BSMOD_MAX_BMFONT_ATLAS_NAME_LENGTH];
 } bsmod_BMFont;
 
 static void _bsmod_parseCharLine(const char* line, bsmod_BMChar* c) {
@@ -67,22 +77,23 @@ static void _bsmod_parseKerningLine(const char* line, bsmod_BMKerning* k) {
 static void _bsmod_peekBMFont(FILE* file, bsmod_BMFont* out, int* out_offset) {
     bsmod_BMFont font = { 0 };
 
+
     char line[512];
     int c;
     while (fgets(line, sizeof(line), file)) {
-        if (strncmp(line, "info ", 5) == 0) {
+        if (strncmp(line, BS_CONSTANT_STRING("info ")) == 0) {
             c = sscanf(line, "info face=\"%*[^\"]\" size=%d", &font.size);
-            if (c <= 0) {
-                bs_warnF("Could not get bmfont size");
-            }
         }
-        else if (strncmp(line, "common ", 7) == 0) {
-            c = sscanf(line, "common lineHeight=%d base=%d", &font.line_height, &font.base);
-        }
-        else if (strncmp(line, "chars count=", 12) == 0) {
+        else if (strncmp(line, BS_CONSTANT_STRING("chars count=")) == 0) {
             c = sscanf(line, "chars count=%d", &font.chars_count);
         }
-        else if (strncmp(line, "kernings count=", 15) == 0) {
+        else if (strncmp(line, BS_CONSTANT_STRING("common ")) == 0) {
+            c = sscanf(line, "common lineHeight=%d base=%d scaleW=%d scaleH=%d pages=%d", &font.line_height, &font.base, &font.atlas_width, &font.atlas_height, &font.pages_count);
+        }
+        else if (strncmp(line, BS_CONSTANT_STRING("chars count=")) == 0) {
+            c = sscanf(line, "chars count=%d", &font.chars_count);
+        }
+        else if (strncmp(line, BS_CONSTANT_STRING("kernings count=")) == 0) {
             c = sscanf(line, "kernings count=%d", &font.kerning_pairs_count);
         }
     }
@@ -140,17 +151,16 @@ typedef struct {
     unsigned char* data;
 
     char* ascii_table;
+    int kerning_pairs_count;
+    int chars_count;
 
-    bsmod_BMFont expected;
 } bsmod_PackBMFontParams;
 
 static bs_Result _bsmod_packBMFont(bs_FileInfo info, bsmod_PackBMFontParams* params) {
     const int channels_count = 4;
     bs_Result result;
 
-   /**
-    Load resources
-    */
+    // Load resources
     static bs_String* name;
     char* ext = bs_fileExtension(info.path);
     if (!ext) 
@@ -175,9 +185,6 @@ static bs_Result _bsmod_packBMFont(bs_FileInfo info, bsmod_PackBMFontParams* par
         _bsmod_destroyBMFont(&font);
         return result;
     }
-
-   /**
-    */
 
     unsigned char* offset = params->data + params->batl_offset;
 
@@ -206,9 +213,7 @@ static bs_Result _bsmod_packBMFont(bs_FileInfo info, bsmod_PackBMFontParams* par
         offset += sizeof(bs_BfntGlyph);
     }
 
-   /**
-    Atlas
-    */
+    // Atlas
     bs_BatlHeader* batl_header = offset;
     *batl_header = (bs_BatlHeader) {
         .magic = BS_BATL_MAGIC,
@@ -249,10 +254,14 @@ static bs_Result _bsmod_findFirstFontFile(bs_FileInfo info, bsmod_PackBMFontPara
     if (!file)
         return BS_RESULT_FAILED_TO_READ;
 
-    int offset;
-    _bsmod_peekBMFont(file, &params->expected, &offset);
+    int c;
+    c = sscanf(line, "info face=\"%*[^\"]\" size=%d", &font.size);
+    fseek(file, c, 0);
+    c = sscanf(line, "chars count=%d", &font.chars_count);
 
-    ; ()
+    int offset;
+    bsmod_BMFont bmfont;
+    _bsmod_peekBMFont(file, &bmfont, &offset);
 
     fseek(file, offset, 0);
 
@@ -269,10 +278,11 @@ static bs_Result _bsmod_findFirstFontFile(bs_FileInfo info, bsmod_PackBMFontPara
 
     fclose(file);
 
-    return BS_RESULT_GENERAL_ERROR; // stop iterating
+    return BS_RESULT_OK;
 }
-
+*/
 BSMODAPI bs_Result _bsmod_packBMFonts(char* package_name, char* directory_path, char* resource_name, int resource_name_length) {
+    /*
     bs_Result result;
 
     bs_BfntHeader header = {
@@ -300,6 +310,9 @@ BSMODAPI bs_Result _bsmod_packBMFonts(char* package_name, char* directory_path, 
     batl_size += chars_count * sizeof("\n");
 
     size_t total_size_excluding_binary = bfnt_size + batl_size;
+    size_t total_size = total_size_excluding_binary;
+
+    unsigned char* data = bs_malloc(total_size);
 
     bs_foreachFile(_bsmod_packBMFont, &params, directory_path, strlen(directory_path));
 
@@ -309,4 +322,6 @@ BSMODAPI bs_Result _bsmod_packBMFonts(char* package_name, char* directory_path, 
    //     return result;
 
     return result;
+    */
+    return BS_RESULT_OK;
 }

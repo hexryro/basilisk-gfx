@@ -4,25 +4,10 @@ project(basilisk-gfx)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+file(GLOB_RECURSE KB_FILES "${CMAKE_SOURCE_DIR}/external/kb/*.*")
 file(GLOB_RECURSE GENERATED_FILES "generated/*.*")
-
 file(GLOB SOURCE_FILES "src/*.c")
-
 file(GLOB TYPE_FILES "src/types/*.*")
-
-file(GLOB PREFAB_FILES "src/types/prefab/*.*")
-file(GLOB PRIMITIVE_FILES "src/types/primitive/*.*")
-file(GLOB LIGHT_FILES "src/types/light/*.*")
-file(GLOB SPAWNER_FILES "src/types/spawner/*.*")
-file(GLOB TILE_FILES "src/types/tile/*.*")
-file(GLOB FOLIAGE_FILES "src/types/foliage/*.*")
-
-file(GLOB ATLAS_FILES "src/objects/atlas/*.*")
-file(GLOB FONT_FILES "src/objects/font/*.*")
-file(GLOB TEXTURE_FILES "src/objects/texture/*.*")
-
-file(GLOB UI_FILES "src/ui/*.*")
-file(GLOB UI_MAIN_FILES "src/ui/main/*.*")
 
 file(GLOB_RECURSE GLSL_FILES "shaders/*.glsl")
 file(GLOB_RECURSE FRAG_FILES "shaders/*.frag")
@@ -31,25 +16,16 @@ file(GLOB_RECURSE COMP_FILES "shaders/*.comp")
 file(GLOB_RECURSE RGEN_FILES "shaders/*.rgen")
 file(GLOB_RECURSE RMISS_FILES "shaders/*.rmiss")
 
-file(GLOB ENTITY_FILES "src/spawners/entity/*.*")
-file(GLOB ITEM_FILES "src/spawners/item/*.*")
-file(GLOB SPAWNERS_FILES "src/spawners/*.*")
-
 file(GLOB_RECURSE HEADER_FILES "include/*.h")
 file(GLOB PROJECT_FILES "./*" LIST_DIRECTORIES false)
 
 add_library(${PROJECT_NAME} SHARED
     bsgfx_contracts.h
+
+    ${KB_FILES}
     ${SOURCE_FILES}
     ${HEADER_FILES}
     ${GENERATED_FILES}
-
-    ${ATLAS_FILES}
-    ${FONT_FILES}
-    ${TEXTURE_FILES}
-
-    ${UI_FILES}
-    ${UI_MAIN_FILES}
 
     ${GLSL_FILES}
     ${FRAG_FILES}
@@ -59,36 +35,11 @@ add_library(${PROJECT_NAME} SHARED
     ${RMISS_FILES}
 
     ${TYPE_FILES}
-    ${PREFAB_FILES}
-    ${PRIMITIVE_FILES}
-    ${LIGHT_FILES}
-    ${SPAWNER_FILES}
-    ${TILE_FILES}
-    ${FOLIAGE_FILES}
 )
 
-source_group("Views" FILES ${VIEWS})
+source_group("External Files" FILES ${KB_FILES})
 source_group("Source Files" FILES ${SOURCE_FILES})
 source_group("Generated Files" FILES ${GENERATED_FILES})
-
-source_group("Source Files/Objects/Atlas" FILES ${ATLAS_FILES})
-source_group("Source Files/Objects/Clothing" FILES ${CLOTHING_FILES})
-source_group("Source Files/Objects/Font" FILES ${FONT_FILES})
-source_group("Source Files/Objects/Texture" FILES ${TEXTURE_FILES})
-
-source_group("Source Files/Types/Prefab" FILES ${PREFAB_FILES})
-source_group("Source Files/Types/Primitive" FILES ${PRIMITIVE_FILES})
-source_group("Source Files/Types/Spawner" FILES ${SPAWNER_FILES})
-source_group("Source Files/Types/Tile" FILES ${TILE_FILES})
-source_group("Source Files/Types/Light" FILES ${LIGHT_FILES})
-source_group("Source Files/Types/Foliage" FILES ${FOLIAGE_FILES})
-
-source_group("Source Files/Spawners/Entity" FILES ${ENTITY_FILES})
-source_group("Source Files/Spawners/Item" FILES ${ITEM_FILES})
-source_group("Source Files/Spawners" FILES ${SPAWNERS_FILES})
-
-source_group("Source Files/UI" FILES ${UI_FILES})
-source_group("Source Files/UI/Main" FILES ${UI_MAIN_FILES})
 
 source_group("Shaders" FILES ${GLSL_FILES})
 source_group("Shaders/vert" FILES ${VERT_FILES})
@@ -123,8 +74,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
     basilisk-core
     #basilisk-steam
-    vulkan-1 
-    #steam_api64 
+    vulkan-1
     dwmapi
     #GFSDK_Aftermath_Lib.x64
 )

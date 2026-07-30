@@ -1801,38 +1801,6 @@ void bs_runSingle(
     next.bs_runSingle(function);
 }
 
-void bs_glyph(
-    bs_TTF* ttf, 
-    bs_U16 code)
-{
-    next.bs_glyph(ttf, code);
-}
-
-bs_Result bs_ttf(
-    bs_TTF* existing, 
-    const char* path, 
-    bs_U32 flags)
-{
-    return next.bs_ttf(existing, path, flags);
-}
-
-void bs_rasterizeGlyph(
-    bs_TTF* font, 
-    bs_Glyph* glyph, 
-    int width, 
-    int height, 
-    char* out_bmp, 
-    float scale)
-{
-    next.bs_rasterizeGlyph(font, glyph, width, height, out_bmp, scale);
-}
-
-void bs_readKernTable(
-    bs_TTF* ttf)
-{
-    next.bs_readKernTable(ttf);
-}
-
 void bs_bindFont(
     bs_Font* font, 
     bs_Sampler* sampler, 

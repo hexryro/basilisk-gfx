@@ -33,11 +33,12 @@
 
 Basilisk basilisk = {
 	.sources = { -1 },
+	.package_id = -1,
 };
 
 volatile long has_performed_tracked_changes = 1;
 
-static void basilisk_loadFontCollection(bs_Object* object) {
+static void basilisk_loadFontCollection(bs_Object* object) {/*
 	bs_Sampler* nearest_sampler = bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler;
 
 	bs_Object* sans_serif_16 = BS_FONT(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16, 0);
@@ -50,7 +51,7 @@ static void basilisk_loadFontCollection(bs_Object* object) {
 		.num = 6, // single quad
 	};
 	_bsmod_subtypes_[BSMOD_SUBTYPE_FONT_SANS_SERIF] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instanced_batch->batch, 0, range);
-
+	*/
 }
 
 static void onLoadScene() {
@@ -59,7 +60,12 @@ static void onLoadScene() {
 
 	basilisk_createRenderers();
 
-	basilisk_loadFonts();
+	//basilisk_loadFonts();
+
+	bs_loadPackage("content/basilisk", &basilisk.package_id);
+
+	bs_Object* atlas = BS_ATLAS(-1, -1, 0);
+	bs_loadAtlas(atlas, basilisk.package_id, 0, BS_CONSTANT_STRING("temp"));
 
 	bsmod_onLoad();
 	bsmod_bindAtlases();
@@ -86,9 +92,9 @@ static void onModTick() {
 
 static void onIni() {
 	bsmod_onIni();
+	bsmod_iniPackage("content/basilisk");
 
 	bsmod_onTrack();
-	bsmod_savePackage(BSGFX_CONTENT_PATH);
 }
 
 static DWORD WINAPI _bsmod_tickAsync(void* param) {
@@ -153,6 +159,9 @@ int main(int argc, char* argv[]) {
 	bs_enableValidation();
 	bsgfx_enableValidation();
 	bsmod_enableValidation();
+
+	bsgfx_test(); // temp testing fonts
+	//return 0;
 
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {

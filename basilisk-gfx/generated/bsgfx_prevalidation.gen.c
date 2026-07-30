@@ -49,6 +49,10 @@ const bsgfx_FunctionTable* _preval_bsgfx_setFunctions(const bsgfx_FunctionTable*
     return &next;
 }
 
+BSGFXAPI void _preval_bsgfx_test() {
+    next.bsgfx_test();
+}
+
 BSGFXAPI bs_PipelineHash _preval_bsgfx_defaultPipelineHash() {
     return next.bsgfx_defaultPipelineHash();
 }
@@ -669,6 +673,7 @@ BSGFXAPI void _preval_bsgfx_renderColorPickers() {
 bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     static bsgfx_FunctionTable functions = { 0 };
 
+    functions.bsgfx_test = _preval_bsgfx_test;
     functions.bsgfx_defaultPipelineHash = _preval_bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _preval_bsgfx_renderTileIcons;
     functions.bsgfx_renderAtlasIcons = _preval_bsgfx_renderAtlasIcons;

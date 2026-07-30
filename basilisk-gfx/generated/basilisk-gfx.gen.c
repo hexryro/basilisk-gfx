@@ -69,6 +69,11 @@ void bsgfx_disableValidation()
     _bsgfx_setFunctions(definitions, NULL);
 }
 
+void bsgfx_test()
+{
+    next.bsgfx_test();
+}
+
 bs_PipelineHash bsgfx_defaultPipelineHash()
 {
     return next.bsgfx_defaultPipelineHash();

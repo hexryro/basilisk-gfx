@@ -44,6 +44,7 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
         (LPCSTR)(&_preval_bsgfx_getFunctions),
         &module);
 
+    functions.bsgfx_test = (PFN_bsgfx_test)GetProcAddress(module, "_preval_bsgfx_test");
     functions.bsgfx_defaultPipelineHash = (PFN_bsgfx_defaultPipelineHash)GetProcAddress(module, "_preval_bsgfx_defaultPipelineHash");
     functions.bsgfx_renderTileIcons = (PFN_bsgfx_renderTileIcons)GetProcAddress(module, "_preval_bsgfx_renderTileIcons");
     functions.bsgfx_renderAtlasIcons = (PFN_bsgfx_renderAtlasIcons)GetProcAddress(module, "_preval_bsgfx_renderAtlasIcons");

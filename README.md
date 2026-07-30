@@ -13,13 +13,15 @@ After that, engine should be working again
 # Attribution
 
 ## Libraries
-- Vulkan
-- lodepng
-- yyjson
-- glslang
-- SPIRV-Cross
-- stb
-- cglm
+- cglm: https://github.com/recp/cglm
+- FreeType: https://github.com/freetype/freetype
+- glslang: https://github.com/khronosGroup/glslang
+- kb: https://github.com/JimmyLefevre/kb
+- lodepng: https://github.com/lvandeve/lodepng
+- SPIRV-Cross: https://github.com/khronosgroup/spirv-cross
+- stb (stb_rect_pack.h): https://github.com/nothings/stb
+- Vulkan: https://github.com/khronosGroup/Vulkan-Docs
+- yyjson: https://github.com/ibireme/yyjson
 
 ## Icons/Artwork
 

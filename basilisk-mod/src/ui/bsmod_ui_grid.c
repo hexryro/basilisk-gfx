@@ -110,6 +110,8 @@ static void _bsmod_directoryWidget(bs_List* widgets, const char* name, int inden
 
 
     if (is_selected) {
+        // TODO: text rewrite
+        /*
         bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
         bs_vec2 text_size = bs_textDimensions(font, name, strlen(name));
         bs_pushBack(widgets, &(bsgfx_Widget) {
@@ -124,6 +126,7 @@ static void _bsmod_directoryWidget(bs_List* widgets, const char* name, int inden
             .offset = { indent, font->min_y_shift, z_offset },
             .material_id = $bsmod_grey_100()->id,
         });
+        */
     }
         bs_pushBack(widgets, &(bsgfx_Widget) {
         .type = BSGFX_WIDGET_STRING,
@@ -241,8 +244,8 @@ static void _bsmod_instanceDirectoryMenu(bs_vec3 center, bs_vec2 dimensions) {
       */
     bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
         .position = center,
-        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head,
-        .text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS],
+        // .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head, // TODO: text rewrite
+        // .text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS], // TODO: text rewrite
         .spacing = 4.0,
         .widgets = widgets.data,
         .widgets_count = widgets.count,
@@ -377,6 +380,8 @@ static bool _bsmod_instanceAtlasPreview(bsgfx_Widget* widget, bsgfx_GridParams g
         if (last_category != material->category) {
             const char* category_name = bsgfx_materialCategoryName(material->category);
             if (category_name) {
+                // TODO: text rewrite
+                /*
                 bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->font;
                 grid.position->y -= font->height;
                 grid.position->x = grid.start.x;
@@ -386,6 +391,7 @@ static bool _bsmod_instanceAtlasPreview(bsgfx_Widget* widget, bsgfx_GridParams g
                     .scale = 16.0,
                     .material_id = $bsmod_grey_30()->id,
                 }, &category_name_dimensions, category_name, strlen(category_name));
+                */
 
                 grid.position->y -= widget->grid.size.y;
                 //position->x = 0.0;
@@ -537,8 +543,8 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
 
     bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
         .position = position,
-        .text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS],
-        .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head,
+        // .text_subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_FONT_CONSOLAS], // TODO: text rewrite
+        // .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head, // TODO: text rewrite
         .spacing = 16.0,
         .widgets = &widget,
         .widgets_count = 1,

@@ -28,6 +28,7 @@
 
 typedef struct {
     int sources[BS_OBJECT_TYPE_COUNT];
+    int package_id;
 } Basilisk;
 
 extern Basilisk basilisk;

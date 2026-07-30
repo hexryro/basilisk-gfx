@@ -36,6 +36,7 @@
 #include <basilisk-gfx.h>
 #include <windows.h>
 
+typedef void(__stdcall* PFN_bsgfx_test)();
 typedef bs_PipelineHash(__stdcall* PFN_bsgfx_defaultPipelineHash)();
 typedef void(__stdcall* PFN_bsgfx_renderTileIcons)();
 typedef void(__stdcall* PFN_bsgfx_renderAtlasIcons)();
@@ -172,6 +173,7 @@ typedef bool(__stdcall* PFN_bsgfx_instanceWidgets)(bsgfx_Menu menu, bsgfx_TitleB
 typedef void(__stdcall* PFN_bsgfx_renderColorPickers)();
 
 typedef struct {
+    PFN_bsgfx_test bsgfx_test;
     PFN_bsgfx_defaultPipelineHash bsgfx_defaultPipelineHash;
     PFN_bsgfx_renderTileIcons bsgfx_renderTileIcons;
     PFN_bsgfx_renderAtlasIcons bsgfx_renderAtlasIcons;
@@ -308,6 +310,7 @@ typedef struct {
     PFN_bsgfx_renderColorPickers bsgfx_renderColorPickers;
 } bsgfx_FunctionTable;
 
+BSGFXAPI void _bsgfx_test();
 BSGFXAPI bs_PipelineHash _bsgfx_defaultPipelineHash();
 BSGFXAPI void _bsgfx_renderTileIcons();
 BSGFXAPI void _bsgfx_renderAtlasIcons();
@@ -446,6 +449,7 @@ BSGFXAPI void _bsgfx_renderColorPickers();
 static inline bsgfx_FunctionTable* _bsgfx_getFunctions() {
     static bsgfx_FunctionTable functions;
 
+    functions.bsgfx_test = _bsgfx_test;
     functions.bsgfx_defaultPipelineHash = _bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _bsgfx_renderTileIcons;
     functions.bsgfx_renderAtlasIcons = _bsgfx_renderAtlasIcons;

@@ -105,8 +105,8 @@ BSMODAPI void _preval_bsmod_onCompileShader(bsmod_TrackParams params) {
     next.bsmod_onCompileShader(params);
 }
 
-BSMODAPI void _preval_bsmod_onLoadTTF(bsmod_TrackParams params) {
-    next.bsmod_onLoadTTF(params);
+BSMODAPI void _preval_bsmod_onConvertFont(bsmod_TrackParams params) {
+    next.bsmod_onConvertFont(params);
 }
 
 BSMODAPI void _preval_bsmod_onConvertBMFont(bsmod_TrackParams params) {
@@ -129,6 +129,13 @@ BSMODAPI void _preval_bsmod_onPackTextureArray(bsmod_TrackParams params) {
     next.bsmod_onPackTextureArray(params);
 }
 
+BSMODAPI void _preval_bsmod_packFont(char* package_name, char* ttf_path, char* resource_name, int resource_name_length) {
+    BSMOD_VALIDATE(package_name != NULL, ,);
+    BSMOD_VALIDATE(ttf_path != NULL, ,);
+    BSMOD_VALIDATE(resource_name != NULL, ,);
+    next.bsmod_packFont(package_name, ttf_path, resource_name, resource_name_length);
+}
+
 BSMODAPI void _preval_bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, char* name, bs_RGBA* data, int width, int height, int category) {
     BSMOD_VALIDATE(packer != NULL, ,);
     BSMOD_VALIDATE(name != NULL, ,);
@@ -136,11 +143,11 @@ BSMODAPI void _preval_bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, char* na
     next.bsmod_packAtlasTexture(packer, name, data, width, height, category);
 }
 
-BSMODAPI bs_Result _preval_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package, char* resource_name) {
+BSMODAPI bs_Result _preval_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package, char* resource_name, bool allow_paging) {
     BSMOD_VALIDATE(packer != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(package != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_packAtlas(packer, width, height, package, resource_name);
+    return next.bsmod_packAtlas(packer, width, height, package, resource_name, allow_paging);
 }
 
 BSMODAPI bsmod_AtlasPacker _preval_bsmod_createAtlasPacker() {
@@ -152,22 +159,6 @@ BSMODAPI bs_Result _preval_bsmod_packImageDirectory(char* directory_name, char* 
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bsmod_packImageDirectory(directory_name, package_name, resource_name);
-}
-
-BSMODAPI bs_Result _preval_bsmod_packBMFont(char* package_name, char* bmfont_path, char* png_path, char* value, int value_length) {
-    BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BSMOD_VALIDATE(bmfont_path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BSMOD_VALIDATE(png_path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BSMOD_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_packBMFont(package_name, bmfont_path, png_path, value, value_length);
-}
-
-BSMODAPI bs_Result _preval_bsmod_packBMFontV(char* package_name, char* bmfont_path, char* png_path, char* format, va_list args) {
-    BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BSMOD_VALIDATE(bmfont_path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BSMOD_VALIDATE(png_path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BSMOD_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_packBMFontV(package_name, bmfont_path, png_path, format, args);
 }
 
 BSMODAPI void _preval_bsmod_scrollbar(const int* scroll, bsgfx_Scrollbar* out) {
@@ -528,18 +519,17 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_onTrack = _preval_bsmod_onTrack;
     functions.bsmod_onPackBindings = _preval_bsmod_onPackBindings;
     functions.bsmod_onCompileShader = _preval_bsmod_onCompileShader;
-    functions.bsmod_onLoadTTF = _preval_bsmod_onLoadTTF;
+    functions.bsmod_onConvertFont = _preval_bsmod_onConvertFont;
     functions.bsmod_onConvertBMFont = _preval_bsmod_onConvertBMFont;
     functions.bsmod_onPackAtlas = _preval_bsmod_onPackAtlas;
     functions.bsmod_onPackModels = _preval_bsmod_onPackModels;
     functions.bsmod_onPackBinary = _preval_bsmod_onPackBinary;
     functions.bsmod_onPackTextureArray = _preval_bsmod_onPackTextureArray;
+    functions.bsmod_packFont = _preval_bsmod_packFont;
     functions.bsmod_packAtlasTexture = _preval_bsmod_packAtlasTexture;
     functions.bsmod_packAtlas = _preval_bsmod_packAtlas;
     functions.bsmod_createAtlasPacker = _preval_bsmod_createAtlasPacker;
     functions.bsmod_packImageDirectory = _preval_bsmod_packImageDirectory;
-    functions.bsmod_packBMFont = _preval_bsmod_packBMFont;
-    functions.bsmod_packBMFontV = _preval_bsmod_packBMFontV;
     functions.bsmod_scrollbar = _preval_bsmod_scrollbar;
     functions.bsmod_dividerWidget = _preval_bsmod_dividerWidget;
     functions.bsmod_iconWidget = _preval_bsmod_iconWidget;

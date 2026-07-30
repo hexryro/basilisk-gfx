@@ -50,14 +50,15 @@ BSMODAPI bsmod_AtlasPacker _bsmod_createAtlasPacker() {
 		.rects = bs_list(sizeof(stbrp_rect), 64),
 	};
 }
-
-BSMODAPI bs_Result _val_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package_name, char* resource_name) {
+BSMODAPI bs_Result _val_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package_name, char* resource_name, bool allow_paging) {
 	BSMOD_VALIDATE(packer->info.count == packer->rects.count, BS_RESULT_OK,);
 
-	return _bsmod_packAtlas(packer, width, height, package_name, resource_name);
+	return _bsmod_packAtlas(packer, width, height, package_name, resource_name, allow_paging);
 }
 
-BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package_name, char* resource_name) {
+BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package_name, char* resource_name, bool allow_paging) {
+	const int padding = 0;
+
 	bs_Result result;
 
 	bs_BatlHeader header = {
@@ -66,72 +67,116 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 		.channels_count = 4,
 		.width = width,
 		.height = height,
+		.images_count = packer->info.count,
 	};
 
 	size_t total_name_lengths = 0;
-	for (int i = 0; i < packer->info.count; i++) {
+	for (int i = 0; i < header.images_count; i++) {
 		bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, i);
 		total_name_lengths += info->name_length;
 	}
 
-	const size_t total_size_excluding_binary = sizeof(bs_BatlHeader) + sizeof(bs_BatlPointer) * packer->info.count + total_name_lengths;
-	const size_t atlas_size = header.width * header.height * header.channels_count;
-	const size_t total_size = total_size_excluding_binary + atlas_size;
+	stbrp_context ctx;
+	stbrp_node* nodes = bs_alloca(header.width * sizeof(stbrp_node));
+
+	stbrp_init_target(&ctx, header.width, header.height, nodes, header.width);
+
+	stbrp_rect* remaining_rects = bs_alloca(header.images_count * sizeof(stbrp_rect));
+	bsmod_TextureInfo* remaining_infos = bs_alloca(header.images_count * sizeof(bsmod_TextureInfo));
+
+	int remaining = header.images_count;
+	while (remaining > 0) {
+		stbrp_pack_rects(&ctx, packer->rects.data, remaining);
+
+		int j = 0;
+		for (int i = 0; i < remaining; i++) {
+			stbrp_rect* rect = bs_fetchUnit(&packer->rects, i);
+			bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, i);
+
+			if (rect->was_packed) {
+				info->page = header.pages_count;
+			}
+			else {
+				remaining_rects[j] = *rect;
+				remaining_infos[j] = *info;
+
+				j++;
+			}
+		}
+
+		remaining = j;
+		header.pages_count++;
+
+		if (!allow_paging)
+			break;
+	}
+
+   /**
+    Allocate memory
+    */
+	size_t total_size = 0;
+	size_t total_size_excluding_binary = 0;
+
+	total_size += sizeof(bs_BatlHeader);
+	total_size += header.images_count * sizeof(bs_BatlImage);
+
+	for (int i = 0; i < header.images_count; i++) {
+		bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, i);
+		total_size += info->name_length + 2; // \0\n
+	}
+	total_size_excluding_binary = total_size;
+	total_size += header.pages_count * width * height * header.channels_count;
 
 	unsigned char* batl = bs_malloc(total_size);
 
-	size_t pointer_offset = sizeof(bs_BatlHeader);
-	header.binary_offset = total_size_excluding_binary;
+   /**
+    Pack atlas
+    */
+	unsigned char* offset = batl;
+	offset += sizeof(bs_BatlHeader);
 
-	memset(batl + header.binary_offset, 0, atlas_size);
-
-	stbrp_context ctx;
-	stbrp_node* nodes = _alloca(header.width * sizeof(stbrp_node));
-
-	stbrp_init_target(&ctx, header.width, header.height, nodes, header.width);
-	stbrp_pack_rects(&ctx, packer->rects.data, packer->info.count);
-
-	const int padding = 0;
-	bs_BatlPointer* dbg = batl + pointer_offset; 
-	for (int i = 0; i < packer->info.count; i++) {
-		bsmod_TextureInfo* image = bs_fetchUnit(&packer->info, i);
+	for (int i = 0; i < header.images_count; i++) {
+		bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, i);
 		stbrp_rect* rect = bs_fetchUnit(&packer->rects, i);
 
-		// image header
-		memcpy(batl + pointer_offset, &(bs_BatlPointer) {
-			.name_length = image->name_length,
+		bs_BatlImage batl_image = {
 			.x = rect->x,
 			.y = rect->y,
 			.w = rect->w,
 			.h = rect->h,
-			.category = image->category,
-		}, sizeof(bs_BatlPointer));
-		pointer_offset += sizeof(bs_BatlPointer);
+			.page = info->page,
+			.category = info->category,
+			.name_length = info->name_length,
+		};
 
-		// image name
-		memcpy(batl + pointer_offset, image->name, image->name_length);
-		pointer_offset += image->name_length;
-		memcpy(batl + pointer_offset, "\0\n", 2);
-		pointer_offset += 2;
+		memcpy(offset, &batl_image, sizeof(bs_BatlImage));
+		offset += sizeof(bs_BatlImage);
 
-		int w = header.width - padding;
-		
+		memcpy(offset, info->name, info->name_length);
+		offset += info->name_length;
+
+		memcpy(offset, "\0\n", 2);
+		offset += 2;
+
+		int w = width - padding;
+
 		// lodepng is upside down (:
+		unsigned char* atlas_offset = batl + total_size_excluding_binary;
+		atlas_offset += info->page * width * height * header.channels_count;
 		for (int y = 0; y < rect->h; y++) {
-			unsigned char* dst = batl + header.binary_offset;
+			unsigned char* dst = atlas_offset;
 			dst += (rect->x + padding) * header.channels_count;
 			dst += (rect->y + padding + y) * w * header.channels_count;
 
-			unsigned char* src = image->data;
+			unsigned char* src = info->data;
 			src += y * rect->w * header.channels_count;
 
 			memcpy(dst, src, rect->w * header.channels_count);
 		}
 
-		free(image->name);
+		free(info->name);
 	}
-	
-	header.images_count = packer->info.count;
+
 	memcpy(batl, &header, sizeof(bs_BatlHeader));
 
 	bs_destroyList(&packer->rects);

@@ -181,6 +181,12 @@ BSMODAPI bs_Result _bsmod_onPackBindings() {
 	return BS_RESULT_OK;
 }
 
+BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
+	bsmod_AtlasPacker packer = _bsmod_createAtlasPacker();
+
+	bsmod_packFont(params.package, params.path, params.path, strlen(params.path));
+}
+
 BSMODAPI void _bsmod_onConvertBMFont(bsmod_TrackParams params) {
 	if (!bs_fileExists(params.path, strlen(params.path))) {
 		bs_warnF(BS_PRINT_COLOR("Removed %s\n", BS_PRINT_RED), params.path);
@@ -212,143 +218,7 @@ BSMODAPI void _bsmod_onConvertBMFont(bsmod_TrackParams params) {
 	char* name = bs_fileName(params.path);
 	int name_length = strlen(name);
 	ext[-1] = '.';
-	_bsmod_packBMFontF(params.package, fnt_path, png_path, "%s%.*s", params.prefix, name_length, name);
-}
-
-BSMODAPI void _bsmod_onLoadTTF(bsmod_TrackParams params) {
-	bs_Result result;
-
-	if (!bs_fileExists(params.path, strlen(params.path))) {
-		bs_warnF(BS_PRINT_COLOR("Removed %s\n", BS_PRINT_RED), params.path);
-		return;
-	}
-
-	printf("Loading ttf \"%s\"\n", params.path);
-
-   /**
-    Load TTF
-    */
-	// bs_TTF* ttf = bs_query(path, BS_QUERY_FORCE_CREATE).ttf;
-
-	const char* alphabet = BSGFX_ALPHABET_DEFAULT;
-	int alphabet_length = sizeof(BSGFX_ALPHABET_DEFAULT) - 1;
-
-	bs_TTF ttf = { 0 };
-	result = bs_ttf(&ttf, params.path, 0);
-	if (!result != BS_RESULT_OK)
-		return;
-
-	for (int i = 0; i < alphabet_length; i++)
-		bs_glyph(&ttf, alphabet[i]);
-
-	bs_readKernTable(&ttf);
-
-   /**
-    Rasterize
-    */
-	stbrp_rect* rects = bs_malloc(ttf.glyphs.count * sizeof(stbrp_rect));
-
-	const float scale = 0.05;
-	int atlas_width = 2048;
-	int atlas_height = 2048;
-	const int max_atlas_width = 2048;
-	const int padding = 4;
-
-	int max_width = 0, max_height = 0;
-	for (int i = 0; i < ttf.glyphs.count; i++) {
-		bs_Glyph* glyph = bs_fetchUnit(&ttf.glyphs, i);
-		glyph->width = (float)(glyph->x_max * scale - glyph->x_min * scale);
-		glyph->height = (float)(glyph->y_max * scale - glyph->y_min * scale);
-
-		max_width = BS_MAX(max_width, glyph->width);
-		max_height = BS_MAX(max_height, glyph->height);
-
-		rects[i] = (stbrp_rect){
-			.id = i,
-			.w = glyph->width + padding,
-			.h = glyph->height + padding,
-		};
-	}
-	char* bmp = malloc(max_width * max_height);
-
-	stbrp_context ctx;
-	stbrp_node* nodes = _alloca(atlas_width * sizeof(stbrp_node));
-
-	stbrp_init_target(&ctx, atlas_width, atlas_height, nodes, atlas_width);
-	stbrp_pack_rects(&ctx, rects, ttf.glyphs.count);
-
-	char* atlas = bs_calloc(1, atlas_width * atlas_height);
-
-	for (int i = 0; i < ttf.glyphs.count; i++) {
-		memset(bmp, 0, max_width * max_height);
-
-		bs_Glyph* glyph = bs_fetchUnit(&ttf.glyphs, i);
-		bs_rasterizeGlyph(&ttf, glyph, atlas_width, atlas_height, bmp, scale);
-
-		for (int y = 0; y < glyph->height; y++) {
-			int src_y = glyph->height - 1 - y;
-
-			memcpy(
-				atlas + (rects[i].x + padding) +
-				(rects[i].y + padding + y) * atlas_width,
-				bmp + src_y * glyph->width,
-				glyph->width
-			);
-		}
-	}
-
-	char* file_name = bs_fileName(params.path);
-	//bs_savePngF(atlas, bs_iv2(atlas_width, atlas_height), BS_PNG_GREY, "resources/atlas/%s.png", file_name);
-
-   /**
-    Create JSON
-    */
-	bs_Json json = bs_emptyJson();
-	bs_ensureJsonMutable(&json);
-
-	bs_ensureJson(&json, bs_jsonValue(ttf.head.units_per_em), BS_CONSTANT_STRING("unitsPerEm"));
-	bs_ensureJson(&json, bs_jsonValue(scale), BS_CONSTANT_STRING("scale"));
-
-	for (int i = 0; i < ttf.kerning_pairs.count; i++) {
-		bs_KerningPair* pair = bs_fetchUnit(&ttf.kerning_pairs, i);
-
-		bs_ensureJsonF(&json, bs_jsonValue(pair->right_index), "kerningPairs[%d].right", i);
-		bs_ensureJsonF(&json, bs_jsonValue(((float)pair->value) * scale), "kerningPairs[%d].value", i);
-	}
-
-	for (int i = 0; i < ttf.glyphs.count; i++) {
-		bs_Glyph* glyph = bs_fetchUnit(&ttf.glyphs, i);
-		int code = glyph->code;
-
-		int color[4] = { 255, 255, 255, 255 };
-		bs_ensureJsonF(&json, bs_jsonValue(rects[i].x + padding), "table.%d.x", code);
-		bs_ensureJsonF(&json, bs_jsonValue(rects[i].y + padding), "table.%d.y", code);
-		bs_ensureJsonF(&json, bs_jsonValue(glyph->width), "table.%d.w", code);
-		bs_ensureJsonF(&json, bs_jsonValue(glyph->height), "table.%d.h", code);
-		bs_ensureJsonF(&json, bs_jsonValue((int)((float)glyph->y_min * scale)), "table.%d.y_shift", code);
-		bs_ensureJsonF(&json, bs_jsonArray(BS_JSON_NUMBER_INTEGER, color, 4), "table.%d.color", code);
-		//bs_ensureJsonF(&json, bs_jsonValue(false), "%d.hasAlpha", code);
-		//bs_ensureJsonF(&json, bs_jsonValue(false), "%d.isSolid", code);
-		bs_ensureJsonF(&json, bs_jsonValue((float)glyph->long_hor_metric.advance_width * scale), "table.%d.advanceWidth", code);
-		bs_ensureJsonF(&json, bs_jsonValue((float)glyph->long_hor_metric.left_side_bearing * scale), "table.%d.leftSideBearing", code);
-		bs_ensureJsonF(&json, bs_jsonValue(glyph->pairs_offset), "table.%d.kerningPairOffset", code);
-		bs_ensureJsonF(&json, bs_jsonValue(glyph->pairs_count), "table.%d.kerningPairCount", code);
-	}
-
-	bs_free(rects);
-	char* raw;
-	result = bs_saveJson(&json, 0, &raw);
-	bs_destroyJson(&json);
-	if (result != BS_RESULT_OK)
-		return;
-
-	result = _bsmod_packResourceF(BS_RESOURCE_BINARY, raw, strlen(raw), params.package, "atlas/%s.json", file_name);
-	bs_free(raw);
-	if (result != BS_RESULT_OK)
-		return;
-
-	//if (_bsmod_procs.bsgfx_loadFonts && bs_instance()->instance)
-	//	_bsmod_procs.bsgfx_loadFonts();
+//	_bsmod_packBMFontF(params.package, fnt_path, png_path, "%s%.*s", params.prefix, name_length, name); // TODO: text rewrite
 }
 
 static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* packer) {
@@ -378,7 +248,7 @@ BSMODAPI void _bsmod_onPackAtlas(bsmod_TrackParams params) {
 	bs_foreachFile(_bsmod_onPackAtlasTexture, &packer, params.path, strlen(params.path));
 
 	extension[-1] = '\0';
-	_bsmod_packAtlas(&packer, 1024, 1024, params.package, directory_name);
+	_bsmod_packAtlas(&packer, 1024, 1024, params.package, directory_name, true);
 	extension[-1] = '.';
 	file_name[-1] = '/';
 }
@@ -733,4 +603,9 @@ BSMODAPI void _bsmod_onTrack() {
 	}
 
 	reload_all = false;
+
+	for (int i = 0; i < _bsmod_packages()->count; i++) {
+		bsmod_Package* package = bs_fetchUnit(_bsmod_packages(), i);
+		bsmod_savePackage(package->name);
+	}
 }

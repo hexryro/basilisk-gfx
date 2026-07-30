@@ -929,6 +929,10 @@
 	<functions>
 		<validationTemplate/>
 
+		<function name="bsgfx_test">
+			<return>void</return>
+		</function>
+		
 		<function name="bsgfx_defaultPipelineHash">
 			<return>bs_PipelineHash</return>
 		</function>

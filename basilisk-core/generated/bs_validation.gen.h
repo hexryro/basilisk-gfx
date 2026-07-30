@@ -184,10 +184,6 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_getScope = (PFN_bs_getScope)GetProcAddress(module, "_val_bs_getScope");
     functions.bs_setScope = (PFN_bs_setScope)GetProcAddress(module, "_val_bs_setScope");
     functions.bs_runSingle = (PFN_bs_runSingle)GetProcAddress(module, "_val_bs_runSingle");
-    functions.bs_glyph = (PFN_bs_glyph)GetProcAddress(module, "_val_bs_glyph");
-    functions.bs_ttf = (PFN_bs_ttf)GetProcAddress(module, "_val_bs_ttf");
-    functions.bs_rasterizeGlyph = (PFN_bs_rasterizeGlyph)GetProcAddress(module, "_val_bs_rasterizeGlyph");
-    functions.bs_readKernTable = (PFN_bs_readKernTable)GetProcAddress(module, "_val_bs_readKernTable");
     functions.bs_bindFont = (PFN_bs_bindFont)GetProcAddress(module, "_val_bs_bindFont");
     functions.bs_textDimensions = (PFN_bs_textDimensions)GetProcAddress(module, "_val_bs_textDimensions");
     functions.bs_destroyFont = (PFN_bs_destroyFont)GetProcAddress(module, "_val_bs_destroyFont");

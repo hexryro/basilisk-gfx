@@ -143,10 +143,10 @@ void bsmod_onCompileShader(
     next.bsmod_onCompileShader(params);
 }
 
-void bsmod_onLoadTTF(
+void bsmod_onConvertFont(
     bsmod_TrackParams params)
 {
-    next.bsmod_onLoadTTF(params);
+    next.bsmod_onConvertFont(params);
 }
 
 void bsmod_onConvertBMFont(
@@ -179,6 +179,15 @@ void bsmod_onPackTextureArray(
     next.bsmod_onPackTextureArray(params);
 }
 
+void bsmod_packFont(
+    char* package_name, 
+    char* ttf_path, 
+    char* resource_name, 
+    int resource_name_length)
+{
+    next.bsmod_packFont(package_name, ttf_path, resource_name, resource_name_length);
+}
+
 void bsmod_packAtlasTexture(
     bsmod_AtlasPacker* packer, 
     char* name, 
@@ -195,9 +204,10 @@ bs_Result bsmod_packAtlas(
     int width, 
     int height, 
     char* package, 
-    char* resource_name)
+    char* resource_name, 
+    bool allow_paging)
 {
-    return next.bsmod_packAtlas(packer, width, height, package, resource_name);
+    return next.bsmod_packAtlas(packer, width, height, package, resource_name, allow_paging);
 }
 
 bsmod_AtlasPacker bsmod_createAtlasPacker()
@@ -211,40 +221,6 @@ bs_Result bsmod_packImageDirectory(
     char* resource_name)
 {
     return next.bsmod_packImageDirectory(directory_name, package_name, resource_name);
-}
-
-bs_Result bsmod_packBMFont(
-    char* package_name, 
-    char* bmfont_path, 
-    char* png_path, 
-    char* value, 
-    int value_length)
-{
-    return next.bsmod_packBMFont(package_name, bmfont_path, png_path, value, value_length);
-}
-
-bs_Result bsmod_packBMFontV(
-    char* package_name, 
-    char* bmfont_path, 
-    char* png_path, 
-    char* format, 
-    va_list args)
-{
-    return next.bsmod_packBMFontV(package_name, bmfont_path, png_path, format, args);
-}
-
-bs_Result bsmod_packBMFontF(
-    char* package_name, 
-    char* bmfont_path, 
-    char* png_path, 
-    char* format, 
-    ...)
-{
-    va_list args;
-    va_start(args, format);
-    bs_Result _return = next.bsmod_packBMFontV(package_name, bmfont_path, png_path, format, args);
-    va_end(args);
-    return _return;
 }
 
 void bsmod_scrollbar(

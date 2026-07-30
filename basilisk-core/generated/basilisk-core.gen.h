@@ -94,7 +94,7 @@ typedef struct bs_BbndHeader bs_BbndHeader;
 typedef struct bs_BiffHeader bs_BiffHeader;
 typedef struct bs_BiffPointer bs_BiffPointer;
 typedef struct bs_BatlHeader bs_BatlHeader;
-typedef struct bs_BatlPointer bs_BatlPointer;
+typedef struct bs_BatlImage bs_BatlImage;
 typedef struct bs_AtlasTexture bs_AtlasTexture;
 typedef struct bs_Atlas bs_Atlas;
 typedef struct bs_Sampler bs_Sampler;
@@ -130,17 +130,7 @@ typedef struct bs_AnimationBone bs_AnimationBone;
 typedef struct bs_Animation bs_Animation;
 typedef struct bs_Sound bs_Sound;
 typedef struct bs_LongHorMetric bs_LongHorMetric;
-typedef struct bs_GlyfPt bs_GlyfPt;
-typedef struct bs_Glyph bs_Glyph;
-typedef struct bs_Head bs_Head;
-typedef struct bs_Maxp bs_Maxp;
-typedef struct bs_Hhea bs_Hhea;
-typedef struct bs_Hmtx bs_Hmtx;
-typedef struct bs_Loca bs_Loca;
-typedef struct bs_Glyf bs_Glyf;
-typedef struct bs_Cmap bs_Cmap;
 typedef struct bs_KerningPair bs_KerningPair;
-typedef struct bs_TTF bs_TTF;
 typedef struct bs_BfntHeader bs_BfntHeader;
 typedef struct bs_BfntKerningPair bs_BfntKerningPair;
 typedef struct bs_BfntGlyph bs_BfntGlyph;
@@ -2526,15 +2516,15 @@ struct bs_BiffPointer {
 struct bs_BatlHeader {
     bs_U32 magic;
     bs_U32 version;
-    bs_U32 images_count;
     bs_U32 width;
     bs_U32 height;
     bs_U32 channels_count;
-    bs_U32 binary_offset;
+    bs_U32 pages_count;
+    bs_U32 images_count;
     bs_U32 reserved_0;
 };
 
-struct bs_BatlPointer {
+struct bs_BatlImage {
     bs_I32 x;
     bs_I32 y;
     bs_I32 w;
@@ -2542,7 +2532,7 @@ struct bs_BatlPointer {
     bs_U32 name_length;
     bs_U32 flags;
     int category;
-    bs_U32 reserved_1;
+    bs_U32 page;
 };
 
 struct bs_AtlasTexture {
@@ -2946,119 +2936,22 @@ struct bs_LongHorMetric {
     bs_I16 left_side_bearing;
 };
 
-struct bs_GlyfPt {
-    bs_I16 x, y;
-    bool on_curve;
-};
-
-struct bs_Glyph {
-    int index;
-    bs_U16 num_points;
-    bs_U16 num_contours;
-    bs_I16 x_min, x_max;
-    bs_I16 y_min, y_max;
-    bs_U16* contours;
-    bs_GlyfPt* coords;
-    bs_vec2 tex_coord;
-    bs_vec2 tex_offset;
-    int width;
-    int height;
-    bs_U16 pairs_count;
-    bs_U16 pairs_offset;
-    bs_LongHorMetric long_hor_metric;
-    union {
-        bs_U16 code;
-        char ascii;
-    };
-};
-
-struct bs_Head {
-    char* buf;
-    int units_per_em;
-    bs_I16 index_to_loc_format;
-};
-
-struct bs_Maxp {
-    char* buf;
-    bs_U16 num_glyphs;
-};
-
-struct bs_Hhea {
-    char* buf;
-    bs_U16 num_of_long_hor_metrics;
-};
-
-struct bs_Hmtx {
-    char* buf;
-};
-
-struct bs_Loca {
-    char* buf;
-};
-
-struct bs_Glyf {
-    char* buf;
-};
-
-struct bs_Cmap {
-    char* buf;
-    bs_U32 offset;
-    int num_subtables;
-    char* subtable;
-    bs_U16 format;
-    bs_U16 length;
-    bs_U16 seg_count_x2;
-    bs_U16 search_range;
-    bs_U16 entry_selector;
-    bs_U16 range_shift;
-    bs_U16* format_data;
-    bs_U16* end_code;
-    bs_U16* start_code;
-    bs_I16* id_delta;
-    bs_U16* id_range_offset;
-};
-
 struct bs_KerningPair {
     int right_index;
     bs_U16 right;
     bs_I16 value;
 };
 
-struct bs_TTF {
-    bs_Header header;
-    bs_U32 offset;
-    bs_String* buffer;
-    const char* name;
-    const char* alphabet;
-    bs_List glyphs;
-    bs_List kerning_pairs;
-    bs_U16 table_count;
-    int x_offset;
-    int y_offset;
-    bs_Head head;
-    bs_Maxp maxp;
-    bs_Hhea hhea;
-    bs_Hmtx hmtx;
-    bs_Loca loca;
-    bs_Glyf glyf;
-};
-
 struct bs_BfntHeader {
     bs_U32 magic;
     bs_U32 version;
-    bs_U32 sizes_count;
-    bs_U32 reserved;
-
+    bs_U32 glyphs_count;
+    bs_U32 kerning_pairs_count;
+    bs_U32 line_height;
+    bs_U32 units_per_em;
+    bs_U32 size;
+    bs_U32 batl_offset;
     char ascii_table[256];
-
-    struct {
-        bs_U32 glyphs_count;
-        bs_U32 kerning_pairs_count;
-        bs_U32 line_height;
-        bs_U32 units_per_em;
-        bs_U32 size;
-        bs_U32 batl_offset;
-    } sizes[];
 };
 
 struct bs_BfntKerningPair {
@@ -5893,54 +5786,6 @@ bs_setScope(
 BSAPI void
 bs_runSingle(
     bs_Callback function);
-
- /**
-  @param ttf
-  @param code
-  @return void
-  */
-BSAPI void
-bs_glyph(
-    bs_TTF* ttf,
-    bs_U16 code);
-
- /**
-  @param existing
-  @param path
-  @param flags
-  @return bs_Result
-  */
-BSAPI bs_Result
-bs_ttf(
-    bs_TTF* existing,
-    const char* path,
-    bs_U32 flags);
-
- /**
-  @param font
-  @param glyph
-  @param width
-  @param height
-  @param out_bmp
-  @param scale
-  @return void
-  */
-BSAPI void
-bs_rasterizeGlyph(
-    bs_TTF* font,
-    bs_Glyph* glyph,
-    int width,
-    int height,
-    char* out_bmp,
-    float scale);
-
- /**
-  @param ttf
-  @return void
-  */
-BSAPI void
-bs_readKernTable(
-    bs_TTF* ttf);
 
  /**
   @param font

@@ -130,6 +130,7 @@
 			<field><type>bs_RGBA*</type><name>data</name></field>
 			<field><type>int</type><name>name_length</name></field>
 			<field><type>int</type><name>category</name></field>
+			<field><type>int</type><name>page</name></field>
 		</structure>
 
 		<structure name="bsmod_Chunk">
@@ -226,7 +227,7 @@
 			<return>void</return>
 			<param><type>bsmod_TrackParams</type><name>params</name></param>
 		</function>
-		<function name="bsmod_onLoadTTF">
+		<function name="bsmod_onConvertFont">
 			<return>void</return>
 			<param><type>bsmod_TrackParams</type><name>params</name></param>
 		</function>
@@ -251,6 +252,13 @@
 			<param><type>bsmod_TrackParams</type><name>params</name></param>
 		</function>
 
+		<function name="bsmod_packFont">
+			<return>void</return>
+			<param><type>char*</type><name>package_name</name></param>
+			<param><type>char*</type><name>ttf_path</name></param>
+			<param><type>char*</type><name>resource_name</name></param>
+			<param><type>int</type><name>resource_name_length</name></param>
+		</function>
 		<function name="bsmod_packAtlasTexture">
 			<return>void</return>
 			<param><type>bsmod_AtlasPacker*</type><name>packer</name></param>
@@ -267,6 +275,7 @@
 			<param><type>int</type><name>height</name></param>
 			<param><type>char*</type><name>package</name></param>
 			<param><type>char*</type><name>resource_name</name></param>
+			<param><type>bool</type><name>allow_paging</name></param>
 		</function>
 		<function name="bsmod_createAtlasPacker">
 			<return>bsmod_AtlasPacker</return>
@@ -279,13 +288,6 @@
 			<param><type>char*</type><name>resource_name</name></param>
 		</function>
 	
-		<variadicStringTemplate name="bsmod_packBMFont">
-			<return>bs_Result</return>
-			<param><type>char*</type><name>package_name</name></param>
-			<param><type>char*</type><name>bmfont_path</name></param>
-			<param><type>char*</type><name>png_path</name></param>
-		</variadicStringTemplate>
-
 		<function name="bsmod_scrollbar">
 			<return>void</return>
 			<param><type>const int*</type><name>scroll</name></param>

@@ -107,8 +107,8 @@ bool _bsgfx_rectangleVsPointExpand(const bs_vec2* position, const bs_vec2* dimen
 
 static inline float _bsgfx_textHeight() {
 	return 0.0;
-	bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
-	return font->height;
+	//bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
+	//return font->height;
 }
 
 /*
@@ -399,7 +399,7 @@ static bool _bsgfx_instanceIcon(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alr
 	if (widget->icon.type == BSGFX_ICON_ATLAS) {
 		ui_icon = bs_queryAtlas(widget->icon.atlas, widget->icon.name);
 		if (ui_icon == -1) {
-			bs_warnF("Failed to query\n"); // TODO: _bsgfx_warn
+			bs_warnF("Failed to query icon \"%s\"\n", widget->icon.name); // TODO: _bsgfx_warn
 			return false;
 		}
 	}
@@ -644,7 +644,7 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	bs_Font* font = widget->font ? widget->font : menu->font;
 
 	bs_vec2 text_dimensions;
-	if (widget->button.name) {
+	if (widget->button.name && font) {
 		text_dimensions = bs_textDimensions(font, widget->button.name, strlen(widget->button.name));
 
 		if (size.x == 0)
@@ -662,7 +662,7 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 		(widget->button.active_override.active_index && *widget->button.active_override.active_index == widget->button.active_override.this_index) ||
 		(!already_hovering && bs_rectangleVsPoint(&position.xy, &size, &cursor));
 
-	if (widget->button.name) {
+	if (widget->button.name && font) {
 		const bsgfx_Text text = {
 			.position = {
 				position.x + (size.x - text_dimensions.x) / 2.0,

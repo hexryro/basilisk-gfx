@@ -1126,7 +1126,10 @@ BSAPI bs_U64 _bs_pipelineHash(bs_PipelineHash* descriptor) {
 }
 
 BSAPI bs_Result _val_bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
+    *out = NULL;
     BS_VALIDATE(_bs_scope_.renderer != NULL, BS_RESULT_VALIDATION_ERROR, "Pipelines must be created within a renderer");
+    BS_VALIDATE(descriptor->shaders[0] != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(descriptor->shaders[1] != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(descriptor->shaders[0]->type == BS_SHADER_STAGE_VERTEX_BIT, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(descriptor->shaders[1]->type == BS_SHADER_STAGE_FRAGMENT_BIT, BS_RESULT_VALIDATION_ERROR,);
 

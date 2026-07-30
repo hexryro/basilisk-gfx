@@ -897,29 +897,6 @@ BSAPI void _preval_bs_runSingle(bs_Callback function) {
     next.bs_runSingle(function);
 }
 
-BSAPI void _preval_bs_glyph(bs_TTF* ttf, bs_U16 code) {
-    BS_VALIDATE(ttf != NULL, ,);
-    next.bs_glyph(ttf, code);
-}
-
-BSAPI bs_Result _preval_bs_ttf(bs_TTF* existing, const char* path, bs_U32 flags) {
-    BS_VALIDATE(existing != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_ttf(existing, path, flags);
-}
-
-BSAPI void _preval_bs_rasterizeGlyph(bs_TTF* font, bs_Glyph* glyph, int width, int height, char* out_bmp, float scale) {
-    BS_VALIDATE(font != NULL, ,);
-    BS_VALIDATE(glyph != NULL, ,);
-    BS_VALIDATE(out_bmp != NULL, ,);
-    next.bs_rasterizeGlyph(font, glyph, width, height, out_bmp, scale);
-}
-
-BSAPI void _preval_bs_readKernTable(bs_TTF* ttf) {
-    BS_VALIDATE(ttf != NULL, ,);
-    next.bs_readKernTable(ttf);
-}
-
 BSAPI void _preval_bs_bindFont(bs_Font* font, bs_Sampler* sampler, int bind_set, int bind_point) {
     BS_VALIDATE(font != NULL, ,);
     BS_VALIDATE(font->head.type == BS_OBJECT_FONT, ,);
@@ -2678,10 +2655,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_getScope = _preval_bs_getScope;
     functions.bs_setScope = _preval_bs_setScope;
     functions.bs_runSingle = _preval_bs_runSingle;
-    functions.bs_glyph = _preval_bs_glyph;
-    functions.bs_ttf = _preval_bs_ttf;
-    functions.bs_rasterizeGlyph = _preval_bs_rasterizeGlyph;
-    functions.bs_readKernTable = _preval_bs_readKernTable;
     functions.bs_bindFont = _preval_bs_bindFont;
     functions.bs_textDimensions = _preval_bs_textDimensions;
     functions.bs_destroyFont = _preval_bs_destroyFont;

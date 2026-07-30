@@ -165,6 +165,7 @@ struct bsmod_TextureInfo {
     bs_RGBA* data;
     int name_length;
     int category;
+    int page;
 };
 
 struct bsmod_Chunk {
@@ -311,7 +312,7 @@ bsmod_onCompileShader(
   @return void
   */
 BSMODAPI void
-bsmod_onLoadTTF(
+bsmod_onConvertFont(
     bsmod_TrackParams params);
 
  /**
@@ -355,6 +356,20 @@ bsmod_onPackTextureArray(
     bsmod_TrackParams params);
 
  /**
+  @param package_name
+  @param ttf_path
+  @param resource_name
+  @param resource_name_length
+  @return void
+  */
+BSMODAPI void
+bsmod_packFont(
+    char* package_name,
+    char* ttf_path,
+    char* resource_name,
+    int resource_name_length);
+
+ /**
   @param packer
   @param name
   @param data
@@ -378,6 +393,7 @@ bsmod_packAtlasTexture(
   @param height
   @param package
   @param resource_name
+  @param allow_paging
   @return bs_Result
   */
 BSMODAPI bs_Result
@@ -386,7 +402,8 @@ bsmod_packAtlas(
     int width,
     int height,
     char* package,
-    char* resource_name);
+    char* resource_name,
+    bool allow_paging);
 
  /**
   @return bsmod_AtlasPacker
@@ -405,54 +422,6 @@ bsmod_packImageDirectory(
     char* directory_name,
     char* package_name,
     char* resource_name);
-
- /**
-  @param package_name
-  @param bmfont_path
-  @param png_path
-  @param value
-  @param value_length
-  @return bs_Result
-  */
-BSMODAPI bs_Result
-bsmod_packBMFont(
-    char* package_name,
-    char* bmfont_path,
-    char* png_path,
-    char* value,
-    int value_length);
-
- /**
-  @param package_name
-  @param bmfont_path
-  @param png_path
-  @param format
-  @param args
-  @return bs_Result
-  */
-BSMODAPI bs_Result
-bsmod_packBMFontV(
-    char* package_name,
-    char* bmfont_path,
-    char* png_path,
-    char* format,
-    va_list args);
-
- /**
-  @param package_name
-  @param bmfont_path
-  @param png_path
-  @param format
-  @param ...
-  @return bs_Result
-  */
-BSMODAPI bs_Result
-bsmod_packBMFontF(
-    char* package_name,
-    char* bmfont_path,
-    char* png_path,
-    char* format,
-     ...);
 
  /**
   @param scroll
