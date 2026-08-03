@@ -27,10 +27,10 @@
 #include <stb_rect_pack/stb_rect_pack.h>
 #include <string.h>
 
-BSMODAPI void _bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, char* name, bs_RGBA* data, int width, int height, int category) {
+BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* name, int name_length) {
 	bsmod_TextureInfo info = {
 		.name = strdup(name),
-		.name_length = strlen(name),
+		.name_length = name_length,
 		.data = data,
 		.category = category,
 	};
@@ -40,23 +40,24 @@ BSMODAPI void _bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, char* name, bs_
 		.h = height,
 	};
 
-	bs_pushBack(&packer->info, &info);
 	bs_pushBack(&packer->rects, &rect);
+	return bs_pushBack(&packer->info, &info);
 }
 
-BSMODAPI bsmod_AtlasPacker _bsmod_createAtlasPacker() {
+BSMODAPI bsmod_AtlasPacker _bsmod_createAtlasPacker(int info_stride) {
 	return (bsmod_AtlasPacker) {
-		.info = bs_list(sizeof(bsmod_TextureInfo), 64),
+		.info = bs_list(info_stride, 64),
 		.rects = bs_list(sizeof(stbrp_rect), 64),
 	};
 }
-BSMODAPI bs_Result _val_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package_name, char* resource_name, bool allow_paging) {
+
+BSMODAPI bs_Result _val_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, int channels_count, char* package_name, char* resource_name, bool allow_paging) {
 	BSMOD_VALIDATE(packer->info.count == packer->rects.count, BS_RESULT_OK,);
 
-	return _bsmod_packAtlas(packer, width, height, package_name, resource_name, allow_paging);
+	return _bsmod_packAtlas(packer, width, height, channels_count, package_name, resource_name, allow_paging);
 }
 
-BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, char* package_name, char* resource_name, bool allow_paging) {
+BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, int channels_count, char* package_name, char* resource_name, bool allow_paging) {
 	const int padding = 0;
 
 	bs_Result result;
@@ -64,7 +65,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 	bs_BatlHeader header = {
 		.magic = BS_BATL_MAGIC,
 		.version = 1,
-		.channels_count = 4,
+		.channels_count = channels_count,
 		.width = width,
 		.height = height,
 		.images_count = packer->info.count,
@@ -174,6 +175,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 			memcpy(dst, src, rect->w * header.channels_count);
 		}
 
+	next:
 		free(info->name);
 	}
 

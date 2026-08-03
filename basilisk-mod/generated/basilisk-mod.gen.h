@@ -39,8 +39,10 @@
 
 typedef struct bsmod_Callbacks bsmod_Callbacks;
 typedef struct bsmod_TrackParams bsmod_TrackParams;
+typedef struct bsmod_UnicodeBlockRange bsmod_UnicodeBlockRange;
 typedef struct bsmod_QueueLoad bsmod_QueueLoad;
 typedef struct bsmod_AtlasPacker bsmod_AtlasPacker;
+typedef struct bsmod_GlyphInfo bsmod_GlyphInfo;
 typedef struct bsmod_TextureInfo bsmod_TextureInfo;
 typedef struct bsmod_Chunk bsmod_Chunk;
 typedef struct bsmod_Package bsmod_Package;
@@ -150,6 +152,14 @@ struct bsmod_TrackParams {
     };
 };
 
+struct bsmod_UnicodeBlockRange {
+    bs_U32  offset;
+    bs_U32  count;
+    bs_U32  size;
+    bsgfx_UnicodeBlock  block;
+    bool  rasterize;
+};
+
 struct bsmod_QueueLoad {
     bs_ResourceType type;
     char* path;
@@ -158,6 +168,11 @@ struct bsmod_QueueLoad {
 struct bsmod_AtlasPacker {
     bs_List info;
     bs_List rects;
+};
+
+struct bsmod_GlyphInfo {
+    int page;
+    unsigned int glyph_id;
 };
 
 struct bsmod_TextureInfo {
@@ -358,39 +373,90 @@ bsmod_onPackTextureArray(
  /**
   @param package_name
   @param ttf_path
+  @param blocks
+  @param blocks_count
+  @param pt_sizes
+  @param pt_sizes_count
   @param resource_name
   @param resource_name_length
-  @return void
+  @return bs_Result
   */
-BSMODAPI void
+BSMODAPI bs_Result
 bsmod_packFont(
     char* package_name,
     char* ttf_path,
+    bsmod_UnicodeBlockRange blocks[],
+    int blocks_count,
+    int pt_sizes[],
+    int pt_sizes_count,
     char* resource_name,
     int resource_name_length);
 
  /**
   @param packer
-  @param name
   @param data
   @param width
   @param height
   @param category
-  @return void
+  @param name
+  @param name_length
+  @return bsmod_TextureInfo*
   */
-BSMODAPI void
+BSMODAPI bsmod_TextureInfo*
 bsmod_packAtlasTexture(
     bsmod_AtlasPacker* packer,
-    char* name,
     bs_RGBA* data,
     int width,
     int height,
-    int category);
+    int category,
+    char* name,
+    int name_length);
+
+ /**
+  @param packer
+  @param data
+  @param width
+  @param height
+  @param category
+  @param format
+  @param args
+  @return bsmod_TextureInfo*
+  */
+BSMODAPI bsmod_TextureInfo*
+bsmod_packAtlasTextureV(
+    bsmod_AtlasPacker* packer,
+    bs_RGBA* data,
+    int width,
+    int height,
+    int category,
+    char* format,
+    va_list args);
+
+ /**
+  @param packer
+  @param data
+  @param width
+  @param height
+  @param category
+  @param format
+  @param ...
+  @return bsmod_TextureInfo*
+  */
+BSMODAPI bsmod_TextureInfo*
+bsmod_packAtlasTextureF(
+    bsmod_AtlasPacker* packer,
+    bs_RGBA* data,
+    int width,
+    int height,
+    int category,
+    char* format,
+     ...);
 
  /**
   @param packer
   @param width
   @param height
+  @param channels_count
   @param package
   @param resource_name
   @param allow_paging
@@ -401,6 +467,7 @@ bsmod_packAtlas(
     bsmod_AtlasPacker* packer,
     int width,
     int height,
+    int channels_count,
     char* package,
     char* resource_name,
     bool allow_paging);

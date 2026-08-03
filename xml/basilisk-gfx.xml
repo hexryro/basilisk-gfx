@@ -248,9 +248,1060 @@
 			<line><name>BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Z</name><value>(1 &lt;&lt; 6)</value></line>
 			<line><name>BSGFX_WIDGET_ADVANCE_APPLY_OFFSET</name><value>(BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_X | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Y | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Z)</value></line>
 		</enum>
+		
+		<enum name="bsgfx_Language">
+			<line><name>BS_LANGUAGE_DONT_KNOW</name><value>0</value></line>
+
+			<line><name>BS_LANGUAGE_A_HMAO</name><value>BSGFX_FOURCC('H', 'M', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AARI</name><value>BSGFX_FOURCC('A', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ABAZA</name><value>BSGFX_FOURCC('A', 'B', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ABKHAZIAN</name><value>BSGFX_FOURCC('A', 'B', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ACHI</name><value>BSGFX_FOURCC('A', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ACHOLI</name><value>BSGFX_FOURCC('A', 'C', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ADYGHE</name><value>BSGFX_FOURCC('A', 'D', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AFAR</name><value>BSGFX_FOURCC('A', 'F', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AFRIKAANS</name><value>BSGFX_FOURCC('A', 'F', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AGAW</name><value>BSGFX_FOURCC('A', 'G', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AITON</name><value>BSGFX_FOURCC('A', 'I', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AKAN</name><value>BSGFX_FOURCC('A', 'K', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ALBANIAN</name><value>BSGFX_FOURCC('S', 'Q', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ALSATIAN</name><value>BSGFX_FOURCC('A', 'L', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ALTAI</name><value>BSGFX_FOURCC('A', 'L', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ALUO</name><value>BSGFX_FOURCC('Y', 'N', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AMERICAN_PHONETIC</name><value>BSGFX_FOURCC('A', 'P', 'P', 'H')</value></line>
+			<line><name>BS_LANGUAGE_AMHARIC</name><value>BSGFX_FOURCC('A', 'M', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ANGLO_SAXON</name><value>BSGFX_FOURCC('A', 'N', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ARABIC</name><value>BSGFX_FOURCC('A', 'R', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ARAGONESE</name><value>BSGFX_FOURCC('A', 'R', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ARAKANESE</name><value>BSGFX_FOURCC('A', 'R', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ARAKWAL</name><value>BSGFX_FOURCC('R', 'K', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ARMENIAN</name><value>BSGFX_FOURCC('H', 'Y', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ARMENIAN_EAST</name><value>BSGFX_FOURCC('H', 'Y', 'E', '0')</value></line>
+			<line><name>BS_LANGUAGE_AROMANIAN</name><value>BSGFX_FOURCC('R', 'U', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ARPITAN</name><value>BSGFX_FOURCC('F', 'R', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ASSAMESE</name><value>BSGFX_FOURCC('A', 'S', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ASTURIAN</name><value>BSGFX_FOURCC('A', 'S', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ATHAPASKAN</name><value>BSGFX_FOURCC('A', 'T', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ATSINA</name><value>BSGFX_FOURCC('A', 'T', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AVAR</name><value>BSGFX_FOURCC('A', 'V', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AVATIME</name><value>BSGFX_FOURCC('A', 'V', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AWADHI</name><value>BSGFX_FOURCC('A', 'W', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AYMARA</name><value>BSGFX_FOURCC('A', 'Y', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_AZERBAIDJANI</name><value>BSGFX_FOURCC('A', 'Z', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BADAGA</name><value>BSGFX_FOURCC('B', 'A', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BAGHELKHANDI</name><value>BSGFX_FOURCC('B', 'A', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BAGRI</name><value>BSGFX_FOURCC('B', 'G', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BALANTE</name><value>BSGFX_FOURCC('B', 'L', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BALINESE</name><value>BSGFX_FOURCC('B', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BALKAR</name><value>BSGFX_FOURCC('B', 'A', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BALTI</name><value>BSGFX_FOURCC('B', 'L', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BALUCHI</name><value>BSGFX_FOURCC('B', 'L', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BAMBARA</name><value>BSGFX_FOURCC('B', 'M', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BAMILEKE</name><value>BSGFX_FOURCC('B', 'M', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BANDA</name><value>BSGFX_FOURCC('B', 'A', 'D', '0')</value></line>
+			<line><name>BS_LANGUAGE_BANDJALANG</name><value>BSGFX_FOURCC('B', 'D', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BANGLA</name><value>BSGFX_FOURCC('B', 'E', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BASHKIR</name><value>BSGFX_FOURCC('B', 'S', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BASQUE</name><value>BSGFX_FOURCC('E', 'U', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK</name><value>BSGFX_FOURCC('B', 'T', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK_ALAS_KLUET</name><value>BSGFX_FOURCC('B', 'T', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK_ANGKOLA</name><value>BSGFX_FOURCC('A', 'K', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK_DAIRI</name><value>BSGFX_FOURCC('B', 'T', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK_KARO</name><value>BSGFX_FOURCC('B', 'T', 'X', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK_MANDAILING</name><value>BSGFX_FOURCC('B', 'T', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK_SIMALUNGUN</name><value>BSGFX_FOURCC('B', 'T', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BATAK_TOBA</name><value>BSGFX_FOURCC('B', 'B', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BAULE</name><value>BSGFX_FOURCC('B', 'A', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BAVARIAN</name><value>BSGFX_FOURCC('B', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BELARUSIAN</name><value>BSGFX_FOURCC('B', 'E', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BEMBA</name><value>BSGFX_FOURCC('B', 'E', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BENCH</name><value>BSGFX_FOURCC('B', 'C', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BERBER</name><value>BSGFX_FOURCC('B', 'B', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BETI</name><value>BSGFX_FOURCC('B', 'T', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BETTE_KURUMA</name><value>BSGFX_FOURCC('X', 'U', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BHILI</name><value>BSGFX_FOURCC('B', 'H', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BHOJPURI</name><value>BSGFX_FOURCC('B', 'H', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BHUTANESE</name><value>BSGFX_FOURCC('D', 'Z', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BIBLE_CREE</name><value>BSGFX_FOURCC('B', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BIKOL</name><value>BSGFX_FOURCC('B', 'I', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BILEN</name><value>BSGFX_FOURCC('B', 'I', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BISHNUPRIYA_MANIPURI</name><value>BSGFX_FOURCC('B', 'P', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BISLAMA</name><value>BSGFX_FOURCC('B', 'I', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BLACKFOOT</name><value>BSGFX_FOURCC('B', 'K', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BODO</name><value>BSGFX_FOURCC('B', 'R', 'X', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BOSNIAN</name><value>BSGFX_FOURCC('B', 'O', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BOUYEI</name><value>BSGFX_FOURCC('P', 'C', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BRAHUI</name><value>BSGFX_FOURCC('B', 'R', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BRAJ_BHASHA</name><value>BSGFX_FOURCC('B', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BRETON</name><value>BSGFX_FOURCC('B', 'R', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BUGIS</name><value>BSGFX_FOURCC('B', 'U', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BULGARIAN</name><value>BSGFX_FOURCC('B', 'G', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BUMTHANGKHA</name><value>BSGFX_FOURCC('K', 'J', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BURMESE</name><value>BSGFX_FOURCC('B', 'R', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_BURUSHASKI</name><value>BSGFX_FOURCC('B', 'S', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CAJUN_FRENCH</name><value>BSGFX_FOURCC('F', 'R', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CARRIER</name><value>BSGFX_FOURCC('C', 'R', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CATALAN</name><value>BSGFX_FOURCC('C', 'A', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CAYUGA</name><value>BSGFX_FOURCC('C', 'A', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CEBUANO</name><value>BSGFX_FOURCC('C', 'E', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CENTRAL_YUPIK</name><value>BSGFX_FOURCC('E', 'S', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHAHA_GURAGE</name><value>BSGFX_FOURCC('C', 'H', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHAMORRO</name><value>BSGFX_FOURCC('C', 'H', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHATTISGARHI</name><value>BSGFX_FOURCC('C', 'H', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHECHEN</name><value>BSGFX_FOURCC('C', 'H', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHEROKEE</name><value>BSGFX_FOURCC('C', 'H', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHEYENNE</name><value>BSGFX_FOURCC('C', 'H', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHICHEWA</name><value>BSGFX_FOURCC('C', 'H', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHIGA</name><value>BSGFX_FOURCC('C', 'G', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHIMILA</name><value>BSGFX_FOURCC('C', 'B', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHIN</name><value>BSGFX_FOURCC('Q', 'I', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHINANTEC</name><value>BSGFX_FOURCC('C', 'C', 'H', 'N')</value></line>
+			<line><name>BS_LANGUAGE_CHINESE_PHONETIC</name><value>BSGFX_FOURCC('Z', 'H', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHINESE_SIMPLIFIED</name><value>BSGFX_FOURCC('Z', 'H', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHINESE_TRADITIONAL</name><value>BSGFX_FOURCC('Z', 'H', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHINESE_TRADITIONAL_HONG_KONG</name><value>BSGFX_FOURCC('Z', 'H', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHINESE_TRADITIONAL_MACAO</name><value>BSGFX_FOURCC('Z', 'H', 'T', 'M')</value></line>
+			<line><name>BS_LANGUAGE_CHIPEWYAN</name><value>BSGFX_FOURCC('C', 'H', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHITTAGONIAN</name><value>BSGFX_FOURCC('C', 'T', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHOCTAW</name><value>BSGFX_FOURCC('C', 'H', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHUKCHI</name><value>BSGFX_FOURCC('C', 'H', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHURCH_SLAVONIC</name><value>BSGFX_FOURCC('C', 'S', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CHUUKESE</name><value>BSGFX_FOURCC('C', 'H', 'K', '0')</value></line>
+			<line><name>BS_LANGUAGE_CHUVASH</name><value>BSGFX_FOURCC('C', 'H', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_COMORIAN</name><value>BSGFX_FOURCC('C', 'M', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_COMOX</name><value>BSGFX_FOURCC('C', 'O', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_COPTIC</name><value>BSGFX_FOURCC('C', 'O', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CORNISH</name><value>BSGFX_FOURCC('C', 'O', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CORSICAN</name><value>BSGFX_FOURCC('C', 'O', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CREE</name><value>BSGFX_FOURCC('C', 'R', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CREOLES</name><value>BSGFX_FOURCC('C', 'P', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CRIMEAN_TATAR</name><value>BSGFX_FOURCC('C', 'R', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CRIOULO</name><value>BSGFX_FOURCC('K', 'E', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CROATIAN</name><value>BSGFX_FOURCC('H', 'R', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CYPRIOT_ARABIC</name><value>BSGFX_FOURCC('A', 'C', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_CZECH</name><value>BSGFX_FOURCC('C', 'S', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DAGBANI</name><value>BSGFX_FOURCC('D', 'A', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DAN</name><value>BSGFX_FOURCC('D', 'N', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DANGME</name><value>BSGFX_FOURCC('D', 'N', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DANISH</name><value>BSGFX_FOURCC('D', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DARGWA</name><value>BSGFX_FOURCC('D', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DARI</name><value>BSGFX_FOURCC('D', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DAYI</name><value>BSGFX_FOURCC('D', 'A', 'X', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DEFAULT</name><value>BSGFX_FOURCC('d', 'f', 'l', 't'), // Can be DFLT too..</value></line>
+			<line><name>BS_LANGUAGE_DEHONG_DAI</name><value>BSGFX_FOURCC('T', 'D', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DHANGU</name><value>BSGFX_FOURCC('D', 'H', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DHIVEHI</name><value>BSGFX_FOURCC('D', 'I', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DHUWAL</name><value>BSGFX_FOURCC('D', 'U', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DIMLI</name><value>BSGFX_FOURCC('D', 'I', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DINKA</name><value>BSGFX_FOURCC('D', 'N', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DIVEHI</name><value>BSGFX_FOURCC('D', 'I', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DJAMBARRPUYNGU</name><value>BSGFX_FOURCC('D', 'J', 'R', '0')</value></line>
+			<line><name>BS_LANGUAGE_DOGRI</name><value>BSGFX_FOURCC('D', 'G', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DOGRI_MACROLANGUAGE</name><value>BSGFX_FOURCC('D', 'G', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DUNGAN</name><value>BSGFX_FOURCC('D', 'U', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DUTCH</name><value>BSGFX_FOURCC('N', 'L', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_DZONGKHA</name><value>BSGFX_FOURCC('D', 'Z', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EASTERN_ABENAKI</name><value>BSGFX_FOURCC('A', 'A', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EASTERN_CHAM</name><value>BSGFX_FOURCC('C', 'J', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EASTERN_CREE</name><value>BSGFX_FOURCC('E', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EASTERN_MANINKAKAN</name><value>BSGFX_FOURCC('E', 'M', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EASTERN_PWO_KAREN</name><value>BSGFX_FOURCC('K', 'J', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EBIRA</name><value>BSGFX_FOURCC('E', 'B', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EDO</name><value>BSGFX_FOURCC('E', 'D', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EFIK</name><value>BSGFX_FOURCC('E', 'F', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EMBERA_BAUDO</name><value>BSGFX_FOURCC('B', 'D', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EMBERA_CATIO</name><value>BSGFX_FOURCC('C', 'T', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EMBERA_CHAMI</name><value>BSGFX_FOURCC('C', 'M', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EMBERA_TADO</name><value>BSGFX_FOURCC('T', 'D', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ENGLISH</name><value>BSGFX_FOURCC('E', 'N', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EPENA</name><value>BSGFX_FOURCC('S', 'J', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ERZYA</name><value>BSGFX_FOURCC('E', 'R', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KB_TEXT_SHAPEANTO</name><value>BSGFX_FOURCC('N', 'T', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ESTONIAN</name><value>BSGFX_FOURCC('E', 'T', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EVEN</name><value>BSGFX_FOURCC('E', 'V', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EVENKI</name><value>BSGFX_FOURCC('E', 'V', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_EWE</name><value>BSGFX_FOURCC('E', 'W', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FALAM_CHIN</name><value>BSGFX_FOURCC('H', 'A', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FANG</name><value>BSGFX_FOURCC('F', 'A', 'N', '0')</value></line>
+			<line><name>BS_LANGUAGE_FANTI</name><value>BSGFX_FOURCC('F', 'A', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FAROESE</name><value>BSGFX_FOURCC('F', 'O', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FEFE</name><value>BSGFX_FOURCC('F', 'M', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FIJIAN</name><value>BSGFX_FOURCC('F', 'J', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FILIPINO</name><value>BSGFX_FOURCC('P', 'I', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FINNISH</name><value>BSGFX_FOURCC('F', 'I', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FLEMISH</name><value>BSGFX_FOURCC('F', 'L', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FON</name><value>BSGFX_FOURCC('F', 'O', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FOREST_ENETS</name><value>BSGFX_FOURCC('F', 'N', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FRENCH</name><value>BSGFX_FOURCC('F', 'R', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FRENCH_ANTILLEAN</name><value>BSGFX_FOURCC('F', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FRISIAN</name><value>BSGFX_FOURCC('F', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FRIULIAN</name><value>BSGFX_FOURCC('F', 'R', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FULAH</name><value>BSGFX_FOURCC('F', 'U', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_FUTA</name><value>BSGFX_FOURCC('F', 'T', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GA</name><value>BSGFX_FOURCC('G', 'A', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GAGAUZ</name><value>BSGFX_FOURCC('G', 'A', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GALICIAN</name><value>BSGFX_FOURCC('G', 'A', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GANDA</name><value>BSGFX_FOURCC('L', 'U', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GARHWALI</name><value>BSGFX_FOURCC('G', 'A', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GARO</name><value>BSGFX_FOURCC('G', 'R', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GARSHUNI</name><value>BSGFX_FOURCC('G', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GEBA_KAREN</name><value>BSGFX_FOURCC('K', 'V', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GEEZ</name><value>BSGFX_FOURCC('G', 'E', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GEORGIAN</name><value>BSGFX_FOURCC('K', 'A', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GEPO</name><value>BSGFX_FOURCC('Y', 'G', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GERMAN</name><value>BSGFX_FOURCC('D', 'E', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GIKUYU</name><value>BSGFX_FOURCC('K', 'I', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GILAKI</name><value>BSGFX_FOURCC('G', 'L', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GILBERTESE</name><value>BSGFX_FOURCC('G', 'I', 'L', '0')</value></line>
+			<line><name>BS_LANGUAGE_GILYAK</name><value>BSGFX_FOURCC('G', 'I', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GITHABUL</name><value>BSGFX_FOURCC('G', 'I', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GOGO</name><value>BSGFX_FOURCC('G', 'O', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GONDI</name><value>BSGFX_FOURCC('G', 'O', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GREEK</name><value>BSGFX_FOURCC('E', 'L', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GREENLANDIC</name><value>BSGFX_FOURCC('G', 'R', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GUARANI</name><value>BSGFX_FOURCC('G', 'U', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GUINEA</name><value>BSGFX_FOURCC('G', 'K', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GUJARATI</name><value>BSGFX_FOURCC('G', 'U', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GUMATJ</name><value>BSGFX_FOURCC('G', 'N', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GUMUZ</name><value>BSGFX_FOURCC('G', 'M', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GUPAPUYNGU</name><value>BSGFX_FOURCC('G', 'U', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_GUSII</name><value>BSGFX_FOURCC('G', 'U', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HAIDA</name><value>BSGFX_FOURCC('H', 'A', 'I', '0')</value></line>
+			<line><name>BS_LANGUAGE_HAITIAN_CREOLE</name><value>BSGFX_FOURCC('H', 'A', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HALKOMELEM</name><value>BSGFX_FOURCC('H', 'U', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HAMMER_BANNA</name><value>BSGFX_FOURCC('H', 'B', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HARARI</name><value>BSGFX_FOURCC('H', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HARAUTI</name><value>BSGFX_FOURCC('H', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HARYANVI</name><value>BSGFX_FOURCC('B', 'G', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HAUSA</name><value>BSGFX_FOURCC('H', 'A', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HAVASUPAI_WALAPAI_YAVAPAI</name><value>BSGFX_FOURCC('Y', 'U', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HAWAIIAN</name><value>BSGFX_FOURCC('H', 'A', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HAYA</name><value>BSGFX_FOURCC('H', 'A', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HAZARAGI</name><value>BSGFX_FOURCC('H', 'A', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HEBREW</name><value>BSGFX_FOURCC('I', 'W', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HEILTSUK</name><value>BSGFX_FOURCC('H', 'E', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HERERO</name><value>BSGFX_FOURCC('H', 'E', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HIGH_MARI</name><value>BSGFX_FOURCC('H', 'M', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HILIGAYNON</name><value>BSGFX_FOURCC('H', 'I', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HINDI</name><value>BSGFX_FOURCC('H', 'I', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HINDKO</name><value>BSGFX_FOURCC('H', 'N', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HIRI_MOTU</name><value>BSGFX_FOURCC('H', 'M', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HMONG</name><value>BSGFX_FOURCC('H', 'M', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HMONG_DAW</name><value>BSGFX_FOURCC('M', 'W', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HMONG_SHUAT</name><value>BSGFX_FOURCC('H', 'M', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HO</name><value>BSGFX_FOURCC('H', 'O', ' ', ' ')</value></line>
+			<line><name>BS_LANGUAGE_HUNGARIAN</name><value>BSGFX_FOURCC('H', 'U', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IBAN</name><value>BSGFX_FOURCC('I', 'B', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IBIBIO</name><value>BSGFX_FOURCC('I', 'B', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ICELANDIC</name><value>BSGFX_FOURCC('I', 'S', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IDO</name><value>BSGFX_FOURCC('I', 'D', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IGBO</name><value>BSGFX_FOURCC('I', 'B', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IJO</name><value>BSGFX_FOURCC('I', 'J', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ILOKANO</name><value>BSGFX_FOURCC('I', 'L', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_INARI_SAMI</name><value>BSGFX_FOURCC('I', 'S', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_INDONESIAN</name><value>BSGFX_FOURCC('I', 'N', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_INGUSH</name><value>BSGFX_FOURCC('I', 'N', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_INTERLINGUA</name><value>BSGFX_FOURCC('I', 'N', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_INTERLINGUE</name><value>BSGFX_FOURCC('I', 'L', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_INUKTITUT</name><value>BSGFX_FOURCC('I', 'N', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_INUPIAT</name><value>BSGFX_FOURCC('I', 'P', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IPA_PHONETIC</name><value>BSGFX_FOURCC('I', 'P', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IRISH</name><value>BSGFX_FOURCC('I', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IRISH_TRADITIONAL</name><value>BSGFX_FOURCC('I', 'R', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_IRULA</name><value>BSGFX_FOURCC('I', 'R', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ITALIAN</name><value>BSGFX_FOURCC('I', 'T', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_JAMAICAN_CREOLE</name><value>BSGFX_FOURCC('J', 'A', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_JAPANESE</name><value>BSGFX_FOURCC('J', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_JAVANESE</name><value>BSGFX_FOURCC('J', 'A', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_JENNU_KURUMA</name><value>BSGFX_FOURCC('X', 'U', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_JUDEO_TAT</name><value>BSGFX_FOURCC('J', 'D', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_JULA</name><value>BSGFX_FOURCC('J', 'U', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KABARDIAN</name><value>BSGFX_FOURCC('K', 'A', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KABYLE</name><value>BSGFX_FOURCC('K', 'A', 'B', '0')</value></line>
+			<line><name>BS_LANGUAGE_KACHCHI</name><value>BSGFX_FOURCC('K', 'A', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KADIWEU</name><value>BSGFX_FOURCC('K', 'B', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KALENJIN</name><value>BSGFX_FOURCC('K', 'A', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KALMYK</name><value>BSGFX_FOURCC('K', 'L', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KAMBA</name><value>BSGFX_FOURCC('K', 'M', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KANAUJI</name><value>BSGFX_FOURCC('B', 'J', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KANNADA</name><value>BSGFX_FOURCC('K', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KANURI</name><value>BSGFX_FOURCC('K', 'N', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KAQCHIKEL</name><value>BSGFX_FOURCC('C', 'A', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KARACHAY</name><value>BSGFX_FOURCC('K', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KARAIM</name><value>BSGFX_FOURCC('K', 'R', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KARAKALPAK</name><value>BSGFX_FOURCC('K', 'R', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KARELIAN</name><value>BSGFX_FOURCC('K', 'R', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KAREN</name><value>BSGFX_FOURCC('K', 'R', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KASHMIRI</name><value>BSGFX_FOURCC('K', 'S', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KASHUBIAN</name><value>BSGFX_FOURCC('C', 'S', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KATE</name><value>BSGFX_FOURCC('K', 'M', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KAZAKH</name><value>BSGFX_FOURCC('K', 'A', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KEBENA</name><value>BSGFX_FOURCC('K', 'E', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KEKCHI</name><value>BSGFX_FOURCC('K', 'E', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHAKASS</name><value>BSGFX_FOURCC('K', 'H', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHAMTI_SHAN</name><value>BSGFX_FOURCC('K', 'H', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHAMYANG</name><value>BSGFX_FOURCC('K', 'S', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHANTY_KAZIM</name><value>BSGFX_FOURCC('K', 'H', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHANTY_SHURISHKAR</name><value>BSGFX_FOURCC('K', 'H', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHANTY_VAKHI</name><value>BSGFX_FOURCC('K', 'H', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHASI</name><value>BSGFX_FOURCC('K', 'S', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHENGKHA</name><value>BSGFX_FOURCC('X', 'K', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHINALUG</name><value>BSGFX_FOURCC('K', 'J', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHMER</name><value>BSGFX_FOURCC('K', 'H', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHORASANI_TURKIC</name><value>BSGFX_FOURCC('K', 'M', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHOWAR</name><value>BSGFX_FOURCC('K', 'H', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KHUTSURI_GEORGIAN</name><value>BSGFX_FOURCC('K', 'G', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KICHE</name><value>BSGFX_FOURCC('Q', 'U', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KIKONGO</name><value>BSGFX_FOURCC('K', 'O', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KILDIN_SAMI</name><value>BSGFX_FOURCC('K', 'S', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KINYARWANDA</name><value>BSGFX_FOURCC('R', 'U', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KIRMANJKI</name><value>BSGFX_FOURCC('K', 'I', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KISII</name><value>BSGFX_FOURCC('K', 'I', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KITUBA</name><value>BSGFX_FOURCC('M', 'K', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KODAGU</name><value>BSGFX_FOURCC('K', 'O', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOKNI</name><value>BSGFX_FOURCC('K', 'K', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOMI</name><value>BSGFX_FOURCC('K', 'O', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOMI_PERMYAK</name><value>BSGFX_FOURCC('K', 'O', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOMI_ZYRIAN</name><value>BSGFX_FOURCC('K', 'O', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOMO</name><value>BSGFX_FOURCC('K', 'M', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOMSO</name><value>BSGFX_FOURCC('K', 'M', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KONGO</name><value>BSGFX_FOURCC('K', 'O', 'N', '0')</value></line>
+			<line><name>BS_LANGUAGE_KONKANI</name><value>BSGFX_FOURCC('K', 'O', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOORETE</name><value>BSGFX_FOURCC('K', 'R', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOREAN</name><value>BSGFX_FOURCC('K', 'O', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOREAO_OLD_HANGUL</name><value>BSGFX_FOURCC('K', 'O', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KORYAK</name><value>BSGFX_FOURCC('K', 'Y', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KOSRAEAN</name><value>BSGFX_FOURCC('K', 'O', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KPELLE</name><value>BSGFX_FOURCC('K', 'P', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KPELLE_LIBERIA</name><value>BSGFX_FOURCC('X', 'P', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KRIO</name><value>BSGFX_FOURCC('K', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KRYMCHAK</name><value>BSGFX_FOURCC('J', 'C', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KUANYAMA</name><value>BSGFX_FOURCC('K', 'U', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KUBE</name><value>BSGFX_FOURCC('K', 'G', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KUI</name><value>BSGFX_FOURCC('K', 'U', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KULVI</name><value>BSGFX_FOURCC('K', 'U', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KUMAONI</name><value>BSGFX_FOURCC('K', 'M', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KUMYK</name><value>BSGFX_FOURCC('K', 'U', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KURDISH</name><value>BSGFX_FOURCC('K', 'U', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KURUKH</name><value>BSGFX_FOURCC('K', 'U', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KUY</name><value>BSGFX_FOURCC('K', 'U', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KWAKWALA</name><value>BSGFX_FOURCC('K', 'W', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_KYRGYZ</name><value>BSGFX_FOURCC('K', 'I', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_L_CREE</name><value>BSGFX_FOURCC('L', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LADAKHI</name><value>BSGFX_FOURCC('L', 'D', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LADIN</name><value>BSGFX_FOURCC('L', 'A', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LADINO</name><value>BSGFX_FOURCC('J', 'U', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LAHULI</name><value>BSGFX_FOURCC('L', 'A', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LAK</name><value>BSGFX_FOURCC('L', 'A', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LAKI</name><value>BSGFX_FOURCC('L', 'K', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LAMBANI</name><value>BSGFX_FOURCC('L', 'A', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LAMPUNG</name><value>BSGFX_FOURCC('L', 'J', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LAO</name><value>BSGFX_FOURCC('L', 'A', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LATIN</name><value>BSGFX_FOURCC('L', 'A', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LATVIAN</name><value>BSGFX_FOURCC('L', 'V', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LAZ</name><value>BSGFX_FOURCC('L', 'A', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LELEMI</name><value>BSGFX_FOURCC('L', 'E', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LEZGI</name><value>BSGFX_FOURCC('L', 'E', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LIGURIAN</name><value>BSGFX_FOURCC('L', 'I', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LIMBU</name><value>BSGFX_FOURCC('L', 'M', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LIMBURGISH</name><value>BSGFX_FOURCC('L', 'I', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LINGALA</name><value>BSGFX_FOURCC('L', 'I', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LIPO</name><value>BSGFX_FOURCC('L', 'P', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LISU</name><value>BSGFX_FOURCC('L', 'I', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LITHUANIAN</name><value>BSGFX_FOURCC('L', 'T', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LIV</name><value>BSGFX_FOURCC('L', 'I', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LOJBAN</name><value>BSGFX_FOURCC('J', 'B', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LOMA</name><value>BSGFX_FOURCC('L', 'O', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LOMBARD</name><value>BSGFX_FOURCC('L', 'M', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LOMWE</name><value>BSGFX_FOURCC('L', 'M', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LOW_MARI</name><value>BSGFX_FOURCC('L', 'M', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LOW_SAXON</name><value>BSGFX_FOURCC('N', 'D', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LOWER_SORBIAN</name><value>BSGFX_FOURCC('L', 'S', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LU</name><value>BSGFX_FOURCC('X', 'B', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LUBA_KATANGA</name><value>BSGFX_FOURCC('L', 'U', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LUBA_LULUA</name><value>BSGFX_FOURCC('L', 'U', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LULE_SAMI</name><value>BSGFX_FOURCC('L', 'S', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LUO</name><value>BSGFX_FOURCC('L', 'U', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LURI</name><value>BSGFX_FOURCC('L', 'R', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LUSHOOTSEED</name><value>BSGFX_FOURCC('L', 'U', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LUXEMBOURGISH</name><value>BSGFX_FOURCC('L', 'T', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_LUYIA</name><value>BSGFX_FOURCC('L', 'U', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MACEDONIAN</name><value>BSGFX_FOURCC('M', 'K', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MADURA</name><value>BSGFX_FOURCC('M', 'A', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAGAHI</name><value>BSGFX_FOURCC('M', 'A', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAITHILI</name><value>BSGFX_FOURCC('M', 'T', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAJANG</name><value>BSGFX_FOURCC('M', 'A', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAKASAR</name><value>BSGFX_FOURCC('M', 'K', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAKHUWA</name><value>BSGFX_FOURCC('M', 'A', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAKONDE</name><value>BSGFX_FOURCC('K', 'D', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MALAGASY</name><value>BSGFX_FOURCC('M', 'L', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MALAY</name><value>BSGFX_FOURCC('M', 'L', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MALAYALAM</name><value>BSGFX_FOURCC('M', 'A', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MALAYALAM_REFORMED</name><value>BSGFX_FOURCC('M', 'L', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MALE</name><value>BSGFX_FOURCC('M', 'L', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MALINKE</name><value>BSGFX_FOURCC('M', 'L', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MALTESE</name><value>BSGFX_FOURCC('M', 'T', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAM</name><value>BSGFX_FOURCC('M', 'A', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANCHU</name><value>BSGFX_FOURCC('M', 'C', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANDAR</name><value>BSGFX_FOURCC('M', 'D', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANDINKA</name><value>BSGFX_FOURCC('M', 'N', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANINKA</name><value>BSGFX_FOURCC('M', 'N', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANIPURI</name><value>BSGFX_FOURCC('M', 'N', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANO</name><value>BSGFX_FOURCC('M', 'E', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANSI</name><value>BSGFX_FOURCC('M', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MANX</name><value>BSGFX_FOURCC('M', 'N', 'X', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAORI</name><value>BSGFX_FOURCC('M', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAPUDUNGUN</name><value>BSGFX_FOURCC('M', 'A', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MARATHI</name><value>BSGFX_FOURCC('M', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MARSHALLESE</name><value>BSGFX_FOURCC('M', 'A', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MARWARI</name><value>BSGFX_FOURCC('M', 'A', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAYAN</name><value>BSGFX_FOURCC('M', 'Y', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MAZANDERANI</name><value>BSGFX_FOURCC('M', 'Z', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MBEMBE_TIGON</name><value>BSGFX_FOURCC('N', 'Z', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MBO</name><value>BSGFX_FOURCC('M', 'B', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MBUNDU</name><value>BSGFX_FOURCC('M', 'B', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MEDUMBA</name><value>BSGFX_FOURCC('B', 'Y', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MEEN</name><value>BSGFX_FOURCC('M', 'E', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MENDE</name><value>BSGFX_FOURCC('M', 'D', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MERU</name><value>BSGFX_FOURCC('M', 'E', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MEWATI</name><value>BSGFX_FOURCC('W', 'T', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MINANGKABAU</name><value>BSGFX_FOURCC('M', 'I', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MINJANGBAL</name><value>BSGFX_FOURCC('X', 'J', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MIRANDESE</name><value>BSGFX_FOURCC('M', 'W', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MIZO</name><value>BSGFX_FOURCC('M', 'I', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MOHAWK</name><value>BSGFX_FOURCC('M', 'O', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MOKSHA</name><value>BSGFX_FOURCC('M', 'O', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MOLDAVIAN</name><value>BSGFX_FOURCC('M', 'O', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MON</name><value>BSGFX_FOURCC('M', 'O', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MONGOLIAN</name><value>BSGFX_FOURCC('M', 'N', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MOOSE_CREE</name><value>BSGFX_FOURCC('M', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MORISYEN</name><value>BSGFX_FOURCC('M', 'F', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MOROCCAN</name><value>BSGFX_FOURCC('M', 'O', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MOSSI</name><value>BSGFX_FOURCC('M', 'P', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MUNDARI</name><value>BSGFX_FOURCC('M', 'U', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_MUSCOGEE</name><value>BSGFX_FOURCC('M', 'U', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_N_CREE</name><value>BSGFX_FOURCC('N', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NAGA_ASSAMESE</name><value>BSGFX_FOURCC('N', 'A', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NAGARI</name><value>BSGFX_FOURCC('N', 'G', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NAHUATL</name><value>BSGFX_FOURCC('N', 'A', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NANAI</name><value>BSGFX_FOURCC('N', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NASKAPI</name><value>BSGFX_FOURCC('N', 'A', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NAURUAN</name><value>BSGFX_FOURCC('N', 'A', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NAVAJO</name><value>BSGFX_FOURCC('N', 'A', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NDAU</name><value>BSGFX_FOURCC('N', 'D', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NDEBELE</name><value>BSGFX_FOURCC('N', 'D', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NDONGA</name><value>BSGFX_FOURCC('N', 'D', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NEAPOLITAN</name><value>BSGFX_FOURCC('N', 'A', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NEPALI</name><value>BSGFX_FOURCC('N', 'E', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NEWARI</name><value>BSGFX_FOURCC('N', 'E', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NGBAKA</name><value>BSGFX_FOURCC('N', 'G', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NIGERIAN_FULFULDE</name><value>BSGFX_FOURCC('F', 'U', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NIMADI</name><value>BSGFX_FOURCC('N', 'O', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NISI</name><value>BSGFX_FOURCC('N', 'I', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NIUEAN</name><value>BSGFX_FOURCC('N', 'I', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NKO</name><value>BSGFX_FOURCC('N', 'K', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NOGAI</name><value>BSGFX_FOURCC('N', 'O', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORFOLK</name><value>BSGFX_FOURCC('P', 'I', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORTH_SLAVEY</name><value>BSGFX_FOURCC('S', 'C', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORTHERN_EMBERA</name><value>BSGFX_FOURCC('E', 'M', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORTHERN_SAMI</name><value>BSGFX_FOURCC('N', 'S', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORTHERN_SOTHO</name><value>BSGFX_FOURCC('N', 'S', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORTHERN_TAI</name><value>BSGFX_FOURCC('N', 'T', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORWAY_HOUSE_CREE</name><value>BSGFX_FOURCC('N', 'H', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORWEGIAN</name><value>BSGFX_FOURCC('N', 'O', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NORWEGIAN_NYNORSK</name><value>BSGFX_FOURCC('N', 'Y', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NOVIAL</name><value>BSGFX_FOURCC('N', 'O', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NUMANGGANG</name><value>BSGFX_FOURCC('N', 'O', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NUNAVIK_INUKTITUT</name><value>BSGFX_FOURCC('I', 'N', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NUU_CHAH_NULTH</name><value>BSGFX_FOURCC('N', 'U', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NYAMWEZI</name><value>BSGFX_FOURCC('N', 'Y', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_NYANKOLE</name><value>BSGFX_FOURCC('N', 'K', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_OCCITAN</name><value>BSGFX_FOURCC('O', 'C', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ODIA</name><value>BSGFX_FOURCC('O', 'R', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_OJI_CREE</name><value>BSGFX_FOURCC('O', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_OJIBWAY</name><value>BSGFX_FOURCC('O', 'J', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_OLD_IRISH</name><value>BSGFX_FOURCC('S', 'G', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_OLD_JAVANESE</name><value>BSGFX_FOURCC('K', 'A', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ONEIDA</name><value>BSGFX_FOURCC('O', 'N', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ONONDAGA</name><value>BSGFX_FOURCC('O', 'N', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_OROMO</name><value>BSGFX_FOURCC('O', 'R', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_OSSETIAN</name><value>BSGFX_FOURCC('O', 'S', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PA_O_KAREN</name><value>BSGFX_FOURCC('B', 'L', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PALAUAN</name><value>BSGFX_FOURCC('P', 'A', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PALAUNG</name><value>BSGFX_FOURCC('P', 'L', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PALESTINIAN_ARAMAIC</name><value>BSGFX_FOURCC('P', 'A', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PALI</name><value>BSGFX_FOURCC('P', 'A', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PALPA</name><value>BSGFX_FOURCC('P', 'A', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PAMPANGAN</name><value>BSGFX_FOURCC('P', 'A', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PANGASINAN</name><value>BSGFX_FOURCC('P', 'A', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PAPIAMENTU</name><value>BSGFX_FOURCC('P', 'A', 'P', '0')</value></line>
+			<line><name>BS_LANGUAGE_PASHTO</name><value>BSGFX_FOURCC('P', 'A', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PATTANI_MALAY</name><value>BSGFX_FOURCC('M', 'F', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PENNSYLVANIA_GERMAN</name><value>BSGFX_FOURCC('P', 'D', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PERSIAN</name><value>BSGFX_FOURCC('F', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PHAKE</name><value>BSGFX_FOURCC('P', 'J', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PICARD</name><value>BSGFX_FOURCC('P', 'C', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PIEMONTESE</name><value>BSGFX_FOURCC('P', 'M', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PILAGA</name><value>BSGFX_FOURCC('P', 'L', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PITE_SAMI</name><value>BSGFX_FOURCC('S', 'J', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_POCOMCHI</name><value>BSGFX_FOURCC('P', 'O', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_POHNPEIAN</name><value>BSGFX_FOURCC('P', 'O', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_POLISH</name><value>BSGFX_FOURCC('P', 'L', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_POLYTONIC_GREEK</name><value>BSGFX_FOURCC('P', 'G', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PORTUGUESE</name><value>BSGFX_FOURCC('P', 'T', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PROVENCAL</name><value>BSGFX_FOURCC('P', 'R', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_PUNJABI</name><value>BSGFX_FOURCC('P', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_QUECHUA</name><value>BSGFX_FOURCC('Q', 'U', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_QUECHUA_BOLIVIA</name><value>BSGFX_FOURCC('Q', 'U', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_QUECHUA_ECUADOR</name><value>BSGFX_FOURCC('Q', 'V', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_QUECHUA_PERU</name><value>BSGFX_FOURCC('Q', 'W', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_R_CREE</name><value>BSGFX_FOURCC('R', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RAJASTHANI</name><value>BSGFX_FOURCC('R', 'A', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RAKHINE</name><value>BSGFX_FOURCC('A', 'R', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RAROTONGAN</name><value>BSGFX_FOURCC('R', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_REJANG</name><value>BSGFX_FOURCC('R', 'E', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RIANG</name><value>BSGFX_FOURCC('R', 'I', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RIPUARIAN</name><value>BSGFX_FOURCC('K', 'S', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RITARUNGO</name><value>BSGFX_FOURCC('R', 'I', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ROHINGYA</name><value>BSGFX_FOURCC('R', 'H', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ROMANIAN</name><value>BSGFX_FOURCC('R', 'O', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ROMANSH</name><value>BSGFX_FOURCC('R', 'M', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ROMANY</name><value>BSGFX_FOURCC('R', 'O', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ROTUMAN</name><value>BSGFX_FOURCC('R', 'T', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RUNDI</name><value>BSGFX_FOURCC('R', 'U', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RUSSIAN</name><value>BSGFX_FOURCC('R', 'U', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RUSSIAN_BURIAT</name><value>BSGFX_FOURCC('R', 'B', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_RUSYN</name><value>BSGFX_FOURCC('R', 'S', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SADRI</name><value>BSGFX_FOURCC('S', 'A', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SAKHA</name><value>BSGFX_FOURCC('Y', 'A', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SAMOAN</name><value>BSGFX_FOURCC('S', 'M', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SAMOGITIAN</name><value>BSGFX_FOURCC('S', 'G', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SAN_BLAS_KUNA</name><value>BSGFX_FOURCC('C', 'U', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SANGO</name><value>BSGFX_FOURCC('S', 'G', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SANSKRIT</name><value>BSGFX_FOURCC('S', 'A', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SANTALI</name><value>BSGFX_FOURCC('S', 'A', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SARAIKI</name><value>BSGFX_FOURCC('S', 'R', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SARDINIAN</name><value>BSGFX_FOURCC('S', 'R', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SASAK</name><value>BSGFX_FOURCC('S', 'A', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SATERLAND_FRISIAN</name><value>BSGFX_FOURCC('S', 'T', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SAYISI</name><value>BSGFX_FOURCC('S', 'A', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SCOTS</name><value>BSGFX_FOURCC('S', 'C', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SCOTTISH_GAELIC</name><value>BSGFX_FOURCC('G', 'A', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SEKOTA</name><value>BSGFX_FOURCC('S', 'E', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SELKUP</name><value>BSGFX_FOURCC('S', 'E', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SENA</name><value>BSGFX_FOURCC('S', 'N', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SENECA</name><value>BSGFX_FOURCC('S', 'E', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SERBIAN</name><value>BSGFX_FOURCC('S', 'R', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SERER</name><value>BSGFX_FOURCC('S', 'R', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SGAW_KAREN</name><value>BSGFX_FOURCC('K', 'S', 'W', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SHAN</name><value>BSGFX_FOURCC('S', 'H', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SHONA</name><value>BSGFX_FOURCC('S', 'N', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SIBE</name><value>BSGFX_FOURCC('S', 'I', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SICILIAN</name><value>BSGFX_FOURCC('S', 'C', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SIDAMO</name><value>BSGFX_FOURCC('S', 'I', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SILESIAN</name><value>BSGFX_FOURCC('S', 'Z', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SILTE_GURAGE</name><value>BSGFX_FOURCC('S', 'I', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SINDHI</name><value>BSGFX_FOURCC('S', 'N', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SINHALA</name><value>BSGFX_FOURCC('S', 'N', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SKOLT_SAMI</name><value>BSGFX_FOURCC('S', 'K', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SLAVEY</name><value>BSGFX_FOURCC('S', 'L', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SLOVAK</name><value>BSGFX_FOURCC('S', 'K', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SLOVENIAN</name><value>BSGFX_FOURCC('S', 'L', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SMALL_FLOWERY_MIAO</name><value>BSGFX_FOURCC('S', 'F', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SODO_GURAGE</name><value>BSGFX_FOURCC('S', 'O', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SOGA</name><value>BSGFX_FOURCC('X', 'O', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SOMALI</name><value>BSGFX_FOURCC('S', 'M', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SONGE</name><value>BSGFX_FOURCC('S', 'O', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SONINKE</name><value>BSGFX_FOURCC('S', 'N', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SOUTH_SLAVEY</name><value>BSGFX_FOURCC('S', 'S', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SOUTHERN_KIWAI</name><value>BSGFX_FOURCC('K', 'J', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SOUTHERN_SAMI</name><value>BSGFX_FOURCC('S', 'S', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SOUTHERN_SOTHO</name><value>BSGFX_FOURCC('S', 'O', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SPANISH</name><value>BSGFX_FOURCC('E', 'S', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_STANDARD_MOROCCAN_TAMAZIGHT</name><value>BSGFX_FOURCC('Z', 'G', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_STRAITS_SALISH</name><value>BSGFX_FOURCC('S', 'T', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SUKUMA</name><value>BSGFX_FOURCC('S', 'U', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SUNDANESE</name><value>BSGFX_FOURCC('S', 'U', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SURI</name><value>BSGFX_FOURCC('S', 'U', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SUTU</name><value>BSGFX_FOURCC('S', 'X', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SVAN</name><value>BSGFX_FOURCC('S', 'V', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SWADAYA_ARAMAIC</name><value>BSGFX_FOURCC('S', 'W', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SWAHILI</name><value>BSGFX_FOURCC('S', 'W', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SWATI</name><value>BSGFX_FOURCC('S', 'W', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SWEDISH</name><value>BSGFX_FOURCC('S', 'V', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SYLHETI</name><value>BSGFX_FOURCC('S', 'Y', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SYRIAC</name><value>BSGFX_FOURCC('S', 'Y', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_SYRIAC_EASTERN</name><value>BSGFX_FOURCC('S', 'Y', 'R', 'N')</value></line>
+			<line><name>BS_LANGUAGE_SYRIAC_ESTRANGELA</name><value>BSGFX_FOURCC('S', 'Y', 'R', 'E')</value></line>
+			<line><name>BS_LANGUAGE_SYRIAC_WESTERN</name><value>BSGFX_FOURCC('S', 'Y', 'R', 'J')</value></line>
+			<line><name>BS_LANGUAGE_TABASARAN</name><value>BSGFX_FOURCC('T', 'A', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TACHELHIT</name><value>BSGFX_FOURCC('S', 'H', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAGALOG</name><value>BSGFX_FOURCC('T', 'G', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAHAGGART_TAMAHAQ</name><value>BSGFX_FOURCC('T', 'H', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAHITIAN</name><value>BSGFX_FOURCC('T', 'H', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAI_LAING</name><value>BSGFX_FOURCC('T', 'J', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAJIKI</name><value>BSGFX_FOURCC('T', 'A', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TALYSH</name><value>BSGFX_FOURCC('T', 'L', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAMASHEK</name><value>BSGFX_FOURCC('T', 'M', 'H', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAMASHEQ</name><value>BSGFX_FOURCC('T', 'A', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAMAZIGHT</name><value>BSGFX_FOURCC('T', 'Z', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAMIL</name><value>BSGFX_FOURCC('T', 'A', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TARIFIT</name><value>BSGFX_FOURCC('R', 'I', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TATAR</name><value>BSGFX_FOURCC('T', 'A', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAWALLAMMAT_TAMAJAQ</name><value>BSGFX_FOURCC('T', 'T', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAY</name><value>BSGFX_FOURCC('T', 'Y', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TAYART_TAMAJEQ</name><value>BSGFX_FOURCC('T', 'H', 'Z', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TELUGU</name><value>BSGFX_FOURCC('T', 'E', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TEMNE</name><value>BSGFX_FOURCC('T', 'M', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TETUM</name><value>BSGFX_FOURCC('T', 'E', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TH_CREE</name><value>BSGFX_FOURCC('T', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_THAI</name><value>BSGFX_FOURCC('T', 'H', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_THAILAND_MON</name><value>BSGFX_FOURCC('M', 'O', 'N', 'T')</value></line>
+			<line><name>BS_LANGUAGE_THOMPSON</name><value>BSGFX_FOURCC('T', 'H', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TIBETAN</name><value>BSGFX_FOURCC('T', 'I', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TIGRE</name><value>BSGFX_FOURCC('T', 'G', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TIGRINYA</name><value>BSGFX_FOURCC('T', 'G', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TIV</name><value>BSGFX_FOURCC('T', 'I', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TLINGIT</name><value>BSGFX_FOURCC('T', 'L', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TOBO</name><value>BSGFX_FOURCC('T', 'B', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TODO</name><value>BSGFX_FOURCC('T', 'O', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TOK_PISIN</name><value>BSGFX_FOURCC('T', 'P', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TOMA</name><value>BSGFX_FOURCC('T', 'O', 'D', '0')</value></line>
+			<line><name>BS_LANGUAGE_TONGA</name><value>BSGFX_FOURCC('T', 'N', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TONGAN</name><value>BSGFX_FOURCC('T', 'G', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TORKI</name><value>BSGFX_FOURCC('A', 'Z', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TSHANGLA</name><value>BSGFX_FOURCC('T', 'S', 'J', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TSONGA</name><value>BSGFX_FOURCC('T', 'S', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TSWANA</name><value>BSGFX_FOURCC('T', 'N', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TULU</name><value>BSGFX_FOURCC('T', 'U', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TUMBUKA</name><value>BSGFX_FOURCC('T', 'U', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TUNDRA_ENETS</name><value>BSGFX_FOURCC('T', 'N', 'E', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TURKISH</name><value>BSGFX_FOURCC('T', 'R', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TURKMEN</name><value>BSGFX_FOURCC('T', 'K', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TUROYO_ARAMAIC</name><value>BSGFX_FOURCC('T', 'U', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TUSCARORA</name><value>BSGFX_FOURCC('T', 'U', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TUVALU</name><value>BSGFX_FOURCC('T', 'V', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TUVIN</name><value>BSGFX_FOURCC('T', 'U', 'V', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TWI</name><value>BSGFX_FOURCC('T', 'W', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_TZOTZIL</name><value>BSGFX_FOURCC('T', 'Z', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UDI</name><value>BSGFX_FOURCC('U', 'D', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UDMURT</name><value>BSGFX_FOURCC('U', 'D', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UKRAINIAN</name><value>BSGFX_FOURCC('U', 'K', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UMBUNDU</name><value>BSGFX_FOURCC('U', 'M', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UME_SAMI</name><value>BSGFX_FOURCC('S', 'J', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UPPER_SAXON</name><value>BSGFX_FOURCC('S', 'X', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UPPER_SORBIAN</name><value>BSGFX_FOURCC('U', 'S', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_URALIC_PHONETIC</name><value>BSGFX_FOURCC('U', 'P', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_URDU</name><value>BSGFX_FOURCC('U', 'R', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UYGHUR</name><value>BSGFX_FOURCC('U', 'Y', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_UZBEK</name><value>BSGFX_FOURCC('U', 'Z', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_VENDA</name><value>BSGFX_FOURCC('V', 'E', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_VENETIAN</name><value>BSGFX_FOURCC('V', 'E', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_VIETNAMESE</name><value>BSGFX_FOURCC('V', 'I', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_VLAX_ROMANI</name><value>BSGFX_FOURCC('R', 'M', 'Y', ' ')</value></line>
+			<line><name>BS_LANGUAGE_VOLAPUK</name><value>BSGFX_FOURCC('V', 'O', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_VORO</name><value>BSGFX_FOURCC('V', 'R', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WA</name><value>BSGFX_FOURCC('W', 'A', ' ', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WACI_GBE</name><value>BSGFX_FOURCC('W', 'C', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WAGDI</name><value>BSGFX_FOURCC('W', 'A', 'G', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WAKHI</name><value>BSGFX_FOURCC('W', 'B', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WALLOON</name><value>BSGFX_FOURCC('W', 'L', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WARAY_WARAY</name><value>BSGFX_FOURCC('W', 'A', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WAYANAD_CHETTI</name><value>BSGFX_FOURCC('C', 'T', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WAYUU</name><value>BSGFX_FOURCC('G', 'U', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WELSH</name><value>BSGFX_FOURCC('W', 'E', 'L', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WENDAT</name><value>BSGFX_FOURCC('W', 'D', 'T', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WEST_CREE</name><value>BSGFX_FOURCC('W', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WESTERN_CHAM</name><value>BSGFX_FOURCC('C', 'J', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WESTERN_KAYAH</name><value>BSGFX_FOURCC('K', 'Y', 'U', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WESTERN_PANJABI</name><value>BSGFX_FOURCC('P', 'N', 'B', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WESTERN_PWO_KAREN</name><value>BSGFX_FOURCC('P', 'W', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WOLOF</name><value>BSGFX_FOURCC('W', 'L', 'F', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WOODS_CREE</name><value>BSGFX_FOURCC('D', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WUDING_LUQUAN_YI</name><value>BSGFX_FOURCC('Y', 'W', 'Q', ' ')</value></line>
+			<line><name>BS_LANGUAGE_WYANDOT</name><value>BSGFX_FOURCC('W', 'Y', 'N', ' ')</value></line>
+			<line><name>BS_LANGUAGE_XHOSA</name><value>BSGFX_FOURCC('X', 'H', 'S', ' ')</value></line>
+			<line><name>BS_LANGUAGE_Y_CREE</name><value>BSGFX_FOURCC('Y', 'C', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_YAO</name><value>BSGFX_FOURCC('Y', 'A', 'O', ' ')</value></line>
+			<line><name>BS_LANGUAGE_YAPESE</name><value>BSGFX_FOURCC('Y', 'A', 'P', ' ')</value></line>
+			<line><name>BS_LANGUAGE_YI_CLASSIC</name><value>BSGFX_FOURCC('Y', 'I', 'C', ' ')</value></line>
+			<line><name>BS_LANGUAGE_YI_MODERN</name><value>BSGFX_FOURCC('Y', 'I', 'M', ' ')</value></line>
+			<line><name>BS_LANGUAGE_YIDDISH</name><value>BSGFX_FOURCC('J', 'I', 'I', ' ')</value></line>
+			<line><name>BS_LANGUAGE_YORUBA</name><value>BSGFX_FOURCC('Y', 'B', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ZAMBOANGA_CHAVACANO</name><value>BSGFX_FOURCC('C', 'B', 'K', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ZANDE</name><value>BSGFX_FOURCC('Z', 'N', 'D', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ZARMA</name><value>BSGFX_FOURCC('D', 'J', 'R', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ZAZAKI</name><value>BSGFX_FOURCC('Z', 'Z', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ZEALANDIC</name><value>BSGFX_FOURCC('Z', 'E', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ZHUANG</name><value>BSGFX_FOURCC('Z', 'H', 'A', ' ')</value></line>
+			<line><name>BS_LANGUAGE_ZULU</name><value>BSGFX_FOURCC('Z', 'U', 'L', ' ')</value></line>
+		</enum>
+		
+		<enum name="bsgfx_UnicodeBlock">
+			<line comment="none"><name>BSGFX_UNICODE_BLOCK_NONE</name><value>0</value></line>
+			<line comment="0000"><name>BSGFX_UNICODE_BLOCK_BASIC_LATIN</name><value>1</value></line>
+			<line comment="0080"><name>BSGFX_UNICODE_BLOCK_LATIN_1_SUPPLEMENT</name><value>2</value></line>
+			<line comment="0100"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_A</name><value>3</value></line>
+			<line comment="0180"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_B</name><value>4</value></line>
+			<line comment="0250"><name>BSGFX_UNICODE_BLOCK_IPA_EXTENSIONS</name><value>5</value></line>
+			<line comment="02B0"><name>BSGFX_UNICODE_BLOCK_SPACING_MODIFIER_LETTERS</name><value>6</value></line>
+			<line comment="0300"><name>BSGFX_UNICODE_BLOCK_COMBINING_DIACRITICAL_MARKS</name><value>7</value></line>
+			<line comment="0370"><name>BSGFX_UNICODE_BLOCK_GREEK</name><value>8</value></line>
+			<line comment="0400"><name>BSGFX_UNICODE_BLOCK_CYRILLIC</name><value>9</value></line>
+			<line comment="0530"><name>BSGFX_UNICODE_BLOCK_ARMENIAN</name><value>10</value></line>
+			<line comment="0590"><name>BSGFX_UNICODE_BLOCK_HEBREW</name><value>11</value></line>
+			<line comment="0600"><name>BSGFX_UNICODE_BLOCK_ARABIC</name><value>12</value></line>
+			<line comment="0700"><name>BSGFX_UNICODE_BLOCK_SYRIAC</name><value>13</value></line>
+			<line comment="0780"><name>BSGFX_UNICODE_BLOCK_THAANA</name><value>14</value></line>
+			<line comment="0900"><name>BSGFX_UNICODE_BLOCK_DEVANAGARI</name><value>15</value></line>
+			<line comment="0980"><name>BSGFX_UNICODE_BLOCK_BENGALI</name><value>16</value></line>
+			<line comment="0A00"><name>BSGFX_UNICODE_BLOCK_GURMUKHI</name><value>17</value></line>
+			<line comment="0A80"><name>BSGFX_UNICODE_BLOCK_GUJARATI</name><value>18</value></line>
+			<line comment="0B00"><name>BSGFX_UNICODE_BLOCK_ORIYA</name><value>19</value></line>
+			<line comment="0B80"><name>BSGFX_UNICODE_BLOCK_TAMIL</name><value>20</value></line>
+			<line comment="0C00"><name>BSGFX_UNICODE_BLOCK_TELUGU</name><value>21</value></line>
+			<line comment="0C80"><name>BSGFX_UNICODE_BLOCK_KANNADA</name><value>22</value></line>
+			<line comment="0D00"><name>BSGFX_UNICODE_BLOCK_MALAYALAM</name><value>23</value></line>
+			<line comment="0D80"><name>BSGFX_UNICODE_BLOCK_SINHALA</name><value>24</value></line>
+			<line comment="0E00"><name>BSGFX_UNICODE_BLOCK_THAI</name><value>25</value></line>
+			<line comment="0E80"><name>BSGFX_UNICODE_BLOCK_LAO</name><value>26</value></line>
+			<line comment="0F00"><name>BSGFX_UNICODE_BLOCK_TIBETAN</name><value>27</value></line>
+			<line comment="1000"><name>BSGFX_UNICODE_BLOCK_MYANMAR</name><value>28</value></line>
+			<line comment="10A0"><name>BSGFX_UNICODE_BLOCK_GEORGIAN</name><value>29</value></line>
+			<line comment="1100"><name>BSGFX_UNICODE_BLOCK_HANGUL_JAMO</name><value>30</value></line>
+			<line comment="1200"><name>BSGFX_UNICODE_BLOCK_ETHIOPIC</name><value>31</value></line>
+			<line comment="13A0"><name>BSGFX_UNICODE_BLOCK_CHEROKEE</name><value>32</value></line>
+			<line comment="1400"><name>BSGFX_UNICODE_BLOCK_UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS</name><value>33</value></line>
+			<line comment="1680"><name>BSGFX_UNICODE_BLOCK_OGHAM</name><value>34</value></line>
+			<line comment="16A0"><name>BSGFX_UNICODE_BLOCK_RUNIC</name><value>35</value></line>
+			<line comment="1780"><name>BSGFX_UNICODE_BLOCK_KHMER</name><value>36</value></line>
+			<line comment="1800"><name>BSGFX_UNICODE_BLOCK_MONGOLIAN</name><value>37</value></line>
+			<line comment="1E00"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_ADDITIONAL</name><value>38</value></line>
+			<line comment="1F00"><name>BSGFX_UNICODE_BLOCK_GREEK_EXTENDED</name><value>39</value></line>
+			<line comment="2000"><name>BSGFX_UNICODE_BLOCK_GENERAL_PUNCTUATION</name><value>40</value></line>
+			<line comment="2070"><name>BSGFX_UNICODE_BLOCK_SUPERSCRIPTS_AND_SUBSCRIPTS</name><value>41</value></line>
+			<line comment="20A0"><name>BSGFX_UNICODE_BLOCK_CURRENCY_SYMBOLS</name><value>42</value></line>
+			<line comment="20D0"><name>BSGFX_UNICODE_BLOCK_COMBINING_MARKS_FOR_SYMBOLS</name><value>43</value></line>
+			<line comment="2100"><name>BSGFX_UNICODE_BLOCK_LETTERLIKE_SYMBOLS</name><value>44</value></line>
+			<line comment="2150"><name>BSGFX_UNICODE_BLOCK_NUMBER_FORMS</name><value>45</value></line>
+			<line comment="2190"><name>BSGFX_UNICODE_BLOCK_ARROWS</name><value>46</value></line>
+			<line comment="2200"><name>BSGFX_UNICODE_BLOCK_MATHEMATICAL_OPERATORS</name><value>47</value></line>
+			<line comment="2300"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_TECHNICAL</name><value>48</value></line>
+			<line comment="2400"><name>BSGFX_UNICODE_BLOCK_CONTROL_PICTURES</name><value>49</value></line>
+			<line comment="2440"><name>BSGFX_UNICODE_BLOCK_OPTICAL_CHARACTER_RECOGNITION</name><value>50</value></line>
+			<line comment="2460"><name>BSGFX_UNICODE_BLOCK_ENCLOSED_ALPHANUMERICS</name><value>51</value></line>
+			<line comment="2500"><name>BSGFX_UNICODE_BLOCK_BOX_DRAWING</name><value>52</value></line>
+			<line comment="2580"><name>BSGFX_UNICODE_BLOCK_BLOCK_ELEMENTS</name><value>53</value></line>
+			<line comment="25A0"><name>BSGFX_UNICODE_BLOCK_GEOMETRIC_SHAPES</name><value>54</value></line>
+			<line comment="2600"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_SYMBOLS</name><value>55</value></line>
+			<line comment="2700"><name>BSGFX_UNICODE_BLOCK_DINGBATS</name><value>56</value></line>
+			<line comment="2800"><name>BSGFX_UNICODE_BLOCK_BRAILLE_PATTERNS</name><value>57</value></line>
+			<line comment="2E80"><name>BSGFX_UNICODE_BLOCK_CJK_RADICALS_SUPPLEMENT</name><value>58</value></line>
+			<line comment="2F00"><name>BSGFX_UNICODE_BLOCK_KANGXI_RADICALS</name><value>59</value></line>
+			<line comment="2FF0"><name>BSGFX_UNICODE_BLOCK_IDEOGRAPHIC_DESCRIPTION_CHARACTERS</name><value>60</value></line>
+			<line comment="3000"><name>BSGFX_UNICODE_BLOCK_CJK_SYMBOLS_AND_PUNCTUATION</name><value>61</value></line>
+			<line comment="3040"><name>BSGFX_UNICODE_BLOCK_HIRAGANA</name><value>62</value></line>
+			<line comment="30A0"><name>BSGFX_UNICODE_BLOCK_KATAKANA</name><value>63</value></line>
+			<line comment="3100"><name>BSGFX_UNICODE_BLOCK_BOPOMOFO</name><value>64</value></line>
+			<line comment="3130"><name>BSGFX_UNICODE_BLOCK_HANGUL_COMPATIBILITY_JAMO</name><value>65</value></line>
+			<line comment="3190"><name>BSGFX_UNICODE_BLOCK_KANBUN</name><value>66</value></line>
+			<line comment="31A0"><name>BSGFX_UNICODE_BLOCK_BOPOMOFO_EXTENDED</name><value>67</value></line>
+			<line comment="3200"><name>BSGFX_UNICODE_BLOCK_ENCLOSED_CJK_LETTERS_AND_MONTHS</name><value>68</value></line>
+			<line comment="3300"><name>BSGFX_UNICODE_BLOCK_CJK_COMPATIBILITY</name><value>69</value></line>
+			<line comment="3400"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A</name><value>70</value></line>
+			<line comment="4E00"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS</name><value>71</value></line>
+			<line comment="A000"><name>BSGFX_UNICODE_BLOCK_YI_SYLLABLES</name><value>72</value></line>
+			<line comment="A490"><name>BSGFX_UNICODE_BLOCK_YI_RADICALS</name><value>73</value></line>
+			<line comment="AC00"><name>BSGFX_UNICODE_BLOCK_HANGUL_SYLLABLES</name><value>74</value></line>
+			<line comment="D800"><name>BSGFX_UNICODE_BLOCK_HIGH_SURROGATES</name><value>75</value></line>
+			<line comment="DB80"><name>BSGFX_UNICODE_BLOCK_HIGH_PRIVATE_USE_SURROGATES</name><value>76</value></line>
+			<line comment="DC00"><name>BSGFX_UNICODE_BLOCK_LOW_SURROGATES</name><value>77</value></line>
+			<line comment="E000"><name>BSGFX_UNICODE_BLOCK_PRIVATE_USE_AREA</name><value>78</value></line>
+			<line><name>BSGFX_UNICODE_BLOCK_PRIVATE_USE</name><value>BSGFX_UNICODE_BLOCK_PRIVATE_USE_AREA</value></line>
+			<line comment="F900"><name>BSGFX_UNICODE_BLOCK_CJK_COMPATIBILITY_IDEOGRAPHS</name><value>79</value></line>
+			<line comment="FB00"><name>BSGFX_UNICODE_BLOCK_ALPHABETIC_PRESENTATION_FORMS</name><value>80</value></line>
+			<line comment="FB50"><name>BSGFX_UNICODE_BLOCK_ARABIC_PRESENTATION_FORMS_A</name><value>81</value></line>
+			<line comment="FE20"><name>BSGFX_UNICODE_BLOCK_COMBINING_HALF_MARKS</name><value>82</value></line>
+			<line comment="FE30"><name>BSGFX_UNICODE_BLOCK_CJK_COMPATIBILITY_FORMS</name><value>83</value></line>
+			<line comment="FE50"><name>BSGFX_UNICODE_BLOCK_SMALL_FORM_VARIANTS</name><value>84</value></line>
+			<line comment="FE70"><name>BSGFX_UNICODE_BLOCK_ARABIC_PRESENTATION_FORMS_B</name><value>85</value></line>
+			<line comment="FFF0"><name>BSGFX_UNICODE_BLOCK_SPECIALS</name><value>86</value></line>
+			<line comment="FF00"><name>BSGFX_UNICODE_BLOCK_HALFWIDTH_AND_FULLWIDTH_FORMS</name><value>87</value></line>
+			<line comment="10300"><name>BSGFX_UNICODE_BLOCK_OLD_ITALIC</name><value>88</value></line>
+			<line comment="10330"><name>BSGFX_UNICODE_BLOCK_GOTHIC</name><value>89</value></line>
+			<line comment="10400"><name>BSGFX_UNICODE_BLOCK_DESERET</name><value>90</value></line>
+			<line comment="1D000"><name>BSGFX_UNICODE_BLOCK_BYZANTINE_MUSICAL_SYMBOLS</name><value>91</value></line>
+			<line comment="1D100"><name>BSGFX_UNICODE_BLOCK_MUSICAL_SYMBOLS</name><value>92</value></line>
+			<line comment="1D400"><name>BSGFX_UNICODE_BLOCK_MATHEMATICAL_ALPHANUMERIC_SYMBOLS</name><value>93</value></line>
+			<line comment="20000"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B</name><value>94</value></line>
+			<line comment="2F800"><name>BSGFX_UNICODE_BLOCK_CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT</name><value>95</value></line>
+			<line comment="E0000"><name>BSGFX_UNICODE_BLOCK_TAGS</name><value>96</value></line>
+			<line comment="0500"><name>BSGFX_UNICODE_BLOCK_CYRILLIC_SUPPLEMENT</name><value>97</value></line>
+			<line><name>BSGFX_UNICODE_BLOCK_CYRILLIC_SUPPLEMENTARY</name><value>BSGFX_UNICODE_BLOCK_CYRILLIC_SUPPLEMENT</value></line>
+			<line comment="1700"><name>BSGFX_UNICODE_BLOCK_TAGALOG</name><value>98</value></line>
+			<line comment="1720"><name>BSGFX_UNICODE_BLOCK_HANUNOO</name><value>99</value></line>
+			<line comment="1740"><name>BSGFX_UNICODE_BLOCK_BUHID</name><value>100</value></line>
+			<line comment="1760"><name>BSGFX_UNICODE_BLOCK_TAGBANWA</name><value>101</value></line>
+			<line comment="27C0"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_MATHEMATICAL_SYMBOLS_A</name><value>102</value></line>
+			<line comment="27F0"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTAL_ARROWS_A</name><value>103</value></line>
+			<line comment="2900"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTAL_ARROWS_B</name><value>104</value></line>
+			<line comment="2980"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_MATHEMATICAL_SYMBOLS_B</name><value>105</value></line>
+			<line comment="2A00"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTAL_MATHEMATICAL_OPERATORS</name><value>106</value></line>
+			<line comment="31F0"><name>BSGFX_UNICODE_BLOCK_KATAKANA_PHONETIC_EXTENSIONS</name><value>107</value></line>
+			<line comment="FE00"><name>BSGFX_UNICODE_BLOCK_VARIATION_SELECTORS</name><value>108</value></line>
+			<line comment="F0000"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTARY_PRIVATE_USE_AREA_A</name><value>109</value></line>
+			<line comment="100000"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTARY_PRIVATE_USE_AREA_B</name><value>110</value></line>
+			<line comment="1900"><name>BSGFX_UNICODE_BLOCK_LIMBU</name><value>111</value></line>
+			<line comment="1950"><name>BSGFX_UNICODE_BLOCK_TAI_LE</name><value>112</value></line>
+			<line comment="19E0"><name>BSGFX_UNICODE_BLOCK_KHMER_SYMBOLS</name><value>113</value></line>
+			<line comment="1D00"><name>BSGFX_UNICODE_BLOCK_PHONETIC_EXTENSIONS</name><value>114</value></line>
+			<line comment="2B00"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_SYMBOLS_AND_ARROWS</name><value>115</value></line>
+			<line comment="4DC0"><name>BSGFX_UNICODE_BLOCK_YIJING_HEXAGRAM_SYMBOLS</name><value>116</value></line>
+			<line comment="10000"><name>BSGFX_UNICODE_BLOCK_LINEAR_B_SYLLABARY</name><value>117</value></line>
+			<line comment="10080"><name>BSGFX_UNICODE_BLOCK_LINEAR_B_IDEOGRAMS</name><value>118</value></line>
+			<line comment="10100"><name>BSGFX_UNICODE_BLOCK_AEGEAN_NUMBERS</name><value>119</value></line>
+			<line comment="10380"><name>BSGFX_UNICODE_BLOCK_UGARITIC</name><value>120</value></line>
+			<line comment="10450"><name>BSGFX_UNICODE_BLOCK_SHAVIAN</name><value>121</value></line>
+			<line comment="10480"><name>BSGFX_UNICODE_BLOCK_OSMANYA</name><value>122</value></line>
+			<line comment="10800"><name>BSGFX_UNICODE_BLOCK_CYPRIOT_SYLLABARY</name><value>123</value></line>
+			<line comment="1D300"><name>BSGFX_UNICODE_BLOCK_TAI_XUAN_JING_SYMBOLS</name><value>124</value></line>
+			<line comment="E0100"><name>BSGFX_UNICODE_BLOCK_VARIATION_SELECTORS_SUPPLEMENT</name><value>125</value></line>
+			<line comment="1D200"><name>BSGFX_UNICODE_BLOCK_ANCIENT_GREEK_MUSICAL_NOTATION</name><value>126</value></line>
+			<line comment="10140"><name>BSGFX_UNICODE_BLOCK_ANCIENT_GREEK_NUMBERS</name><value>127</value></line>
+			<line comment="0750"><name>BSGFX_UNICODE_BLOCK_ARABIC_SUPPLEMENT</name><value>128</value></line>
+			<line comment="1A00"><name>BSGFX_UNICODE_BLOCK_BUGINESE</name><value>129</value></line>
+			<line comment="31C0"><name>BSGFX_UNICODE_BLOCK_CJK_STROKES</name><value>130</value></line>
+			<line comment="1DC0"><name>BSGFX_UNICODE_BLOCK_COMBINING_DIACRITICAL_MARKS_SUPPLEMENT</name><value>131</value></line>
+			<line comment="2C80"><name>BSGFX_UNICODE_BLOCK_COPTIC</name><value>132</value></line>
+			<line comment="2D80"><name>BSGFX_UNICODE_BLOCK_ETHIOPIC_EXTENDED</name><value>133</value></line>
+			<line comment="1380"><name>BSGFX_UNICODE_BLOCK_ETHIOPIC_SUPPLEMENT</name><value>134</value></line>
+			<line comment="2D00"><name>BSGFX_UNICODE_BLOCK_GEORGIAN_SUPPLEMENT</name><value>135</value></line>
+			<line comment="2C00"><name>BSGFX_UNICODE_BLOCK_GLAGOLITIC</name><value>136</value></line>
+			<line comment="10A00"><name>BSGFX_UNICODE_BLOCK_KHAROSHTHI</name><value>137</value></line>
+			<line comment="A700"><name>BSGFX_UNICODE_BLOCK_MODIFIER_TONE_LETTERS</name><value>138</value></line>
+			<line comment="1980"><name>BSGFX_UNICODE_BLOCK_NEW_TAI_LUE</name><value>139</value></line>
+			<line comment="103A0"><name>BSGFX_UNICODE_BLOCK_OLD_PERSIAN</name><value>140</value></line>
+			<line comment="1D80"><name>BSGFX_UNICODE_BLOCK_PHONETIC_EXTENSIONS_SUPPLEMENT</name><value>141</value></line>
+			<line comment="2E00"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTAL_PUNCTUATION</name><value>142</value></line>
+			<line comment="A800"><name>BSGFX_UNICODE_BLOCK_SYLOTI_NAGRI</name><value>143</value></line>
+			<line comment="2D30"><name>BSGFX_UNICODE_BLOCK_TIFINAGH</name><value>144</value></line>
+			<line comment="FE10"><name>BSGFX_UNICODE_BLOCK_VERTICAL_FORMS</name><value>145</value></line>
+			<line comment="07C0"><name>BSGFX_UNICODE_BLOCK_NKO</name><value>146</value></line>
+			<line comment="1B00"><name>BSGFX_UNICODE_BLOCK_BALINESE</name><value>147</value></line>
+			<line comment="2C60"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_C</name><value>148</value></line>
+			<line comment="A720"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_D</name><value>149</value></line>
+			<line comment="A840"><name>BSGFX_UNICODE_BLOCK_PHAGS_PA</name><value>150</value></line>
+			<line comment="10900"><name>BSGFX_UNICODE_BLOCK_PHOENICIAN</name><value>151</value></line>
+			<line comment="12000"><name>BSGFX_UNICODE_BLOCK_CUNEIFORM</name><value>152</value></line>
+			<line comment="12400"><name>BSGFX_UNICODE_BLOCK_CUNEIFORM_NUMBERS_AND_PUNCTUATION</name><value>153</value></line>
+			<line comment="1D360"><name>BSGFX_UNICODE_BLOCK_COUNTING_ROD_NUMERALS</name><value>154</value></line>
+			<line comment="1B80"><name>BSGFX_UNICODE_BLOCK_SUNDANESE</name><value>155</value></line>
+			<line comment="1C00"><name>BSGFX_UNICODE_BLOCK_LEPCHA</name><value>156</value></line>
+			<line comment="1C50"><name>BSGFX_UNICODE_BLOCK_OL_CHIKI</name><value>157</value></line>
+			<line comment="2DE0"><name>BSGFX_UNICODE_BLOCK_CYRILLIC_EXTENDED_A</name><value>158</value></line>
+			<line comment="A500"><name>BSGFX_UNICODE_BLOCK_VAI</name><value>159</value></line>
+			<line comment="A640"><name>BSGFX_UNICODE_BLOCK_CYRILLIC_EXTENDED_B</name><value>160</value></line>
+			<line comment="A880"><name>BSGFX_UNICODE_BLOCK_SAURASHTRA</name><value>161</value></line>
+			<line comment="A900"><name>BSGFX_UNICODE_BLOCK_KAYAH_LI</name><value>162</value></line>
+			<line comment="A930"><name>BSGFX_UNICODE_BLOCK_REJANG</name><value>163</value></line>
+			<line comment="AA00"><name>BSGFX_UNICODE_BLOCK_CHAM</name><value>164</value></line>
+			<line comment="10190"><name>BSGFX_UNICODE_BLOCK_ANCIENT_SYMBOLS</name><value>165</value></line>
+			<line comment="101D0"><name>BSGFX_UNICODE_BLOCK_PHAISTOS_DISC</name><value>166</value></line>
+			<line comment="10280"><name>BSGFX_UNICODE_BLOCK_LYCIAN</name><value>167</value></line>
+			<line comment="102A0"><name>BSGFX_UNICODE_BLOCK_CARIAN</name><value>168</value></line>
+			<line comment="10920"><name>BSGFX_UNICODE_BLOCK_LYDIAN</name><value>169</value></line>
+			<line comment="1F000"><name>BSGFX_UNICODE_BLOCK_MAHJONG_TILES</name><value>170</value></line>
+			<line comment="1F030"><name>BSGFX_UNICODE_BLOCK_DOMINO_TILES</name><value>171</value></line>
+			<line comment="0800"><name>BSGFX_UNICODE_BLOCK_SAMARITAN</name><value>172</value></line>
+			<line comment="18B0"><name>BSGFX_UNICODE_BLOCK_UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS_EXTENDED</name><value>173</value></line>
+			<line comment="1A20"><name>BSGFX_UNICODE_BLOCK_TAI_THAM</name><value>174</value></line>
+			<line comment="1CD0"><name>BSGFX_UNICODE_BLOCK_VEDIC_EXTENSIONS</name><value>175</value></line>
+			<line comment="A4D0"><name>BSGFX_UNICODE_BLOCK_LISU</name><value>176</value></line>
+			<line comment="A6A0"><name>BSGFX_UNICODE_BLOCK_BAMUM</name><value>177</value></line>
+			<line comment="A830"><name>BSGFX_UNICODE_BLOCK_COMMON_INDIC_NUMBER_FORMS</name><value>178</value></line>
+			<line comment="A8E0"><name>BSGFX_UNICODE_BLOCK_DEVANAGARI_EXTENDED</name><value>179</value></line>
+			<line comment="A960"><name>BSGFX_UNICODE_BLOCK_HANGUL_JAMO_EXTENDED_A</name><value>180</value></line>
+			<line comment="A980"><name>BSGFX_UNICODE_BLOCK_JAVANESE</name><value>181</value></line>
+			<line comment="AA60"><name>BSGFX_UNICODE_BLOCK_MYANMAR_EXTENDED_A</name><value>182</value></line>
+			<line comment="AA80"><name>BSGFX_UNICODE_BLOCK_TAI_VIET</name><value>183</value></line>
+			<line comment="ABC0"><name>BSGFX_UNICODE_BLOCK_MEETEI_MAYEK</name><value>184</value></line>
+			<line comment="D7B0"><name>BSGFX_UNICODE_BLOCK_HANGUL_JAMO_EXTENDED_B</name><value>185</value></line>
+			<line comment="10840"><name>BSGFX_UNICODE_BLOCK_IMPERIAL_ARAMAIC</name><value>186</value></line>
+			<line comment="10A60"><name>BSGFX_UNICODE_BLOCK_OLD_SOUTH_ARABIAN</name><value>187</value></line>
+			<line comment="10B00"><name>BSGFX_UNICODE_BLOCK_AVESTAN</name><value>188</value></line>
+			<line comment="10B40"><name>BSGFX_UNICODE_BLOCK_INSCRIPTIONAL_PARTHIAN</name><value>189</value></line>
+			<line comment="10B60"><name>BSGFX_UNICODE_BLOCK_INSCRIPTIONAL_PAHLAVI</name><value>190</value></line>
+			<line comment="10C00"><name>BSGFX_UNICODE_BLOCK_OLD_TURKIC</name><value>191</value></line>
+			<line comment="10E60"><name>BSGFX_UNICODE_BLOCK_RUMI_NUMERAL_SYMBOLS</name><value>192</value></line>
+			<line comment="11080"><name>BSGFX_UNICODE_BLOCK_KAITHI</name><value>193</value></line>
+			<line comment="13000"><name>BSGFX_UNICODE_BLOCK_EGYPTIAN_HIEROGLYPHS</name><value>194</value></line>
+			<line comment="1F100"><name>BSGFX_UNICODE_BLOCK_ENCLOSED_ALPHANUMERIC_SUPPLEMENT</name><value>195</value></line>
+			<line comment="1F200"><name>BSGFX_UNICODE_BLOCK_ENCLOSED_IDEOGRAPHIC_SUPPLEMENT</name><value>196</value></line>
+			<line comment="2A700"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C</name><value>197</value></line>
+			<line comment="0840"><name>BSGFX_UNICODE_BLOCK_MANDAIC</name><value>198</value></line>
+			<line comment="1BC0"><name>BSGFX_UNICODE_BLOCK_BATAK</name><value>199</value></line>
+			<line comment="AB00"><name>BSGFX_UNICODE_BLOCK_ETHIOPIC_EXTENDED_A</name><value>200</value></line>
+			<line comment="11000"><name>BSGFX_UNICODE_BLOCK_BRAHMI</name><value>201</value></line>
+			<line comment="16800"><name>BSGFX_UNICODE_BLOCK_BAMUM_SUPPLEMENT</name><value>202</value></line>
+			<line comment="1B000"><name>BSGFX_UNICODE_BLOCK_KANA_SUPPLEMENT</name><value>203</value></line>
+			<line comment="1F0A0"><name>BSGFX_UNICODE_BLOCK_PLAYING_CARDS</name><value>204</value></line>
+			<line comment="1F300"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_SYMBOLS_AND_PICTOGRAPHS</name><value>205</value></line>
+			<line comment="1F600"><name>BSGFX_UNICODE_BLOCK_EMOTICONS</name><value>206</value></line>
+			<line comment="1F680"><name>BSGFX_UNICODE_BLOCK_TRANSPORT_AND_MAP_SYMBOLS</name><value>207</value></line>
+			<line comment="1F700"><name>BSGFX_UNICODE_BLOCK_ALCHEMICAL_SYMBOLS</name><value>208</value></line>
+			<line comment="2B740"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D</name><value>209</value></line>
+			<line comment="08A0"><name>BSGFX_UNICODE_BLOCK_ARABIC_EXTENDED_A</name><value>210</value></line>
+			<line comment="1EE00"><name>BSGFX_UNICODE_BLOCK_ARABIC_MATHEMATICAL_ALPHABETIC_SYMBOLS</name><value>211</value></line>
+			<line comment="11100"><name>BSGFX_UNICODE_BLOCK_CHAKMA</name><value>212</value></line>
+			<line comment="AAE0"><name>BSGFX_UNICODE_BLOCK_MEETEI_MAYEK_EXTENSIONS</name><value>213</value></line>
+			<line comment="109A0"><name>BSGFX_UNICODE_BLOCK_MEROITIC_CURSIVE</name><value>214</value></line>
+			<line comment="10980"><name>BSGFX_UNICODE_BLOCK_MEROITIC_HIEROGLYPHS</name><value>215</value></line>
+			<line comment="16F00"><name>BSGFX_UNICODE_BLOCK_MIAO</name><value>216</value></line>
+			<line comment="11180"><name>BSGFX_UNICODE_BLOCK_SHARADA</name><value>217</value></line>
+			<line comment="110D0"><name>BSGFX_UNICODE_BLOCK_SORA_SOMPENG</name><value>218</value></line>
+			<line comment="1CC0"><name>BSGFX_UNICODE_BLOCK_SUNDANESE_SUPPLEMENT</name><value>219</value></line>
+			<line comment="11680"><name>BSGFX_UNICODE_BLOCK_TAKRI</name><value>220</value></line>
+			<line comment="16AD0"><name>BSGFX_UNICODE_BLOCK_BASSA_VAH</name><value>221</value></line>
+			<line comment="10530"><name>BSGFX_UNICODE_BLOCK_CAUCASIAN_ALBANIAN</name><value>222</value></line>
+			<line comment="102E0"><name>BSGFX_UNICODE_BLOCK_COPTIC_EPACT_NUMBERS</name><value>223</value></line>
+			<line comment="1AB0"><name>BSGFX_UNICODE_BLOCK_COMBINING_DIACRITICAL_MARKS_EXTENDED</name><value>224</value></line>
+			<line comment="1BC00"><name>BSGFX_UNICODE_BLOCK_DUPLOYAN</name><value>225</value></line>
+			<line comment="10500"><name>BSGFX_UNICODE_BLOCK_ELBASAN</name><value>226</value></line>
+			<line comment="1F780"><name>BSGFX_UNICODE_BLOCK_GEOMETRIC_SHAPES_EXTENDED</name><value>227</value></line>
+			<line comment="11300"><name>BSGFX_UNICODE_BLOCK_GRANTHA</name><value>228</value></line>
+			<line comment="11200"><name>BSGFX_UNICODE_BLOCK_KHOJKI</name><value>229</value></line>
+			<line comment="112B0"><name>BSGFX_UNICODE_BLOCK_KHUDAWADI</name><value>230</value></line>
+			<line comment="AB30"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_E</name><value>231</value></line>
+			<line comment="10600"><name>BSGFX_UNICODE_BLOCK_LINEAR_A</name><value>232</value></line>
+			<line comment="11150"><name>BSGFX_UNICODE_BLOCK_MAHAJANI</name><value>233</value></line>
+			<line comment="10AC0"><name>BSGFX_UNICODE_BLOCK_MANICHAEAN</name><value>234</value></line>
+			<line comment="1E800"><name>BSGFX_UNICODE_BLOCK_MENDE_KIKAKUI</name><value>235</value></line>
+			<line comment="11600"><name>BSGFX_UNICODE_BLOCK_MODI</name><value>236</value></line>
+			<line comment="16A40"><name>BSGFX_UNICODE_BLOCK_MRO</name><value>237</value></line>
+			<line comment="A9E0"><name>BSGFX_UNICODE_BLOCK_MYANMAR_EXTENDED_B</name><value>238</value></line>
+			<line comment="10880"><name>BSGFX_UNICODE_BLOCK_NABATAEAN</name><value>239</value></line>
+			<line comment="10A80"><name>BSGFX_UNICODE_BLOCK_OLD_NORTH_ARABIAN</name><value>240</value></line>
+			<line comment="10350"><name>BSGFX_UNICODE_BLOCK_OLD_PERMIC</name><value>241</value></line>
+			<line comment="1F650"><name>BSGFX_UNICODE_BLOCK_ORNAMENTAL_DINGBATS</name><value>242</value></line>
+			<line comment="16B00"><name>BSGFX_UNICODE_BLOCK_PAHAWH_HMONG</name><value>243</value></line>
+			<line comment="10860"><name>BSGFX_UNICODE_BLOCK_PALMYRENE</name><value>244</value></line>
+			<line comment="11AC0"><name>BSGFX_UNICODE_BLOCK_PAU_CIN_HAU</name><value>245</value></line>
+			<line comment="10B80"><name>BSGFX_UNICODE_BLOCK_PSALTER_PAHLAVI</name><value>246</value></line>
+			<line comment="1BCA0"><name>BSGFX_UNICODE_BLOCK_SHORTHAND_FORMAT_CONTROLS</name><value>247</value></line>
+			<line comment="11580"><name>BSGFX_UNICODE_BLOCK_SIDDHAM</name><value>248</value></line>
+			<line comment="111E0"><name>BSGFX_UNICODE_BLOCK_SINHALA_ARCHAIC_NUMBERS</name><value>249</value></line>
+			<line comment="1F800"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTAL_ARROWS_C</name><value>250</value></line>
+			<line comment="11480"><name>BSGFX_UNICODE_BLOCK_TIRHUTA</name><value>251</value></line>
+			<line comment="118A0"><name>BSGFX_UNICODE_BLOCK_WARANG_CITI</name><value>252</value></line>
+			<line comment="11700"><name>BSGFX_UNICODE_BLOCK_AHOM</name><value>253</value></line>
+			<line comment="14400"><name>BSGFX_UNICODE_BLOCK_ANATOLIAN_HIEROGLYPHS</name><value>254</value></line>
+			<line comment="AB70"><name>BSGFX_UNICODE_BLOCK_CHEROKEE_SUPPLEMENT</name><value>255</value></line>
+			<line comment="2B820"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E</name><value>256</value></line>
+			<line comment="12480"><name>BSGFX_UNICODE_BLOCK_EARLY_DYNASTIC_CUNEIFORM</name><value>257</value></line>
+			<line comment="108E0"><name>BSGFX_UNICODE_BLOCK_HATRAN</name><value>258</value></line>
+			<line comment="11280"><name>BSGFX_UNICODE_BLOCK_MULTANI</name><value>259</value></line>
+			<line comment="10C80"><name>BSGFX_UNICODE_BLOCK_OLD_HUNGARIAN</name><value>260</value></line>
+			<line comment="1F900"><name>BSGFX_UNICODE_BLOCK_SUPPLEMENTAL_SYMBOLS_AND_PICTOGRAPHS</name><value>261</value></line>
+			<line comment="1D800"><name>BSGFX_UNICODE_BLOCK_SUTTON_SIGNWRITING</name><value>262</value></line>
+			<line comment="1E900"><name>BSGFX_UNICODE_BLOCK_ADLAM</name><value>263</value></line>
+			<line comment="11C00"><name>BSGFX_UNICODE_BLOCK_BHAIKSUKI</name><value>264</value></line>
+			<line comment="1C80"><name>BSGFX_UNICODE_BLOCK_CYRILLIC_EXTENDED_C</name><value>265</value></line>
+			<line comment="1E000"><name>BSGFX_UNICODE_BLOCK_GLAGOLITIC_SUPPLEMENT</name><value>266</value></line>
+			<line comment="16FE0"><name>BSGFX_UNICODE_BLOCK_IDEOGRAPHIC_SYMBOLS_AND_PUNCTUATION</name><value>267</value></line>
+			<line comment="11C70"><name>BSGFX_UNICODE_BLOCK_MARCHEN</name><value>268</value></line>
+			<line comment="11660"><name>BSGFX_UNICODE_BLOCK_MONGOLIAN_SUPPLEMENT</name><value>269</value></line>
+			<line comment="11400"><name>BSGFX_UNICODE_BLOCK_NEWA</name><value>270</value></line>
+			<line comment="104B0"><name>BSGFX_UNICODE_BLOCK_OSAGE</name><value>271</value></line>
+			<line comment="17000"><name>BSGFX_UNICODE_BLOCK_TANGUT</name><value>272</value></line>
+			<line comment="18800"><name>BSGFX_UNICODE_BLOCK_TANGUT_COMPONENTS</name><value>273</value></line>
+			<line comment="2CEB0"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F</name><value>274</value></line>
+			<line comment="1B100"><name>BSGFX_UNICODE_BLOCK_KANA_EXTENDED_A</name><value>275</value></line>
+			<line comment="11D00"><name>BSGFX_UNICODE_BLOCK_MASARAM_GONDI</name><value>276</value></line>
+			<line comment="1B170"><name>BSGFX_UNICODE_BLOCK_NUSHU</name><value>277</value></line>
+			<line comment="11A50"><name>BSGFX_UNICODE_BLOCK_SOYOMBO</name><value>278</value></line>
+			<line comment="0860"><name>BSGFX_UNICODE_BLOCK_SYRIAC_SUPPLEMENT</name><value>279</value></line>
+			<line comment="11A00"><name>BSGFX_UNICODE_BLOCK_ZANABAZAR_SQUARE</name><value>280</value></line>
+			<line comment="1FA00"><name>BSGFX_UNICODE_BLOCK_CHESS_SYMBOLS</name><value>281</value></line>
+			<line comment="11800"><name>BSGFX_UNICODE_BLOCK_DOGRA</name><value>282</value></line>
+			<line comment="1C90"><name>BSGFX_UNICODE_BLOCK_GEORGIAN_EXTENDED</name><value>283</value></line>
+			<line comment="11D60"><name>BSGFX_UNICODE_BLOCK_GUNJALA_GONDI</name><value>284</value></line>
+			<line comment="10D00"><name>BSGFX_UNICODE_BLOCK_HANIFI_ROHINGYA</name><value>285</value></line>
+			<line comment="1EC70"><name>BSGFX_UNICODE_BLOCK_INDIC_SIYAQ_NUMBERS</name><value>286</value></line>
+			<line comment="11EE0"><name>BSGFX_UNICODE_BLOCK_MAKASAR</name><value>287</value></line>
+			<line comment="1D2E0"><name>BSGFX_UNICODE_BLOCK_MAYAN_NUMERALS</name><value>288</value></line>
+			<line comment="16E40"><name>BSGFX_UNICODE_BLOCK_MEDEFAIDRIN</name><value>289</value></line>
+			<line comment="10F00"><name>BSGFX_UNICODE_BLOCK_OLD_SOGDIAN</name><value>290</value></line>
+			<line comment="10F30"><name>BSGFX_UNICODE_BLOCK_SOGDIAN</name><value>291</value></line>
+			<line comment="13430"><name>BSGFX_UNICODE_BLOCK_EGYPTIAN_HIEROGLYPH_FORMAT_CONTROLS</name><value>292</value></line>
+			<line comment="10FE0"><name>BSGFX_UNICODE_BLOCK_ELYMAIC</name><value>293</value></line>
+			<line comment="119A0"><name>BSGFX_UNICODE_BLOCK_NANDINAGARI</name><value>294</value></line>
+			<line comment="1E100"><name>BSGFX_UNICODE_BLOCK_NYIAKENG_PUACHUE_HMONG</name><value>295</value></line>
+			<line comment="1ED00"><name>BSGFX_UNICODE_BLOCK_OTTOMAN_SIYAQ_NUMBERS</name><value>296</value></line>
+			<line comment="1B130"><name>BSGFX_UNICODE_BLOCK_SMALL_KANA_EXTENSION</name><value>297</value></line>
+			<line comment="1FA70"><name>BSGFX_UNICODE_BLOCK_SYMBOLS_AND_PICTOGRAPHS_EXTENDED_A</name><value>298</value></line>
+			<line comment="11FC0"><name>BSGFX_UNICODE_BLOCK_TAMIL_SUPPLEMENT</name><value>299</value></line>
+			<line comment="1E2C0"><name>BSGFX_UNICODE_BLOCK_WANCHO</name><value>300</value></line>
+			<line comment="10FB0"><name>BSGFX_UNICODE_BLOCK_CHORASMIAN</name><value>301</value></line>
+			<line comment="30000"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_G</name><value>302</value></line>
+			<line comment="11900"><name>BSGFX_UNICODE_BLOCK_DIVES_AKURU</name><value>303</value></line>
+			<line comment="18B00"><name>BSGFX_UNICODE_BLOCK_KHITAN_SMALL_SCRIPT</name><value>304</value></line>
+			<line comment="11FB0"><name>BSGFX_UNICODE_BLOCK_LISU_SUPPLEMENT</name><value>305</value></line>
+			<line comment="1FB00"><name>BSGFX_UNICODE_BLOCK_SYMBOLS_FOR_LEGACY_COMPUTING</name><value>306</value></line>
+			<line comment="18D00"><name>BSGFX_UNICODE_BLOCK_TANGUT_SUPPLEMENT</name><value>307</value></line>
+			<line comment="10E80"><name>BSGFX_UNICODE_BLOCK_YEZIDI</name><value>308</value></line>
+			<line comment="0870"><name>BSGFX_UNICODE_BLOCK_ARABIC_EXTENDED_B</name><value>309</value></line>
+			<line comment="12F90"><name>BSGFX_UNICODE_BLOCK_CYPRO_MINOAN</name><value>310</value></line>
+			<line comment="1E7E0"><name>BSGFX_UNICODE_BLOCK_ETHIOPIC_EXTENDED_B</name><value>311</value></line>
+			<line comment="1AFF0"><name>BSGFX_UNICODE_BLOCK_KANA_EXTENDED_B</name><value>312</value></line>
+			<line comment="10780"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_F</name><value>313</value></line>
+			<line comment="1DF00"><name>BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_G</name><value>314</value></line>
+			<line comment="10F70"><name>BSGFX_UNICODE_BLOCK_OLD_UYGHUR</name><value>315</value></line>
+			<line comment="16A70"><name>BSGFX_UNICODE_BLOCK_TANGSA</name><value>316</value></line>
+			<line comment="1E290"><name>BSGFX_UNICODE_BLOCK_TOTO</name><value>317</value></line>
+			<line comment="11AB0"><name>BSGFX_UNICODE_BLOCK_UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS_EXTENDED_A</name><value>318</value></line>
+			<line comment="10570"><name>BSGFX_UNICODE_BLOCK_VITHKUQI</name><value>319</value></line>
+			<line comment="1CF00"><name>BSGFX_UNICODE_BLOCK_ZNAMENNY_MUSICAL_NOTATION</name><value>320</value></line>
+			<line comment="10EC0"><name>BSGFX_UNICODE_BLOCK_ARABIC_EXTENDED_C</name><value>321</value></line>
+			<line comment="31350"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_H</name><value>322</value></line>
+			<line comment="1E030"><name>BSGFX_UNICODE_BLOCK_CYRILLIC_EXTENDED_D</name><value>323</value></line>
+			<line comment="11B00"><name>BSGFX_UNICODE_BLOCK_DEVANAGARI_EXTENDED_A</name><value>324</value></line>
+			<line comment="1D2C0"><name>BSGFX_UNICODE_BLOCK_KAKTOVIK_NUMERALS</name><value>325</value></line>
+			<line comment="11F00"><name>BSGFX_UNICODE_BLOCK_KAWI</name><value>326</value></line>
+			<line comment="1E4D0"><name>BSGFX_UNICODE_BLOCK_NAG_MUNDARI</name><value>327</value></line>
+			<line comment="2EBF0"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_I</name><value>328</value></line>
+			<line comment="13460"><name>BSGFX_UNICODE_BLOCK_EGYPTIAN_HIEROGLYPHS_EXTENDED_A</name><value>329</value></line>
+			<line comment="10D40"><name>BSGFX_UNICODE_BLOCK_GARAY</name><value>330</value></line>
+			<line comment="16100"><name>BSGFX_UNICODE_BLOCK_GURUNG_KHEMA</name><value>331</value></line>
+			<line comment="16D40"><name>BSGFX_UNICODE_BLOCK_KIRAT_RAI</name><value>332</value></line>
+			<line comment="116D0"><name>BSGFX_UNICODE_BLOCK_MYANMAR_EXTENDED_C</name><value>333</value></line>
+			<line comment="1E5D0"><name>BSGFX_UNICODE_BLOCK_OL_ONAL</name><value>334</value></line>
+			<line comment="11BC0"><name>BSGFX_UNICODE_BLOCK_SUNUWAR</name><value>335</value></line>
+			<line comment="1CC00"><name>BSGFX_UNICODE_BLOCK_SYMBOLS_FOR_LEGACY_COMPUTING_SUPPLEMENT</name><value>336</value></line>
+			<line comment="105C0"><name>BSGFX_UNICODE_BLOCK_TODHRI</name><value>337</value></line>
+			<line comment="11380"><name>BSGFX_UNICODE_BLOCK_TULU_TIGALARI</name><value>338</value></line>
+			<line comment="16EA0"><name>BSGFX_UNICODE_BLOCK_BERIA_ERFE</name><value>339</value></line>
+			<line comment="323B0"><name>BSGFX_UNICODE_BLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_J</name><value>340</value></line>
+			<line comment="1CEC0"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_SYMBOLS_SUPPLEMENT</name><value>341</value></line>
+			<line comment="11B60"><name>BSGFX_UNICODE_BLOCK_SHARADA_SUPPLEMENT</name><value>342</value></line>
+			<line comment="10940"><name>BSGFX_UNICODE_BLOCK_SIDETIC</name><value>343</value></line>
+			<line comment="1E6C0"><name>BSGFX_UNICODE_BLOCK_TAI_YO</name><value>344</value></line>
+			<line comment="18D80"><name>BSGFX_UNICODE_BLOCK_TANGUT_COMPONENTS_SUPPLEMENT</name><value>345</value></line>
+			<line comment="11DB0"><name>BSGFX_UNICODE_BLOCK_TOLONG_SIKI</name><value>346</value></line>
+			<line comment="12550"><name>BSGFX_UNICODE_BLOCK_ARCHAIC_CUNEIFORM_NUMERALS</name><value>347</value></line>
+			<line comment="11DF0"><name>BSGFX_UNICODE_BLOCK_BENGALI_SUPPLEMENT</name><value>348</value></line>
+			<line comment="16D80"><name>BSGFX_UNICODE_BLOCK_CHISOI</name><value>349</value></line>
+			<line comment="18E00"><name>BSGFX_UNICODE_BLOCK_JURCHEN</name><value>350</value></line>
+			<line comment="191A0"><name>BSGFX_UNICODE_BLOCK_JURCHEN_RADICALS</name><value>351</value></line>
+			<line comment="1DB00"><name>BSGFX_UNICODE_BLOCK_MISCELLANEOUS_SYMBOLS_AND_ARROWS_EXTENDED</name><value>352</value></line>
+			<line comment="1D250"><name>BSGFX_UNICODE_BLOCK_MUSICAL_SYMBOLS_SUPPLEMENT</name><value>353</value></line>
+			<line comment="3D000"><name>BSGFX_UNICODE_BLOCK_SEAL</name><value>354</value></line>
+			<line><name>BSGFX_UNICODE_BLOCK_COUNT</name><value>355</value></line>
+		</enum>
 	</enums>
 
     <macros>
+		<macro><name>#define BSGFX_FOURCC(A, B, C, D)</name><line>((bs_U32)(A) | ((bs_U32)(B) &lt;&lt; 8) | ((bs_U32)(C) &lt;&lt; 16) | ((bs_U32)(D) &lt;&lt; 24))</line></macro>
+		
         <macro><name>#define BSGFX_MODEL_PATH</name><line>"resources/models/"</line></macro>
         <macro><name>#define BSGFX_SHADER_PATH</name><line>"resources/shaders/"</line></macro>
         <macro><name>#define BSGFX_AUDIO_PATH</name><line>"resources/audio/"</line></macro>
@@ -715,6 +1766,32 @@
 			<field><type>int</type><name>index</name></field>
 		</structure>
 
+		<structure name="bsgfx_Font">
+            <field><type>const char*</type><name>alphabet</name></field>
+            <field><type>bs_Atlas*</type><name>atlas</name></field>
+            <field><type>int</type><name>min_y_shift</name></field>
+            <field><type>int</type><name>size</name></field>
+            <field><type>int</type><name>units_per_em</name></field>
+            <field><type>int</type><name>height</name></field>
+            <field><type>float</type><name>spacing</name></field>
+            <field><type>int</type><name>pairs_count</name></field>
+            <structure instance="* pairs">
+                <field><type>int</type><name>right</name></field>
+                <field><type>float</type><name>value</name></field>
+            </structure>
+            <structure instance="* glyphs">
+                <field><type>int</type><name>y_offset</name></field>
+                <field><type>float</type><name>advance_width</name></field>
+                <field><type>float</type><name>left_side_bearing</name></field>
+                <field><type>int</type><name>kerning_pair_offset</name></field>
+                <field><type>int</type><name>kerning_pair_count</name></field>
+            </structure>
+            <field><type>char</type><name>table</name><size>256</size></field>
+            <structure instance="_[]">
+                <field><type>void*</type><name>unused</name></field>
+            </structure>
+        </structure>
+		
 		<structure name="bsgfx_Widget">
 			<field><type>int</type><name>indent</name></field>
 			<field><type>int</type><name>id</name></field>
@@ -726,7 +1803,7 @@
 			<field><type>void*</type><name>params</name></field>
 			<field><type>bs_vec3</type><name>offset</name></field>
 			<field><type>float</type><name>align_height</name></field>
-			<field><type>bs_Font*</type><name>font</name></field>
+			<field><type>bsgfx_Font*</type><name>font</name></field>
 			<structure type="union">
 				<structure instance=" string">
 					<field><type>char*</type><name>value</name></field>
@@ -902,7 +1979,7 @@
 				<field><type>int</type><name>border_id</name></field>
 				<field><type>bool</type><name>auto_scale_width</name></field>
 			</structure>
-			<field><type>bs_Font*</type><name>font</name></field>
+			<field><type>bsgfx_Font*</type><name>font</name></field>
 			<field><type>float</type><name>border_radius</name></field>
 			<field><type>int</type><name>shadow_material_id</name></field>
 			<field><type>int</type><name>outline_material_id</name></field>
@@ -911,7 +1988,7 @@
 
 		<structure name="bsgfx_TitleBar">
 			<field><type>const char*</type><name>name</name></field>
-			<field><type>bs_Font*</type><name>font</name></field>
+			<field><type>bsgfx_Font*</type><name>font</name></field>
 			<field><type>int</type><name>material_id</name></field>
 			<field><type>int</type><name>button_unavailable_material_id</name></field>
 			<field><type>int</type><name>button_material_id</name></field>
@@ -932,7 +2009,15 @@
 		<function name="bsgfx_test">
 			<return>void</return>
 		</function>
-		
+
+		<function name="bsgfx_textDimensions">
+			<return>void</return>
+			<param><type>bsgfx_Font*</type><name>font</name></param>
+			<param><type>bs_vec2*</type><name>out</name></param>
+			<param><type>char*</type><name>name</name></param>
+			<param><type>int</type><name>length</name></param>
+		</function>
+
 		<function name="bsgfx_defaultPipelineHash">
 			<return>bs_PipelineHash</return>
 		</function>
@@ -1269,7 +2354,7 @@
 		<variadicStringTemplate name="bsgfx_instanceText">
 			<return>void</return>
 			<param><type>int</type><name>subtype</name></param>
-			<param><type>bs_Font*</type><name>font</name></param>
+			<param><type>bsgfx_Font*</type><name>font</name></param>
 			<param><type>bsgfx_Text*</type><name>params</name></param>
 			<param><type>bs_vec2*</type><name>out_text_size</name></param>
 		</variadicStringTemplate>

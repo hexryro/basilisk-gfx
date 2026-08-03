@@ -1381,7 +1381,7 @@ BSAPI bs_Range _bs_pushModel(bs_Batch* batch, bs_Model* model) {
 }
 
 /*
-void _bs_pushGlyph(bs_Batch* batch, bs_Font* font, bs_Glyph* glyph, bs_vec3 pos, bs_RGBA col, float scale) {
+void _bs_pushGlyph(bs_Batch* batch, bsgfx_Font* font, bs_Glyph* glyph, bs_vec3 pos, bs_RGBA col, float scale) {
     pos.y += (float)glyph->y_min * font->scale;
 
     bs_Quad quad = _bs_quad(pos, bs_v2MulV1(BS_V2(glyph->width, BS_TTF_DIM), scale));
@@ -1389,7 +1389,7 @@ void _bs_pushGlyph(bs_Batch* batch, bs_Font* font, bs_Glyph* glyph, bs_vec3 pos,
     _bs_pushQuad(batch, quad, col, NULL);
 }
 
-void _bs_pushText(bs_Batch* batch, bs_Font* font, bs_vec3 pos, bs_RGBA col, float scale, const char* text, va_list args) {
+void _bs_pushText(bs_Batch* batch, bsgfx_Font* font, bs_vec3 pos, bs_RGBA col, float scale, const char* text, va_list args) {
     bs_Range batch_part = (bs_Range){ batch->indices.num_units, 0 };
 
     char buf[512];

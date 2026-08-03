@@ -74,6 +74,15 @@ void bsgfx_test()
     next.bsgfx_test();
 }
 
+void bsgfx_textDimensions(
+    bsgfx_Font* font, 
+    bs_vec2* out, 
+    char* name, 
+    int length)
+{
+    next.bsgfx_textDimensions(font, out, name, length);
+}
+
 bs_PipelineHash bsgfx_defaultPipelineHash()
 {
     return next.bsgfx_defaultPipelineHash();
@@ -580,7 +589,7 @@ int bsgfx_instanceAtlasFlipped(
 
 void bsgfx_instanceText(
     int subtype, 
-    bs_Font* font, 
+    bsgfx_Font* font, 
     bsgfx_Text* params, 
     bs_vec2* out_text_size, 
     char* value, 
@@ -591,7 +600,7 @@ void bsgfx_instanceText(
 
 void bsgfx_instanceTextV(
     int subtype, 
-    bs_Font* font, 
+    bsgfx_Font* font, 
     bsgfx_Text* params, 
     bs_vec2* out_text_size, 
     char* format, 
@@ -602,7 +611,7 @@ void bsgfx_instanceTextV(
 
 void bsgfx_instanceTextF(
     int subtype, 
-    bs_Font* font, 
+    bsgfx_Font* font, 
     bsgfx_Text* params, 
     bs_vec2* out_text_size, 
     char* format, 

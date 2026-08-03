@@ -897,34 +897,6 @@ BSAPI void _preval_bs_runSingle(bs_Callback function) {
     next.bs_runSingle(function);
 }
 
-BSAPI void _preval_bs_bindFont(bs_Font* font, bs_Sampler* sampler, int bind_set, int bind_point) {
-    BS_VALIDATE(font != NULL, ,);
-    BS_VALIDATE(font->head.type == BS_OBJECT_FONT, ,);
-    BS_VALIDATE(sampler != NULL, ,);
-    BS_VALIDATE(sampler->head.type == BS_OBJECT_SAMPLER, ,);
-    next.bs_bindFont(font, sampler, bind_set, bind_point);
-}
-
-BSAPI bs_vec2 _preval_bs_textDimensions(bs_Font* font, char* name, int length) {
-    BS_VALIDATE(font != NULL, (bs_vec2) { 0 },);
-    BS_VALIDATE(font->head.type == BS_OBJECT_FONT, (bs_vec2) { 0 },);
-    BS_VALIDATE(name != NULL, (bs_vec2) { 0 },);
-    return next.bs_textDimensions(font, name, length);
-}
-
-BSAPI void _preval_bs_destroyFont(bs_Font* font) {
-    BS_VALIDATE(font != NULL, ,);
-    BS_VALIDATE(font->head.type == BS_OBJECT_FONT, ,);
-    next.bs_destroyFont(font);
-}
-
-BSAPI bs_Result _preval_bs_loadFont(bs_Object* object, int package_id, const char* resource_name, const char* alphabet, float spacing, bs_U32 flags) {
-    BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BS_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BS_VALIDATE(alphabet != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadFont(object, package_id, resource_name, alphabet, spacing, flags);
-}
-
 BSAPI bs_Result _preval_bs_image(bs_Object* object, bs_ivec2 dim, int num_indices, bs_Format format, bs_U32 flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_image(object, dim, num_indices, format, flags);
@@ -958,12 +930,6 @@ BSAPI bs_Result _preval_bs_loadPng(const char* path, int channels_count, bs_PngD
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(out_png_data != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_loadPng(path, channels_count, out_png_data);
-}
-
-BSAPI bs_Result _preval_bs_bitmapImage(bs_Object* existing_object, unsigned char* image_data, bs_ivec2 dim, bs_Format format, bs_ImageBits flags) {
-    BS_VALIDATE(existing_object != NULL, BS_RESULT_VALIDATION_ERROR,);
-    BS_VALIDATE(image_data != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_bitmapImage(existing_object, image_data, dim, format, flags);
 }
 
 BSAPI bs_Result _preval_bs_savePng(char* data, bs_ivec2 resolution, bs_PngType type, char* path, int path_length) {
@@ -2655,17 +2621,12 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_getScope = _preval_bs_getScope;
     functions.bs_setScope = _preval_bs_setScope;
     functions.bs_runSingle = _preval_bs_runSingle;
-    functions.bs_bindFont = _preval_bs_bindFont;
-    functions.bs_textDimensions = _preval_bs_textDimensions;
-    functions.bs_destroyFont = _preval_bs_destroyFont;
-    functions.bs_loadFont = _preval_bs_loadFont;
     functions.bs_image = _preval_bs_image;
     functions.bs_transition = _preval_bs_transition;
     functions.bs_peekPng = _preval_bs_peekPng;
     functions.bs_peekPngV = _preval_bs_peekPngV;
     functions.bs_loadPngData = _preval_bs_loadPngData;
     functions.bs_loadPng = _preval_bs_loadPng;
-    functions.bs_bitmapImage = _preval_bs_bitmapImage;
     functions.bs_savePng = _preval_bs_savePng;
     functions.bs_savePngV = _preval_bs_savePngV;
     functions.bs_encodePng = _preval_bs_encodePng;

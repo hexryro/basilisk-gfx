@@ -34,6 +34,37 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+bsmod_TextureInfo* _bsmod_packAtlasTextureV(
+    bsmod_AtlasPacker* packer, 
+    bs_RGBA* data, 
+    int width, 
+    int height, 
+    int category, 
+    char* format, 
+    va_list args)
+{
+    int _length = bs_formatStringLength(format, args);
+    char* _formatted = bs_alloca(_length + 1);
+    vsnprintf(_formatted, _length + 1, format, args);
+    return _bsmod_packAtlasTexture(packer, data, width, height, category, _formatted, _length);
+}
+
+bsmod_TextureInfo* _bsmod_packAtlasTextureF(
+    bsmod_AtlasPacker* packer, 
+    bs_RGBA* data, 
+    int width, 
+    int height, 
+    int category, 
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    bsmod_TextureInfo* _return = _bsmod_packAtlasTextureV(packer, data, width, height, category, format, args);
+    va_end(args);
+    return _return;
+}
+
 bs_Result _bsmod_packResourceV(
     bs_ResourceType type, 
     unsigned char* data, 

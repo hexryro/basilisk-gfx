@@ -104,4 +104,7 @@ static inline const char* _bsmod_applicationContentPath() {
 #define BSMOD_WARN_SPVC_ERROR(function, code, format, ...)            \
     bs_warnF("%s at %s:%d: %s failed" __VA_OPT__(", ") format " (SPVC result %d)\n", __func__, __FILE__, __LINE__, function __VA_OPT__(,) __VA_ARGS__, code)
 
+#define BSMOD_WARN_FREETYPE_ERROR(function, code, format, ...)        \
+    bs_warnF("%s at %s:%d: %s failed" __VA_OPT__(", ") format " (FreeType error %d)\n", __func__, __FILE__, __LINE__, function __VA_OPT__(,) __VA_ARGS__, code)
+
 #endif

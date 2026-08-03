@@ -358,10 +358,7 @@
 			<line><name>BS_OBJECT_BATCH</name></line>
 			<line><name>BS_OBJECT_RENDERER</name></line>
 			<line><name>BS_OBJECT_RAY_TRACER</name></line>
-			<line><name>BS_OBJECT_FONT</name></line>
 			<line><name>BS_OBJECT_ATLAS</name></line>
-			
-			<line><name>BSGFX_OBJECT_FONT_COLLECTION</name></line>
 			
 			<line><name>BS_OBJECT_TYPE_COUNT</name></line>
 		</enum>
@@ -402,6 +399,7 @@
         <macro><name>#define BS_BBND_MAGIC</name><line>0x646E6262</line></macro>
         <macro><name>#define BS_BATL_MAGIC</name><line>0x6C746162</line></macro>
         <macro><name>#define BS_BIFF_MAGIC</name><line>0x66666962</line></macro>
+        <macro><name>#define BS_BFNT_MAGIC</name><line>0x746E6662</line></macro>
 		
         <macro><name>#define BS_CONSTANT_STRING(s)</name><line>s, sizeof(s) - 1</line></macro>
 
@@ -736,7 +734,6 @@
         <macro><name>#define BS_PIPELINE(source_id, id, flags)</name><line>BS_OBJECT(bs_Pipeline, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_PIPELINE)</line></macro>
         <macro><name>#define BS_RAY_TRACER(source_id, id, flags)</name><line>BS_OBJECT(bs_RayTracer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_RAY_TRACER)</line></macro>
         <macro><name>#define BS_ATLAS(source_id, id, flags)</name><line>BS_OBJECT(bs_Atlas, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_ATLAS)</line></macro>
-        <macro><name>#define BS_FONT(source_id, id, flags)</name><line>BS_OBJECT(bs_Font, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_FONT)</line></macro>
 		
         <macro><name>#define BS_NUM_STRIKES_RULE</name><line>(1)</line></macro>
         <macro><name>#define BS_QUERY_FORCE_CREATE</name><line>(1 &lt;&lt; 31)</line></macro>
@@ -1172,7 +1169,6 @@
                 <field><type>bs_Sound*</type><name>sound</name></field>
                 <field><type>bs_Queue*</type><name>queue</name></field>
                 <field><type>bs_RayTracer*</type><name>ray_tracer</name></field>
-                <field><type>bs_Font*</type><name>font</name></field>
                 <field><type>bs_Context*</type><name>context</name></field>
             </structure>
         </structure>
@@ -1190,7 +1186,6 @@
                 <field><type>bs_Shader*</type><name>shader</name></field>
                 <field><type>bs_Sound*</type><name>sound</name></field>
                 <field><type>bs_Atlas*</type><name>atlas</name></field>
-                <field><type>bs_Font*</type><name>font</name></field>
                 <field><type>bs_Image*</type><name>image</name></field>
             </structure>
         </structure>
@@ -1682,103 +1677,6 @@
             <field><type>void*</type><name>data</name></field>
             <field><type>void*</type><name>xaudio</name></field>
             <field><type>int</type><name>size</name></field>
-        </structure>
-        <structure name="bs_LongHorMetric">
-            <field><type>bs_U16</type><name>advance_width</name></field>
-            <field><type>bs_I16</type><name>left_side_bearing</name></field>
-        </structure>
-		<structure name="bs_KerningPair">
-            <field><type>int</type><name>right_index</name></field>
-            <field><type>bs_U16</type><name>right</name></field>
-            <field><type>bs_I16</type><name>value</name></field>
-        </structure>
-        <structure name="bs_BfntHeader">
-            <field><type>bs_U32</type><name>magic</name></field>
-            <field><type>bs_U32</type><name>version</name></field>
-            <field><type>bs_U32</type><name>glyphs_count</name></field>
-            <field><type>bs_U32</type><name>kerning_pairs_count</name></field>
-            <field><type>bs_U32</type><name>line_height</name></field>
-            <field><type>bs_U32</type><name>units_per_em</name></field>
-            <field><type>bs_U32</type><name>size</name></field>
-            <field><type>bs_U32</type><name>batl_offset</name></field>
-            <field><type>char</type><name>ascii_table</name><size>256</size></field>
-        </structure>
-        <structure name="bs_BfntKerningPair">
-            <field><type>int</type><name>right</name></field>
-            <field><type>int</type><name>value</name></field>
-        </structure>
-        <structure name="bs_BfntGlyph">
-            <field><type>bs_U32</type><name>code</name></field>
-            <field><type>int</type><name>y_offset</name></field>
-            <field><type>int</type><name>advance_width</name></field>
-            <field><type>int</type><name>left_side_bearing</name></field>
-            <field><type>bs_U32</type><name>kerning_pair_offset</name></field>
-            <field><type>bs_U32</type><name>kerning_pair_count</name></field>
-            <field><type>bs_U32 reserved_0,</type><name>reserved_1</name></field>
-        </structure>
-        <structure name="bs_Font" object="BS_OBJECT_FONT">
-            <field><type>bs_Header</type><name>head</name></field>
-            <field><type>const char*</type><name>alphabet</name></field>
-            <field><type>bs_Atlas*</type><name>atlas</name></field>
-            <field><type>int</type><name>min_y_shift</name></field>
-            <field><type>int</type><name>size</name></field>
-            <field><type>int</type><name>units_per_em</name></field>
-            <field><type>int</type><name>height</name></field>
-            <field><type>float</type><name>spacing</name></field>
-            <field><type>int</type><name>pairs_count</name></field>
-            <structure instance="* pairs">
-                <field><type>int</type><name>right</name></field>
-                <field><type>float</type><name>value</name></field>
-            </structure>
-            <structure instance="* glyphs">
-                <field><type>int</type><name>y_offset</name></field>
-                <field><type>float</type><name>advance_width</name></field>
-                <field><type>float</type><name>left_side_bearing</name></field>
-                <field><type>int</type><name>kerning_pair_offset</name></field>
-                <field><type>int</type><name>kerning_pair_count</name></field>
-            </structure>
-            <field><type>char</type><name>table</name><size>256</size></field>
-            <structure instance="_[]">
-                <field><type>void*</type><name>unused</name></field>
-            </structure>
-        </structure>
-        <structure name="bs_Endpoint">
-            <field><type>bs_EndpointType</type><name>type</name></field>
-            <field><type>int</type><name>name_len</name></field>
-            <field><type>const char*</type><name>name</name></field>
-        </structure>
-        <structure name="bs_Server">
-            <field><type>bs_List</type><name>endpoints</name></field>
-            <field><type>void*</type><name>queue</name></field>
-            <field><type>void*</type><name>overlapped</name></field>
-            <field><type>char*</type><name>buffer</name></field>
-            <field><type>int</type><name>buffer_capacity</name></field>
-            <field><type>bool</type><name>is_waiting</name></field>
-            <field><type>int</type><name>reserved</name></field>
-        </structure>
-        <structure name="bs_Simulation">
-            <field><type>float</type><name>mass</name></field>
-            <field><type>float</type><name>inverse_mass</name></field>
-            <field><type>float</type><name>damping</name></field>
-            <field><type>float</type><name>angular_damping</name></field>
-            <field><type>float</type><name>gravity_scale</name></field>
-            <field><type>bs_vec3</type><name>velocity</name></field>
-            <field><type>bs_vec3</type><name>angular_velocity</name></field>
-            <field><type>bs_vec3</type><name>acceleration_last</name></field>
-            <field><type>bs_vec3</type><name>force</name></field>
-            <field><type>bs_vec3</type><name>torque</name></field>
-            <field><type>bs_vec3</type><name>position</name></field>
-            <field><type>bs_vec4</type><name>rotation</name></field>
-            <field><type>bs_mat3</type><name>local_inverse_inertia</name></field>
-            <field><type>bs_mat3</type><name>world_inverse_inertia</name></field>
-        </structure>
-        <structure name="bs_Contact">
-            <field><type>bs_mat3</type><name>to_world</name></field>
-            <field><type>bs_vec3</type><name>normal</name></field>
-            <field><type>bs_vec3</type><name>point</name></field>
-            <field><type>bs_vec3</type><name>velocity</name></field>
-            <field><type>float</type><name>delta_velocity</name></field>
-            <field><type>float</type><name>penetration</name></field>
         </structure>
 		<structure name="bs_ImageDescriptor">
 			<field><type>bs_Sampler*</type><name>sampler</name></field>
@@ -2970,32 +2868,6 @@
         <function name="bs_runSingle">
             <return>void</return>
             <param><type>bs_Callback</type><name>function</name></param>
-        </function>
-        <function name="bs_bindFont">
-            <return>void</return>
-            <param><type>bs_Font*</type><name>font</name></param>
-            <param><type>bs_Sampler*</type><name>sampler</name></param>
-            <param><assert>bind_set &gt;= 0</assert><type>int</type><name>bind_set</name></param>
-            <param><type>int</type><name>bind_point</name></param>
-        </function>
-        <function name="bs_textDimensions">
-            <return>bs_vec2</return>
-            <param><type>bs_Font*</type><name>font</name></param>
-            <param><type>char*</type><name>name</name></param>
-            <param><type>int</type><name>length</name></param>
-        </function>
-        <function name="bs_destroyFont">
-            <return>void</return>
-            <param><type>bs_Font*</type><name>font</name></param>
-        </function>
-        <function name="bs_loadFont">
-            <return>bs_Result</return>
-            <param><type>bs_Object*</type><name>object</name></param>
-            <param><type>int</type><name>package_id</name></param>
-            <param><type>const char*</type><name>resource_name</name></param>
-            <param><type>const char*</type><name>alphabet</name></param>
-            <param><type>float</type><name>spacing</name></param>
-            <param><type>bs_U32</type><name>flags</name></param>
         </function>
         <function name="bs_image" section="bs_images.h">
             <return>bs_Result</return>

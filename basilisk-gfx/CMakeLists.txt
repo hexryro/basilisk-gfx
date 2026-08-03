@@ -65,10 +65,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src/
     ${CMAKE_SOURCE_DIR}/include/objects/
     levels/
+    ${CMAKE_SOURCE_DIR}/external/freetype/include
 )
 
 target_link_directories(${PROJECT_NAME} PRIVATE 
     ${CMAKE_SOURCE_DIR}/external/
+    ${CMAKE_SOURCE_DIR}/external/freetype/objs
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -77,6 +79,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     vulkan-1
     dwmapi
     #GFSDK_Aftermath_Lib.x64
+    freetype
 )
 
 if (MSVC)

@@ -57,7 +57,7 @@ bsgfx_Material* _bsgfx_materialF(
 
 void _bsgfx_instanceTextV(
     int subtype, 
-    bs_Font* font, 
+    bsgfx_Font* font, 
     bsgfx_Text* params, 
     bs_vec2* out_text_size, 
     char* format, 
@@ -71,7 +71,7 @@ void _bsgfx_instanceTextV(
 
 void _bsgfx_instanceTextF(
     int subtype, 
-    bs_Font* font, 
+    bsgfx_Font* font, 
     bsgfx_Text* params, 
     bs_vec2* out_text_size, 
     char* format, 

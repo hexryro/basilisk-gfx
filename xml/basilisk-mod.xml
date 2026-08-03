@@ -115,6 +115,15 @@
 			</structure>
 		</structure>
 
+		<structure name="bsmod_UnicodeBlockRange">
+			<field><type>bs_U32</type><name> offset</name></field>
+			<field><type>bs_U32</type><name> count</name></field>
+			<field><type>bs_U32</type><name> size</name></field>
+			<field><type>bsgfx_UnicodeBlock</type><name> block</name></field>
+			<field><type>bool</type><name> rasterize</name></field>
+
+		</structure>
+
 		<structure name="bsmod_QueueLoad">
 			<field><type>bs_ResourceType</type><name>type</name></field>
 			<field><type>char*</type><name>path</name></field>
@@ -124,7 +133,12 @@
 			<field><type>bs_List</type><name>info</name></field>
 			<field><type>bs_List</type><name>rects</name></field>
 		</structure>
-
+		
+		<structure name="bsmod_GlyphInfo">
+			<field><type>int</type><name>page</name></field>
+			<field><type>unsigned int</type><name>glyph_id</name></field>
+		</structure>
+		
 		<structure name="bsmod_TextureInfo">
 			<field><type>char*</type><name>name</name></field>
 			<field><type>bs_RGBA*</type><name>data</name></field>
@@ -253,26 +267,30 @@
 		</function>
 
 		<function name="bsmod_packFont">
-			<return>void</return>
+			<return>bs_Result</return>
 			<param><type>char*</type><name>package_name</name></param>
 			<param><type>char*</type><name>ttf_path</name></param>
+			<param><type>bsmod_UnicodeBlockRange</type><name>blocks</name><size></size></param>
+			<param><type>int</type><name>blocks_count</name></param>
+			<param><type>int</type><name>pt_sizes</name><size></size></param>
+			<param><type>int</type><name>pt_sizes_count</name></param>
 			<param><type>char*</type><name>resource_name</name></param>
 			<param><type>int</type><name>resource_name_length</name></param>
 		</function>
-		<function name="bsmod_packAtlasTexture">
-			<return>void</return>
+		<variadicStringTemplate name="bsmod_packAtlasTexture" string="name">
+			<return>bsmod_TextureInfo*</return>
 			<param><type>bsmod_AtlasPacker*</type><name>packer</name></param>
-			<param><type>char*</type><name>name</name></param>
 			<param><type>bs_RGBA*</type><name>data</name></param>
 			<param><type>int</type><name>width</name></param>
 			<param><type>int</type><name>height</name></param>
 			<param><type>int</type><name>category</name></param>
-		</function>
+		</variadicStringTemplate>
 		<function name="bsmod_packAtlas">
 			<return>bs_Result</return>
 			<param><type>bsmod_AtlasPacker*</type><name>packer</name></param>
 			<param><type>int</type><name>width</name></param>
 			<param><type>int</type><name>height</name></param>
+			<param><type>int</type><name>channels_count</name></param>
 			<param><type>char*</type><name>package</name></param>
 			<param><type>char*</type><name>resource_name</name></param>
 			<param><type>bool</type><name>allow_paging</name></param>

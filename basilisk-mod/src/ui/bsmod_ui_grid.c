@@ -112,8 +112,8 @@ static void _bsmod_directoryWidget(bs_List* widgets, const char* name, int inden
     if (is_selected) {
         // TODO: text rewrite
         /*
-        bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
-        bs_vec2 text_size = bs_textDimensions(font, name, strlen(name));
+        bsgfx_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
+        bs_vec2 text_size = bsgfx_textDimensions(font, name, strlen(name));
         bs_pushBack(widgets, &(bsgfx_Widget) {
             .type = BSGFX_WIDGET_BACKGROUND,
             .background = {
@@ -382,7 +382,7 @@ static bool _bsmod_instanceAtlasPreview(bsgfx_Widget* widget, bsgfx_GridParams g
             if (category_name) {
                 // TODO: text rewrite
                 /*
-                bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->font;
+                bsgfx_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->font;
                 grid.position->y -= font->height;
                 grid.position->x = grid.start.x;
                 bs_vec2 category_name_dimensions;

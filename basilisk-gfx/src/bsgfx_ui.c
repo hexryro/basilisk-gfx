@@ -107,14 +107,14 @@ bool _bsgfx_rectangleVsPointExpand(const bs_vec2* position, const bs_vec2* dimen
 
 static inline float _bsgfx_textHeight() {
 	return 0.0;
-	//bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
+	//bsgfx_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
 	//return font->height;
 }
 
 /*
 static inline float _bsgfx_instanceTextField(int subtype, bs_vec3* position, char* text, int material_id) {
 	return 0.0;
-	bs_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
+	bsgfx_Font* font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16)->head;
 	//position->y -= _bsgfx_textHeight();
 
 	return _bsgfx_instanceText(subtype, font, &(bsgfx_Text) {
@@ -224,14 +224,14 @@ static bool _bsgfx_instanceUrl(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alre
 	/*
 	bs_vec2 cursor = bs_cursorPosition();
 	bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 	
 	bsgfx_AtlasCache* ui_copy = $BSGFX_ATLAS_ANY_ui_copy();
 
 	//if ((position->y - ui_copy_size.y) < menu->coords.y)
 	//	return;
 
-	bs_vec2 name_dimensions = bs_textDimensions(font, widget->url.path, strlen(widget->url.path));
+	bs_vec2 name_dimensions = bsgfx_textDimensions(font, widget->url.path, strlen(widget->url.path));
 	bool url_hovering = !already_hovering && bs_rectangleVsPoint(bs_v2AddY(position.xy, -name_dimensions.y), &name_dimensions, &cursor);
 
 	// url_hovering ? BSGFX_DEBUG_URL_SELECTED_COLOR : BSGFX_DEBUG_URL_COLOR
@@ -273,11 +273,11 @@ static bool _bsgfx_instanceUrl(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alre
 static bool _bsgfx_instanceRange(bsgfx_Menu* menu, bsgfx_Widget* widget, bool already_hovering, int id, bs_vec3 position, bs_vec2* out_width) {
 	bs_vec2 cursor = bs_cursorPosition();
 	bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 
 	bsgfx_AtlasCache* ui_increment = $BSGFX_ATLAS_ANY_ui_increment();
 
-	//bs_vec2 name_dimensions = bs_textDimensions(font, widget->name, strlen(widget->name));
+	//bs_vec2 name_dimensions = bsgfx_textDimensions(font, widget->name, strlen(widget->name));
 	bs_vec2 name_dimensions = BS_V2(16, 16);
 
 	bs_vec3 copy_position = BS_V3(position.x + name_dimensions.x, position.y, position.z + 1);
@@ -331,9 +331,9 @@ static bool _bsgfx_instanceRange(bsgfx_Menu* menu, bsgfx_Widget* widget, bool al
  */
 static bool _bsgfx_instanceSlider(bsgfx_Menu* menu, bsgfx_Widget* widget, bool already_hovering, int id, bs_vec3 position, bs_vec2* out_size) {
 	bs_vec2 cursor = bs_cursorPosition();
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 
-//	bs_vec2 name_dimensions = bs_textDimensions(font, widget->name, strlen(widget->name));
+//	bs_vec2 name_dimensions = bsgfx_textDimensions(font, widget->name, strlen(widget->name));
 	bs_vec2 name_dimensions = BS_V2(16, 16);
 	bs_vec2 bar_dimensions = BS_V2(3 * BSGFX_PIXEL_SCALE, 4.0 * BSGFX_PIXEL_SCALE);
 	position.y -= bar_dimensions.y;
@@ -393,7 +393,7 @@ static bool _bsgfx_instanceIcon(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alr
 
 	bs_vec2 cursor = bs_cursorPosition();
 
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 
 	int ui_icon = 0;
 	if (widget->icon.type == BSGFX_ICON_ATLAS) {
@@ -420,7 +420,7 @@ static bool _bsgfx_instanceIcon(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alr
 
 	//bs_vec2 name_dimensions = { 0 };
 	//if (widget->name)
-	//	name_dimensions = bs_textDimensions(font, widget->name, strlen(widget->name));
+	//	name_dimensions = bsgfx_textDimensions(font, widget->name, strlen(widget->name));
 
 	//if (widget->icon.placement == BSGFX_ICON_PLACE_BELOW)
 	//	position->y -= size.y;
@@ -515,7 +515,7 @@ static bool _bsgfx_instanceIcon(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alr
 static bool _bsgfx_instanceList(bsgfx_Menu* menu, bsgfx_Widget* widget, bool already_hovering, int id, bs_vec3 position, bs_vec2* out_size) {
 	/*
 	bs_vec2 cursor = bs_cursorPosition();
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 
 	const int max_name_length = 128;
 
@@ -581,13 +581,13 @@ static bool _bsgfx_instanceWidgetName(bsgfx_Menu* menu, bsgfx_Widget* widget, bs
 	if (widget_name_len <= 0)
 		return false;
 
-	bs_textDimensions(widget->font ? widget->font : menu->font, widget->name, widget_name_len);
+	bsgfx_textDimensions(widget->font ? widget->font : menu->font, widget->name, widget_name_len);
 	if (widget->type != BSGFX_WIDGET_BUTTON &&
 		widget->type != BSGFX_WIDGET_URL)
 	{
 		bs_vec3 position = menu->position;
 		float width = _bsgfx_instanceTextField(menu->text_subtype, &position, widget->name, widget->material_id);
-		bs_Font* font = widget->font ? widget->font : menu->font;
+		bsgfx_Font* font = widget->font ? widget->font : menu->font;
 		bs_vec2 size = BS_V2(width, font->height);
 
 		menu->position.x += width;
@@ -606,9 +606,11 @@ static bool _bsgfx_instanceString(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	//if (widget->type != BSGFX_WIDGET_ICON || widget->icon.placement == BSGFX_ICON_PLACE_RIGHT || widget->icon.placement == BSGFX_ICON_PLACE_BELOW)
 	//hovering_name = _bsgfx_instanceWidgetName(&menu, widget, cursor);
 
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 	int len = strlen(widget->string.value);
-	bs_vec2 text_dimensions = bs_textDimensions(font, widget->string.value, len);
+
+	bs_vec2 text_dimensions;
+	bsgfx_textDimensions(font, &text_dimensions, widget->string.value, len);
 
 	if (widget->align_height == 0.0)
 		widget->align_height = text_dimensions.y;
@@ -641,11 +643,11 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	bs_vec2 cursor = bs_cursorPosition();
 	bs_vec2 size = widget->button.size;
 
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 
 	bs_vec2 text_dimensions;
 	if (widget->button.name && font) {
-		text_dimensions = bs_textDimensions(font, widget->button.name, strlen(widget->button.name));
+		bsgfx_textDimensions(font, &text_dimensions, widget->button.name, strlen(widget->button.name));
 
 		if (size.x == 0)
 			size.x = text_dimensions.x;
@@ -952,7 +954,7 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 	//	position.z + 30), $white_material()->id);
 
 	if (widget->advance_flags & BSGFX_WIDGET_ADVANCE_RIGHT) {
-		bs_Font* font = widget->font ? widget->font : menu->font;
+		bsgfx_Font* font = widget->font ? widget->font : menu->font;
 	//	position->y -= font->height + widget->name_padding;
 		position.x += widget->color.dimensions.x + hue_dimensions.x + alpha_dimensions.x + widget->color.padding * 3;
 	}
@@ -965,7 +967,7 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
  */
 static bs_U64 _bsgfx_selected_input = 0;
 
-static inline void _bsgfx_findClosestX(bs_Font* font, bs_String* input, int* select_position, float* select_draw_position_x, float target) {
+static inline void _bsgfx_findClosestX(bsgfx_Font* font, bs_String* input, int* select_position, float* select_draw_position_x, float target) {
 	float result_draw_position_x = 0.0;
 
 	for (; *select_position < input->len; (*select_position)++) {
@@ -989,7 +991,7 @@ static inline void _bsgfx_findClosestX(bs_Font* font, bs_String* input, int* sel
 		*select_draw_position_x = result_draw_position_x;
 }
 
-static inline void _bsgfx_inputCursorPosition(bs_Font* font, bs_String* input, float relative_x, float relative_y, int* position) {
+static inline void _bsgfx_inputCursorPosition(bsgfx_Font* font, bs_String* input, float relative_x, float relative_y, int* position) {
 	float current = 0.0;
 
 	// find y
@@ -1022,7 +1024,7 @@ static inline void _bsgfx_inputCursorPosition(bs_Font* font, bs_String* input, f
 	_bsgfx_findClosestX(font, input, position, NULL, relative_x);
 }
 
-static inline void _bsgfx_findPreviousLine(bs_Font* font, bs_String* input, int* select_position_out, float* select_draw_position_x, float* select_draw_position_y) {
+static inline void _bsgfx_findPreviousLine(bsgfx_Font* font, bs_String* input, int* select_position_out, float* select_draw_position_x, float* select_draw_position_y) {
 	int select_position = (*select_position_out) - 1;
 	float target = *select_draw_position_x;
 
@@ -1055,7 +1057,7 @@ static inline void _bsgfx_findPreviousLine(bs_Font* font, bs_String* input, int*
 	*select_draw_position_y += _bsgfx_textHeight(&select_position);
 }
 
-static inline void _bsgfx_findNextLine(bs_Font* font, bs_String* input, int* select_position_out, float* select_draw_position_x, float* select_draw_position_y) {
+static inline void _bsgfx_findNextLine(bsgfx_Font* font, bs_String* input, int* select_position_out, float* select_draw_position_x, float* select_draw_position_y) {
 	int select_position = *select_position_out;
 
 	// go to next row
@@ -1121,7 +1123,7 @@ static bool _bsgfx_instanceInput(
 {
 	bs_vec2 cursor = bs_cursorPosition();
 
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 
 	static bs_String* string;
 	if (!string)
@@ -1255,13 +1257,14 @@ static bool _bsgfx_instanceInput(
 		}
 
 		char* row = string->value + row_position;
-		float select_draw_position_x = bs_textDimensions(font, row, select_position - row_position).x;
-		float select_draw_position_y = widget->input.dimensions.y - _bsgfx_textHeight() - (row_index * _bsgfx_textHeight());
+		bs_vec2 select_draw_position;
+		bsgfx_textDimensions(font, &select_draw_position, row, select_position - row_position);
+		select_draw_position.y = widget->input.dimensions.y - _bsgfx_textHeight() - (row_index * _bsgfx_textHeight());
 		if (y_dir != 0) {
 			if (bs_keyDown(BS_KEY_LEFT_SHIFT)) {
 				int select_size_end = select_position;
-				float select_size_draw_position_x = select_draw_position_x;
-				float select_size_draw_position_y = select_draw_position_y;
+				float select_size_draw_position_x = select_draw_position.x;
+				float select_size_draw_position_y = select_draw_position.y;
 
 				if (y_dir > 0)
 					_bsgfx_findNextLine(font, string, &select_position, &select_size_draw_position_x, &select_size_draw_position_y);
@@ -1273,9 +1276,9 @@ static bool _bsgfx_instanceInput(
 			else {
 				select_size = 0;
 				if (y_dir > 0)
-					_bsgfx_findNextLine(font, string, &select_position, &select_draw_position_x, &select_draw_position_y);
+					_bsgfx_findNextLine(font, string, &select_position, &select_draw_position.x, &select_draw_position.y);
 				if (y_dir < 0)
-					_bsgfx_findPreviousLine(font, string, &select_position, &select_draw_position_x, &select_draw_position_y);
+					_bsgfx_findPreviousLine(font, string, &select_position, &select_draw_position.x, &select_draw_position.y);
 			}
 		}
 
@@ -1353,7 +1356,7 @@ static bool _bsgfx_instanceInput(
 		if (_bsgfx_selected_input == widget->input.hash && blinking_underscore == '|') {
 			char c[2] = { blinking_underscore, '\0' };
 			bsgfx_Text text = {
-				.position = { position.x + select_draw_position_x, position.y + select_draw_position_y - font->min_y_shift, position.z + 4, 1 },
+				.position = { position.x + select_draw_position.x, position.y + select_draw_position.y - font->min_y_shift, position.z + 4, 1 },
 				.scale = 16.0, // todo font scale
 				.material_id = $black_material()->id,
 			};
@@ -1588,7 +1591,7 @@ static bool _bsgfx_instanceTable(bsgfx_Menu* menu, bsgfx_Widget* widget, bool al
 	bs_vec2 cursor = bs_cursorPosition();
 
 	bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
-	bs_Font* font = widget->font ? widget->font : menu->font;
+	bsgfx_Font* font = widget->font ? widget->font : menu->font;
 	int white = bs_queryAtlas(atlas, "white");
 	bs_vec4 coords = bs_atlasCoordinates(atlas, white, 0);
 //	int atlas_any_hi_res_subtype = _bsgfx_querySubtypeNull(BSGFX_INSTANCE_TYPE_QUAD_LEGACY, BSGFX_QUAD_LEGACY_KEY_ATLAS_ANY_HI_RES);
@@ -1710,7 +1713,7 @@ static bool _bsgfx_instanceDebugSettingsMenu(bsgfx_Menu* menu, bsgfx_TitleBar* t
 
 static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar) {
 	const int x_indent = 0.0;
-	bs_Font* font = menu->font;
+	bsgfx_Font* font = menu->font;
 	bs_vec3 position = menu->position;
 	bs_vec3 scale = BS_V3(64.0, tab_bar->height, 1.0);
 
@@ -1719,7 +1722,8 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 	position.z -= 10;
 	bs_vec3 start = position;
 
-	bs_vec2 close_dimensions = bs_textDimensions(font, " [x]", 4);
+	bs_vec2 close_dimensions;
+	bsgfx_textDimensions(font, &close_dimensions, " [x]", 4);
 
 	position.z -= BSGFX_BACKGROUND_Z_COUNT;
 	_bsgfx_instanceBackground(_bsgfx_subtypes_[BSGFX_SUBTYPE_UI_COLOR],
@@ -1802,7 +1806,7 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 }
 
 static void _bsgfx_instanceTitleBar(bsgfx_Menu* menu, bsgfx_TitleBar* title_bar, bs_vec3 position, bs_vec2 dimensions) {
-	bs_Font* font = title_bar->font ? title_bar->font : menu->font;
+	bsgfx_Font* font = title_bar->font ? title_bar->font : menu->font;
 	bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
 	
 	bsgfx_AtlasCache* white = $BSGFX_ATLAS_ANY_white();

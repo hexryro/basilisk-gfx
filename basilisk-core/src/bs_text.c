@@ -38,34 +38,19 @@
   /*==============================================================================
    * Font Format
    *============================================================================*/
+/*
 
-BSAPI bs_vec2 _bs_textDimensions(bs_Font* font, char* name, int length) {
-    float width = 0.0;
-    float layout_scale = ((float)font->size / (float)font->units_per_em);
 
-    for (int i = 0; i < length; i++) {
-        char c = font->table[name[i]];
-        int index = font->table[c];
-        if (index >= font->atlas->count)
-            index = 0;
-        float spacing = font->glyphs[index].advance_width * layout_scale;
-        width += spacing;
-        // width += name[i] == ' ' ? font->spacing * layout_scale : _bs_atlasSize(font->atlas, c).x;
-    }
-
-    return BS_V2(width, font->height);
-}
-
-BSAPI void _bs_destroyFont(bs_Font* font) {
+BSAPI void _bs_destroyFont(bsgfx_Font* font) {
     if (font->atlas)
         _bs_destroyAtlas(font->atlas);
     //	if (font->fragment_shader)
     //		_bs_destroyShader(font->fragment_shader);
 
-    _bs_resetObject(&font->head, sizeof(bs_Font));
+    _bs_resetObject(&font->head, sizeof(bsgfx_Font));
 }
 
-BSAPI void _bs_bindFont(bs_Font* font, bs_Sampler* sampler, int bind_set, int bind_point) {
+BSAPI void _bs_bindFont(bsgfx_Font* font, bs_Sampler* sampler, int bind_set, int bind_point) {
     _bs_bindImages(bind_set, bind_point, &(bs_ImageDescriptor) {
         .image = font->atlas->image,
         .layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -73,11 +58,12 @@ BSAPI void _bs_bindFont(bs_Font* font, bs_Sampler* sampler, int bind_set, int bi
     }, 1);
 }
 
+*/
 BSAPI bs_Result _bs_loadFont(bs_Object* object, int package_id, const char* resource_name, const char* alphabet, float spacing, bs_U32 flags) {
     /*
     bs_Result result;
 
-    bs_Font* font = object->font;
+    bsgfx_Font* font = object->font;
 
     if (object->flags & BS_OBJECT_ALREADY_EXISTS && !(object->flags & BS_OBJECT_FORCE_DESTROY)) {
         return BS_RESULT_OK;

@@ -179,35 +179,69 @@ void bsmod_onPackTextureArray(
     next.bsmod_onPackTextureArray(params);
 }
 
-void bsmod_packFont(
+bs_Result bsmod_packFont(
     char* package_name, 
     char* ttf_path, 
+    bsmod_UnicodeBlockRange blocks[], 
+    int blocks_count, 
+    int pt_sizes[], 
+    int pt_sizes_count, 
     char* resource_name, 
     int resource_name_length)
 {
-    next.bsmod_packFont(package_name, ttf_path, resource_name, resource_name_length);
+    return next.bsmod_packFont(package_name, ttf_path, blocks, blocks_count, pt_sizes, pt_sizes_count, resource_name, resource_name_length);
 }
 
-void bsmod_packAtlasTexture(
+bsmod_TextureInfo* bsmod_packAtlasTexture(
     bsmod_AtlasPacker* packer, 
-    char* name, 
     bs_RGBA* data, 
     int width, 
     int height, 
-    int category)
+    int category, 
+    char* name, 
+    int name_length)
 {
-    next.bsmod_packAtlasTexture(packer, name, data, width, height, category);
+    return next.bsmod_packAtlasTexture(packer, data, width, height, category, name, name_length);
+}
+
+bsmod_TextureInfo* bsmod_packAtlasTextureV(
+    bsmod_AtlasPacker* packer, 
+    bs_RGBA* data, 
+    int width, 
+    int height, 
+    int category, 
+    char* format, 
+    va_list args)
+{
+    return next.bsmod_packAtlasTextureV(packer, data, width, height, category, format, args);
+}
+
+bsmod_TextureInfo* bsmod_packAtlasTextureF(
+    bsmod_AtlasPacker* packer, 
+    bs_RGBA* data, 
+    int width, 
+    int height, 
+    int category, 
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    bsmod_TextureInfo* _return = next.bsmod_packAtlasTextureV(packer, data, width, height, category, format, args);
+    va_end(args);
+    return _return;
 }
 
 bs_Result bsmod_packAtlas(
     bsmod_AtlasPacker* packer, 
     int width, 
     int height, 
+    int channels_count, 
     char* package, 
     char* resource_name, 
     bool allow_paging)
 {
-    return next.bsmod_packAtlas(packer, width, height, package, resource_name, allow_paging);
+    return next.bsmod_packAtlas(packer, width, height, channels_count, package, resource_name, allow_paging);
 }
 
 bsmod_AtlasPacker bsmod_createAtlasPacker()

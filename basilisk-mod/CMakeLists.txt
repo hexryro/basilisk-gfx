@@ -72,7 +72,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     generated/
     src/
     ${CMAKE_SOURCE_DIR}/include/objects/
-    levels/
     ${CMAKE_SOURCE_DIR}/external/freetype/include
 )
 

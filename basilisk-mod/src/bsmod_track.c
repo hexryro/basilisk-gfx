@@ -184,7 +184,23 @@ BSMODAPI bs_Result _bsmod_onPackBindings() {
 BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 	bsmod_AtlasPacker packer = _bsmod_createAtlasPacker();
 
-	bsmod_packFont(params.package, params.path, params.path, strlen(params.path));
+	bsmod_UnicodeBlockRange ranges[] = {
+		{
+			.block = BSGFX_UNICODE_BLOCK_BASIC_LATIN,
+			.offset = 0,
+			.count = 0x007F - 0,
+			.size = 1,
+			.rasterize = true,
+		}
+	};
+
+	int ranges_count = sizeof(ranges) / sizeof(*ranges);
+
+	int pt_sizes[] = { 11 };
+
+	int pt_sizes_count = sizeof(pt_sizes) / sizeof(*pt_sizes);
+
+	bsmod_packFont(params.package, params.path, ranges, ranges_count, pt_sizes, pt_sizes_count, params.path, strlen(params.path));
 }
 
 BSMODAPI void _bsmod_onConvertBMFont(bsmod_TrackParams params) {
@@ -230,7 +246,7 @@ static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* 
 	bs_PngData png_data;
 	if (bs_loadPng(info.path, 4, &png_data) == BS_RESULT_OK) {
 		ext[-1] = '\0';
-		_bsmod_packAtlasTexture(packer, name, png_data.data, png_data.width, png_data.height, 0);
+		_bsmod_packAtlasTexture(packer, png_data.data, png_data.width, png_data.height, 0, name, strlen(name));
 		ext[-1] = '.';
 	}
 
@@ -248,7 +264,7 @@ BSMODAPI void _bsmod_onPackAtlas(bsmod_TrackParams params) {
 	bs_foreachFile(_bsmod_onPackAtlasTexture, &packer, params.path, strlen(params.path));
 
 	extension[-1] = '\0';
-	_bsmod_packAtlas(&packer, 1024, 1024, params.package, directory_name, true);
+	_bsmod_packAtlas(&packer, 1024, 1024, 4, params.package, directory_name, true);
 	extension[-1] = '.';
 	file_name[-1] = '/';
 }

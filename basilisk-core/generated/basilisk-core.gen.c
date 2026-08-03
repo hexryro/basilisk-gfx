@@ -1801,40 +1801,6 @@ void bs_runSingle(
     next.bs_runSingle(function);
 }
 
-void bs_bindFont(
-    bs_Font* font, 
-    bs_Sampler* sampler, 
-    int bind_set, 
-    int bind_point)
-{
-    next.bs_bindFont(font, sampler, bind_set, bind_point);
-}
-
-bs_vec2 bs_textDimensions(
-    bs_Font* font, 
-    char* name, 
-    int length)
-{
-    return next.bs_textDimensions(font, name, length);
-}
-
-void bs_destroyFont(
-    bs_Font* font)
-{
-    next.bs_destroyFont(font);
-}
-
-bs_Result bs_loadFont(
-    bs_Object* object, 
-    int package_id, 
-    const char* resource_name, 
-    const char* alphabet, 
-    float spacing, 
-    bs_U32 flags)
-{
-    return next.bs_loadFont(object, package_id, resource_name, alphabet, spacing, flags);
-}
-
 bs_Result bs_image(
     bs_Object* object, 
     bs_ivec2 dim, 
@@ -1897,16 +1863,6 @@ bs_Result bs_loadPng(
     bs_PngData* out_png_data)
 {
     return next.bs_loadPng(path, channels_count, out_png_data);
-}
-
-bs_Result bs_bitmapImage(
-    bs_Object* existing_object, 
-    unsigned char* image_data, 
-    bs_ivec2 dim, 
-    bs_Format format, 
-    bs_ImageBits flags)
-{
-    return next.bs_bitmapImage(existing_object, image_data, dim, format, flags);
 }
 
 bs_Result bs_savePng(

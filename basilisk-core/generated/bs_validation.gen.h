@@ -184,16 +184,11 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_getScope = (PFN_bs_getScope)GetProcAddress(module, "_val_bs_getScope");
     functions.bs_setScope = (PFN_bs_setScope)GetProcAddress(module, "_val_bs_setScope");
     functions.bs_runSingle = (PFN_bs_runSingle)GetProcAddress(module, "_val_bs_runSingle");
-    functions.bs_bindFont = (PFN_bs_bindFont)GetProcAddress(module, "_val_bs_bindFont");
-    functions.bs_textDimensions = (PFN_bs_textDimensions)GetProcAddress(module, "_val_bs_textDimensions");
-    functions.bs_destroyFont = (PFN_bs_destroyFont)GetProcAddress(module, "_val_bs_destroyFont");
-    functions.bs_loadFont = (PFN_bs_loadFont)GetProcAddress(module, "_val_bs_loadFont");
     functions.bs_image = (PFN_bs_image)GetProcAddress(module, "_val_bs_image");
     functions.bs_transition = (PFN_bs_transition)GetProcAddress(module, "_val_bs_transition");
     functions.bs_peekPng = (PFN_bs_peekPng)GetProcAddress(module, "_val_bs_peekPng");
     functions.bs_loadPngData = (PFN_bs_loadPngData)GetProcAddress(module, "_val_bs_loadPngData");
     functions.bs_loadPng = (PFN_bs_loadPng)GetProcAddress(module, "_val_bs_loadPng");
-    functions.bs_bitmapImage = (PFN_bs_bitmapImage)GetProcAddress(module, "_val_bs_bitmapImage");
     functions.bs_savePng = (PFN_bs_savePng)GetProcAddress(module, "_val_bs_savePng");
     functions.bs_encodePng = (PFN_bs_encodePng)GetProcAddress(module, "_val_bs_encodePng");
     functions.bs_destroyImage = (PFN_bs_destroyImage)GetProcAddress(module, "_val_bs_destroyImage");

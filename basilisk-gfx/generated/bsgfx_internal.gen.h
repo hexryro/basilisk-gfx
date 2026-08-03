@@ -37,6 +37,7 @@
 #include <windows.h>
 
 typedef void(__stdcall* PFN_bsgfx_test)();
+typedef void(__stdcall* PFN_bsgfx_textDimensions)(bsgfx_Font* font, bs_vec2* out, char* name, int length);
 typedef bs_PipelineHash(__stdcall* PFN_bsgfx_defaultPipelineHash)();
 typedef void(__stdcall* PFN_bsgfx_renderTileIcons)();
 typedef void(__stdcall* PFN_bsgfx_renderAtlasIcons)();
@@ -108,9 +109,9 @@ typedef int(__stdcall* PFN_bsgfx_instanceQuad)(int subtype, bs_mat4x3 transform,
 typedef void(__stdcall* PFN_bsgfx_instanceDepthlessCircle)(const bs_mat4* transform, int segments, float radius, bs_RGBA color, bs_Range* out);
 typedef int(__stdcall* PFN_bsgfx_instanceAtlas)(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
 typedef int(__stdcall* PFN_bsgfx_instanceAtlasFlipped)(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
-typedef void(__stdcall* PFN_bsgfx_instanceText)(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length);
-typedef void(__stdcall* PFN_bsgfx_instanceTextV)(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args);
-typedef void(__stdcall* PFN_bsgfx_instanceTextF)(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, ...);
+typedef void(__stdcall* PFN_bsgfx_instanceText)(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length);
+typedef void(__stdcall* PFN_bsgfx_instanceTextV)(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args);
+typedef void(__stdcall* PFN_bsgfx_instanceTextF)(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, ...);
 typedef bs_mat4x3(__stdcall* PFN_bsgfx_matrix)(bs_vec3 position, bs_vec3 scale);
 typedef void(__stdcall* PFN_bsgfx_renderFineShadowVolumes)();
 typedef void(__stdcall* PFN_bsgfx_renderShadowVolumes)();
@@ -174,6 +175,7 @@ typedef void(__stdcall* PFN_bsgfx_renderColorPickers)();
 
 typedef struct {
     PFN_bsgfx_test bsgfx_test;
+    PFN_bsgfx_textDimensions bsgfx_textDimensions;
     PFN_bsgfx_defaultPipelineHash bsgfx_defaultPipelineHash;
     PFN_bsgfx_renderTileIcons bsgfx_renderTileIcons;
     PFN_bsgfx_renderAtlasIcons bsgfx_renderAtlasIcons;
@@ -311,6 +313,7 @@ typedef struct {
 } bsgfx_FunctionTable;
 
 BSGFXAPI void _bsgfx_test();
+BSGFXAPI void _bsgfx_textDimensions(bsgfx_Font* font, bs_vec2* out, char* name, int length);
 BSGFXAPI bs_PipelineHash _bsgfx_defaultPipelineHash();
 BSGFXAPI void _bsgfx_renderTileIcons();
 BSGFXAPI void _bsgfx_renderAtlasIcons();
@@ -382,9 +385,9 @@ BSGFXAPI int _bsgfx_instanceQuad(int subtype, bs_mat4x3 transform, bs_vec4 coord
 BSGFXAPI void _bsgfx_instanceDepthlessCircle(const bs_mat4* transform, int segments, float radius, bs_RGBA color, bs_Range* out);
 BSGFXAPI int _bsgfx_instanceAtlas(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
 BSGFXAPI int _bsgfx_instanceAtlasFlipped(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
-BSGFXAPI void _bsgfx_instanceText(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length);
-BSGFXAPI void _bsgfx_instanceTextV(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args);
-BSGFXAPI void _bsgfx_instanceTextF(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format,  ...);
+BSGFXAPI void _bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length);
+BSGFXAPI void _bsgfx_instanceTextV(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args);
+BSGFXAPI void _bsgfx_instanceTextF(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format,  ...);
 BSGFXAPI bs_mat4x3 _bsgfx_matrix(bs_vec3 position, bs_vec3 scale);
 BSGFXAPI void _bsgfx_renderFineShadowVolumes();
 BSGFXAPI void _bsgfx_renderShadowVolumes();
@@ -450,6 +453,7 @@ static inline bsgfx_FunctionTable* _bsgfx_getFunctions() {
     static bsgfx_FunctionTable functions;
 
     functions.bsgfx_test = _bsgfx_test;
+    functions.bsgfx_textDimensions = _bsgfx_textDimensions;
     functions.bsgfx_defaultPipelineHash = _bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _bsgfx_renderTileIcons;
     functions.bsgfx_renderAtlasIcons = _bsgfx_renderAtlasIcons;

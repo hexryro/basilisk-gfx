@@ -53,6 +53,13 @@ BSGFXAPI void _preval_bsgfx_test() {
     next.bsgfx_test();
 }
 
+BSGFXAPI void _preval_bsgfx_textDimensions(bsgfx_Font* font, bs_vec2* out, char* name, int length) {
+    BSGFX_VALIDATE(font != NULL, ,);
+    BSGFX_VALIDATE(out != NULL, ,);
+    BSGFX_VALIDATE(name != NULL, ,);
+    next.bsgfx_textDimensions(font, out, name, length);
+}
+
 BSGFXAPI bs_PipelineHash _preval_bsgfx_defaultPipelineHash() {
     return next.bsgfx_defaultPipelineHash();
 }
@@ -377,7 +384,7 @@ BSGFXAPI int _preval_bsgfx_instanceAtlasFlipped(int subtype, bs_mat4x3 transform
     return next.bsgfx_instanceAtlasFlipped(subtype, transform, texture, flags, id, material);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceText(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length) {
+BSGFXAPI void _preval_bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length) {
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(params != NULL, ,);
     BSGFX_VALIDATE(out_text_size != NULL, ,);
@@ -385,7 +392,7 @@ BSGFXAPI void _preval_bsgfx_instanceText(int subtype, bs_Font* font, bsgfx_Text*
     next.bsgfx_instanceText(subtype, font, params, out_text_size, value, value_length);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceTextV(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args) {
+BSGFXAPI void _preval_bsgfx_instanceTextV(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args) {
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(params != NULL, ,);
     BSGFX_VALIDATE(out_text_size != NULL, ,);
@@ -674,6 +681,7 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     static bsgfx_FunctionTable functions = { 0 };
 
     functions.bsgfx_test = _preval_bsgfx_test;
+    functions.bsgfx_textDimensions = _preval_bsgfx_textDimensions;
     functions.bsgfx_defaultPipelineHash = _preval_bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _preval_bsgfx_renderTileIcons;
     functions.bsgfx_renderAtlasIcons = _preval_bsgfx_renderAtlasIcons;

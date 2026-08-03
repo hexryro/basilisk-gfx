@@ -129,16 +129,6 @@ typedef struct bs_Armature bs_Armature;
 typedef struct bs_AnimationBone bs_AnimationBone;
 typedef struct bs_Animation bs_Animation;
 typedef struct bs_Sound bs_Sound;
-typedef struct bs_LongHorMetric bs_LongHorMetric;
-typedef struct bs_KerningPair bs_KerningPair;
-typedef struct bs_BfntHeader bs_BfntHeader;
-typedef struct bs_BfntKerningPair bs_BfntKerningPair;
-typedef struct bs_BfntGlyph bs_BfntGlyph;
-typedef struct bs_Font bs_Font;
-typedef struct bs_Endpoint bs_Endpoint;
-typedef struct bs_Server bs_Server;
-typedef struct bs_Simulation bs_Simulation;
-typedef struct bs_Contact bs_Contact;
 typedef struct bs_ImageDescriptor bs_ImageDescriptor;
 typedef struct bs_Descriptor bs_Descriptor;
 typedef struct bs_Binding bs_Binding;
@@ -238,6 +228,9 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 
 #define BS_BIFF_MAGIC                                                \
     0x66666962
+
+#define BS_BFNT_MAGIC                                                \
+    0x746E6662
 
 #define BS_CONSTANT_STRING(s)                                        \
     s, sizeof(s) - 1
@@ -774,9 +767,6 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 
 #define BS_ATLAS(source_id, id, flags)                               \
     BS_OBJECT(bs_Atlas, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_ATLAS)
-
-#define BS_FONT(source_id, id, flags)                                \
-    BS_OBJECT(bs_Font, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_FONT)
 
 #define BS_NUM_STRIKES_RULE                                          \
     (1)
@@ -1767,9 +1757,7 @@ enum bs_ObjectType {
     BS_OBJECT_BATCH,
     BS_OBJECT_RENDERER,
     BS_OBJECT_RAY_TRACER,
-    BS_OBJECT_FONT,
     BS_OBJECT_ATLAS,
-    BSGFX_OBJECT_FONT_COLLECTION,
     BS_OBJECT_TYPE_COUNT,
 };
 
@@ -2369,7 +2357,6 @@ struct bs_Object {
         bs_Sound* sound;
         bs_Queue* queue;
         bs_RayTracer* ray_tracer;
-        bs_Font* font;
         bs_Context* context;
     };
 };
@@ -2389,7 +2376,6 @@ struct bs_Resource {
         bs_Shader* shader;
         bs_Sound* sound;
         bs_Atlas* atlas;
-        bs_Font* font;
         bs_Image* image;
     };
 };
@@ -2929,113 +2915,6 @@ struct bs_Sound {
     void* data;
     void* xaudio;
     int size;
-};
-
-struct bs_LongHorMetric {
-    bs_U16 advance_width;
-    bs_I16 left_side_bearing;
-};
-
-struct bs_KerningPair {
-    int right_index;
-    bs_U16 right;
-    bs_I16 value;
-};
-
-struct bs_BfntHeader {
-    bs_U32 magic;
-    bs_U32 version;
-    bs_U32 glyphs_count;
-    bs_U32 kerning_pairs_count;
-    bs_U32 line_height;
-    bs_U32 units_per_em;
-    bs_U32 size;
-    bs_U32 batl_offset;
-    char ascii_table[256];
-};
-
-struct bs_BfntKerningPair {
-    int right;
-    int value;
-};
-
-struct bs_BfntGlyph {
-    bs_U32 code;
-    int y_offset;
-    int advance_width;
-    int left_side_bearing;
-    bs_U32 kerning_pair_offset;
-    bs_U32 kerning_pair_count;
-    bs_U32 reserved_0, reserved_1;
-};
-
-struct bs_Font {
-    bs_Header head;
-    const char* alphabet;
-    bs_Atlas* atlas;
-    int min_y_shift;
-    int size;
-    int units_per_em;
-    int height;
-    float spacing;
-    int pairs_count;
-    struct {
-        int right;
-        float value;
-    }* pairs;
-    struct {
-        int y_offset;
-        float advance_width;
-        float left_side_bearing;
-        int kerning_pair_offset;
-        int kerning_pair_count;
-    }* glyphs;
-    char table[256];
-    struct {
-        void* unused;
-    }_[];
-};
-
-struct bs_Endpoint {
-    bs_EndpointType type;
-    int name_len;
-    const char* name;
-};
-
-struct bs_Server {
-    bs_List endpoints;
-    void* queue;
-    void* overlapped;
-    char* buffer;
-    int buffer_capacity;
-    bool is_waiting;
-    int reserved;
-};
-
-struct bs_Simulation {
-    float mass;
-    float inverse_mass;
-    float damping;
-    float angular_damping;
-    float gravity_scale;
-    bs_vec3 velocity;
-    bs_vec3 angular_velocity;
-    bs_vec3 acceleration_last;
-    bs_vec3 force;
-    bs_vec3 torque;
-    bs_vec3 position;
-    bs_vec4 rotation;
-    bs_mat3 local_inverse_inertia;
-    bs_mat3 world_inverse_inertia;
-};
-
-struct bs_Contact {
-    bs_mat3 to_world;
-    bs_vec3 normal;
-    bs_vec3 point;
-    bs_vec3 velocity;
-    float delta_velocity;
-    float penetration;
 };
 
 struct bs_ImageDescriptor {
@@ -5788,58 +5667,6 @@ bs_runSingle(
     bs_Callback function);
 
  /**
-  @param font
-  @param sampler
-  @param bind_set
-  @param bind_point
-  @return void
-  */
-BSAPI void
-bs_bindFont(
-    bs_Font* font,
-    bs_Sampler* sampler,
-    int bind_set,
-    int bind_point);
-
- /**
-  @param font
-  @param name
-  @param length
-  @return bs_vec2
-  */
-BSAPI bs_vec2
-bs_textDimensions(
-    bs_Font* font,
-    char* name,
-    int length);
-
- /**
-  @param font
-  @return void
-  */
-BSAPI void
-bs_destroyFont(
-    bs_Font* font);
-
- /**
-  @param object
-  @param package_id
-  @param resource_name
-  @param alphabet
-  @param spacing
-  @param flags
-  @return bs_Result
-  */
-BSAPI bs_Result
-bs_loadFont(
-    bs_Object* object,
-    int package_id,
-    const char* resource_name,
-    const char* alphabet,
-    float spacing,
-    bs_U32 flags);
-
- /**
   @param object
   @param dim
   @param num_indices
@@ -5930,22 +5757,6 @@ bs_loadPng(
     const char* path,
     int channels_count,
     bs_PngData* out_png_data);
-
- /**
-  @param existing_object
-  @param image_data
-  @param dim
-  @param format
-  @param flags
-  @return bs_Result
-  */
-BSAPI bs_Result
-bs_bitmapImage(
-    bs_Object* existing_object,
-    unsigned char* image_data,
-    bs_ivec2 dim,
-    bs_Format format,
-    bs_ImageBits flags);
 
  /**
   @param data

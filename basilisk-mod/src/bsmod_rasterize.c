@@ -259,11 +259,19 @@ BSMODAPI void _bsmod_pollRasterizer() {
 
             if (bs_mapBuffer(rasterization->buffer, BS_U32_MAX) == BS_RESULT_OK) {
                 unsigned char* map = bs_bufferMap(rasterization->buffer);
-                _bsmod_packAtlasTexture(&packer, rasterization->name, map, rasterization->scaled_image->dim.x, rasterization->scaled_image->dim.y, rasterization->category);
+                _bsmod_packAtlasTexture(
+                    &packer, 
+                    map, 
+                    rasterization->scaled_image->dim.x, 
+                    rasterization->scaled_image->dim.y, 
+                    rasterization->category, 
+                    rasterization->name, 
+                    strlen(rasterization->name)
+                );
                 // bs_savePngF(map, bs_iv2(rasterization->scaled_image->dim.x, rasterization->scaled_image->dim.y), BS_PNG_RGBA, "test%d.png", i);
             }
         }
 
-        _bsmod_packAtlas(&packer, 2048, 2048, _bsmod_queued_rasterization.package, _bsmod_queued_rasterization.name, false);
+        _bsmod_packAtlas(&packer, 2048, 2048, 4, _bsmod_queued_rasterization.package, _bsmod_queued_rasterization.name, false);
     }
 }

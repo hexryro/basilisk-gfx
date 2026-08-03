@@ -710,7 +710,8 @@ BSGFXAPI void _bsgfx_instanceDepthlessCircle(const bs_mat4* transform, int segme
 	*out = result;
 }
 
-BSGFXAPI void _bsgfx_instanceText(int subtype, bs_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* text, int text_length) {
+BSGFXAPI void _bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* text, int text_length) {
+	/*
 	if (!text)
 		text = "(null)";
 
@@ -794,6 +795,7 @@ BSGFXAPI void _bsgfx_instanceText(int subtype, bs_Font* font, bsgfx_Text* params
 	}
 
 	*out_text_size = offset;
+	*/
 }
 
 BSGFXAPI bs_mat4x3 _bsgfx_matrix(bs_vec3 position, bs_vec3 scale) {
