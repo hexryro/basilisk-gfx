@@ -135,7 +135,7 @@
  /**
   Resources
 
-  Ends with resource name + \n\0
+  Ends with resource name + \n
   */
 #define BS_BPAK_RESOURCE_NAME_HASH_OFFSET      0 // U64
 #define BS_BPAK_RESOURCE_CHUNK_OFFSET          8 // I32

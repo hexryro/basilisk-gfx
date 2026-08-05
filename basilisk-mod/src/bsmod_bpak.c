@@ -40,7 +40,7 @@ BSMODAPI bsmod_Package* _bsmod_queryPackage(const char* name) {
 	for (int i = 0; i < _bsmod_packages_.count; i++) {
 		bsmod_Package* package = bs_fetchUnit(&_bsmod_packages_, i);
 
-		if (hash == package->directory_hash)
+		if (hash == package->path_hash)
 			return package;
 	}
 
@@ -59,9 +59,9 @@ BSMODAPI bsmod_Package* _bsmod_ensurePackage(char* path) {
 	char* ext = strrchr(file_name, '.');
 
 	if (ext) {
-		ext[-1] = '\0';
+		ext[0] = '\0';
 		name = strdup(file_name);
-		ext[-1] = '\.';
+		ext[0] = '\.';
 	}
 	else
 		name = strdup(file_name);
@@ -75,6 +75,8 @@ BSMODAPI bsmod_Package* _bsmod_ensurePackage(char* path) {
 		.name_hash = bs_stringHash(name),
 		.directory = directory,
 		.directory_hash = bs_stringHash(directory),
+		.path_hash = bs_stringHash(path),
+		.path = path,
 		.chunks = bs_list(sizeof(bsmod_Chunk), 16),
 		.resources = bs_list(sizeof(bsmod_Resource), 32),
 	});
@@ -119,11 +121,16 @@ BSMODAPI bs_Result _bsmod_iniPackage(int package_id) {
 	bs_Result result;
 
 	int previous_count = _bsmod_packages_.count;
-	bsmod_Package* package_metadata = _bsmod_ensurePackage(package_id);
-	if (previous_count == _bsmod_packages_.count) {
-		bs_warnF("Package \"%s\" is already initialized\n", package->path);
-		return BS_RESULT_OK; // TODO
-	}
+	bsmod_Package* package_metadata = _bsmod_ensurePackage(package->path);
+//	if (previous_count == _bsmod_packages_.count) {
+//		bs_warnF("Package \"%s\" is already initialized\n", package->path);
+//		return BS_RESULT_OK; // TODO
+//	}
+
+	if (package_metadata->is_initialized)
+		return BS_RESULT_OK;
+
+	package_metadata->is_initialized = true;
 
 	bs_String* bpak;
 	result = bs_loadFile(&bpak, package->path);
@@ -165,7 +172,7 @@ BSMODAPI bs_Result _bsmod_iniPackage(int package_id) {
 	*/
 
 	for (int i = 0; i < package->resource_headers_count; i++) {
-		bs_ResourceHeader* header = bs_fetchUnit(&package->resource_headers, i);
+		bs_ResourceHeader* header = package->resource_headers + i;
 
 		bsmod_Resource* added = bs_pushBack(&package_metadata->resources, &(bsmod_Resource) {
 			.chunk = header->chunk,
@@ -440,18 +447,31 @@ static int _bsmod_compareResource(const bsmod_Resource* a, const bsmod_Resource*
 	return 0;
 }
 
-BSMODAPI bs_Result _val_bsmod_savePackage(const char* name) {
+BSMODAPI bs_Result _val_bsmod_savePackageN(const char* path, int path_length) {
 	BSMOD_VALIDATE(bs_instance()->device != NULL, BS_RESULT_VALIDATION_ERROR,);
 
-	return _bsmod_savePackage(name);
+	return _bsmod_savePackageN(path, path_length);
 }
 
-BSMODAPI bs_Result _bsmod_savePackage(char* path) {
+BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length) {
 	bs_Result result;
-	bsmod_Package* package = _bsmod_ensurePackage(path);
 
-	if (!package->has_changes)
+	bsmod_Package* package = _bsmod_queryPackage(path);
+
+	if (!package || !package->has_changes)
 		return BS_RESULT_OK;
+
+	/** Ensure package is initialized to not overwrite data */
+	if (!package->is_initialized) {
+		int existing_package_id = bs_queryPackage(path);
+		if (existing_package_id < 0)
+			bs_loadPackage(&existing_package_id, path);
+
+		if (existing_package_id >= 0)
+			_bsmod_iniPackage(existing_package_id);
+
+		package->is_initialized = true;
+	}
 
 	package->has_changes = false;
 
@@ -478,18 +498,18 @@ BSMODAPI bs_Result _bsmod_savePackage(char* path) {
 	size_t size;
 	size = BS_BPAK_HEADER_SIZE;
 	size += BS_RESOURCE_TYPE_COUNT * BS_BPAK_RESOURCE_TYPE_SIZE;
-	size += package->resources.count * (BS_BPAK_RESOURCE_SIZE + 1); // don't remember what +1 was for
+	size += package->resources.count * BS_BPAK_RESOURCE_SIZE;
 
 	for (int i = 0; i < package->resources.count; i++) {
 		bsmod_Resource* resource = bs_fetchUnit(&package->resources, i);
-		size += strlen(resource->name);
+		size += strlen(resource->name) + 1; // + \n
 	}
 
 	unsigned char* data = bs_malloc(size);
 
 	bs_setLittleEndian32(BS_BPAK_MAGIC, data + BS_BPAK_MAGIC_OFFSET);
 	bs_setLittleEndian32(package->resources.count, data + BS_BPAK_RESOURCES_COUNT_OFFSET);
-	bs_setLittleEndian32(BS_RESOURCE_TYPE_COUNT, data + BS_BPAK_MAGIC);
+	bs_setLittleEndian32(BS_RESOURCE_TYPE_COUNT, data + BS_BPAK_RESOURCES_TYPES_COUNT_OFFSET);
 	bs_setLittleEndian32(0, data + BS_BPAK_RESOURCES_RESERVED);
 
 	unsigned char* resource_types_data = data + BS_BPAK_RESOURCE_TYPES_OFFSET;

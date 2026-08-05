@@ -293,15 +293,15 @@ bs_List* bsmod_packages()
 }
 
 bsmod_Package* bsmod_queryPackage(
-    const char* name)
+    const char* path)
 {
-    return next.bsmod_queryPackage(name);
+    return next.bsmod_queryPackage(path);
 }
 
 bsmod_Package* bsmod_ensurePackage(
-    const char* name)
+    const char* path)
 {
-    return next.bsmod_ensurePackage(name);
+    return next.bsmod_ensurePackage(path);
 }
 
 bsmod_Resource* bsmod_queryResource(
@@ -369,6 +369,31 @@ bs_Result bsmod_savePackage(
     char* path)
 {
     return next.bsmod_savePackage(path);
+}
+
+bs_Result bsmod_savePackageN(
+    char* path, 
+    int path_length)
+{
+    return next.bsmod_savePackageN(path, path_length);
+}
+
+bs_Result bsmod_savePackageV(
+    char* format, 
+    va_list args)
+{
+    return next.bsmod_savePackageV(format, args);
+}
+
+bs_Result bsmod_savePackageF(
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    bs_Result _return = next.bsmod_savePackageV(format, args);
+    va_end(args);
+    return _return;
 }
 
 void bsmod_loadShaderReferences()

@@ -28,14 +28,19 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 		<function name="{@name}" type="allowBody">
 			<xsl:copy-of select="return | param"/>
-			<xsl:choose>
-				<xsl:when test="@string">
-					<param><type>char*</type><name><xsl:value-of select="@string"/></name></param>
-				</xsl:when>
-				<xsl:otherwise>
-					<param><type>char*</type><name>value</name></param>
-				</xsl:otherwise>
-			</xsl:choose>
+
+			<xsl:variable name="string">
+				<xsl:choose>
+					<xsl:when test="@string">
+						<xsl:value-of select="@string"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="'value'"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:variable>
+
+			<param><type>char*</type><name><xsl:value-of select="$string"/></name></param>
 			<body>
 				<xsl:text>    </xsl:text>
 				<xsl:if test="not(return = 'void')">
@@ -44,13 +49,14 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="@name"/>
-				<xsl:text>(</xsl:text>
+				<xsl:text>N(</xsl:text>
 				<xsl:for-each select="param">
 					<xsl:value-of select="name"/>
 					<xsl:text>, </xsl:text>
 				</xsl:for-each>
-				<xsl:text>strlen(</xsl:text>
-				<xsl:value-of select="@name"/>
+				<xsl:value-of select="$string"/>
+				<xsl:text>, strlen(</xsl:text>
+				<xsl:value-of select="$string"/>
 				<xsl:text>));</xsl:text>
 			</body>
 		</function>

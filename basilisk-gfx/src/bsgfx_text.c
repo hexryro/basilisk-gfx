@@ -96,7 +96,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
 
 BSGFXAPI void _bsgfx_test() {
     int package_id = 0;
-    if (bs_loadPackage("content/basilisk-fonts", &package_id) != BS_RESULT_OK)
+    if (bs_loadPackage(&package_id, "content/basilisk-fonts") != BS_RESULT_OK)
         return;
 
     bs_Resource* resource;

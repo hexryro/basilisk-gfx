@@ -586,6 +586,8 @@ BSMODAPI void _bsmod_onTrack() {
 
 	reload_all = false;
 
-	for (int i = 0; i < _bsmod_packages()->count; i++)
-		bsmod_savePackage(i);
+	for (int i = 0; i < _bsmod_packages()->count; i++) {
+		bsmod_Package* package = bs_fetchUnit(_bsmod_packages(), i);
+		bsmod_savePackageF("%s/%s.bpak", package->directory, package->name);
+	}
 }

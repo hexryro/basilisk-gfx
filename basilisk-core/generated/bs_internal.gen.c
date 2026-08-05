@@ -37,7 +37,7 @@
 void _bs_writeLogFile(
     char* value)
 {
-    _bs_writeLogFile(strlen(bs_writeLogFile));
+    _bs_writeLogFileN(value, strlen(value));
 }
 
 void _bs_writeLogFileV(
@@ -63,7 +63,7 @@ void _bs_writeLogFileF(
 void _bs_beginComment(
     char* value)
 {
-    _bs_beginComment(strlen(bs_beginComment));
+    _bs_beginCommentN(value, strlen(value));
 }
 
 void _bs_beginCommentV(
@@ -90,7 +90,7 @@ bs_Attribute* _bs_queryAttribute(
     bs_Batch* batch, 
     char* name)
 {
-    return _bs_queryAttribute(batch, strlen(bs_queryAttribute));
+    return _bs_queryAttributeN(batch, name, strlen(name));
 }
 
 bs_Attribute* _bs_queryAttributeV(
@@ -120,7 +120,7 @@ bs_Result _bs_peekPng(
     bs_PngData* out_png_data, 
     char* path)
 {
-    return _bs_peekPng(out_png_data, strlen(bs_peekPng));
+    return _bs_peekPngN(out_png_data, path, strlen(path));
 }
 
 bs_Result _bs_peekPngV(
@@ -152,7 +152,7 @@ bs_Result _bs_savePng(
     bs_PngType type, 
     char* path)
 {
-    return _bs_savePng(data, resolution, type, strlen(bs_savePng));
+    return _bs_savePngN(data, resolution, type, path, strlen(path));
 }
 
 bs_Result _bs_savePngV(
@@ -188,7 +188,7 @@ bs_Result _bs_loadImage(
     bs_ImageBits flags, 
     char* path)
 {
-    return _bs_loadImage(object, package_id, flags, strlen(bs_loadImage));
+    return _bs_loadImageN(object, package_id, flags, path, strlen(path));
 }
 
 bs_Result _bs_loadImageV(
@@ -224,7 +224,7 @@ bs_Result _bs_loadAtlas(
     bs_U32 flags, 
     char* path)
 {
-    return _bs_loadAtlas(object, package_id, flags, strlen(bs_loadAtlas));
+    return _bs_loadAtlasN(object, package_id, flags, path, strlen(path));
 }
 
 bs_Result _bs_loadAtlasV(
@@ -259,7 +259,7 @@ void _bsi_nameHandle(
     bs_U32 type, 
     char* value)
 {
-    _bsi_nameHandle(handle, type, strlen(bsi_nameHandle));
+    _bsi_nameHandleN(handle, type, value, strlen(value));
 }
 
 void _bsi_nameHandleV(
@@ -290,7 +290,7 @@ bs_Result _bs_loadJson(
     bs_Json* out, 
     char* path)
 {
-    return _bs_loadJson(out, strlen(bs_loadJson));
+    return _bs_loadJsonN(out, path, strlen(path));
 }
 
 bs_Result _bs_loadJsonV(
@@ -321,7 +321,7 @@ bs_JsonValue _bs_fetchJson(
     bs_JsonType expect, 
     char* path)
 {
-    return _bs_fetchJson(root, expect, strlen(bs_fetchJson));
+    return _bs_fetchJsonN(root, expect, path, strlen(path));
 }
 
 bs_JsonValue _bs_fetchJsonV(
@@ -353,7 +353,7 @@ void _bs_deleteJson(
     bs_Json* root, 
     char* path)
 {
-    _bs_deleteJson(root, strlen(bs_deleteJson));
+    _bs_deleteJsonN(root, path, strlen(path));
 }
 
 void _bs_deleteJsonV(
@@ -383,7 +383,7 @@ bs_Result _bs_ensureJson(
     bs_JsonValue value, 
     char* path)
 {
-    return _bs_ensureJson(root, value, strlen(bs_ensureJson));
+    return _bs_ensureJsonN(root, value, path, strlen(path));
 }
 
 bs_Result _bs_ensureJsonV(
@@ -414,7 +414,7 @@ bs_Result _bs_ensureJsonF(
 void _bs_logSection(
     char* value)
 {
-    _bs_logSection(strlen(bs_logSection));
+    _bs_logSectionN(value, strlen(value));
 }
 
 void _bs_logSectionV(
@@ -441,7 +441,7 @@ void _bs_logWithTimestamp(
     bs_MessageLevel level, 
     char* value)
 {
-    _bs_logWithTimestamp(level, strlen(bs_logWithTimestamp));
+    _bs_logWithTimestampN(level, value, strlen(value));
 }
 
 void _bs_logWithTimestampV(
@@ -469,7 +469,7 @@ void _bs_logWithTimestampF(
 void _bs_log(
     char* message)
 {
-    _bs_log(strlen(bs_log));
+    _bs_logN(message, strlen(message));
 }
 
 void _bs_logV(
@@ -495,7 +495,7 @@ void _bs_logF(
 void _bs_info(
     char* message)
 {
-    _bs_info(strlen(bs_info));
+    _bs_infoN(message, strlen(message));
 }
 
 void _bs_infoV(
@@ -521,7 +521,7 @@ void _bs_infoF(
 void _bs_warn(
     char* message)
 {
-    _bs_warn(strlen(bs_warn));
+    _bs_warnN(message, strlen(message));
 }
 
 void _bs_warnV(
@@ -547,7 +547,7 @@ void _bs_warnF(
 void _bs_critical(
     char* message)
 {
-    _bs_critical(strlen(bs_critical));
+    _bs_criticalN(message, strlen(message));
 }
 
 void _bs_criticalV(
@@ -573,7 +573,7 @@ void _bs_criticalF(
 void _bs_system(
     char* value)
 {
-    _bs_system(strlen(bs_system));
+    _bs_systemN(value, strlen(value));
 }
 
 void _bs_systemV(
@@ -600,7 +600,7 @@ bs_String* _bs_string(
     bs_String* old, 
     char* value)
 {
-    return _bs_string(old, strlen(bs_string));
+    return _bs_stringN(old, value, strlen(value));
 }
 
 bs_String* _bs_stringV(
@@ -629,7 +629,7 @@ bs_String* _bs_stringF(
 bs_Result _bs_setWorkingDirectory(
     char* path)
 {
-    return _bs_setWorkingDirectory(strlen(bs_setWorkingDirectory));
+    return _bs_setWorkingDirectoryN(path, strlen(path));
 }
 
 bs_Result _bs_setWorkingDirectoryV(
@@ -667,7 +667,7 @@ char* _bs_charStringF(
 bool _bs_directoryExists(
     char* path)
 {
-    return _bs_directoryExists(strlen(bs_directoryExists));
+    return _bs_directoryExistsN(path, strlen(path));
 }
 
 bool _bs_directoryExistsV(
@@ -696,7 +696,7 @@ bs_Result _bs_appendFile(
     bs_U32 data_len, 
     char* value)
 {
-    return _bs_appendFile(data, data_len, strlen(bs_appendFile));
+    return _bs_appendFileN(data, data_len, value, strlen(value));
 }
 
 bs_Result _bs_appendFileV(
@@ -729,7 +729,7 @@ bs_Result _bs_saveFile(
     bs_U32 data_len, 
     char* path)
 {
-    return _bs_saveFile(data, data_len, strlen(bs_saveFile));
+    return _bs_saveFileN(data, data_len, path, strlen(path));
 }
 
 bs_Result _bs_saveFileV(
@@ -760,7 +760,7 @@ bs_Result _bs_saveFileF(
 void _bs_convertWin32Path(
     char* path)
 {
-    _bs_convertWin32Path(strlen(bs_convertWin32Path));
+    _bs_convertWin32PathN(path, strlen(path));
 }
 
 void _bs_convertWin32PathV(
@@ -786,7 +786,7 @@ void _bs_convertWin32PathF(
 bs_Result _bs_ensureDirectory(
     char* path)
 {
-    return _bs_ensureDirectory(strlen(bs_ensureDirectory));
+    return _bs_ensureDirectoryN(path, strlen(path));
 }
 
 bs_Result _bs_ensureDirectoryV(
@@ -814,7 +814,7 @@ bs_Result _bs_fileModifiedDate(
     bs_DateTime* out, 
     char* path)
 {
-    return _bs_fileModifiedDate(out, strlen(bs_fileModifiedDate));
+    return _bs_fileModifiedDateN(out, path, strlen(path));
 }
 
 bs_Result _bs_fileModifiedDateV(
@@ -844,7 +844,7 @@ bs_Result _bs_setFileModifiedDate(
     bs_DateTime* date, 
     char* path)
 {
-    return _bs_setFileModifiedDate(date, strlen(bs_setFileModifiedDate));
+    return _bs_setFileModifiedDateN(date, path, strlen(path));
 }
 
 bs_Result _bs_setFileModifiedDateV(
@@ -873,7 +873,7 @@ bs_Result _bs_setFileModifiedDateF(
 bool _bs_fileExists(
     char* path)
 {
-    return _bs_fileExists(strlen(bs_fileExists));
+    return _bs_fileExistsN(path, strlen(path));
 }
 
 bool _bs_fileExistsV(
@@ -903,7 +903,7 @@ bs_Result _bs_loadResource(
     bs_Resource** out, 
     char* value)
 {
-    return _bs_loadResource(package_id, flags, out, strlen(bs_loadResource));
+    return _bs_loadResourceN(package_id, flags, out, value, strlen(value));
 }
 
 bs_Result _bs_loadResourceV(
@@ -937,7 +937,7 @@ bs_Result _bs_loadPackage(
     int* out, 
     char* path)
 {
-    return _bs_loadPackage(out, strlen(bs_loadPackage));
+    return _bs_loadPackageN(out, path, strlen(path));
 }
 
 bs_Result _bs_loadPackageV(
@@ -966,7 +966,7 @@ bs_Result _bs_loadPackageF(
 void _bs_titleWindow(
     char* name)
 {
-    _bs_titleWindow(strlen(bs_titleWindow));
+    _bs_titleWindowN(name, strlen(name));
 }
 
 void _bs_titleWindowV(
@@ -992,7 +992,7 @@ void _bs_titleWindowF(
 void _bs_copyToClipboard(
     char* value)
 {
-    _bs_copyToClipboard(strlen(bs_copyToClipboard));
+    _bs_copyToClipboardN(value, strlen(value));
 }
 
 void _bs_copyToClipboardV(
@@ -1019,7 +1019,7 @@ bs_String* _bs_appendString(
     bs_String* destination, 
     char* value)
 {
-    return _bs_appendString(destination, strlen(bs_appendString));
+    return _bs_appendStringN(destination, value, strlen(value));
 }
 
 bs_String* _bs_appendStringV(
@@ -1050,7 +1050,7 @@ bs_Result _bs_foreachFile(
     void* param, 
     char* value)
 {
-    return _bs_foreachFile(x, param, strlen(bs_foreachFile));
+    return _bs_foreachFileN(x, param, value, strlen(value));
 }
 
 bs_Result _bs_foreachFileV(
@@ -1083,7 +1083,7 @@ bs_Result _bs_foreachDirectory(
     void* param, 
     char* path)
 {
-    return _bs_foreachDirectory(x, param, strlen(bs_foreachDirectory));
+    return _bs_foreachDirectoryN(x, param, path, strlen(path));
 }
 
 bs_Result _bs_foreachDirectoryV(
@@ -1114,7 +1114,7 @@ bs_Result _bs_foreachDirectoryF(
 int _bs_numFiles(
     char* path)
 {
-    return _bs_numFiles(strlen(bs_numFiles));
+    return _bs_numFilesN(path, strlen(path));
 }
 
 int _bs_numFilesV(
@@ -1141,7 +1141,7 @@ int _bs_numFilesF(
 int _bs_numDirectories(
     char* path)
 {
-    return _bs_numDirectories(strlen(bs_numDirectories));
+    return _bs_numDirectoriesN(path, strlen(path));
 }
 
 int _bs_numDirectoriesV(
@@ -1170,7 +1170,7 @@ bs_Result _bs_openFile(
     bs_File* out, 
     char* path)
 {
-    return _bs_openFile(mode, out, strlen(bs_openFile));
+    return _bs_openFileN(mode, out, path, strlen(path));
 }
 
 bs_Result _bs_openFileV(
@@ -1202,7 +1202,7 @@ bs_Result _bs_loadFile(
     bs_String** out, 
     char* path)
 {
-    return _bs_loadFile(out, strlen(bs_loadFile));
+    return _bs_loadFileN(out, path, strlen(path));
 }
 
 bs_Result _bs_loadFileV(
@@ -1234,7 +1234,7 @@ bs_Result _bs_loadFileChunk(
     bs_String** out, 
     char* path)
 {
-    return _bs_loadFileChunk(offset, size, out, strlen(bs_loadFileChunk));
+    return _bs_loadFileChunkN(offset, size, out, path, strlen(path));
 }
 
 bs_Result _bs_loadFileChunkV(
@@ -1267,7 +1267,7 @@ bs_Result _bs_loadFileChunkF(
 bs_Result _bs_deleteFile(
     char* path)
 {
-    return _bs_deleteFile(strlen(bs_deleteFile));
+    return _bs_deleteFileN(path, strlen(path));
 }
 
 bs_Result _bs_deleteFileV(
@@ -1294,7 +1294,7 @@ bs_Result _bs_deleteFileF(
 bs_Result _bs_deleteDirectoryContents(
     char* path)
 {
-    return _bs_deleteDirectoryContents(strlen(bs_deleteDirectoryContents));
+    return _bs_deleteDirectoryContentsN(path, strlen(path));
 }
 
 bs_Result _bs_deleteDirectoryContentsV(
@@ -1321,7 +1321,7 @@ bs_Result _bs_deleteDirectoryContentsF(
 bs_Result _bs_deleteDirectory(
     char* path)
 {
-    return _bs_deleteDirectory(strlen(bs_deleteDirectory));
+    return _bs_deleteDirectoryN(path, strlen(path));
 }
 
 bs_Result _bs_deleteDirectoryV(

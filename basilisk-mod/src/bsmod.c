@@ -421,9 +421,9 @@ BSMODAPI void _bsmod_onIni() {
     if (!_bsmod_.bindings_json.doc)
         _bsmod_.bindings_json = bs_emptyJson();
 
-    _bsmod_iniPackage(BSMOD_CONTENT_PATH);
-    _bsmod_iniPackage(BSGFX_CONTENT_PATH);
-    _bsmod_iniPackage(_bsmod_applicationContentPath());
+   // _bsmod_iniPackage(BSMOD_CONTENT_PATH);
+   // _bsmod_iniPackage(BSGFX_CONTENT_PATH);
+   // _bsmod_iniPackage(_bsmod_applicationContentPath());
     // _bsmod_iniLisk();
     _bsmod_iniCompiler();
 }
@@ -431,11 +431,12 @@ BSMODAPI void _bsmod_onIni() {
 BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track
     bs_Result result;
 
-    _bsmod_savePackage(BSMOD_CONTENT_PATH);
-    _bsmod_savePackage(BSGFX_CONTENT_PATH);
-    _bsmod_savePackage(_bsmod_applicationContentPath());
+    //_bsmod_savePackage(BSMOD_CONTENT_PATH);
+    //_bsmod_savePackage(BSGFX_CONTENT_PATH);
+    //_bsmod_savePackage(_bsmod_applicationContentPath());
 
     result = bs_loadPackageN(&_bsmod_.package, BS_CONSTANT_STRING(BSMOD_CONTENT_PATH));
+    bsmod_iniPackage(_bsmod_.package);
 
     if (bs_args()->track_changes)
         CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);

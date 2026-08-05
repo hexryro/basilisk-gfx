@@ -37,7 +37,7 @@
 bsgfx_Material* _bsgfx_material(
     char* name)
 {
-    return _bsgfx_material(strlen(bsgfx_material));
+    return _bsgfx_materialN(name, strlen(name));
 }
 
 bsgfx_Material* _bsgfx_materialV(
@@ -68,7 +68,7 @@ void _bsgfx_instanceText(
     bs_vec2* out_text_size, 
     char* value)
 {
-    _bsgfx_instanceText(subtype, font, params, out_text_size, strlen(bsgfx_instanceText));
+    _bsgfx_instanceTextN(subtype, font, params, out_text_size, value, strlen(value));
 }
 
 void _bsgfx_instanceTextV(

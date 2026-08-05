@@ -195,9 +195,12 @@ struct bsmod_Package {
     char* name;
     bs_U64 directory_hash;
     char* directory;
+    char* path;
+    bs_U64 path_hash;
     bs_List chunks;
     bs_List resources;
     bool has_changes;
+    bool is_initialized;
 };
 
 struct bsmod_Resource {
@@ -553,20 +556,20 @@ BSMODAPI bs_List*
 bsmod_packages();
 
  /**
-  @param name
+  @param path
   @return bsmod_Package*
   */
 BSMODAPI bsmod_Package*
 bsmod_queryPackage(
-    const char* name);
+    const char* path);
 
  /**
-  @param name
+  @param path
   @return bsmod_Package*
   */
 BSMODAPI bsmod_Package*
 bsmod_ensurePackage(
-    const char* name);
+    const char* path);
 
  /**
   @param package
@@ -665,6 +668,36 @@ bsmod_packResourceF(
 BSMODAPI bs_Result
 bsmod_savePackage(
     char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSMODAPI bs_Result
+bsmod_savePackageN(
+    char* path,
+    int path_length);
+
+ /**
+  @param format
+  @param args
+  @return bs_Result
+  */
+BSMODAPI bs_Result
+bsmod_savePackageV(
+    char* format,
+    va_list args);
+
+ /**
+  @param format
+  @param ...
+  @return bs_Result
+  */
+BSMODAPI bs_Result
+bsmod_savePackageF(
+    char* format,
+     ...);
 
  /**
   @return void

@@ -138,6 +138,10 @@ BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** ou
     }
     //else
     //    _bs_free(existing->resource->data);
+
+    char* ext = strrchr(package->path, '.');
+    if (ext) ext[0] = '\0';
+
     bs_Result result = _bs_loadFileChunkF(
         existing->offset, 
         existing->size, 
@@ -145,6 +149,8 @@ BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** ou
         "%s_%03d.bpak", 
         package->path, (existing->chunk + 1)
     );
+
+    if (ext) ext[0] = '.';
 
     if (result == BS_RESULT_OK) {
         _bs_infoF("Loaded resource \"%s\"", resource_name);
@@ -154,7 +160,7 @@ BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** ou
     return result;
 }
 
-BSAPI bs_Result _bs_loadPackageN(const char* path, int* out) {
+BSAPI bs_Result _bs_loadPackageN(int* out, const char* path, int path_length) {
     bs_Result result;
 
     bs_String* raw;
@@ -221,7 +227,6 @@ BSAPI bs_Result _bs_loadPackageN(const char* path, int* out) {
         return BS_RESULT_CORRUPTED;
     }
 
-    resources_types_count = BS_MIN(resources_types_count, BS_RESOURCE_TYPE_COUNT);
     unsigned char* resource_types_offset = data + BS_BPAK_RESOURCE_TYPES_OFFSET;
     for (int i = 0; i < resources_types_count; i++) {
         existing->resource_type_offsets[i].offset = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_START_OFFSET);
@@ -240,6 +245,13 @@ BSAPI bs_Result _bs_loadPackageN(const char* path, int* out) {
         bs_I32 name_length = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_NAME_LENGTH_OFFSET);
         bs_I32 type = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_OFFSET);
 
+#ifdef _DEBUG
+        if (chunk < 0 || offset < 0 || size < 0 || name_length < 0 || type < 0) {
+            bs_warnF("%s at %s:%d: Corrupted resource (%d) in package \"%s\"", __func__, __FILE__, __LINE__, i, path); // TODO: warn macro
+            return BS_RESULT_CORRUPTED;
+        }
+#endif
+
         resource_types_offset += BS_BPAK_RESOURCE_SIZE;
         unsigned char* resource_name = resource_types_offset;
 
@@ -249,7 +261,7 @@ BSAPI bs_Result _bs_loadPackageN(const char* path, int* out) {
         }
         end[0] = '\0';
 
-        resource_types_offset += name_length + 2; // \n\0
+        resource_types_offset += name_length + 1; // \n
 
         bs_ResourceHeader* added = existing->resource_headers + actual_resources_count++;
 

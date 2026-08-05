@@ -192,14 +192,14 @@ BSMODAPI bs_List* _preval_bsmod_packages() {
     return next.bsmod_packages();
 }
 
-BSMODAPI bsmod_Package* _preval_bsmod_queryPackage(const char* name) {
-    BSMOD_VALIDATE(name != NULL, NULL,);
-    return next.bsmod_queryPackage(name);
+BSMODAPI bsmod_Package* _preval_bsmod_queryPackage(const char* path) {
+    BSMOD_VALIDATE(path != NULL, NULL,);
+    return next.bsmod_queryPackage(path);
 }
 
-BSMODAPI bsmod_Package* _preval_bsmod_ensurePackage(const char* name) {
-    BSMOD_VALIDATE(name != NULL, NULL,);
-    return next.bsmod_ensurePackage(name);
+BSMODAPI bsmod_Package* _preval_bsmod_ensurePackage(const char* path) {
+    BSMOD_VALIDATE(path != NULL, NULL,);
+    return next.bsmod_ensurePackage(path);
 }
 
 BSMODAPI bsmod_Resource* _preval_bsmod_queryResource(bsmod_Package* package, bs_ResourceType type, const char* name) {
@@ -236,6 +236,16 @@ BSMODAPI bs_Result _preval_bsmod_packResourceV(bs_ResourceType type, unsigned ch
 BSMODAPI bs_Result _preval_bsmod_savePackage(char* path) {
     BSMOD_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bsmod_savePackage(path);
+}
+
+BSMODAPI bs_Result _preval_bsmod_savePackageN(char* path, int path_length) {
+    BSMOD_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsmod_savePackageN(path, path_length);
+}
+
+BSMODAPI bs_Result _preval_bsmod_savePackageV(char* format, va_list args) {
+    BSMOD_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsmod_savePackageV(format, args);
 }
 
 BSMODAPI void _preval_bsmod_loadShaderReferences() {
@@ -564,6 +574,8 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_packResourceN = _preval_bsmod_packResourceN;
     functions.bsmod_packResourceV = _preval_bsmod_packResourceV;
     functions.bsmod_savePackage = _preval_bsmod_savePackage;
+    functions.bsmod_savePackageN = _preval_bsmod_savePackageN;
+    functions.bsmod_savePackageV = _preval_bsmod_savePackageV;
     functions.bsmod_loadShaderReferences = _preval_bsmod_loadShaderReferences;
     functions.bsmod_updateShaderReferences = _preval_bsmod_updateShaderReferences;
     functions.bsmod_iniCompiler = _preval_bsmod_iniCompiler;

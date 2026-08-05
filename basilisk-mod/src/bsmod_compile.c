@@ -82,7 +82,7 @@ static bs_U32 _bsmod_readBindSetFlags(spvc_compiler compiler, spvc_resources res
 	return bind_set_flags;
 }
 
-BSMODAPI bs_Result _bsmod_packShader(spvc_compiler compiler, spvc_resources resources, bs_U32* spirv, size_t spirv_size, bs_ShaderType shader_type, bsmod_Package* package, char* resource_name) {
+BSMODAPI bs_Result _bsmod_packShader(spvc_compiler compiler, spvc_resources resources, bs_U32* spirv, size_t spirv_size, bs_ShaderType shader_type, char* package_path, char* resource_name) {
 	bs_Result result;
 
 	bs_BshaHeader header = {
@@ -139,7 +139,7 @@ BSMODAPI bs_Result _bsmod_packShader(spvc_compiler compiler, spvc_resources reso
 	memcpy(bsha + total_size_excluding_binary, spirv, spirv_size);
 	memcpy(bsha, &header, sizeof(bs_BatlHeader));
 
-	result = _bsmod_packResource(BS_RESOURCE_SHADER, bsha, total_size, package->name, resource_name);
+	result = _bsmod_packResource(BS_RESOURCE_SHADER, bsha, total_size, package_path, resource_name);
 	bs_free(bsha);
 
 	return BS_RESULT_OK;
@@ -225,7 +225,7 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 
 	unsigned char* bbnd = bs_malloc(total_size);
 	memcpy(bbnd, &header, sizeof(bs_BbndHeader));
-	bs_result = _bsmod_packResource(BS_RESOURCE_BINDING, bbnd, total_size, package->name, name);
+	bs_result = _bsmod_packResource(BS_RESOURCE_BINDING, bbnd, total_size, package->path, name);
 	bs_free(bbnd);
 
 	return bs_result;
@@ -573,7 +573,7 @@ BSMODAPI bs_Result _bsmod_compileShader(char* path, char* name, char* package_na
 		return BS_RESULT_GENERAL_ERROR;
 	}
 
-	bs_result = _bsmod_packShader(compiler, resources, spirv, size * sizeof(bs_U32), type, package, name);
+	bs_result = _bsmod_packShader(compiler, resources, spirv, size * sizeof(bs_U32), type, package_name, name);
 	if (bs_result != BS_RESULT_OK) {
 		return bs_result;
 	}

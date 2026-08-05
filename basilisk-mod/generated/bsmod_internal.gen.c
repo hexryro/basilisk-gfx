@@ -42,7 +42,7 @@ bsmod_TextureInfo* _bsmod_packAtlasTexture(
     int category, 
     char* name)
 {
-    return _bsmod_packAtlasTexture(packer, data, width, height, category, strlen(bsmod_packAtlasTexture));
+    return _bsmod_packAtlasTextureN(packer, data, width, height, category, name, strlen(name));
 }
 
 bsmod_TextureInfo* _bsmod_packAtlasTextureV(
@@ -83,7 +83,7 @@ bs_Result _bsmod_packResource(
     const char* package_name, 
     char* resource_name)
 {
-    return _bsmod_packResource(type, data, data_size, package_name, strlen(bsmod_packResource));
+    return _bsmod_packResourceN(type, data, data_size, package_name, resource_name, strlen(resource_name));
 }
 
 bs_Result _bsmod_packResourceV(
@@ -115,11 +115,38 @@ bs_Result _bsmod_packResourceF(
     return _return;
 }
 
+bs_Result _bsmod_savePackage(
+    char* path)
+{
+    return _bsmod_savePackageN(path, strlen(path));
+}
+
+bs_Result _bsmod_savePackageV(
+    char* format, 
+    va_list args)
+{
+    int _length = bs_formatStringLength(format, args);
+    char* _formatted = bs_alloca(_length + 1);
+    vsnprintf(_formatted, _length + 1, format, args);
+    return _bsmod_savePackageN(_formatted, _length);
+}
+
+bs_Result _bsmod_savePackageF(
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    bs_Result _return = _bsmod_savePackageV(format, args);
+    va_end(args);
+    return _return;
+}
+
 bs_Result _bsmod_saveType(
     bsgfx_TypeId id, 
     char* value)
 {
-    return _bsmod_saveType(id, strlen(bsmod_saveType));
+    return _bsmod_saveTypeN(id, value, strlen(value));
 }
 
 bs_Result _bsmod_saveTypeV(

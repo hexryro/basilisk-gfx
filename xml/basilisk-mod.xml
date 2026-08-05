@@ -158,9 +158,12 @@
             <field><type>char*</type><name>name</name></field>
             <field><type>bs_U64</type><name>directory_hash</name></field>
             <field><type>char*</type><name>directory</name></field>
+            <field><type>char*</type><name>path</name></field>
+            <field><type>bs_U64</type><name>path_hash</name></field>
 			<field><type>bs_List</type><name>chunks</name></field>
 			<field><type>bs_List</type><name>resources</name></field>
 			<field><type>bool</type><name>has_changes</name></field>
+			<field><type>bool</type><name>is_initialized</name></field>
 		</structure>
 
 		<structure name="bsmod_Resource">
@@ -336,11 +339,11 @@
 		</function>
 		<function name="bsmod_queryPackage">
 			<return>bsmod_Package*</return>
-			<param><type>const char*</type><name>name</name></param>
+			<param><type>const char*</type><name>path</name></param>
 		</function>
 		<function name="bsmod_ensurePackage">
 			<return>bsmod_Package*</return>
-			<param><type>const char*</type><name>name</name></param>
+			<param><type>const char*</type><name>path</name></param>
 		</function>
 		<function name="bsmod_queryResource">
 			<return>bsmod_Resource*</return>
@@ -359,10 +362,9 @@
 			<param><type>size_t</type><name>data_size</name></param>
 			<param><type>const char*</type><name>package_name</name></param>
 		</variadicStringTemplate>
-		<function name="bsmod_savePackage">
+		<variadicStringTemplate name="bsmod_savePackage" string="path">
 			<return>bs_Result</return>
-			<param><type>char*</type><name>path</name></param>
-		</function>
+		</variadicStringTemplate>
 
 		<function name="bsmod_loadShaderReferences">
 			<return>void</return>
