@@ -51,7 +51,7 @@ int bsmod_fetchSource(bs_ObjectType type) {
     return _bsmod_sources_[type];
 }
 
-volatile long _bsmod_has_performed_tracked_changes_ = 1;
+volatile long _bsmod_has_performed_tracked_changes_ = 0;
 
 int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT] = { 0 };
 
@@ -100,7 +100,35 @@ static void _bsmod_instanceAxisFace(
     bsgfx_instanceDepthlessLine(c, a, color);
 }
 
+bs_Result _bsmod_loadResource(int type, int package_id, char* name);
 BSMODAPI void _bsmod_onTick() {
+    if (InterlockedCompareExchange(&_bsmod_has_performed_tracked_changes_, 1, 1) == 1) {
+
+        bool has_changes = false;
+
+        for (int i = 0; i < bsmod_packages()->count; i++) {
+            bsmod_Package* package = bs_fetchUnit(bsmod_packages(), i);
+            int package_id = bs_queryPackage(package->path); // this is shit
+            if (package_id < 0)
+                continue;
+
+            for (int j = 0; j < package->resources.count; j++) {
+                bsmod_Resource* resource = bs_fetchUnit(&package->resources, j);
+                if (resource->has_changes) {
+                    _bsmod_loadResource(resource->type, package_id, resource->name);
+                    resource->has_changes = false;
+                    has_changes = true;
+                }
+            }
+        }
+
+        if (has_changes)
+            bs_pushDescriptors();
+
+        InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 0);
+    }
+    
+
    // memset(&_bsmod_.queue, 0, sizeof(_bsmod_.queue));
 
   //  static float lisk_time = 0.0;
@@ -110,15 +138,6 @@ BSMODAPI void _bsmod_onTick() {
   //          _bsmod_tickLisk();
   //      lisk_time = 0.0;
   //  }
-
-    if (InterlockedCompareExchange(&_bsmod_has_performed_tracked_changes_, 1, 1) == 1) {
-
-        _bsmod_savePackage(BSMOD_CONTENT_PATH);
-        _bsmod_savePackage(BSGFX_CONTENT_PATH);
-        if (_bsmod_config_.doc)
-            _bsmod_savePackage(_bsmod_applicationContentPath());
-
-    }
 
     return;
     if (bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_CURSOR_READS) && bs_bufferIsMapped(bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_CURSOR_READS)->buffer)) {
@@ -369,7 +388,6 @@ BSMODAPI void _bsmod_onGfxRender() {
 
 static DWORD WINAPI _bsmod_tickAsync(void* param) {
     while (1) {
-        InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 0);
         _bsmod_onTrack();
         InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 1);
         Sleep(1000);

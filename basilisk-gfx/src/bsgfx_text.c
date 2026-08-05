@@ -58,7 +58,6 @@ BSAPI bs_vec2 _bsgfx_textDimensions(bsgfx_Font* font, char* name, int length) {
     return BS_V2(width, font->height);
 }
 
-
 BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flags, bs_Resource **out) {
     bs_Result result;
 

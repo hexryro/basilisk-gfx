@@ -270,6 +270,8 @@ BSAPI bs_Result _bs_loadPackageN(int* out, const char* path, int path_length) {
             break;
         }
 
+        existing->chunks_count = BS_MAX(existing->chunks_count, chunk + 1);
+
         *added = (bs_ResourceHeader) {
             .chunk = chunk,
             .name_hash = name_hash,

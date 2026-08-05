@@ -41,6 +41,7 @@
 
 	<typedefs>
 		<typedef><type>void</type><name>(__stdcall* PFN_void)()</name></typedef>
+		<typedef><type>unsigned char*</type><name>(__stdcall* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int)</name></typedef>
 		<typedef><type>const char*</type><name>(__stdcall* PFN_bsmod_GridMenu)(bs_List* widgets)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int)</name></typedef>
 	</typedefs>
@@ -141,10 +142,13 @@
 		
 		<structure name="bsmod_TextureInfo">
 			<field><type>char*</type><name>name</name></field>
-			<field><type>bs_RGBA*</type><name>data</name></field>
+			<field><type>PFN_bsmod_getAtlasTextureData</type><name>get_data</name></field>
+			<field><type>void*</type><name>param</name></field>
+			<field><type>unsigned char*</type><name>data</name></field>
 			<field><type>int</type><name>name_length</name></field>
 			<field><type>int</type><name>category</name></field>
 			<field><type>int</type><name>page</name></field>
+			<field><type>int</type><name>id</name></field>
 		</structure>
 
 		<structure name="bsmod_Chunk">
@@ -286,10 +290,13 @@
 		<variadicStringTemplate name="bsmod_packAtlasTexture" string="name">
 			<return>bsmod_TextureInfo*</return>
 			<param><type>bsmod_AtlasPacker*</type><name>packer</name></param>
-			<param><type>bs_RGBA*</type><name>data</name></param>
+			<param><type>unsigned char*</type><name>data</name></param>
+			<param><type>PFN_bsmod_getAtlasTextureData</type><name>get_data</name></param>
+			<param><type>void*</type><name>param</name></param>
 			<param><type>int</type><name>width</name></param>
 			<param><type>int</type><name>height</name></param>
 			<param><type>int</type><name>category</name></param>
+			<param><type>int</type><name>id</name></param>
 		</variadicStringTemplate>
 		<function name="bsmod_packAtlas">
 			<return>bs_Result</return>

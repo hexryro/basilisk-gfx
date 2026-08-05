@@ -5,7 +5,7 @@
         "package": "content/bsgfx.bpak",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-08-05 17:43:02",
+        "lastModified": "2026-08-05 18:49:12",
         "entries": [
             "project/basilisk-gfx/shaders/bsgfx.glsl",
             "project/basilisk-gfx/shaders/bsgfx_atlas.glsl",
@@ -114,7 +114,7 @@
         "package": "content/bsmod.bpak",
         "prefix": "",
         "callOnce": true,
-        "lastModified": "2026-08-05 17:43:40",
+        "lastModified": "2026-08-05 18:50:24",
         "entries": [
             "project/basilisk-mod/atlas/ui/circle.png",
             "project/basilisk-mod/atlas/ui/expand.png",

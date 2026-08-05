@@ -137,40 +137,6 @@ BSMODAPI bs_Result _bsmod_iniPackage(int package_id) {
 	if (result != BS_RESULT_OK)
 		return result;
 
-	int chunks_count = 0;
-
-	/*
-	for (int i = sizeof(bs_PackageHeader); i < (bpak->len - 1);) {
-		bs_ResourceHeader* header = bpak->value + i;
-		i += sizeof(header->header);
-		if (i >= bpak->len) {
-			bs_criticalF("Package \"%s\" has corrupted data", package_name); // TODO: bsmod warn
-			return BS_RESULT_CORRUPTED;
-		}
-
-		char* name = bpak->value + i;
-		i += header->header.name_length + 1;
-		if (i >= bpak->len) {
-			bs_criticalF("Package \"%s\" has corrupted data", package_name); // TODO: bsmod warn
-			return BS_RESULT_CORRUPTED;
-		}
-
-		char* end = strchr(name, '\n');
-		if (!end) {
-			bs_criticalF("Package \"%s\" has corrupted data", package_name); // TODO: bsmod warn
-			return BS_RESULT_CORRUPTED;
-		}
-		end[0] = '\0';
-
-		bsmod_Resource* added = bs_pushBack(&package->resources, &(bsmod_Resource) {
-			.header = header->header,
-			.name = strdup(name),
-		});
-
-		chunks_count = BS_MAX(chunks_count, (header->header.chunk + 1));
-	}
-	*/
-
 	for (int i = 0; i < package->resource_headers_count; i++) {
 		bs_ResourceHeader* header = package->resource_headers + i;
 
@@ -185,10 +151,10 @@ BSMODAPI bs_Result _bsmod_iniPackage(int package_id) {
 		});
 	}
 
-	for (int i = 0; i < chunks_count; i++) {
+	for (int i = 0; i < package->chunks_count; i++) {
 		bs_String* chunk_bin; 
 		char* ext = strrchr(package->path, '.');
-		if (bs_loadFileF(&chunk_bin, "%s_%03d.bpak", package->path, (i + 1)) != BS_RESULT_OK) {
+		if (bs_loadFileF(&chunk_bin, "%s/%s_%03d.bpak", package_metadata->directory, package_metadata->name, (i + 1)) != BS_RESULT_OK) {
 			continue;
 		}
 
@@ -230,6 +196,18 @@ static bsmod_Chunk* _bsmod_ensureChunk(bsmod_Package* package, int size) {
 
 BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length) {
 	bsmod_Package* package = _bsmod_ensurePackage(package_name);
+
+	/** Ensure package is loaded to not overwrite data */
+	if (!package->is_initialized) {
+		int existing_package_id = bs_queryPackage(package->path);
+		if (existing_package_id < 0)
+			bs_loadPackage(&existing_package_id, package->path);
+
+		if (existing_package_id >= 0)
+			_bsmod_iniPackage(existing_package_id);
+
+		package->is_initialized = true;
+	}
 
 	bsmod_Resource* resource = _bsmod_ensureResource(package, type, resource_name);
 	resource->type = type;
@@ -280,7 +258,7 @@ BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* dat
 	return BS_RESULT_OK;
 }
 
-static bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
+bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 	bs_Result result = BS_RESULT_OK;
 
 	bs_Scope scope = bs_enterSingle();
@@ -461,20 +439,6 @@ BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length) {
 	if (!package || !package->has_changes)
 		return BS_RESULT_OK;
 
-	/** Ensure package is initialized to not overwrite data */
-	if (!package->is_initialized) {
-		int existing_package_id = bs_queryPackage(path);
-		if (existing_package_id < 0)
-			bs_loadPackage(&existing_package_id, path);
-
-		if (existing_package_id >= 0)
-			_bsmod_iniPackage(existing_package_id);
-
-		package->is_initialized = true;
-	}
-
-	package->has_changes = false;
-
 	/**
 	 Binary
 	 */
@@ -568,16 +532,7 @@ BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length) {
 	 */
 	int package_id;
 	result = bs_loadPackageF(&package_id, "%s/%s.bpak", package->directory, package->name);
-	if (result != BS_RESULT_OK)
-		return result;
 
-	for (int i = 0; i < package->resources.count; i++) {
-		bsmod_Resource* resource = bs_fetchUnit(&package->resources, i);
-		if (resource->has_changes) {
-			result = _bsmod_loadResource(resource->type, package_id, resource->name);
-			resource->has_changes = false;
-		}
-	}
-
-	return BS_RESULT_OK;
+	package->has_changes = false;
+	return result;
 }

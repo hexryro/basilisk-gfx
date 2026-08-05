@@ -212,7 +212,19 @@ static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* 
 	bs_PngData png_data;
 	if (bs_loadPng(info.path, 4, &png_data) == BS_RESULT_OK) {
 		ext[-1] = '\0';
-		_bsmod_packAtlasTexture(packer, png_data.data, png_data.width, png_data.height, 0, name);
+
+		_bsmod_packAtlasTexture(
+			packer, 
+			png_data.data,
+			NULL,
+			NULL, 
+			png_data.width, 
+			png_data.height, 
+			0,
+			0, 
+			name
+		);
+
 		ext[-1] = '.';
 	}
 

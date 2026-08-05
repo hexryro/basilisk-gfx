@@ -2409,6 +2409,7 @@ struct bs_Package {
     bs_ResourceHeader* resource_headers;
     bs_String* raw;
     bs_Range resource_type_offsets[BS_RESOURCE_TYPE_COUNT];
+    int chunks_count;
 };
 
 struct bs_BlitOperation {

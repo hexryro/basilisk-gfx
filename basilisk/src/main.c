@@ -79,7 +79,7 @@ static bs_Queue* onQueue() {
 }
 
 static void onTick() {
-	bsmod_onTick();
+	_bsmod_onTick();
 
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
@@ -97,18 +97,8 @@ static void onIni() {
 	bsmod_onTrack();
 }
 
-static DWORD WINAPI _bsmod_tickAsync(void* param) {
-	while (1) {
-		InterlockedExchange(&has_performed_tracked_changes, 0);
-		bsmod_onTrack();
-		InterlockedExchange(&has_performed_tracked_changes, 1);
-		Sleep(1000);
-	}
-}
 static void onLateIni() {
 	bsmod_onLateIni();
-
-	CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
 
 	bsgfx_loadScene("engine");
 }

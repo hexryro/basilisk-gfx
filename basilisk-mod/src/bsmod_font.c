@@ -52,6 +52,13 @@ bs_Result _bsmod_convertFreetypeError(FT_Error error) {
 	return BS_RESULT_GENERAL_ERROR;
 }
 
+static unsigned char* _bsmod_getFontTextureData(bsmod_AtlasPacker* packer, int index) {
+	bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, index);
+	bs_List* bitmap = info->param;
+
+	return bitmap->data + info->id;
+}
+
 BSMODAPI bs_Result _bsmod_packFont(
 	char* package_path, 
 	char* ttf_path, 
@@ -112,6 +119,8 @@ BSMODAPI bs_Result _bsmod_packFont(
 	bs_setLittleEndian32(1, batl + BS_BFNT_VERSION_OFFSET);
 	bs_setLittleEndian16(blocks_count, batl + BS_BFNT_1_BLOCKS_COUNT_OFFSET);
 
+	bs_List bitmap_data = bs_list(sizeof(unsigned char), 1024);
+
    /**
     Font specific codepoint ranges
 	*/
@@ -155,15 +164,35 @@ BSMODAPI bs_Result _bsmod_packFont(
 					if (face->glyph->bitmap.rows == 0)
 						continue;
 
-					bsmod_packAtlasTextureF(&packer, face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, "%d", glyph_id);
+					FT_Bitmap* bmp = &face->glyph->bitmap;
+					bs_ensureSize(&bitmap_data, bmp->rows * bmp->width);
+
+					unsigned char* dst = bitmap_data.data + bitmap_data.count;
+					for (int y = 0; y < bmp->rows; ++y) {
+						memcpy(dst + y * bmp->width,
+							bmp->buffer + y * bmp->pitch,
+							bmp->width);
+					}
+
+					bsmod_TextureInfo* texture = bsmod_packAtlasTextureF(
+						&packer, 
+						NULL, 
+						_bsmod_getFontTextureData, 
+						&bitmap_data,
+						bmp->width, 
+						bmp->rows, 
+						0, 
+						bitmap_data.count,
+						"%d", glyph_id
+					);
+
+					bitmap_data.count += bmp->rows * bmp->width;
 				}
 			}
 		}
 
 		block_offset += BS_BFNT_1_BLOCK_SIZE;
 	}
-
-	FT_Done_Face(face);
 
    /**
     Copy TTF data
@@ -172,16 +201,16 @@ BSMODAPI bs_Result _bsmod_packFont(
 
 	memcpy(ttf_offset, ttf->value, ttf->len);
 
-	bs_free(ttf);
-
-	//result = bs_savePng(batl + header.binary_offset, BS_IV2(width, height), BS_PNG_RGBA, BS_CONSTANT_STRING("test.png"));
-
 	result = _bsmod_packAtlas(&packer, 1024, 1024, 1, package_path, resource_name, true);
 	if (result != BS_RESULT_OK)
-		return result;
+		goto end;
 
 	result = _bsmod_packResource(BS_RESOURCE_FONT, batl, total_size, package_path, resource_name);
-
+	
+end:
+	bs_destroyList(&bitmap_data);
+	FT_Done_Face(face);
+	bs_free(ttf);
 	bs_free(batl);
 	//	if (result != BS_RESULT_OK)
 	//		return result;

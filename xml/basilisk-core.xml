@@ -1219,6 +1219,7 @@
             <field><type>bs_ResourceHeader*</type><name>resource_headers</name></field>
             <field><type>bs_String*</type><name>raw</name></field>
             <field><type>bs_Range</type><name>resource_type_offsets</name><size>BS_RESOURCE_TYPE_COUNT</size></field>
+            <field><type>int</type><name>chunks_count</name></field>
         </structure>
         <structure name="bs_BlitOperation">
             <field><type>bs_Image*</type><name>source</name></field>

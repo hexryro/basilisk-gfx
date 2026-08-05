@@ -110,6 +110,7 @@ typedef enum bsmod_SideMenuTabId bsmod_SideMenuTabId;
     &_bsmod_.selected_tiles
 
 typedef void (__stdcall* PFN_void)();
+typedef unsigned char* (__stdcall* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int);
 typedef const char* (__stdcall* PFN_bsmod_GridMenu)(bs_List* widgets);
 typedef void (__stdcall* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int);
 enum bsmod_EditType {
@@ -178,10 +179,13 @@ struct bsmod_GlyphInfo {
 
 struct bsmod_TextureInfo {
     char* name;
-    bs_RGBA* data;
+    PFN_bsmod_getAtlasTextureData get_data;
+    void* param;
+    unsigned char* data;
     int name_length;
     int category;
     int page;
+    int id;
 };
 
 struct bsmod_Chunk {
@@ -398,27 +402,36 @@ bsmod_packFont(
  /**
   @param packer
   @param data
+  @param get_data
+  @param param
   @param width
   @param height
   @param category
+  @param id
   @param name
   @return bsmod_TextureInfo*
   */
 BSMODAPI bsmod_TextureInfo*
 bsmod_packAtlasTexture(
     bsmod_AtlasPacker* packer,
-    bs_RGBA* data,
+    unsigned char* data,
+    PFN_bsmod_getAtlasTextureData get_data,
+    void* param,
     int width,
     int height,
     int category,
+    int id,
     char* name);
 
  /**
   @param packer
   @param data
+  @param get_data
+  @param param
   @param width
   @param height
   @param category
+  @param id
   @param name
   @param name_length
   @return bsmod_TextureInfo*
@@ -426,19 +439,25 @@ bsmod_packAtlasTexture(
 BSMODAPI bsmod_TextureInfo*
 bsmod_packAtlasTextureN(
     bsmod_AtlasPacker* packer,
-    bs_RGBA* data,
+    unsigned char* data,
+    PFN_bsmod_getAtlasTextureData get_data,
+    void* param,
     int width,
     int height,
     int category,
+    int id,
     char* name,
     int name_length);
 
  /**
   @param packer
   @param data
+  @param get_data
+  @param param
   @param width
   @param height
   @param category
+  @param id
   @param format
   @param args
   @return bsmod_TextureInfo*
@@ -446,19 +465,25 @@ bsmod_packAtlasTextureN(
 BSMODAPI bsmod_TextureInfo*
 bsmod_packAtlasTextureV(
     bsmod_AtlasPacker* packer,
-    bs_RGBA* data,
+    unsigned char* data,
+    PFN_bsmod_getAtlasTextureData get_data,
+    void* param,
     int width,
     int height,
     int category,
+    int id,
     char* format,
     va_list args);
 
  /**
   @param packer
   @param data
+  @param get_data
+  @param param
   @param width
   @param height
   @param category
+  @param id
   @param format
   @param ...
   @return bsmod_TextureInfo*
@@ -466,10 +491,13 @@ bsmod_packAtlasTextureV(
 BSMODAPI bsmod_TextureInfo*
 bsmod_packAtlasTextureF(
     bsmod_AtlasPacker* packer,
-    bs_RGBA* data,
+    unsigned char* data,
+    PFN_bsmod_getAtlasTextureData get_data,
+    void* param,
     int width,
     int height,
     int category,
+    int id,
     char* format,
      ...);
 

@@ -261,11 +261,14 @@ BSMODAPI void _bsmod_pollRasterizer() {
                 unsigned char* map = bs_bufferMap(rasterization->buffer);
                 _bsmod_packAtlasTexture(
                     &packer, 
-                    map, 
+                    map,
+                    NULL,
+                    NULL,
                     rasterization->scaled_image->dim.x, 
                     rasterization->scaled_image->dim.y, 
                     rasterization->category, 
-                    rasterization->name
+                    rasterization->name,
+                    0
                 );
                 // bs_savePngF(map, bs_iv2(rasterization->scaled_image->dim.x, rasterization->scaled_image->dim.y), BS_PNG_RGBA, "test%d.png", i);
             }

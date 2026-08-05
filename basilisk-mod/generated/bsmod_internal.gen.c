@@ -36,42 +36,51 @@
 
 bsmod_TextureInfo* _bsmod_packAtlasTexture(
     bsmod_AtlasPacker* packer, 
-    bs_RGBA* data, 
+    unsigned char* data, 
+    PFN_bsmod_getAtlasTextureData get_data, 
+    void* param, 
     int width, 
     int height, 
     int category, 
+    int id, 
     char* name)
 {
-    return _bsmod_packAtlasTextureN(packer, data, width, height, category, name, strlen(name));
+    return _bsmod_packAtlasTextureN(packer, data, get_data, param, width, height, category, id, name, strlen(name));
 }
 
 bsmod_TextureInfo* _bsmod_packAtlasTextureV(
     bsmod_AtlasPacker* packer, 
-    bs_RGBA* data, 
+    unsigned char* data, 
+    PFN_bsmod_getAtlasTextureData get_data, 
+    void* param, 
     int width, 
     int height, 
     int category, 
+    int id, 
     char* format, 
     va_list args)
 {
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bsmod_packAtlasTextureN(packer, data, width, height, category, _formatted, _length);
+    return _bsmod_packAtlasTextureN(packer, data, get_data, param, width, height, category, id, _formatted, _length);
 }
 
 bsmod_TextureInfo* _bsmod_packAtlasTextureF(
     bsmod_AtlasPacker* packer, 
-    bs_RGBA* data, 
+    unsigned char* data, 
+    PFN_bsmod_getAtlasTextureData get_data, 
+    void* param, 
     int width, 
     int height, 
     int category, 
+    int id, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    bsmod_TextureInfo* _return = _bsmod_packAtlasTextureV(packer, data, width, height, category, format, args);
+    bsmod_TextureInfo* _return = _bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id, format, args);
     va_end(args);
     return _return;
 }

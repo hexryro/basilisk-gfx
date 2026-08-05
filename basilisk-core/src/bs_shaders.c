@@ -183,6 +183,8 @@ static void _bs_pushDescriptorPools() {
         bind_set->vk_layout = _bs_pushDescriptorLayout(bind_set);
         bind_set->vk_set    = _bs_pushDescriptorSet(bind_set, bind_set->vk_layout, descriptor_pool);
     }
+
+    bs_logN(BS_CONSTANT_STRING("Pushed descriptor pools"));
 }
 
  /**
@@ -209,6 +211,8 @@ BSAPI void _bs_pushDescriptors() {
 
         bind_set->needs_update = false;
         vkUpdateDescriptorSetWithTemplate(_bs_instance_->device, bind_set->vk_set, bind_set->vk_update_template, bind_set->descriptors);
+
+        bs_logF("Updated bind set %d descriptors", bind_set->slot);
     }
 }
 

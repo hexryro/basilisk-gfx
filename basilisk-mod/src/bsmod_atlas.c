@@ -27,11 +27,25 @@
 #include <stb_rect_pack/stb_rect_pack.h>
 #include <string.h>
 
-BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* name, int name_length) {
+BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
+	bsmod_AtlasPacker* packer, 
+	unsigned char* data, 
+	PFN_bsmod_getAtlasTextureData get_data,
+	void* param, 
+	int width, 
+	int height, 
+	int category, 
+	int id, 
+	char* name, 
+	int name_length) 
+{
 	bsmod_TextureInfo info = {
 		.name = strdup(name),
 		.name_length = name_length,
 		.data = data,
+		.get_data = get_data,
+		.param = param,
+		.id = id,
 		.category = category,
 	};
 
@@ -160,6 +174,9 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 		offset += 2;
 
 		int w = width - padding;
+
+		if (info->get_data)
+			info->data = info->get_data(packer, i);
 
 		// lodepng is upside down (:
 		unsigned char* atlas_offset = batl + total_size_excluding_binary;

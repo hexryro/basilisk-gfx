@@ -188,51 +188,63 @@ bs_Result bsmod_packFont(
 
 bsmod_TextureInfo* bsmod_packAtlasTexture(
     bsmod_AtlasPacker* packer, 
-    bs_RGBA* data, 
+    unsigned char* data, 
+    PFN_bsmod_getAtlasTextureData get_data, 
+    void* param, 
     int width, 
     int height, 
     int category, 
+    int id, 
     char* name)
 {
-    return next.bsmod_packAtlasTexture(packer, data, width, height, category, name);
+    return next.bsmod_packAtlasTexture(packer, data, get_data, param, width, height, category, id, name);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTextureN(
     bsmod_AtlasPacker* packer, 
-    bs_RGBA* data, 
+    unsigned char* data, 
+    PFN_bsmod_getAtlasTextureData get_data, 
+    void* param, 
     int width, 
     int height, 
     int category, 
+    int id, 
     char* name, 
     int name_length)
 {
-    return next.bsmod_packAtlasTextureN(packer, data, width, height, category, name, name_length);
+    return next.bsmod_packAtlasTextureN(packer, data, get_data, param, width, height, category, id, name, name_length);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTextureV(
     bsmod_AtlasPacker* packer, 
-    bs_RGBA* data, 
+    unsigned char* data, 
+    PFN_bsmod_getAtlasTextureData get_data, 
+    void* param, 
     int width, 
     int height, 
     int category, 
+    int id, 
     char* format, 
     va_list args)
 {
-    return next.bsmod_packAtlasTextureV(packer, data, width, height, category, format, args);
+    return next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id, format, args);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTextureF(
     bsmod_AtlasPacker* packer, 
-    bs_RGBA* data, 
+    unsigned char* data, 
+    PFN_bsmod_getAtlasTextureData get_data, 
+    void* param, 
     int width, 
     int height, 
     int category, 
+    int id, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    bsmod_TextureInfo* _return = next.bsmod_packAtlasTextureV(packer, data, width, height, category, format, args);
+    bsmod_TextureInfo* _return = next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id, format, args);
     va_end(args);
     return _return;
 }

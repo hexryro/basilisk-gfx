@@ -261,7 +261,7 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
     bs_parseArgs(argc, argv);
 
 #ifdef _DEBUG
-    const char* args[] = { "--cmd-log", "--color-log", "--use-lisk", "--use-validation-layers" };
+    const char* args[] = { "--cmd-log", "--color-log", "--use-lisk", "--use-validation-layers", "--track-changes"};
     bs_parseArgs(sizeof(args) / sizeof(char*), args);
 #endif
     
