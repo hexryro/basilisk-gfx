@@ -58,8 +58,8 @@ static int* _bs_gltfIntArray(bs_Model* model, bs_Json* root, int accessor, int* 
     int buffer_view_id = _bs_fetchJsonF(root, BS_JSON_NUMBER, "accessors[%d].bufferView", accessor).as_number;
     bs_Json buffer_view = _bs_jsonRoot(root, _bs_fetchJsonF(root, BS_JSON_OBJECT, "bufferViews[%d]", buffer_view_id).as_object);
 
-    *out_len   = _bs_fetchJson(&buffer_view, BS_JSON_NUMBER, BS_CONSTANT_STRING("byteLength")).as_number / size;
-    int offset = _bs_fetchJson(&buffer_view, BS_JSON_NUMBER, BS_CONSTANT_STRING("byteOffset")).as_number;
+    *out_len   = _bs_fetchJsonN(&buffer_view, BS_JSON_NUMBER, BS_CONSTANT_STRING("byteLength")).as_number / size;
+    int offset = _bs_fetchJsonN(&buffer_view, BS_JSON_NUMBER, BS_CONSTANT_STRING("byteOffset")).as_number;
 
     return (int*)(model->gltf + offset);
 }
@@ -114,12 +114,12 @@ static bs_Primitive* _bs_loadPrimitive(
 {
     memset(primitive, 0, sizeof(bs_Primitive));
 
-    bs_Json attributes       = _bs_jsonRoot(root, _bs_fetchJson(primitive_json, BS_JSON_OBJECT, BS_CONSTANT_STRING("attributes")).as_object);
-    bs_JsonValue position    = _bs_fetchJson(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("POSITION"));
-    bs_JsonValue normal      = _bs_fetchJson(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("NORMAL"));
-    bs_JsonValue tex_coord   = _bs_fetchJson(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("TEXCOORD_0"));
-    bs_JsonValue joints      = _bs_fetchJson(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("JOINTS_0"));
-    bs_JsonValue weights     = _bs_fetchJson(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("WEIGHTS_0"));
+    bs_Json attributes       = _bs_jsonRoot(root, _bs_fetchJsonN(primitive_json, BS_JSON_OBJECT, BS_CONSTANT_STRING("attributes")).as_object);
+    bs_JsonValue position    = _bs_fetchJsonN(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("POSITION"));
+    bs_JsonValue normal      = _bs_fetchJsonN(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("NORMAL"));
+    bs_JsonValue tex_coord   = _bs_fetchJsonN(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("TEXCOORD_0"));
+    bs_JsonValue joints      = _bs_fetchJsonN(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("JOINTS_0"));
+    bs_JsonValue weights     = _bs_fetchJsonN(&attributes, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("WEIGHTS_0"));
 
     primitive->aabb.max = (bs_vec3) { -FLT_MAX, -FLT_MAX, -FLT_MAX };
     primitive->aabb.min = (bs_vec3) { FLT_MAX, FLT_MAX, FLT_MAX };
@@ -133,7 +133,7 @@ static bs_Primitive* _bs_loadPrimitive(
     if (joints.found)    vertex_size = (primitive->bone_offset = vertex_size) + 4;
     if (weights.found)   vertex_size = (primitive->weight_offset = vertex_size) + 4;
 
-    primitive->material_id = _bs_fetchJson(primitive_json, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("material")).as_number;
+    primitive->material_id = _bs_fetchJsonN(primitive_json, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("material")).as_number;
     primitive->parent = mesh;
     primitive->vertex_size = vertex_size;
     primitive->num_vertices = num_floats / 3;
@@ -148,7 +148,7 @@ static bs_Primitive* _bs_loadPrimitive(
    /**
     Read indices
     */
-    int accessor = _bs_fetchJson(primitive_json, BS_JSON_NUMBER, BS_CONSTANT_STRING("indices")).as_number;
+    int accessor = _bs_fetchJsonN(primitive_json, BS_JSON_NUMBER, BS_CONSTANT_STRING("indices")).as_number;
 
     bs_U16* arr = (bs_U16*)_bs_gltfFloatArray(mesh->model, root, accessor, &primitive->num_indices, 1);
     primitive->indices = _bs_calloc(primitive->num_indices, sizeof(int));
@@ -164,8 +164,8 @@ static bs_Primitive* _bs_loadPrimitive(
 }
 
 static void _bs_loadMeshes(bs_Model* model, bs_Json* root) {
-    bs_JsonValue meshes = _bs_fetchJson(root, BS_JSON_ARRAY, BS_CONSTANT_STRING("meshes"));
-    bs_JsonValue nodes = _bs_fetchJson(root, BS_JSON_ARRAY, BS_CONSTANT_STRING("nodes"));
+    bs_JsonValue meshes = _bs_fetchJsonN(root, BS_JSON_ARRAY, BS_CONSTANT_STRING("meshes"));
+    bs_JsonValue nodes = _bs_fetchJsonN(root, BS_JSON_ARRAY, BS_CONSTANT_STRING("nodes"));
 
     model->meshes_count = meshes.size;
     model->meshes = _bs_malloc(model->meshes_count * sizeof(bs_Mesh));
@@ -173,17 +173,17 @@ static void _bs_loadMeshes(bs_Model* model, bs_Json* root) {
     for (int i = 0; i < nodes.size; i++) {
         bs_Json node = _bs_jsonRoot(root, nodes.as_array.as_objects[i]);
 
-        bs_JsonValue mesh_id = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("mesh"));
+        bs_JsonValue mesh_id = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("mesh"));
         if (!mesh_id.found) 
             continue;
 
         int id = mesh_id.as_number;
         bs_Json mesh_json = _bs_jsonRoot(root, meshes.as_array.as_objects[id]);
 
-        bs_JsonValue primitives = _bs_fetchJson(&mesh_json, BS_JSON_ARRAY, BS_CONSTANT_STRING("primitives"));
-        bs_JsonValue translation = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("translation"));
-        bs_JsonValue rotation = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("rotation"));
-        bs_JsonValue scale = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("scale"));
+        bs_JsonValue primitives = _bs_fetchJsonN(&mesh_json, BS_JSON_ARRAY, BS_CONSTANT_STRING("primitives"));
+        bs_JsonValue translation = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("translation"));
+        bs_JsonValue rotation = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("rotation"));
+        bs_JsonValue scale = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("scale"));
 
         bool has_translation = translation.found && translation.type & BS_JSON_ARRAY && translation.type & BS_JSON_NUMBER && translation.size == 3;
         bool has_rotation = rotation.found && rotation.type & BS_JSON_ARRAY && rotation.type & BS_JSON_NUMBER && rotation.size == 4;
@@ -194,7 +194,7 @@ static void _bs_loadMeshes(bs_Model* model, bs_Json* root) {
             .model = model,
             .aabb.max = { -FLT_MAX, -FLT_MAX, -FLT_MAX },
             .aabb.min = { FLT_MAX, FLT_MAX, FLT_MAX },
-            .name = strdup(_bs_fetchJson(&node, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string),
+            .name = strdup(_bs_fetchJsonN(&node, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string),
             .primitives = _bs_malloc(primitives.size * sizeof(bs_Primitive)),
             .primitives_count = primitives.size,
 
@@ -464,11 +464,11 @@ BSAPI bs_Result _bs_loadAnimation(bs_Model* model, const char* name, bs_Animatio
     bs_JsonValue animation_object = _bs_fetchJsonF(root, BS_JSON_UNDEFINED, "animations[%d]", animation_id);
     bs_Json animation_root = _bs_jsonRoot(root, animation_object.as_object);
 
-    bs_JsonArray samplers = _bs_fetchJson(&animation_root, BS_JSON_ARRAY, BS_CONSTANT_STRING("samplers")).as_array;
-    bs_JsonValue channels_json = _bs_fetchJson(&animation_root, BS_JSON_ARRAY, BS_CONSTANT_STRING("channels"));
+    bs_JsonArray samplers = _bs_fetchJsonN(&animation_root, BS_JSON_ARRAY, BS_CONSTANT_STRING("samplers")).as_array;
+    bs_JsonValue channels_json = _bs_fetchJsonN(&animation_root, BS_JSON_ARRAY, BS_CONSTANT_STRING("channels"));
 
     bs_Animation animation = {
-        .name = strdup(_bs_fetchJson(&animation_root, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string),
+        .name = strdup(_bs_fetchJsonN(&animation_root, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string),
         .bones_allocated = channels_json.size / 3,
     };
 
@@ -478,12 +478,12 @@ BSAPI bs_Result _bs_loadAnimation(bs_Model* model, const char* name, bs_Animatio
     for (int i = 0, last_node = -1; i < channels_json.size; i++) {
         bs_Json channel_json = _bs_jsonRoot(root, channels_json.as_array.as_objects[i]);
 
-        int sampler_id = _bs_fetchJson(&channel_json, BS_JSON_NUMBER, BS_CONSTANT_STRING("sampler")).as_number;
+        int sampler_id = _bs_fetchJsonN(&channel_json, BS_JSON_NUMBER, BS_CONSTANT_STRING("sampler")).as_number;
         bs_Json sampler = _bs_jsonRoot(root, samplers.as_objects[sampler_id]);
-        int input = _bs_fetchJson(&sampler, BS_JSON_NUMBER, BS_CONSTANT_STRING("input")).as_number;
-        int output = _bs_fetchJson(&sampler, BS_JSON_NUMBER, BS_CONSTANT_STRING("output")).as_number;
-        char* path = _bs_fetchJson(&channel_json, BS_JSON_STRING, BS_CONSTANT_STRING("target.path")).as_string;
-        int node = _bs_fetchJson(&channel_json, BS_JSON_NUMBER, BS_CONSTANT_STRING("target.node")).as_number;
+        int input = _bs_fetchJsonN(&sampler, BS_JSON_NUMBER, BS_CONSTANT_STRING("input")).as_number;
+        int output = _bs_fetchJsonN(&sampler, BS_JSON_NUMBER, BS_CONSTANT_STRING("output")).as_number;
+        char* path = _bs_fetchJsonN(&channel_json, BS_JSON_STRING, BS_CONSTANT_STRING("target.path")).as_string;
+        int node = _bs_fetchJsonN(&channel_json, BS_JSON_NUMBER, BS_CONSTANT_STRING("target.node")).as_number;
 
         //char* name = __bs_fetchJsonF(root, BS_JSON_STRING, "nodes[%d].name", node).as_string;
         int num_inputs = 0, num_outputs = 0;
@@ -565,11 +565,11 @@ static inline void _bs_setOppositeIds(bs_Armature* armature, bs_Bone* bone) {
 }
 
 static void _bs_loadArmature(bs_Model* model, bs_Armature* armature, bs_Json* root, bs_Json* skin_root) {
-    int inverse_bind_matrices_accessor = _bs_fetchJson(skin_root, BS_JSON_NUMBER, BS_CONSTANT_STRING("inverseBindMatrices")).as_number;
-    bs_JsonValue joints = _bs_fetchJson(skin_root, BS_JSON_ARRAY, BS_CONSTANT_STRING("joints"));
+    int inverse_bind_matrices_accessor = _bs_fetchJsonN(skin_root, BS_JSON_NUMBER, BS_CONSTANT_STRING("inverseBindMatrices")).as_number;
+    bs_JsonValue joints = _bs_fetchJsonN(skin_root, BS_JSON_ARRAY, BS_CONSTANT_STRING("joints"));
 
     *armature = (bs_Armature){
-        .name = strdup(_bs_fetchJson(skin_root, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string),
+        .name = strdup(_bs_fetchJsonN(skin_root, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string),
         .bones_count = joints.size,
         .bones_allocated = joints.size,
         .bones = _bs_calloc(joints.size, sizeof(*armature->bones)),
@@ -581,13 +581,13 @@ static void _bs_loadArmature(bs_Model* model, bs_Armature* armature, bs_Json* ro
     for (int j = 0; j < armature->bones_count; j++) {
         int node_id = joints.as_array.as_numbers[j];
         bs_Json node = _bs_jsonRoot(root, _bs_fetchJsonF(root, BS_JSON_OBJECT, "nodes[%d]", node_id).as_object);
-        bs_JsonValue children = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("children"));
+        bs_JsonValue children = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("children"));
 
         _bs_setParentIds(armature, &joints.as_array, &children, j);
 
-        double* translation = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("translation")).as_array.as_numbers;
-        double* rotation = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("rotation")).as_array.as_numbers;
-        double* scale = _bs_fetchJson(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("scale")).as_array.as_numbers;
+        double* translation = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("translation")).as_array.as_numbers;
+        double* rotation = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("rotation")).as_array.as_numbers;
+        double* scale = _bs_fetchJsonN(&node, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("scale")).as_array.as_numbers;
 
         bs_mat4 transform = BS_MAT4_IDENTITY;
         if (translation)
@@ -608,7 +608,7 @@ static void _bs_loadArmature(bs_Model* model, bs_Armature* armature, bs_Json* ro
         bone->local_matrix;
         bs_m4Mul(&bind_matrix, &transform, &bone->local_matrix);
 
-        char* name = _bs_fetchJson(&node, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string;
+        char* name = _bs_fetchJsonN(&node, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string;
         if (name) {
             bone->name_hash = _bs_stringHash(name);
             bone->name = strdup(name);
@@ -624,7 +624,7 @@ static void _bs_loadArmature(bs_Model* model, bs_Armature* armature, bs_Json* ro
 }
 
 static void _bs_loadArmatures(bs_Model* model, bs_Json* root) {
-    bs_JsonValue skins = _bs_fetchJson(root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("skins"));
+    bs_JsonValue skins = _bs_fetchJsonN(root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("skins"));
     if (!skins.found || skins.size == 0)
         return;
 
@@ -647,9 +647,9 @@ static void _bs_loadArmatures(bs_Model* model, bs_Json* root) {
    =============================================================================*/
 
 static void _bs_loadMaterial(bs_Material* material, bs_Json* root) {
-    material->name = strdup(_bs_fetchJson(root, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string);
+    material->name = strdup(_bs_fetchJsonN(root, BS_JSON_STRING, BS_CONSTANT_STRING("name")).as_string);
 
-    bs_JsonValue base_color_factor = _bs_fetchJson(root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("pbrMetallicRoughness.baseColorFactor"));
+    bs_JsonValue base_color_factor = _bs_fetchJsonN(root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("pbrMetallicRoughness.baseColorFactor"));
     if (base_color_factor.found) {
         // asserts shouldnt ever fail
         assert(base_color_factor.size == 4);
@@ -665,7 +665,7 @@ static void _bs_loadMaterial(bs_Material* material, bs_Json* root) {
 }
 
 static void _bs_loadMaterials(bs_Model* model, bs_Json* root) {
-    bs_JsonValue materials = _bs_fetchJson(root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("materials"));
+    bs_JsonValue materials = _bs_fetchJsonN(root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("materials"));
     if (!materials.found || materials.size == 0)
         return;
 
@@ -730,7 +730,7 @@ BSAPI bs_Result _bs_model(int package_id, const char* name, bs_U32 flags, bs_Res
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, flags, &resource, name, strlen(name));
+    result = _bs_loadResource(package_id, flags, &resource, name);
     if (result != BS_RESULT_OK)
         return result;
 

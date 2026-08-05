@@ -109,7 +109,7 @@ BSMODAPI void _bsmod_onDragPrefab(bsmod_DraggingParams params) {
             .scale = { 1, 1, 1 },
             .name_hash = prefab_mesh->name_hash,
         });
-        _bsmod_saveType(BSGFX_TYPE_PREFAB, BS_CONSTANT_STRING("Created prefab"));
+        _bsmod_saveTypeN(BSGFX_TYPE_PREFAB, BS_CONSTANT_STRING("Created prefab"));
     }
 }
 

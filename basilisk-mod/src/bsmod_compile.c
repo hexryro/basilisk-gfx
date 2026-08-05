@@ -139,7 +139,7 @@ BSMODAPI bs_Result _bsmod_packShader(spvc_compiler compiler, spvc_resources reso
 	memcpy(bsha + total_size_excluding_binary, spirv, spirv_size);
 	memcpy(bsha, &header, sizeof(bs_BatlHeader));
 
-	result = _bsmod_packResource(BS_RESOURCE_SHADER, bsha, total_size, package->name, resource_name, strlen(resource_name));
+	result = _bsmod_packResource(BS_RESOURCE_SHADER, bsha, total_size, package->name, resource_name);
 	bs_free(bsha);
 
 	return BS_RESULT_OK;
@@ -191,10 +191,10 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 	char* name = bs_alloca(len + 1);
 	snprintf(name, len + 1, "_bbnd/%d/%d", header.set, header.point);
 
-	bsmod_Resource* existing = _bsmod_queryResource(package, name);
+	bsmod_Resource* existing = _bsmod_queryResource(package, BS_RESOURCE_BINDING, name);
 	if (existing) {
-		bsmod_Chunk* chunk = bs_fetchUnit(&package->chunks, existing->header.chunk);
-		bs_BbndHeader* existing_header = chunk->bin.data + existing->header.offset;
+		bsmod_Chunk* chunk = bs_fetchUnit(&package->chunks, existing->chunk);
+		bs_BbndHeader* existing_header = chunk->bin.data + existing->offset;
 
 		if (existing_header->magic == BS_BBND_MAGIC) {
 			header.shader_stages |= existing_header->shader_stages;
@@ -225,7 +225,7 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 
 	unsigned char* bbnd = bs_malloc(total_size);
 	memcpy(bbnd, &header, sizeof(bs_BbndHeader));
-	bs_result = _bsmod_packResource(BS_RESOURCE_BINDING, bbnd, total_size, package->name, name, len);
+	bs_result = _bsmod_packResource(BS_RESOURCE_BINDING, bbnd, total_size, package->name, name);
 	bs_free(bbnd);
 
 	return bs_result;
@@ -240,7 +240,7 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 BSMODAPI void _bsmod_onCompileShader(bsmod_TrackParams params) {
 	bs_Result result;
 
-	if (!bs_fileExists(params.path, strlen(params.path)))
+	if (!bs_fileExists(params.path))
 		return;
 
 	char* resource_name = bs_fileName(params.path);
@@ -258,7 +258,7 @@ BSMODAPI void _bsmod_onCompileShader(bsmod_TrackParams params) {
 
 		if (bs_instance()->instance) {
 			int package;
-			result = bs_loadPackage(params.package, &package);
+			result = bs_loadPackage(&package, params.package);
 			if (result != BS_RESULT_OK)
 				return;
 
@@ -269,7 +269,7 @@ BSMODAPI void _bsmod_onCompileShader(bsmod_TrackParams params) {
 
 	if (params.compile_references && (bs_fileExtensionIs(params.path, "glsl") || bs_fileExtensionIs(params.path, "h"))) { // header file, compile all references
 		bs_Json json;
-		result = bs_loadJson(&json, BS_CONSTANT_STRING("project/woc/references.json")); // TODO: remove woc
+		result = bs_loadJsonN(&json, BS_CONSTANT_STRING("project/woc/references.json")); // TODO: remove woc
 		if (result != BS_RESULT_OK)
 			return;
 
@@ -365,7 +365,7 @@ static void _bsmod_saveBuffer(bs_Json* json, char* shader_type, const char* name
 
 static bs_Json _bsmod_shader_references = { 0 };
 BSMODAPI void _bsmod_loadShaderReferences() {
-	bs_Result result = bs_loadJson(&_bsmod_shader_references, BS_CONSTANT_STRING("project/woc/references.json")); // TODO: remove woc
+	bs_Result result = bs_loadJsonN(&_bsmod_shader_references, BS_CONSTANT_STRING("project/woc/references.json")); // TODO: remove woc
 	if (result == BS_RESULT_OK)
 		_bsmod_shader_references = bs_emptyJson();
 }
@@ -378,13 +378,13 @@ BSMODAPI void _bsmod_updateShaderReferences() {
 	if (result != BS_RESULT_OK)
 		return;
 
-	result = bs_saveFile(raw, strlen(raw), BS_CONSTANT_STRING("project/woc/references.json")); //TODO: remove woc
+	result = bs_saveFileN(raw, strlen(raw), BS_CONSTANT_STRING("project/woc/references.json")); //TODO: remove woc
 	if (result != BS_RESULT_OK)
 		return;
 }
 
 static void _bsmod_writeReferences(char* path, bs_String* glsl) {
-	bs_String* include_path = bs_string(NULL, "", 0);
+	bs_String* include_path = bs_stringN(NULL, "", 0);
 #define INCLUDE_SEARCH "#include "
 	char* include = glsl->value;
 	int length = glsl->len;
@@ -400,7 +400,7 @@ static void _bsmod_writeReferences(char* path, bs_String* glsl) {
 		assert(end);
 		int len = end - include;
 
-		include_path = bs_string(include_path, include, len);
+		include_path = bs_stringN(include_path, include, len);
 		char* ext = bs_fileExtension(include_path->value);
 		assert(ext);
 		int name_len = (ext - 1) - include_path->value;
@@ -482,7 +482,7 @@ BSMODAPI bs_Result _bsmod_compileShader(char* path, char* name, char* package_na
 	bs_Result bs_result = BS_RESULT_OK;
 
 	bs_String* glsl; 
-	bs_result = bs_loadFile(&glsl, path, strlen(path));
+	bs_result = bs_loadFile(&glsl, path);
 	if (bs_result != BS_RESULT_OK)
 		return bs_result;
 	//char* name = bs_fileName(path);

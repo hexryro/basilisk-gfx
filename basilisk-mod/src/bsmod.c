@@ -380,7 +380,7 @@ static void _bsmod_onLoadVariables() {
     if (_bsmod_config_.doc)
         bs_destroyJson(&_bsmod_config_);
 
-    bs_loadJson(&_bsmod_config_, BS_CONSTANT_STRING(BSMOD_CONFIG_PATH));
+    bs_loadJsonN(&_bsmod_config_, BS_CONSTANT_STRING(BSMOD_CONFIG_PATH));
     if (_bsmod_config_.doc)
         bs_infoF("Loaded \"%s\"\n", BSMOD_CONFIG_PATH);
 
@@ -406,12 +406,12 @@ BSMODAPI void _bsmod_onIni() {
     _bsmod_onLoadVariables();
     _bsmod_loadShaderReferences();
 
-    result = bs_loadPackage(BSGFX_CONTENT_PATH, &_bsmod_.bsgfx_package);
+    result = bs_loadPackageN(&_bsmod_.bsgfx_package, BS_CONSTANT_STRING(BSGFX_CONTENT_PATH));
 
     if (result == BS_RESULT_OK) {
 
         bs_Resource* resource;
-        result = bs_loadResource(_bsmod_.bsgfx_package, 0, &resource, BS_CONSTANT_STRING("bindings"));
+        result = bs_loadResourceN(_bsmod_.bsgfx_package, 0, &resource, BS_CONSTANT_STRING("bindings"));
 
         if (result == BS_RESULT_OK) {
             result = bs_json(resource->data->value, resource->data->len, &_bsmod_.bindings_json);
@@ -435,7 +435,7 @@ BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track
     _bsmod_savePackage(BSGFX_CONTENT_PATH);
     _bsmod_savePackage(_bsmod_applicationContentPath());
 
-    result = bs_loadPackage(BSMOD_CONTENT_PATH, &_bsmod_.package);
+    result = bs_loadPackageN(&_bsmod_.package, BS_CONSTANT_STRING(BSMOD_CONTENT_PATH));
 
     if (bs_args()->track_changes)
         CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
@@ -596,10 +596,10 @@ BSMODAPI void _bsmod_onLoad() {
     bs_Object* primitive_icons = BS_ATLAS(BSMOD_ATLASES, BSMOD_ATLAS_PRIMITIVE_ICONS, 0);
     bs_Object* prefab_icons = BS_ATLAS(BSMOD_ATLASES, BSMOD_ATLAS_PREFAB_ICONS, 0);
 
-    bs_loadAtlas(ui, _bsmod_.package, 0, BS_CONSTANT_STRING("ui"));
-    bs_loadAtlas(material_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("material_icons"));
-    bs_loadAtlas(primitive_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("primitive_icons"));
-    bs_loadAtlas(prefab_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("prefab_icons"));
+    bs_loadAtlasN(ui, _bsmod_.package, 0, BS_CONSTANT_STRING("ui"));
+    bs_loadAtlasN(material_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("material_icons"));
+    bs_loadAtlasN(primitive_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("primitive_icons"));
+    bs_loadAtlasN(prefab_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("prefab_icons"));
 
     _bsmod_bindAtlases();
 }

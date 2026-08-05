@@ -38,7 +38,7 @@ void basilisk_renderDepthlessLines() {
     hash.skip_depth_test = true;
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginComment(BS_CONSTANT_STRING("[BSMOD] Lines (Depthless)"));
+        bs_beginCommentN(BS_CONSTANT_STRING("[BSMOD] Lines (Depthless)"));
 
         bs_setLineWidth(4.0);
         bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
@@ -59,7 +59,7 @@ void basilisk_renderLines() {
     hash.topology_type = BS_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginComment(BS_CONSTANT_STRING("[BSMOD] Lines"));
+        bs_beginCommentN(BS_CONSTANT_STRING("[BSMOD] Lines"));
 
         bs_setLineWidth(4.0);
         bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
@@ -94,7 +94,7 @@ void basilisk_renderCones() {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
-    bs_beginComment(BS_CONSTANT_STRING("Cones"));
+    bs_beginCommentN(BS_CONSTANT_STRING("Cones"));
 
     bs_Object* atlas_object = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY);
 
@@ -164,7 +164,7 @@ void basilisk_renderSelectedTile() {
             .camera = poser()->camera.result,
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("Selected Tiles"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Selected Tiles"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bs_render(bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_TILE)->batch, pipeline, 0, BS_U32_MAX, 0, 1);
@@ -231,7 +231,7 @@ void basilisk_renderPrefabOutlines() {
     hash.cull_type = bsgfx_settings()->cull_backfaces ? BS_CULL_MODE_BACK_BIT : BS_CULL_MODE_NONE;
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginComment(BS_CONSTANT_STRING("Prefabs"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Prefabs"));
 
         bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
         struct {
@@ -290,7 +290,7 @@ void basilisk_renderRoundedQuads() {
             .border_radius = 5.0,
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("Rounded Quads"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Rounded Quads"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_ATLAS_ICON], pipeline);
@@ -321,7 +321,7 @@ void basilisk_renderUI() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("UI"));
+        bs_beginCommentN(BS_CONSTANT_STRING("UI"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], pipeline);
@@ -352,7 +352,7 @@ void basilisk_renderUISolid() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("UI (Color only)"));
+        bs_beginCommentN(BS_CONSTANT_STRING("UI (Color only)"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR], pipeline);
@@ -393,7 +393,7 @@ void basilisk_renderUIStencil() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("UI Stencil"));
+        bs_beginCommentN(BS_CONSTANT_STRING("UI Stencil"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_STENCIL], pipeline);
@@ -424,7 +424,7 @@ void basilisk_renderDither() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("Dither"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Dither"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_DITHER], pipeline);

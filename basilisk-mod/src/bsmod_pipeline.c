@@ -66,7 +66,7 @@ static void _bsmod_renderGradients() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("Gradients"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Gradients"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_CORNER_GRADIENT], pipeline);
@@ -116,7 +116,7 @@ static void _bsmod_renderMaterialTextureQuads() {
     bsgfx_requiredForTransparency(&hash);
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginComment(BS_CONSTANT_STRING("Material Texture Quad"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Material Texture Quad"));
 
         struct {
             bs_mat4 camera;
@@ -196,7 +196,7 @@ static void _bsmod_renderPrefabs() {
     hash.cull_type = bsgfx_settings()->cull_backfaces ? BS_CULL_MODE_BACK_BIT : BS_CULL_MODE_NONE;
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginComment(BS_CONSTANT_STRING("Prefabs"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Prefabs"));
 
         bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
 

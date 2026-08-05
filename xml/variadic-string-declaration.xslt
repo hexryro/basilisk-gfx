@@ -17,6 +17,18 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
             <xsl:choose>
                 <xsl:when test="@string">
                     <param><type>char*</type><name><xsl:value-of select="@string"/></name></param>
+                </xsl:when>
+                <xsl:otherwise>
+                    <param><type>char*</type><name>value</name></param>
+                </xsl:otherwise>
+            </xsl:choose>
+        </function>
+
+		<function name="{@name}N" type="allowBody" variadic="N">
+            <xsl:copy-of select="return | param"/>
+            <xsl:choose>
+                <xsl:when test="@string">
+                    <param><type>char*</type><name><xsl:value-of select="@string"/></name></param>
                     <param><type>int</type><name><xsl:value-of select="@string"/>_length</name></param>
                 </xsl:when>
                 <xsl:otherwise>
@@ -25,7 +37,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 </xsl:otherwise>
             </xsl:choose>
         </function>
-
+		
         <function name="{@name}V" type="allowBody" variadic="V">
             <xsl:copy-of select="return | param"/>
             <param><type>char*</type><name>format</name></param>
@@ -60,8 +72,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <xsl:if test="not(return = 'void')">
                     <xsl:text>&#xA;    return _return;</xsl:text>
                 </xsl:if>
-
-
             </body>
         </function>
 	</xsl:template>

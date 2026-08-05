@@ -57,7 +57,7 @@ static mtx_t _bs_log_mutex_;
 static mtx_t _bs_log_file_mutex_;
 static cnd_t _bs_log_condition_;
 
-BSAPI void _bs_writeLogFile(char* message, int message_length) {
+BSAPI void _bs_writeLogFileN(char* message, int message_length) {
     fprintf(_log_file_, "%s\n", message);
 }
 
@@ -147,7 +147,7 @@ BSAPI void _bs_writeLogger(
     mtx_unlock(&_bs_log_mutex_);
 }
 
-BSAPI void _bs_log(char* message, int message_len) {
+BSAPI void _bs_logN(char* message, int message_len) {
     _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_INFO, 0, 0, NULL, NULL, 0, "%s", message);
 }
 
@@ -171,7 +171,7 @@ void _bs_destroyLogger() {
 
 
  /** Log section */
-BSAPI void _bs_logSection(char* message, int message_len) {
+BSAPI void _bs_logSectionN(char* message, int message_len) {
     _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_INFO, 0, 0, NULL, NULL, 0, "%s%s%s", BS_SECTION_HEADER_START, message, BS_SECTION_HEADER_END);
 }
 
@@ -181,7 +181,7 @@ BSAPI void _bs_logEndOfSection() {
 }
 
  /** Log with timestamp */
-BSAPI void _bs_logWithTimestamp(bs_MessageLevel level, char* message, int message_len) {
+BSAPI void _bs_logWithTimestampN(bs_MessageLevel level, char* message, int message_len) {
     bs_DateTime dt = _bs_dateTime();
 
     _bs_writeLogger(BS_LIBRARY_BASILISK, level, 0, 0, NULL, NULL, 0, "[%02d-%02d-%02d %02d:%02d:%02d %04d] %s",
@@ -189,17 +189,17 @@ BSAPI void _bs_logWithTimestamp(bs_MessageLevel level, char* message, int messag
 }
 
 /** Info log */
-BSAPI void _bs_info(char* message, int message_len) {
-    _bs_logWithTimestamp(BS_MESSAGE_INFO, message, message_len);
+BSAPI void _bs_infoN(char* message, int message_len) {
+    _bs_logWithTimestampN(BS_MESSAGE_INFO, message, message_len);
 }
 
  /** Warning log */
-BSAPI void _bs_warn(char* message, int message_len) {
-    _bs_logWithTimestamp(BS_MESSAGE_WARNING, message, message_len);
+BSAPI void _bs_warnN(char* message, int message_len) {
+    _bs_logWithTimestampN(BS_MESSAGE_WARNING, message, message_len);
 }
 
  /** Critical error log */
-BSAPI void _bs_critical(char* message, int message_len) {
+BSAPI void _bs_criticalN(char* message, int message_len) {
     printf(BS_PRINT_COLOR("[CRITICAL ERROR]", BS_PRINT_RED) "%s", message);
 
 #ifdef _WIN32

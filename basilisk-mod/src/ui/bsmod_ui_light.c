@@ -119,7 +119,7 @@ static inline void _bsmod_addLight(bsgfx_LightType type) {
 
 static bool _bsmod_onAddPointTick(const bsgfx_ButtonParams* params) {
     if (params->hovering && bs_leftClickOnce())
-        bs_warn(BS_CONSTANT_STRING("Point light is not implemented\n"));
+        bs_warnN(BS_CONSTANT_STRING("Point light is not implemented\n"));
 
     return params->hovering;
 }

@@ -34,6 +34,17 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+bsmod_TextureInfo* _bsmod_packAtlasTexture(
+    bsmod_AtlasPacker* packer, 
+    bs_RGBA* data, 
+    int width, 
+    int height, 
+    int category, 
+    char* name)
+{
+    return _bsmod_packAtlasTexture(packer, data, width, height, category, strlen(bsmod_packAtlasTexture));
+}
+
 bsmod_TextureInfo* _bsmod_packAtlasTextureV(
     bsmod_AtlasPacker* packer, 
     bs_RGBA* data, 
@@ -46,7 +57,7 @@ bsmod_TextureInfo* _bsmod_packAtlasTextureV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bsmod_packAtlasTexture(packer, data, width, height, category, _formatted, _length);
+    return _bsmod_packAtlasTextureN(packer, data, width, height, category, _formatted, _length);
 }
 
 bsmod_TextureInfo* _bsmod_packAtlasTextureF(
@@ -65,6 +76,16 @@ bsmod_TextureInfo* _bsmod_packAtlasTextureF(
     return _return;
 }
 
+bs_Result _bsmod_packResource(
+    bs_ResourceType type, 
+    unsigned char* data, 
+    size_t data_size, 
+    const char* package_name, 
+    char* resource_name)
+{
+    return _bsmod_packResource(type, data, data_size, package_name, strlen(bsmod_packResource));
+}
+
 bs_Result _bsmod_packResourceV(
     bs_ResourceType type, 
     unsigned char* data, 
@@ -76,7 +97,7 @@ bs_Result _bsmod_packResourceV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bsmod_packResource(type, data, data_size, package_name, _formatted, _length);
+    return _bsmod_packResourceN(type, data, data_size, package_name, _formatted, _length);
 }
 
 bs_Result _bsmod_packResourceF(
@@ -94,6 +115,13 @@ bs_Result _bsmod_packResourceF(
     return _return;
 }
 
+bs_Result _bsmod_saveType(
+    bsgfx_TypeId id, 
+    char* value)
+{
+    return _bsmod_saveType(id, strlen(bsmod_saveType));
+}
+
 bs_Result _bsmod_saveTypeV(
     bsgfx_TypeId id, 
     char* format, 
@@ -102,7 +130,7 @@ bs_Result _bsmod_saveTypeV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bsmod_saveType(id, _formatted, _length);
+    return _bsmod_saveTypeN(id, _formatted, _length);
 }
 
 bs_Result _bsmod_saveTypeF(

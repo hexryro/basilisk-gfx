@@ -131,7 +131,7 @@ BSGFXAPI void _bsgfx_renderPrefabShadowVolumes() {
     bs_Pipeline* pipeline;
     bs_PipelineHash hash;
 
-    bs_beginComment(BS_CONSTANT_STRING("Shadow Volumes"));
+    bs_beginCommentN(BS_CONSTANT_STRING("Shadow Volumes"));
 
     bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
     bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
@@ -478,7 +478,7 @@ BSGFXAPI void _bsgfx_renderScenePrefabs() {
 
     bs_Pipeline* mesh_pipeline;
     if (bs_pipeline(&hash, &mesh_pipeline) == BS_RESULT_OK) {
-        bs_beginComment(BS_CONSTANT_STRING("Prefabs"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Prefabs"));
 
         bs_pushConstant(mesh_pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
         _bsgfx_renderPrefabs(mesh_pipeline, BSGFX_PREFAB_SUBTYPE_MESH);

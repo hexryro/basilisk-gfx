@@ -76,13 +76,15 @@ BSAPI void _bs_destroyResource(bs_Resource* resource) {
 #define BS_FAILED_TO_QUERY(format, ...) \
     _bs_warnF("Failed to query:\n" format __VA_OPT__("\n",) __VA_ARGS__)
 
-BSAPI bs_Result _bs_queryResource(int package_id, const char* name, bs_Resource** out) {
+BSAPI bs_Result _bs_queryResource(int package_id, bs_ResourceType type, const char* name, bs_Resource** out) {
     bs_Package* package = _bs_fetchUnit(_bs_packages(), package_id);
     bs_U64 hash = _bs_stringHash(name);
 
-    for (int i = 0; i < package->resource_headers_count; i++) {
-        bs_ResourceHeader* resource = package->resource_headers + i;
-        if (resource->header.name_hash == hash) {
+    bs_Range range = package->resource_type_offsets[type];
+
+    for (int i = 0; i < range.num; i++) {
+        bs_ResourceHeader* resource = package->resource_headers + range.offset + i;
+        if (resource->name_hash == hash) {
             *out = resource->resource;
             return BS_RESULT_OK;
         }
@@ -107,7 +109,7 @@ BSAPI int _bs_queryPackage(const char* name) {
     return -1;
 }
 
-BSAPI bs_Result _bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out, char* resource_name, int resource_name_length) {
+BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** out, char* resource_name, int resource_name_length) {
     if (package_id < 0)
         return BS_RESULT_OUT_OF_BOUNDS;
 
@@ -118,7 +120,7 @@ BSAPI bs_Result _bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out
     bs_ResourceHeader* existing = NULL;
     for (int i = 0; i < package->resource_headers_count; i++) {
         bs_ResourceHeader* resource = package->resource_headers + i;
-        if (resource->header.name_hash == hash) {
+        if (resource->name_hash == hash) {
             existing = resource;
             break;
         }
@@ -137,11 +139,11 @@ BSAPI bs_Result _bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out
     //else
     //    _bs_free(existing->resource->data);
     bs_Result result = _bs_loadFileChunkF(
-        existing->header.offset, 
-        existing->header.size, 
+        existing->offset, 
+        existing->size, 
         &existing->resource->data, 
         "%s_%03d.bpak", 
-        package->path, (existing->header.chunk + 1)
+        package->path, (existing->chunk + 1)
     );
 
     if (result == BS_RESULT_OK) {
@@ -152,28 +154,36 @@ BSAPI bs_Result _bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out
     return result;
 }
 
-BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
+BSAPI bs_Result _bs_loadPackageN(const char* path, int* out) {
     bs_Result result;
 
     bs_String* raw;
-    result = _bs_loadFileF(&raw, "%s.bpak", path);
+    result = _bs_loadFileF(&raw, path);
     if (result != BS_RESULT_OK)
         return result;
 
-    bs_PackageHeader* package_header = raw->value;
-    if (package_header->magic != BS_BPAK_MAGIC) {
+    unsigned char* data = raw->value;
+
+    bs_U32 magic = bs_getLittleEndian32(data + BS_BPAK_MAGIC_OFFSET);
+    if (magic != BS_BPAK_MAGIC) {
         bs_free(raw);
         BS_WARN_INVALID_MAGIC("package", path);
         return BS_RESULT_CORRUPTED;
     }
 
-    if (package_header->resources_count <= 0) {
-        bs_warnF("%s at %s:%d: No resources in package \"%s\"", __func__, __FILE__, __LINE__, path);
+    bs_U32 resources_count = bs_getLittleEndian32(data + BS_BPAK_RESOURCES_COUNT_OFFSET);
+    if (resources_count == 0) {
+        bs_warnF("%s at %s:%d: No resources in package \"%s\"", __func__, __FILE__, __LINE__, path); // TODO: warn macro
         return BS_RESULT_CORRUPTED;
     }
 
-    char* path_dup = strdup(path);
-    bs_U64 hash = _bs_stringHash(path_dup);
+    bs_U32 resources_types_count = bs_getLittleEndian32(data + BS_BPAK_RESOURCES_TYPES_COUNT_OFFSET);
+    if (resources_types_count == 0) {
+        bs_warnF("%s at %s:%d: No resource types in package \"%s\"", __func__, __FILE__, __LINE__, path); // TODO: warn macro
+        return BS_RESULT_CORRUPTED;
+    }
+
+    bs_U64 path_hash = _bs_stringHash(path);
 
     bs_Package* existing = NULL;
     bs_ResourceHeader* old_headers = NULL;
@@ -181,7 +191,7 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
     int id = -1;
     for (int i = 0; i < _bs_packages()->count; i++) {
         bs_Package* package = _bs_fetchUnit(_bs_packages(), i);
-        if (package->path_hash == hash) {
+        if (package->path_hash == path_hash) {
             existing = package;
             old_headers = package->resource_headers;
             old_headers_count = package->resource_headers_count;
@@ -192,56 +202,75 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
         }
     }
 
-    _bs_infoF("Loading package \"%s\"", path_dup);
+    _bs_infoF("Loading package \"%s\"", path);
     if (!existing) {
         id = _bs_packages()->count;
+
         existing = _bs_pushBack(_bs_packages(), &(bs_Package) {
-            .path_hash = hash,
-            .path = path_dup,
+            .path = strdup(path),
+            .path_hash = path_hash,
         });
     }
 
     existing->raw = raw;
-    existing->resource_headers_count = package_header->resources_count;
-    existing->resource_headers = bs_calloc(package_header->resources_count, sizeof(bs_ResourceHeader));
+    existing->resource_headers_count = resources_count;
+    existing->resource_headers = bs_calloc(resources_count, sizeof(bs_ResourceHeader));
 
-    int resource_types_count = BS_MIN(package_header->resource_types_count, BS_RESOURCE_TYPE_COUNT);
-    memcpy(existing->resource_type_offsets, package_header->resource_type_offsets, resource_types_count * sizeof(bs_Range));
+    if (resources_types_count > BS_RESOURCE_TYPE_COUNT) {
+        bs_warnF("%s at %s:%d: Invalid resource types count (%d) in package \"%s\"", __func__, __FILE__, __LINE__, resources_types_count, path); // TODO: warn macro
+        return BS_RESULT_CORRUPTED;
+    }
+
+    resources_types_count = BS_MIN(resources_types_count, BS_RESOURCE_TYPE_COUNT);
+    unsigned char* resource_types_offset = data + BS_BPAK_RESOURCE_TYPES_OFFSET;
+    for (int i = 0; i < resources_types_count; i++) {
+        existing->resource_type_offsets[i].offset = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_START_OFFSET);
+        existing->resource_type_offsets[i].num = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_COUNT_OFFSET);
+
+        resource_types_offset += BS_BPAK_RESOURCE_TYPE_SIZE;
+    }
 
     int actual_resources_count = 0;
-    for (int i = sizeof(bs_PackageHeader); i < (raw->len - 1);) {
-        bs_ResourceHeader* header = raw->value + i;
-        i += sizeof(header->header);
-        if (i >= raw->len) {
-            return BS_RESULT_CORRUPTED;
-        }
+    for (int i = 0; i < resources_count; i++) {
 
-        char* name = raw->value + i;
-        i += header->header.name_length + 1;
-        if (i >= raw->len) {
-            return BS_RESULT_CORRUPTED;
-        }
+        bs_U64 name_hash = bs_getLittleEndian64(resource_types_offset + BS_BPAK_RESOURCE_NAME_HASH_OFFSET);
+        bs_I32 chunk = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_CHUNK_OFFSET);
+        bs_I32 offset = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_START_OFFSET);
+        bs_I32 size = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_SIZE_OFFSET);
+        bs_I32 name_length = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_NAME_LENGTH_OFFSET);
+        bs_I32 type = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_OFFSET);
 
-        char* end = strchr(name, '\n');
+        resource_types_offset += BS_BPAK_RESOURCE_SIZE;
+        unsigned char* resource_name = resource_types_offset;
+
+        char* end = strchr(resource_name, '\n');
         if (!end) {
             return BS_RESULT_CORRUPTED;
         }
         end[0] = '\0';
 
+        resource_types_offset += name_length + 2; // \n\0
+
         bs_ResourceHeader* added = existing->resource_headers + actual_resources_count++;
 
-        if (actual_resources_count > package_header->resources_count) {
+        if (actual_resources_count > resources_count) {
+            end[0] = '\n';
             break;
         }
 
         *added = (bs_ResourceHeader) {
-            .header = header->header,
-            .name = strdup(name),
+            .chunk = chunk,
+            .name_hash = name_hash,
+            .name_length = name_length,
+            .offset = offset,
+            .size = size,
+            .type = type,
+            .name = strdup(resource_name),
         };
         
         for (int j = 0; j < old_headers_count; j++) {
             bs_ResourceHeader* existing_header = old_headers + j;
-            if (existing_header->header.name_hash == header->header.name_hash) {
+            if (existing_header->name_hash == name_hash) {
                 added->resource = existing_header->resource;
                 break;
             }
@@ -256,9 +285,9 @@ BSAPI bs_Result _bs_loadPackage(const char* path, int* out) {
         bs_free(old_headers);
     }
 
-    if (actual_resources_count != package_header->resources_count) {
+    if (actual_resources_count != resources_count) {
         // Kinda critical but we'll see what happens, shouldn't happen though
-        bs_warnF("Package \"%s\" specifies %d resources, but %d resources were found\n", package_header->resources_count, (actual_resources_count + 1));
+        bs_warnF("Package \"%s\" specifies %d resources, but %d resources were found\n", resources_count, (actual_resources_count + 1));
         return BS_RESULT_CORRUPTED;
     }
 
@@ -542,6 +571,6 @@ BSAPI void _bs_nameImage(bs_Object* object, const char* name) {
 BSAPI void _bs_nameSampler(bs_Object* object, const char* name) {
     int name_length = strlen(name);
     for (int i = 0; i < _bs_samplerSwapsCount(object->sampler); i++) {
-        bsi_nameHandle(object->sampler->_[i].vk_sampler, VK_OBJECT_TYPE_SAMPLER, name, name_length);
+        bsi_nameHandleN(object->sampler->_[i].vk_sampler, VK_OBJECT_TYPE_SAMPLER, name, name_length);
     }
 }

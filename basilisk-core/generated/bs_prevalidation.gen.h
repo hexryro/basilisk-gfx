@@ -188,6 +188,7 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_peekPng = (PFN_bs_peekPng)GetProcAddress(module, "_preval_bs_peekPng");
     functions.bs_loadPngData = (PFN_bs_loadPngData)GetProcAddress(module, "_preval_bs_loadPngData");
     functions.bs_loadPng = (PFN_bs_loadPng)GetProcAddress(module, "_preval_bs_loadPng");
+    functions.bs_peekFile = (PFN_bs_peekFile)GetProcAddress(module, "_preval_bs_peekFile");
     functions.bs_savePng = (PFN_bs_savePng)GetProcAddress(module, "_preval_bs_savePng");
     functions.bs_encodePng = (PFN_bs_encodePng)GetProcAddress(module, "_preval_bs_encodePng");
     functions.bs_destroyImage = (PFN_bs_destroyImage)GetProcAddress(module, "_preval_bs_destroyImage");

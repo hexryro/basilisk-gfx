@@ -626,7 +626,7 @@ static bool _bsgfx_instanceString(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	};
 
 	bs_vec2 text_size;
-	_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->string.value, len);
+	_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, widget->string.value, len);
 	bool hovering = bs_rectangleVsPoint(&text.position.xy, &text_dimensions, &cursor);
 	if (widget->string.on_hover && hovering)
 		widget->string.on_hover(widget);
@@ -675,7 +675,7 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 		};
 
 		bs_vec2 text_size;
-		_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->button.name, strlen(widget->button.name));
+		_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->button.name);
 
 	}
 	
@@ -719,7 +719,7 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
  Color Picker
  */
 BSGFXAPI void _bsgfx_renderColorPickers() {
-	bs_beginComment(BS_CONSTANT_STRING("Color picker"));
+	bs_beginCommentN(BS_CONSTANT_STRING("Color picker"));
 	bs_Pipeline* pipeline;
 	bs_PipelineHash hash;
 
@@ -1088,7 +1088,7 @@ static void _bsgfx_deserializeInputValue(bsgfx_Widget* widget, bs_String* string
 	case BSGFX_INPUT_INT: *widget->input.as_uint = bs_toLong(string->value); break;
 	case BSGFX_INPUT_CHAR: *widget->input.as_uint = bs_toLong(string->value); break;
 	case BSGFX_INPUT_UCHAR: *widget->input.as_uint = bs_toULong(string->value); break;
-	case BSGFX_INPUT_STRING: *widget->input.as_string = bs_string(*widget->input.as_string, string->value, string->len); break;
+	case BSGFX_INPUT_STRING: *widget->input.as_string = bs_stringN(*widget->input.as_string, string->value, string->len); break;
 	default:
 		bs_warnF("Input type %d", widget->input.type); // TODO: bsgfx warn
 	}
@@ -1106,7 +1106,7 @@ static bs_String* _bsgfx_serializeInputValue(bsgfx_Widget* widget, bs_String* st
 	case BSGFX_INPUT_CHAR: return bs_stringF(string, "%d", (int)*widget->input.as_char);
 	case BSGFX_INPUT_UCHAR: return bs_stringF(string, "%d", (int)*widget->input.as_uchar);
 	case BSGFX_INPUT_STRING: 
-		return *widget->input.as_string ? bs_string(string, (*widget->input.as_string)->value, (*widget->input.as_string)->len) : string;
+		return *widget->input.as_string ? bs_stringN(string, (*widget->input.as_string)->value, (*widget->input.as_string)->len) : string;
 	default:
 		bs_warnF("Input type %d", widget->input.type); // TODO: bsgfx warn
 		return NULL;
@@ -1127,7 +1127,7 @@ static bool _bsgfx_instanceInput(
 
 	static bs_String* string;
 	if (!string)
-		string = bs_string(string, "", 0);
+		string = bs_stringN(string, "", 0);
 
 	string = _bsgfx_serializeInputValue(widget, string);
 
@@ -1362,7 +1362,7 @@ static bool _bsgfx_instanceInput(
 			};
 
 			bs_vec2 text_size;
-			_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, c, 1);
+			_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, c, 1);
 		}
 	}
 
@@ -1384,12 +1384,12 @@ static bool _bsgfx_instanceInput(
 	if (string->len == 0 && widget->input.placeholder_text) {
 		text.material_id = widget->input.placeholder_text_material_id;
 		bs_vec2 text_size;
-		_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->input.placeholder_text, strlen(widget->input.placeholder_text));
+		_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->input.placeholder_text);
 	}
 	else {
 		text.material_id = widget->material_id;
 		bs_vec2 text_size;
-		_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, string->value, BS_MIN(string->len, 1024));
+		_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, string->value, BS_MIN(string->len, 1024));
 	}
 
 	const float z_offset = 3;
@@ -1749,7 +1749,7 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 			},
 			.scale = 16.0,
 			.max_length = menu->untextured.dimensions.x / (float)tab_bar->tabs_count
-		}, & name_dimensions, tab->name, strlen(tab->name));
+		}, & name_dimensions, tab->name);
 
 		name_dimensions.x += 16.0;
 		scale.x = name_dimensions.x + x_indent;
@@ -1831,7 +1831,7 @@ static void _bsgfx_instanceTitleBar(bsgfx_Menu* menu, bsgfx_TitleBar* title_bar,
 		_bsgfx_instanceText(menu->text_subtype, font, &(bsgfx_Text) {
 			.position = BS_V4(position.x + bar_padding, position.y + bar_padding, position.z + 1, 1),
 			.scale = 16.0,
-		}, &text_size, title_bar->name, strlen(title_bar->name));
+		}, &text_size, title_bar->name);
 	}
 
 	 /**

@@ -233,7 +233,7 @@ static int _bsgfx_comparePrefabDepths(const bsgfx_Prefab** ap, const bsgfx_Prefa
 
 BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
     return;
-    bs_beginComment(BS_CONSTANT_STRING("Shadow Volumes (Fine)"));
+    bs_beginCommentN(BS_CONSTANT_STRING("Shadow Volumes (Fine)"));
 
     bs_barrier(0,
         BS_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,

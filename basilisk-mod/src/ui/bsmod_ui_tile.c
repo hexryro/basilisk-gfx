@@ -196,7 +196,7 @@ BSMODAPI void _bsmod_onDragTile(bsmod_DraggingParams params) {
             bs_warnF("Tile is not selected\n");
         }
 
-        _bsmod_saveType(BSGFX_TYPE_TILE, "Created %d tiles", _bsmod_.selected_tiles.count);
+        _bsmod_saveTypeN(BSGFX_TYPE_TILE, "Created %d tiles", _bsmod_.selected_tiles.count);
         _bsmod_deselectAll();
     }
 }

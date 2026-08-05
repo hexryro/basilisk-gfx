@@ -85,7 +85,7 @@ BSMODAPI void _bsmod_onDragPrimitive(bsmod_DraggingParams params) {
             .type = _bsmod_.dragging_id,
             .guid = bs_guid(),
         });
-        _bsmod_saveType(BSGFX_TYPE_PRIMITIVE, BS_CONSTANT_STRING("Created primitive"));
+        _bsmod_saveTypeN(BSGFX_TYPE_PRIMITIVE, BS_CONSTANT_STRING("Created primitive"));
     }
 }
 

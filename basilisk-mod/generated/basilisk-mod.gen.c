@@ -149,12 +149,6 @@ void bsmod_onConvertFont(
     next.bsmod_onConvertFont(params);
 }
 
-void bsmod_onConvertBMFont(
-    bsmod_TrackParams params)
-{
-    next.bsmod_onConvertBMFont(params);
-}
-
 void bsmod_onPackAtlas(
     bsmod_TrackParams params)
 {
@@ -198,10 +192,21 @@ bsmod_TextureInfo* bsmod_packAtlasTexture(
     int width, 
     int height, 
     int category, 
+    char* name)
+{
+    return next.bsmod_packAtlasTexture(packer, data, width, height, category, name);
+}
+
+bsmod_TextureInfo* bsmod_packAtlasTextureN(
+    bsmod_AtlasPacker* packer, 
+    bs_RGBA* data, 
+    int width, 
+    int height, 
+    int category, 
     char* name, 
     int name_length)
 {
-    return next.bsmod_packAtlasTexture(packer, data, width, height, category, name, name_length);
+    return next.bsmod_packAtlasTextureN(packer, data, width, height, category, name, name_length);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTextureV(
@@ -301,15 +306,16 @@ bsmod_Package* bsmod_ensurePackage(
 
 bsmod_Resource* bsmod_queryResource(
     bsmod_Package* package, 
+    bs_ResourceType type, 
     const char* name)
 {
-    return next.bsmod_queryResource(package, name);
+    return next.bsmod_queryResource(package, type, name);
 }
 
 bs_Result bsmod_iniPackage(
-    const char* package_name)
+    int package_id)
 {
-    return next.bsmod_iniPackage(package_name);
+    return next.bsmod_iniPackage(package_id);
 }
 
 bs_Result bsmod_packResource(
@@ -317,10 +323,20 @@ bs_Result bsmod_packResource(
     unsigned char* data, 
     size_t data_size, 
     const char* package_name, 
+    char* resource_name)
+{
+    return next.bsmod_packResource(type, data, data_size, package_name, resource_name);
+}
+
+bs_Result bsmod_packResourceN(
+    bs_ResourceType type, 
+    unsigned char* data, 
+    size_t data_size, 
+    const char* package_name, 
     char* resource_name, 
     int resource_name_length)
 {
-    return next.bsmod_packResource(type, data, data_size, package_name, resource_name, resource_name_length);
+    return next.bsmod_packResourceN(type, data, data_size, package_name, resource_name, resource_name_length);
 }
 
 bs_Result bsmod_packResourceV(
@@ -350,9 +366,9 @@ bs_Result bsmod_packResourceF(
 }
 
 bs_Result bsmod_savePackage(
-    const char* name)
+    char* path)
 {
-    return next.bsmod_savePackage(name);
+    return next.bsmod_savePackage(path);
 }
 
 void bsmod_loadShaderReferences()
@@ -448,10 +464,17 @@ void bsmod_deleteSelected(
 
 bs_Result bsmod_saveType(
     bsgfx_TypeId id, 
+    char* value)
+{
+    return next.bsmod_saveType(id, value);
+}
+
+bs_Result bsmod_saveTypeN(
+    bsgfx_TypeId id, 
     char* value, 
     int value_length)
 {
-    return next.bsmod_saveType(id, value, value_length);
+    return next.bsmod_saveTypeN(id, value, value_length);
 }
 
 bs_Result bsmod_saveTypeV(

@@ -256,7 +256,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 	bs_m4Scale(&transform, &scale, &transform);
 
 	if (bs_leftClickUpOnce() && _bsmod_.axis != -1) {
-		_bsmod_saveType(type, NULL, 0);
+		_bsmod_saveTypeN(type, NULL, 0);
 
 		_bsmod_.axis = -1;
 	}

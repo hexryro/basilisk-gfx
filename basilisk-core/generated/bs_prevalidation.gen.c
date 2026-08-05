@@ -84,9 +84,14 @@ BSAPI int _preval_bs_rendererSwapsCount(bs_Renderer* renderer) {
     return next.bs_rendererSwapsCount(renderer);
 }
 
-BSAPI void _preval_bs_writeLogFile(char* value, int value_length) {
+BSAPI void _preval_bs_writeLogFile(char* value) {
     BS_VALIDATE(value != NULL, ,);
-    next.bs_writeLogFile(value, value_length);
+    next.bs_writeLogFile(value);
+}
+
+BSAPI void _preval_bs_writeLogFileN(char* value, int value_length) {
+    BS_VALIDATE(value != NULL, ,);
+    next.bs_writeLogFileN(value, value_length);
 }
 
 BSAPI void _preval_bs_writeLogFileV(char* format, va_list args) {
@@ -284,9 +289,14 @@ BSAPI void _preval_bs_populateVertexDeclaration(bs_VertexDeclaration* declaratio
     next.bs_populateVertexDeclaration(declaration, attributes, attributes_count);
 }
 
-BSAPI void _preval_bs_beginComment(char* value, int value_length) {
+BSAPI void _preval_bs_beginComment(char* value) {
     BS_VALIDATE(value != NULL, ,);
-    next.bs_beginComment(value, value_length);
+    next.bs_beginComment(value);
+}
+
+BSAPI void _preval_bs_beginCommentN(char* value, int value_length) {
+    BS_VALIDATE(value != NULL, ,);
+    next.bs_beginCommentN(value, value_length);
 }
 
 BSAPI void _preval_bs_beginCommentV(char* format, va_list args) {
@@ -467,11 +477,18 @@ BSAPI bs_Result _preval_bs_batch(bs_Object* object, int index_size, bs_Shader* v
     return next.bs_batch(object, index_size, vertex_shader, flags);
 }
 
-BSAPI bs_Attribute* _preval_bs_queryAttribute(bs_Batch* batch, char* name, int name_length) {
+BSAPI bs_Attribute* _preval_bs_queryAttribute(bs_Batch* batch, char* name) {
     BS_VALIDATE(batch != NULL, NULL,);
     BS_VALIDATE(batch->head.type == BS_OBJECT_BATCH, NULL,);
     BS_VALIDATE(name != NULL, NULL,);
-    return next.bs_queryAttribute(batch, name, name_length);
+    return next.bs_queryAttribute(batch, name);
+}
+
+BSAPI bs_Attribute* _preval_bs_queryAttributeN(bs_Batch* batch, char* name, int name_length) {
+    BS_VALIDATE(batch != NULL, NULL,);
+    BS_VALIDATE(batch->head.type == BS_OBJECT_BATCH, NULL,);
+    BS_VALIDATE(name != NULL, NULL,);
+    return next.bs_queryAttributeN(batch, name, name_length);
 }
 
 BSAPI bs_Attribute* _preval_bs_queryAttributeV(bs_Batch* batch, char* format, va_list args) {
@@ -908,10 +925,16 @@ BSAPI void _preval_bs_transition(bs_Image* image, int index, bs_ImageLayout old_
     next.bs_transition(image, index, old_layout, new_layout);
 }
 
-BSAPI bs_Result _preval_bs_peekPng(bs_PngData* out_png_data, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_peekPng(bs_PngData* out_png_data, char* path) {
     BS_VALIDATE(out_png_data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_peekPng(out_png_data, path, path_length);
+    return next.bs_peekPng(out_png_data, path);
+}
+
+BSAPI bs_Result _preval_bs_peekPngN(bs_PngData* out_png_data, char* path, int path_length) {
+    BS_VALIDATE(out_png_data != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_peekPngN(out_png_data, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_peekPngV(bs_PngData* out_png_data, char* format, va_list args) {
@@ -932,10 +955,22 @@ BSAPI bs_Result _preval_bs_loadPng(const char* path, int channels_count, bs_PngD
     return next.bs_loadPng(path, channels_count, out_png_data);
 }
 
-BSAPI bs_Result _preval_bs_savePng(char* data, bs_ivec2 resolution, bs_PngType type, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_peekFile(bs_FileInfo* out, char* path, int path_length) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_peekFile(out, path, path_length);
+}
+
+BSAPI bs_Result _preval_bs_savePng(char* data, bs_ivec2 resolution, bs_PngType type, char* path) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_savePng(data, resolution, type, path, path_length);
+    return next.bs_savePng(data, resolution, type, path);
+}
+
+BSAPI bs_Result _preval_bs_savePngN(char* data, bs_ivec2 resolution, bs_PngType type, char* path, int path_length) {
+    BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_savePngN(data, resolution, type, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_savePngV(char* data, bs_ivec2 resolution, bs_PngType type, char* format, va_list args) {
@@ -998,10 +1033,16 @@ BSAPI void _preval_bs_blit(bs_BlitOperation operation) {
     next.bs_blit(operation);
 }
 
-BSAPI bs_Result _preval_bs_loadImage(bs_Object* object, int package_id, bs_ImageBits flags, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_loadImage(bs_Object* object, int package_id, bs_ImageBits flags, char* path) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadImage(object, package_id, flags, path, path_length);
+    return next.bs_loadImage(object, package_id, flags, path);
+}
+
+BSAPI bs_Result _preval_bs_loadImageN(bs_Object* object, int package_id, bs_ImageBits flags, char* path, int path_length) {
+    BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadImageN(object, package_id, flags, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_loadImageV(bs_Object* object, int package_id, bs_ImageBits flags, char* format, va_list args) {
@@ -1033,10 +1074,16 @@ BSAPI bs_Result _preval_bs_sampler(bs_Object* object, bs_ImageFilter filter, bs_
     return next.bs_sampler(object, filter, flags);
 }
 
-BSAPI bs_Result _preval_bs_loadAtlas(bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_loadAtlas(bs_Object* object, int package_id, bs_U32 flags, char* path) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadAtlas(object, package_id, flags, path, path_length);
+    return next.bs_loadAtlas(object, package_id, flags, path);
+}
+
+BSAPI bs_Result _preval_bs_loadAtlasN(bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length) {
+    BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadAtlasN(object, package_id, flags, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_loadAtlasV(bs_Object* object, int package_id, bs_U32 flags, char* format, va_list args) {
@@ -1131,9 +1178,14 @@ BSAPI bs_Result _preval_bs_pushQueue(bs_Queue* queue) {
     return next.bs_pushQueue(queue);
 }
 
-BSAPI void _preval_bsi_nameHandle(bs_U64 handle, bs_U32 type, char* value, int value_length) {
+BSAPI void _preval_bsi_nameHandle(bs_U64 handle, bs_U32 type, char* value) {
     BS_VALIDATE(value != NULL, ,);
-    next.bsi_nameHandle(handle, type, value, value_length);
+    next.bsi_nameHandle(handle, type, value);
+}
+
+BSAPI void _preval_bsi_nameHandleN(bs_U64 handle, bs_U32 type, char* value, int value_length) {
+    BS_VALIDATE(value != NULL, ,);
+    next.bsi_nameHandleN(handle, type, value, value_length);
 }
 
 BSAPI void _preval_bsi_nameHandleV(bs_U64 handle, bs_U32 type, char* format, va_list args) {
@@ -1187,10 +1239,16 @@ BSAPI bs_Result _preval_bs_json(char* raw, int len, bs_Json* out) {
     return next.bs_json(raw, len, out);
 }
 
-BSAPI bs_Result _preval_bs_loadJson(bs_Json* out, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_loadJson(bs_Json* out, char* path) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadJson(out, path, path_length);
+    return next.bs_loadJson(out, path);
+}
+
+BSAPI bs_Result _preval_bs_loadJsonN(bs_Json* out, char* path, int path_length) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadJsonN(out, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_loadJsonV(bs_Json* out, char* format, va_list args) {
@@ -1209,10 +1267,16 @@ BSAPI bs_JsonValue _preval_bs_parseJsonValue(char* raw) {
     return next.bs_parseJsonValue(raw);
 }
 
-BSAPI bs_JsonValue _preval_bs_fetchJson(bs_Json* root, bs_JsonType expect, char* path, int path_length) {
+BSAPI bs_JsonValue _preval_bs_fetchJson(bs_Json* root, bs_JsonType expect, char* path) {
     BS_VALIDATE(root != NULL, (bs_JsonValue) { 0 },);
     BS_VALIDATE(path != NULL, (bs_JsonValue) { 0 },);
-    return next.bs_fetchJson(root, expect, path, path_length);
+    return next.bs_fetchJson(root, expect, path);
+}
+
+BSAPI bs_JsonValue _preval_bs_fetchJsonN(bs_Json* root, bs_JsonType expect, char* path, int path_length) {
+    BS_VALIDATE(root != NULL, (bs_JsonValue) { 0 },);
+    BS_VALIDATE(path != NULL, (bs_JsonValue) { 0 },);
+    return next.bs_fetchJsonN(root, expect, path, path_length);
 }
 
 BSAPI bs_JsonValue _preval_bs_fetchJsonV(bs_Json* root, bs_JsonType expect, char* format, va_list args) {
@@ -1221,10 +1285,16 @@ BSAPI bs_JsonValue _preval_bs_fetchJsonV(bs_Json* root, bs_JsonType expect, char
     return next.bs_fetchJsonV(root, expect, format, args);
 }
 
-BSAPI void _preval_bs_deleteJson(bs_Json* root, char* path, int path_length) {
+BSAPI void _preval_bs_deleteJson(bs_Json* root, char* path) {
     BS_VALIDATE(root != NULL, ,);
     BS_VALIDATE(path != NULL, ,);
-    next.bs_deleteJson(root, path, path_length);
+    next.bs_deleteJson(root, path);
+}
+
+BSAPI void _preval_bs_deleteJsonN(bs_Json* root, char* path, int path_length) {
+    BS_VALIDATE(root != NULL, ,);
+    BS_VALIDATE(path != NULL, ,);
+    next.bs_deleteJsonN(root, path, path_length);
 }
 
 BSAPI void _preval_bs_deleteJsonV(bs_Json* root, char* format, va_list args) {
@@ -1233,10 +1303,16 @@ BSAPI void _preval_bs_deleteJsonV(bs_Json* root, char* format, va_list args) {
     next.bs_deleteJsonV(root, format, args);
 }
 
-BSAPI bs_Result _preval_bs_ensureJson(bs_Json* root, bs_JsonValue value, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_ensureJson(bs_Json* root, bs_JsonValue value, char* path) {
     BS_VALIDATE(root != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_ensureJson(root, value, path, path_length);
+    return next.bs_ensureJson(root, value, path);
+}
+
+BSAPI bs_Result _preval_bs_ensureJsonN(bs_Json* root, bs_JsonValue value, char* path, int path_length) {
+    BS_VALIDATE(root != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_ensureJsonN(root, value, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_ensureJsonV(bs_Json* root, bs_JsonValue value, char* format, va_list args) {
@@ -1308,9 +1384,14 @@ BSAPI bs_JsonValue _preval_bs_jsonRGBA(bs_RGBA color) {
     return next.bs_jsonRGBA(color);
 }
 
-BSAPI void _preval_bs_logSection(char* value, int value_length) {
+BSAPI void _preval_bs_logSection(char* value) {
     BS_VALIDATE(value != NULL, ,);
-    next.bs_logSection(value, value_length);
+    next.bs_logSection(value);
+}
+
+BSAPI void _preval_bs_logSectionN(char* value, int value_length) {
+    BS_VALIDATE(value != NULL, ,);
+    next.bs_logSectionN(value, value_length);
 }
 
 BSAPI void _preval_bs_logSectionV(char* format, va_list args) {
@@ -1322,9 +1403,14 @@ BSAPI void _preval_bs_logEndOfSection() {
     next.bs_logEndOfSection();
 }
 
-BSAPI void _preval_bs_logWithTimestamp(bs_MessageLevel level, char* value, int value_length) {
+BSAPI void _preval_bs_logWithTimestamp(bs_MessageLevel level, char* value) {
     BS_VALIDATE(value != NULL, ,);
-    next.bs_logWithTimestamp(level, value, value_length);
+    next.bs_logWithTimestamp(level, value);
+}
+
+BSAPI void _preval_bs_logWithTimestampN(bs_MessageLevel level, char* value, int value_length) {
+    BS_VALIDATE(value != NULL, ,);
+    next.bs_logWithTimestampN(level, value, value_length);
 }
 
 BSAPI void _preval_bs_logWithTimestampV(bs_MessageLevel level, char* format, va_list args) {
@@ -1332,9 +1418,14 @@ BSAPI void _preval_bs_logWithTimestampV(bs_MessageLevel level, char* format, va_
     next.bs_logWithTimestampV(level, format, args);
 }
 
-BSAPI void _preval_bs_log(char* message, int message_length) {
+BSAPI void _preval_bs_log(char* message) {
     BS_VALIDATE(message != NULL, ,);
-    next.bs_log(message, message_length);
+    next.bs_log(message);
+}
+
+BSAPI void _preval_bs_logN(char* message, int message_length) {
+    BS_VALIDATE(message != NULL, ,);
+    next.bs_logN(message, message_length);
 }
 
 BSAPI void _preval_bs_logV(char* format, va_list args) {
@@ -1342,9 +1433,14 @@ BSAPI void _preval_bs_logV(char* format, va_list args) {
     next.bs_logV(format, args);
 }
 
-BSAPI void _preval_bs_info(char* message, int message_length) {
+BSAPI void _preval_bs_info(char* message) {
     BS_VALIDATE(message != NULL, ,);
-    next.bs_info(message, message_length);
+    next.bs_info(message);
+}
+
+BSAPI void _preval_bs_infoN(char* message, int message_length) {
+    BS_VALIDATE(message != NULL, ,);
+    next.bs_infoN(message, message_length);
 }
 
 BSAPI void _preval_bs_infoV(char* format, va_list args) {
@@ -1352,9 +1448,14 @@ BSAPI void _preval_bs_infoV(char* format, va_list args) {
     next.bs_infoV(format, args);
 }
 
-BSAPI void _preval_bs_warn(char* message, int message_length) {
+BSAPI void _preval_bs_warn(char* message) {
     BS_VALIDATE(message != NULL, ,);
-    next.bs_warn(message, message_length);
+    next.bs_warn(message);
+}
+
+BSAPI void _preval_bs_warnN(char* message, int message_length) {
+    BS_VALIDATE(message != NULL, ,);
+    next.bs_warnN(message, message_length);
 }
 
 BSAPI void _preval_bs_warnV(char* format, va_list args) {
@@ -1362,9 +1463,14 @@ BSAPI void _preval_bs_warnV(char* format, va_list args) {
     next.bs_warnV(format, args);
 }
 
-BSAPI void _preval_bs_critical(char* message, int message_length) {
+BSAPI void _preval_bs_critical(char* message) {
     BS_VALIDATE(message != NULL, ,);
-    next.bs_critical(message, message_length);
+    next.bs_critical(message);
+}
+
+BSAPI void _preval_bs_criticalN(char* message, int message_length) {
+    BS_VALIDATE(message != NULL, ,);
+    next.bs_criticalN(message, message_length);
 }
 
 BSAPI void _preval_bs_criticalV(char* format, va_list args) {
@@ -1404,9 +1510,14 @@ BSAPI bs_IO* _preval_bs_io() {
     return next.bs_io();
 }
 
-BSAPI void _preval_bs_system(char* value, int value_length) {
+BSAPI void _preval_bs_system(char* value) {
     BS_VALIDATE(value != NULL, ,);
-    next.bs_system(value, value_length);
+    next.bs_system(value);
+}
+
+BSAPI void _preval_bs_systemN(char* value, int value_length) {
+    BS_VALIDATE(value != NULL, ,);
+    next.bs_systemN(value, value_length);
 }
 
 BSAPI void _preval_bs_systemV(char* format, va_list args) {
@@ -1441,9 +1552,14 @@ BSAPI bs_String* _preval_bs_emptyString(bs_String* old) {
     return next.bs_emptyString(old);
 }
 
-BSAPI bs_String* _preval_bs_string(bs_String* old, char* value, int value_length) {
+BSAPI bs_String* _preval_bs_string(bs_String* old, char* value) {
     BS_VALIDATE(value != NULL, NULL,);
-    return next.bs_string(old, value, value_length);
+    return next.bs_string(old, value);
+}
+
+BSAPI bs_String* _preval_bs_stringN(bs_String* old, char* value, int value_length) {
+    BS_VALIDATE(value != NULL, NULL,);
+    return next.bs_stringN(old, value, value_length);
 }
 
 BSAPI bs_String* _preval_bs_stringV(bs_String* old, char* format, va_list args) {
@@ -1497,9 +1613,14 @@ BSAPI bs_String* _preval_bs_workingDirectory() {
     return next.bs_workingDirectory();
 }
 
-BSAPI bs_Result _preval_bs_setWorkingDirectory(char* path, int path_length) {
+BSAPI bs_Result _preval_bs_setWorkingDirectory(char* path) {
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_setWorkingDirectory(path, path_length);
+    return next.bs_setWorkingDirectory(path);
+}
+
+BSAPI bs_Result _preval_bs_setWorkingDirectoryN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_setWorkingDirectoryN(path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_setWorkingDirectoryV(char* format, va_list args) {
@@ -1704,9 +1825,14 @@ BSAPI int _preval_bs_numDigits(int n) {
     return next.bs_numDigits(n);
 }
 
-BSAPI bool _preval_bs_directoryExists(char* path, int path_length) {
+BSAPI bool _preval_bs_directoryExists(char* path) {
     BS_VALIDATE(path != NULL, false,);
-    return next.bs_directoryExists(path, path_length);
+    return next.bs_directoryExists(path);
+}
+
+BSAPI bool _preval_bs_directoryExistsN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, false,);
+    return next.bs_directoryExistsN(path, path_length);
 }
 
 BSAPI bool _preval_bs_directoryExistsV(char* format, va_list args) {
@@ -1730,10 +1856,16 @@ BSAPI char* _preval_bs_fileName(const char* path) {
     return next.bs_fileName(path);
 }
 
-BSAPI bs_Result _preval_bs_appendFile(char* data, bs_U32 data_len, char* value, int value_length) {
+BSAPI bs_Result _preval_bs_appendFile(char* data, bs_U32 data_len, char* value) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_appendFile(data, data_len, value, value_length);
+    return next.bs_appendFile(data, data_len, value);
+}
+
+BSAPI bs_Result _preval_bs_appendFileN(char* data, bs_U32 data_len, char* value, int value_length) {
+    BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_appendFileN(data, data_len, value, value_length);
 }
 
 BSAPI bs_Result _preval_bs_appendFileV(char* data, bs_U32 data_len, char* format, va_list args) {
@@ -1742,10 +1874,16 @@ BSAPI bs_Result _preval_bs_appendFileV(char* data, bs_U32 data_len, char* format
     return next.bs_appendFileV(data, data_len, format, args);
 }
 
-BSAPI bs_Result _preval_bs_saveFile(char* data, bs_U32 data_len, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_saveFile(char* data, bs_U32 data_len, char* path) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_saveFile(data, data_len, path, path_length);
+    return next.bs_saveFile(data, data_len, path);
+}
+
+BSAPI bs_Result _preval_bs_saveFileN(char* data, bs_U32 data_len, char* path, int path_length) {
+    BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_saveFileN(data, data_len, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_saveFileV(char* data, bs_U32 data_len, char* format, va_list args) {
@@ -1754,9 +1892,14 @@ BSAPI bs_Result _preval_bs_saveFileV(char* data, bs_U32 data_len, char* format, 
     return next.bs_saveFileV(data, data_len, format, args);
 }
 
-BSAPI void _preval_bs_convertWin32Path(char* path, int path_length) {
+BSAPI void _preval_bs_convertWin32Path(char* path) {
     BS_VALIDATE(path != NULL, ,);
-    next.bs_convertWin32Path(path, path_length);
+    next.bs_convertWin32Path(path);
+}
+
+BSAPI void _preval_bs_convertWin32PathN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, ,);
+    next.bs_convertWin32PathN(path, path_length);
 }
 
 BSAPI void _preval_bs_convertWin32PathV(char* format, va_list args) {
@@ -1764,9 +1907,14 @@ BSAPI void _preval_bs_convertWin32PathV(char* format, va_list args) {
     next.bs_convertWin32PathV(format, args);
 }
 
-BSAPI bs_Result _preval_bs_ensureDirectory(char* path, int path_length) {
+BSAPI bs_Result _preval_bs_ensureDirectory(char* path) {
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_ensureDirectory(path, path_length);
+    return next.bs_ensureDirectory(path);
+}
+
+BSAPI bs_Result _preval_bs_ensureDirectoryN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_ensureDirectoryN(path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_ensureDirectoryV(char* format, va_list args) {
@@ -1774,10 +1922,16 @@ BSAPI bs_Result _preval_bs_ensureDirectoryV(char* format, va_list args) {
     return next.bs_ensureDirectoryV(format, args);
 }
 
-BSAPI bs_Result _preval_bs_fileModifiedDate(bs_DateTime* out, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_fileModifiedDate(bs_DateTime* out, char* path) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_fileModifiedDate(out, path, path_length);
+    return next.bs_fileModifiedDate(out, path);
+}
+
+BSAPI bs_Result _preval_bs_fileModifiedDateN(bs_DateTime* out, char* path, int path_length) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_fileModifiedDateN(out, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_fileModifiedDateV(bs_DateTime* out, char* format, va_list args) {
@@ -1786,10 +1940,16 @@ BSAPI bs_Result _preval_bs_fileModifiedDateV(bs_DateTime* out, char* format, va_
     return next.bs_fileModifiedDateV(out, format, args);
 }
 
-BSAPI bs_Result _preval_bs_setFileModifiedDate(bs_DateTime* date, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_setFileModifiedDate(bs_DateTime* date, char* path) {
     BS_VALIDATE(date != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_setFileModifiedDate(date, path, path_length);
+    return next.bs_setFileModifiedDate(date, path);
+}
+
+BSAPI bs_Result _preval_bs_setFileModifiedDateN(bs_DateTime* date, char* path, int path_length) {
+    BS_VALIDATE(date != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_setFileModifiedDateN(date, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_setFileModifiedDateV(bs_DateTime* date, char* format, va_list args) {
@@ -1804,9 +1964,14 @@ BSAPI bs_String* _preval_bs_fullPath(bs_String* old, const char* path, int path_
     return next.bs_fullPath(old, path, path_len);
 }
 
-BSAPI bool _preval_bs_fileExists(char* path, int path_length) {
+BSAPI bool _preval_bs_fileExists(char* path) {
     BS_VALIDATE(path != NULL, false,);
-    return next.bs_fileExists(path, path_length);
+    return next.bs_fileExists(path);
+}
+
+BSAPI bool _preval_bs_fileExistsN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, false,);
+    return next.bs_fileExistsN(path, path_length);
 }
 
 BSAPI bool _preval_bs_fileExistsV(char* format, va_list args) {
@@ -1981,10 +2146,10 @@ BSAPI void _preval_bs_destroyResource(bs_Resource* resource) {
     next.bs_destroyResource(resource);
 }
 
-BSAPI bs_Result _preval_bs_queryResource(int package_id, const char* name, bs_Resource** out) {
+BSAPI bs_Result _preval_bs_queryResource(int package_id, int resource_type, const char* name, bs_Resource** out) {
     BS_VALIDATE(name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_queryResource(package_id, name, out);
+    return next.bs_queryResource(package_id, resource_type, name, out);
 }
 
 BSAPI int _preval_bs_queryPackage(const char* name) {
@@ -1992,10 +2157,16 @@ BSAPI int _preval_bs_queryPackage(const char* name) {
     return next.bs_queryPackage(name);
 }
 
-BSAPI bs_Result _preval_bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out, char* value, int value_length) {
+BSAPI bs_Result _preval_bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out, char* value) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadResource(package_id, flags, out, value, value_length);
+    return next.bs_loadResource(package_id, flags, out, value);
+}
+
+BSAPI bs_Result _preval_bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** out, char* value, int value_length) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadResourceN(package_id, flags, out, value, value_length);
 }
 
 BSAPI bs_Result _preval_bs_loadResourceV(int package_id, bs_U32 flags, bs_Resource** out, char* format, va_list args) {
@@ -2004,10 +2175,22 @@ BSAPI bs_Result _preval_bs_loadResourceV(int package_id, bs_U32 flags, bs_Resour
     return next.bs_loadResourceV(package_id, flags, out, format, args);
 }
 
-BSAPI bs_Result _preval_bs_loadPackage(const char* path, int* out) {
-    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+BSAPI bs_Result _preval_bs_loadPackage(int* out, char* path) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadPackage(path, out);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadPackage(out, path);
+}
+
+BSAPI bs_Result _preval_bs_loadPackageN(int* out, char* path, int path_length) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadPackageN(out, path, path_length);
+}
+
+BSAPI bs_Result _preval_bs_loadPackageV(int* out, char* format, va_list args) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadPackageV(out, format, args);
 }
 
 BSAPI int _preval_bs_configureSource(bs_ObjectType type, int count, const char** names) {
@@ -2310,9 +2493,14 @@ BSAPI bs_ivec2 _preval_bs_resolution() {
     return next.bs_resolution();
 }
 
-BSAPI void _preval_bs_titleWindow(char* name, int name_length) {
+BSAPI void _preval_bs_titleWindow(char* name) {
     BS_VALIDATE(name != NULL, ,);
-    next.bs_titleWindow(name, name_length);
+    next.bs_titleWindow(name);
+}
+
+BSAPI void _preval_bs_titleWindowN(char* name, int name_length) {
+    BS_VALIDATE(name != NULL, ,);
+    next.bs_titleWindowN(name, name_length);
 }
 
 BSAPI void _preval_bs_titleWindowV(char* format, va_list args) {
@@ -2337,9 +2525,14 @@ BSAPI void _preval_bs_checkTimer(bs_Timer* timer) {
     next.bs_checkTimer(timer);
 }
 
-BSAPI void _preval_bs_copyToClipboard(char* value, int value_length) {
+BSAPI void _preval_bs_copyToClipboard(char* value) {
     BS_VALIDATE(value != NULL, ,);
-    next.bs_copyToClipboard(value, value_length);
+    next.bs_copyToClipboard(value);
+}
+
+BSAPI void _preval_bs_copyToClipboardN(char* value, int value_length) {
+    BS_VALIDATE(value != NULL, ,);
+    next.bs_copyToClipboardN(value, value_length);
 }
 
 BSAPI void _preval_bs_copyToClipboardV(char* format, va_list args) {
@@ -2347,10 +2540,16 @@ BSAPI void _preval_bs_copyToClipboardV(char* format, va_list args) {
     next.bs_copyToClipboardV(format, args);
 }
 
-BSAPI bs_String* _preval_bs_appendString(bs_String* destination, char* value, int value_length) {
+BSAPI bs_String* _preval_bs_appendString(bs_String* destination, char* value) {
     BS_VALIDATE(destination != NULL, NULL,);
     BS_VALIDATE(value != NULL, NULL,);
-    return next.bs_appendString(destination, value, value_length);
+    return next.bs_appendString(destination, value);
+}
+
+BSAPI bs_String* _preval_bs_appendStringN(bs_String* destination, char* value, int value_length) {
+    BS_VALIDATE(destination != NULL, NULL,);
+    BS_VALIDATE(value != NULL, NULL,);
+    return next.bs_appendStringN(destination, value, value_length);
 }
 
 BSAPI bs_String* _preval_bs_appendStringV(bs_String* destination, char* format, va_list args) {
@@ -2359,10 +2558,16 @@ BSAPI bs_String* _preval_bs_appendStringV(bs_String* destination, char* format, 
     return next.bs_appendStringV(destination, format, args);
 }
 
-BSAPI bs_Result _preval_bs_foreachFile(bs_ForeachDocumentFunction x, void* param, char* value, int value_length) {
+BSAPI bs_Result _preval_bs_foreachFile(bs_ForeachDocumentFunction x, void* param, char* value) {
     BS_VALIDATE(param != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_foreachFile(x, param, value, value_length);
+    return next.bs_foreachFile(x, param, value);
+}
+
+BSAPI bs_Result _preval_bs_foreachFileN(bs_ForeachDocumentFunction x, void* param, char* value, int value_length) {
+    BS_VALIDATE(param != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_foreachFileN(x, param, value, value_length);
 }
 
 BSAPI bs_Result _preval_bs_foreachFileV(bs_ForeachDocumentFunction x, void* param, char* format, va_list args) {
@@ -2371,10 +2576,16 @@ BSAPI bs_Result _preval_bs_foreachFileV(bs_ForeachDocumentFunction x, void* para
     return next.bs_foreachFileV(x, param, format, args);
 }
 
-BSAPI bs_Result _preval_bs_foreachDirectory(bs_ForeachDocumentFunction x, void* param, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_foreachDirectory(bs_ForeachDocumentFunction x, void* param, char* path) {
     BS_VALIDATE(param != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_foreachDirectory(x, param, path, path_length);
+    return next.bs_foreachDirectory(x, param, path);
+}
+
+BSAPI bs_Result _preval_bs_foreachDirectoryN(bs_ForeachDocumentFunction x, void* param, char* path, int path_length) {
+    BS_VALIDATE(param != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_foreachDirectoryN(x, param, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_foreachDirectoryV(bs_ForeachDocumentFunction x, void* param, char* format, va_list args) {
@@ -2383,9 +2594,14 @@ BSAPI bs_Result _preval_bs_foreachDirectoryV(bs_ForeachDocumentFunction x, void*
     return next.bs_foreachDirectoryV(x, param, format, args);
 }
 
-BSAPI int _preval_bs_numFiles(char* path, int path_length) {
+BSAPI int _preval_bs_numFiles(char* path) {
     BS_VALIDATE(path != NULL, 0,);
-    return next.bs_numFiles(path, path_length);
+    return next.bs_numFiles(path);
+}
+
+BSAPI int _preval_bs_numFilesN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, 0,);
+    return next.bs_numFilesN(path, path_length);
 }
 
 BSAPI int _preval_bs_numFilesV(char* format, va_list args) {
@@ -2393,9 +2609,14 @@ BSAPI int _preval_bs_numFilesV(char* format, va_list args) {
     return next.bs_numFilesV(format, args);
 }
 
-BSAPI int _preval_bs_numDirectories(char* path, int path_length) {
+BSAPI int _preval_bs_numDirectories(char* path) {
     BS_VALIDATE(path != NULL, 0,);
-    return next.bs_numDirectories(path, path_length);
+    return next.bs_numDirectories(path);
+}
+
+BSAPI int _preval_bs_numDirectoriesN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, 0,);
+    return next.bs_numDirectoriesN(path, path_length);
 }
 
 BSAPI int _preval_bs_numDirectoriesV(char* format, va_list args) {
@@ -2403,11 +2624,18 @@ BSAPI int _preval_bs_numDirectoriesV(char* format, va_list args) {
     return next.bs_numDirectoriesV(format, args);
 }
 
-BSAPI bs_Result _preval_bs_openFile(const char* mode, bs_File* out, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_openFile(const char* mode, bs_File* out, char* path) {
     BS_VALIDATE(mode != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_openFile(mode, out, path, path_length);
+    return next.bs_openFile(mode, out, path);
+}
+
+BSAPI bs_Result _preval_bs_openFileN(const char* mode, bs_File* out, char* path, int path_length) {
+    BS_VALIDATE(mode != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_openFileN(mode, out, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_openFileV(const char* mode, bs_File* out, char* format, va_list args) {
@@ -2422,10 +2650,16 @@ BSAPI void _preval_bs_closeFile(bs_File* file) {
     next.bs_closeFile(file);
 }
 
-BSAPI bs_Result _preval_bs_loadFile(bs_String** out, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_loadFile(bs_String** out, char* path) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadFile(out, path, path_length);
+    return next.bs_loadFile(out, path);
+}
+
+BSAPI bs_Result _preval_bs_loadFileN(bs_String** out, char* path, int path_length) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadFileN(out, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_loadFileV(bs_String** out, char* format, va_list args) {
@@ -2434,10 +2668,16 @@ BSAPI bs_Result _preval_bs_loadFileV(bs_String** out, char* format, va_list args
     return next.bs_loadFileV(out, format, args);
 }
 
-BSAPI bs_Result _preval_bs_loadFileChunk(long offset, size_t size, bs_String** out, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_loadFileChunk(long offset, size_t size, bs_String** out, char* path) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadFileChunk(offset, size, out, path, path_length);
+    return next.bs_loadFileChunk(offset, size, out, path);
+}
+
+BSAPI bs_Result _preval_bs_loadFileChunkN(long offset, size_t size, bs_String** out, char* path, int path_length) {
+    BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_loadFileChunkN(offset, size, out, path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_loadFileChunkV(long offset, size_t size, bs_String** out, char* format, va_list args) {
@@ -2446,9 +2686,14 @@ BSAPI bs_Result _preval_bs_loadFileChunkV(long offset, size_t size, bs_String** 
     return next.bs_loadFileChunkV(offset, size, out, format, args);
 }
 
-BSAPI bs_Result _preval_bs_deleteFile(char* path, int path_length) {
+BSAPI bs_Result _preval_bs_deleteFile(char* path) {
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_deleteFile(path, path_length);
+    return next.bs_deleteFile(path);
+}
+
+BSAPI bs_Result _preval_bs_deleteFileN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_deleteFileN(path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_deleteFileV(char* format, va_list args) {
@@ -2456,9 +2701,14 @@ BSAPI bs_Result _preval_bs_deleteFileV(char* format, va_list args) {
     return next.bs_deleteFileV(format, args);
 }
 
-BSAPI bs_Result _preval_bs_deleteDirectoryContents(char* path, int path_length) {
+BSAPI bs_Result _preval_bs_deleteDirectoryContents(char* path) {
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_deleteDirectoryContents(path, path_length);
+    return next.bs_deleteDirectoryContents(path);
+}
+
+BSAPI bs_Result _preval_bs_deleteDirectoryContentsN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_deleteDirectoryContentsN(path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_deleteDirectoryContentsV(char* format, va_list args) {
@@ -2466,9 +2716,14 @@ BSAPI bs_Result _preval_bs_deleteDirectoryContentsV(char* format, va_list args) 
     return next.bs_deleteDirectoryContentsV(format, args);
 }
 
-BSAPI bs_Result _preval_bs_deleteDirectory(char* path, int path_length) {
+BSAPI bs_Result _preval_bs_deleteDirectory(char* path) {
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_deleteDirectory(path, path_length);
+    return next.bs_deleteDirectory(path);
+}
+
+BSAPI bs_Result _preval_bs_deleteDirectoryN(char* path, int path_length) {
+    BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_deleteDirectoryN(path, path_length);
 }
 
 BSAPI bs_Result _preval_bs_deleteDirectoryV(char* format, va_list args) {
@@ -2486,6 +2741,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_queueSwapsCount = _preval_bs_queueSwapsCount;
     functions.bs_rendererSwapsCount = _preval_bs_rendererSwapsCount;
     functions.bs_writeLogFile = _preval_bs_writeLogFile;
+    functions.bs_writeLogFileN = _preval_bs_writeLogFileN;
     functions.bs_writeLogFileV = _preval_bs_writeLogFileV;
     functions.bs_v2Mid = _preval_bs_v2Mid;
     functions.bs_v3Mid = _preval_bs_v3Mid;
@@ -2518,6 +2774,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_lineVsLine = _preval_bs_lineVsLine;
     functions.bs_populateVertexDeclaration = _preval_bs_populateVertexDeclaration;
     functions.bs_beginComment = _preval_bs_beginComment;
+    functions.bs_beginCommentN = _preval_bs_beginCommentN;
     functions.bs_beginCommentV = _preval_bs_beginCommentV;
     functions.bs_endComment = _preval_bs_endComment;
     functions.bs_swapchainImage = _preval_bs_swapchainImage;
@@ -2551,6 +2808,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_setBufferAsync = _preval_bs_setBufferAsync;
     functions.bs_batch = _preval_bs_batch;
     functions.bs_queryAttribute = _preval_bs_queryAttribute;
+    functions.bs_queryAttributeN = _preval_bs_queryAttributeN;
     functions.bs_queryAttributeV = _preval_bs_queryAttributeV;
     functions.bs_canPushBatch = _preval_bs_canPushBatch;
     functions.bs_batchIsIndexed = _preval_bs_batchIsIndexed;
@@ -2624,10 +2882,13 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_image = _preval_bs_image;
     functions.bs_transition = _preval_bs_transition;
     functions.bs_peekPng = _preval_bs_peekPng;
+    functions.bs_peekPngN = _preval_bs_peekPngN;
     functions.bs_peekPngV = _preval_bs_peekPngV;
     functions.bs_loadPngData = _preval_bs_loadPngData;
     functions.bs_loadPng = _preval_bs_loadPng;
+    functions.bs_peekFile = _preval_bs_peekFile;
     functions.bs_savePng = _preval_bs_savePng;
+    functions.bs_savePngN = _preval_bs_savePngN;
     functions.bs_savePngV = _preval_bs_savePngV;
     functions.bs_encodePng = _preval_bs_encodePng;
     functions.bs_destroyImage = _preval_bs_destroyImage;
@@ -2638,6 +2899,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_copyBufferToImage = _preval_bs_copyBufferToImage;
     functions.bs_blit = _preval_bs_blit;
     functions.bs_loadImage = _preval_bs_loadImage;
+    functions.bs_loadImageN = _preval_bs_loadImageN;
     functions.bs_loadImageV = _preval_bs_loadImageV;
     functions.bs_isStencilFormat = _preval_bs_isStencilFormat;
     functions.bs_isDepthFormat = _preval_bs_isDepthFormat;
@@ -2645,6 +2907,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_destroySampler = _preval_bs_destroySampler;
     functions.bs_sampler = _preval_bs_sampler;
     functions.bs_loadAtlas = _preval_bs_loadAtlas;
+    functions.bs_loadAtlasN = _preval_bs_loadAtlasN;
     functions.bs_loadAtlasV = _preval_bs_loadAtlasV;
     functions.bs_atlasCoordinates = _preval_bs_atlasCoordinates;
     functions.bs_mirrorUV = _preval_bs_mirrorUV;
@@ -2663,6 +2926,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_resetQueue = _preval_bs_resetQueue;
     functions.bs_pushQueue = _preval_bs_pushQueue;
     functions.bsi_nameHandle = _preval_bsi_nameHandle;
+    functions.bsi_nameHandleN = _preval_bsi_nameHandleN;
     functions.bsi_nameHandleV = _preval_bsi_nameHandleV;
     functions.bs_beginEnumeration = _preval_bs_beginEnumeration;
     functions.bs_enumerateJson = _preval_bs_enumerateJson;
@@ -2674,14 +2938,18 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_emptyJsonArray = _preval_bs_emptyJsonArray;
     functions.bs_json = _preval_bs_json;
     functions.bs_loadJson = _preval_bs_loadJson;
+    functions.bs_loadJsonN = _preval_bs_loadJsonN;
     functions.bs_loadJsonV = _preval_bs_loadJsonV;
     functions.bs_destroyJson = _preval_bs_destroyJson;
     functions.bs_parseJsonValue = _preval_bs_parseJsonValue;
     functions.bs_fetchJson = _preval_bs_fetchJson;
+    functions.bs_fetchJsonN = _preval_bs_fetchJsonN;
     functions.bs_fetchJsonV = _preval_bs_fetchJsonV;
     functions.bs_deleteJson = _preval_bs_deleteJson;
+    functions.bs_deleteJsonN = _preval_bs_deleteJsonN;
     functions.bs_deleteJsonV = _preval_bs_deleteJsonV;
     functions.bs_ensureJson = _preval_bs_ensureJson;
+    functions.bs_ensureJsonN = _preval_bs_ensureJsonN;
     functions.bs_ensureJsonV = _preval_bs_ensureJsonV;
     functions.bs_jsonValueFromObject = _preval_bs_jsonValueFromObject;
     functions.bs_jsonValueFromRoot = _preval_bs_jsonValueFromRoot;
@@ -2698,17 +2966,23 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_jsonVec4 = _preval_bs_jsonVec4;
     functions.bs_jsonRGBA = _preval_bs_jsonRGBA;
     functions.bs_logSection = _preval_bs_logSection;
+    functions.bs_logSectionN = _preval_bs_logSectionN;
     functions.bs_logSectionV = _preval_bs_logSectionV;
     functions.bs_logEndOfSection = _preval_bs_logEndOfSection;
     functions.bs_logWithTimestamp = _preval_bs_logWithTimestamp;
+    functions.bs_logWithTimestampN = _preval_bs_logWithTimestampN;
     functions.bs_logWithTimestampV = _preval_bs_logWithTimestampV;
     functions.bs_log = _preval_bs_log;
+    functions.bs_logN = _preval_bs_logN;
     functions.bs_logV = _preval_bs_logV;
     functions.bs_info = _preval_bs_info;
+    functions.bs_infoN = _preval_bs_infoN;
     functions.bs_infoV = _preval_bs_infoV;
     functions.bs_warn = _preval_bs_warn;
+    functions.bs_warnN = _preval_bs_warnN;
     functions.bs_warnV = _preval_bs_warnV;
     functions.bs_critical = _preval_bs_critical;
+    functions.bs_criticalN = _preval_bs_criticalN;
     functions.bs_criticalV = _preval_bs_criticalV;
     functions.bs_instance = _preval_bs_instance;
     functions.bs_args = _preval_bs_args;
@@ -2719,6 +2993,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_context = _preval_bs_context;
     functions.bs_io = _preval_bs_io;
     functions.bs_system = _preval_bs_system;
+    functions.bs_systemN = _preval_bs_systemN;
     functions.bs_systemV = _preval_bs_systemV;
     functions.bs_createThread = _preval_bs_createThread;
     functions.bs_formatStringLength = _preval_bs_formatStringLength;
@@ -2726,6 +3001,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_stringAlloc = _preval_bs_stringAlloc;
     functions.bs_emptyString = _preval_bs_emptyString;
     functions.bs_string = _preval_bs_string;
+    functions.bs_stringN = _preval_bs_stringN;
     functions.bs_stringV = _preval_bs_stringV;
     functions.bs_toUpper = _preval_bs_toUpper;
     functions.bs_toLower = _preval_bs_toLower;
@@ -2737,6 +3013,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_stringContainsChar = _preval_bs_stringContainsChar;
     functions.bs_workingDirectory = _preval_bs_workingDirectory;
     functions.bs_setWorkingDirectory = _preval_bs_setWorkingDirectory;
+    functions.bs_setWorkingDirectoryN = _preval_bs_setWorkingDirectoryN;
     functions.bs_setWorkingDirectoryV = _preval_bs_setWorkingDirectoryV;
     functions.bs_executablePath = _preval_bs_executablePath;
     functions.bs_appdataPath = _preval_bs_appdataPath;
@@ -2776,24 +3053,32 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_guidIsNull = _preval_bs_guidIsNull;
     functions.bs_numDigits = _preval_bs_numDigits;
     functions.bs_directoryExists = _preval_bs_directoryExists;
+    functions.bs_directoryExistsN = _preval_bs_directoryExistsN;
     functions.bs_directoryExistsV = _preval_bs_directoryExistsV;
     functions.bs_fileExtension = _preval_bs_fileExtension;
     functions.bs_fileExtensionIs = _preval_bs_fileExtensionIs;
     functions.bs_fileName = _preval_bs_fileName;
     functions.bs_appendFile = _preval_bs_appendFile;
+    functions.bs_appendFileN = _preval_bs_appendFileN;
     functions.bs_appendFileV = _preval_bs_appendFileV;
     functions.bs_saveFile = _preval_bs_saveFile;
+    functions.bs_saveFileN = _preval_bs_saveFileN;
     functions.bs_saveFileV = _preval_bs_saveFileV;
     functions.bs_convertWin32Path = _preval_bs_convertWin32Path;
+    functions.bs_convertWin32PathN = _preval_bs_convertWin32PathN;
     functions.bs_convertWin32PathV = _preval_bs_convertWin32PathV;
     functions.bs_ensureDirectory = _preval_bs_ensureDirectory;
+    functions.bs_ensureDirectoryN = _preval_bs_ensureDirectoryN;
     functions.bs_ensureDirectoryV = _preval_bs_ensureDirectoryV;
     functions.bs_fileModifiedDate = _preval_bs_fileModifiedDate;
+    functions.bs_fileModifiedDateN = _preval_bs_fileModifiedDateN;
     functions.bs_fileModifiedDateV = _preval_bs_fileModifiedDateV;
     functions.bs_setFileModifiedDate = _preval_bs_setFileModifiedDate;
+    functions.bs_setFileModifiedDateN = _preval_bs_setFileModifiedDateN;
     functions.bs_setFileModifiedDateV = _preval_bs_setFileModifiedDateV;
     functions.bs_fullPath = _preval_bs_fullPath;
     functions.bs_fileExists = _preval_bs_fileExists;
+    functions.bs_fileExistsN = _preval_bs_fileExistsN;
     functions.bs_fileExistsV = _preval_bs_fileExistsV;
     functions.bs_toLong = _preval_bs_toLong;
     functions.bs_toULong = _preval_bs_toULong;
@@ -2829,8 +3114,11 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_queryResource = _preval_bs_queryResource;
     functions.bs_queryPackage = _preval_bs_queryPackage;
     functions.bs_loadResource = _preval_bs_loadResource;
+    functions.bs_loadResourceN = _preval_bs_loadResourceN;
     functions.bs_loadResourceV = _preval_bs_loadResourceV;
     functions.bs_loadPackage = _preval_bs_loadPackage;
+    functions.bs_loadPackageN = _preval_bs_loadPackageN;
+    functions.bs_loadPackageV = _preval_bs_loadPackageV;
     functions.bs_configureSource = _preval_bs_configureSource;
     functions.bs_exists = _preval_bs_exists;
     functions.bs_fetch = _preval_bs_fetch;
@@ -2898,35 +3186,48 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_elapsedTime = _preval_bs_elapsedTime;
     functions.bs_resolution = _preval_bs_resolution;
     functions.bs_titleWindow = _preval_bs_titleWindow;
+    functions.bs_titleWindowN = _preval_bs_titleWindowN;
     functions.bs_titleWindowV = _preval_bs_titleWindowV;
     functions.bs_inFixedTick = _preval_bs_inFixedTick;
     functions.bs_setTargetFramerate = _preval_bs_setTargetFramerate;
     functions.bs_timer = _preval_bs_timer;
     functions.bs_checkTimer = _preval_bs_checkTimer;
     functions.bs_copyToClipboard = _preval_bs_copyToClipboard;
+    functions.bs_copyToClipboardN = _preval_bs_copyToClipboardN;
     functions.bs_copyToClipboardV = _preval_bs_copyToClipboardV;
     functions.bs_appendString = _preval_bs_appendString;
+    functions.bs_appendStringN = _preval_bs_appendStringN;
     functions.bs_appendStringV = _preval_bs_appendStringV;
     functions.bs_foreachFile = _preval_bs_foreachFile;
+    functions.bs_foreachFileN = _preval_bs_foreachFileN;
     functions.bs_foreachFileV = _preval_bs_foreachFileV;
     functions.bs_foreachDirectory = _preval_bs_foreachDirectory;
+    functions.bs_foreachDirectoryN = _preval_bs_foreachDirectoryN;
     functions.bs_foreachDirectoryV = _preval_bs_foreachDirectoryV;
     functions.bs_numFiles = _preval_bs_numFiles;
+    functions.bs_numFilesN = _preval_bs_numFilesN;
     functions.bs_numFilesV = _preval_bs_numFilesV;
     functions.bs_numDirectories = _preval_bs_numDirectories;
+    functions.bs_numDirectoriesN = _preval_bs_numDirectoriesN;
     functions.bs_numDirectoriesV = _preval_bs_numDirectoriesV;
     functions.bs_openFile = _preval_bs_openFile;
+    functions.bs_openFileN = _preval_bs_openFileN;
     functions.bs_openFileV = _preval_bs_openFileV;
     functions.bs_closeFile = _preval_bs_closeFile;
     functions.bs_loadFile = _preval_bs_loadFile;
+    functions.bs_loadFileN = _preval_bs_loadFileN;
     functions.bs_loadFileV = _preval_bs_loadFileV;
     functions.bs_loadFileChunk = _preval_bs_loadFileChunk;
+    functions.bs_loadFileChunkN = _preval_bs_loadFileChunkN;
     functions.bs_loadFileChunkV = _preval_bs_loadFileChunkV;
     functions.bs_deleteFile = _preval_bs_deleteFile;
+    functions.bs_deleteFileN = _preval_bs_deleteFileN;
     functions.bs_deleteFileV = _preval_bs_deleteFileV;
     functions.bs_deleteDirectoryContents = _preval_bs_deleteDirectoryContents;
+    functions.bs_deleteDirectoryContentsN = _preval_bs_deleteDirectoryContentsN;
     functions.bs_deleteDirectoryContentsV = _preval_bs_deleteDirectoryContentsV;
     functions.bs_deleteDirectory = _preval_bs_deleteDirectory;
+    functions.bs_deleteDirectoryN = _preval_bs_deleteDirectoryN;
     functions.bs_deleteDirectoryV = _preval_bs_deleteDirectoryV;
 
     return &functions;

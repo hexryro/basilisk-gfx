@@ -406,14 +406,14 @@ BSAPI bs_Result _bs_encodePng(size_t* out_size, const unsigned char* data, bs_iv
 
     if (result != 0) {
         char* error = lodepng_error_text(result);
-        _bs_warn(error, strlen(error));
+        _bs_warn(error);
         return BS_RESULT_FAILED_TO_ENCODE;
     }
 
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_savePng(char* data, bs_ivec2 dim, bs_PngType type, char* path, int path_length) {
+BSAPI bs_Result _bs_savePngN(char* data, bs_ivec2 dim, bs_PngType type, char* path, int path_length) {
     int error = 0;
 
     switch (type) {
@@ -435,7 +435,7 @@ BSAPI bs_Result _bs_savePng(char* data, bs_ivec2 dim, bs_PngType type, char* pat
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_peekPng(bs_PngData* out_png_data, char* path, int path_length) {
+BSAPI bs_Result _bs_peekPngN(bs_PngData* out_png_data, char* path, int path_length) {
     unsigned error;
     unsigned char* data = NULL;
 
@@ -778,17 +778,17 @@ BSAPI void _bs_blit(bs_BlitOperation operation)  {
 BSAPI bs_Result _val_bs_loadImage(bs_Object* object, int package_id, bs_ImageBits flags, char* resource_name, char* resource_name_length) {
    // BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_OK);
 
-    return _bs_loadImage(object, package_id, flags, resource_name, resource_name_length);
+    return _bs_loadImageN(object, package_id, flags, resource_name, resource_name_length);
 }
 
-BSAPI bs_Result _bs_loadImage(bs_Object* object, int package_id, bs_ImageBits flags, char* path, int path_length) {
+BSAPI bs_Result _bs_loadImageN(bs_Object* object, int package_id, bs_ImageBits flags, char* path, int path_length) {
     bs_Result result;
 
     if (!object->image)
         return BS_RESULT_OK;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, 0, &resource, path, path_length);
+    result = _bs_loadResourceN(package_id, 0, &resource, path, path_length);
     if (result != BS_RESULT_OK)
         return result;
 
@@ -1088,11 +1088,11 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_loadAtlas(bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length) {
+BSAPI bs_Result _bs_loadAtlasN(bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length) {
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, 0, &resource, path, path_length);
+    result = _bs_loadResourceN(package_id, 0, &resource, path, path_length);
     if (result != BS_RESULT_OK)
         return result;
 

@@ -112,10 +112,16 @@ int bs_rendererSwapsCount(
 }
 
 void bs_writeLogFile(
+    char* value)
+{
+    next.bs_writeLogFile(value);
+}
+
+void bs_writeLogFileN(
     char* value, 
     int value_length)
 {
-    next.bs_writeLogFile(value, value_length);
+    next.bs_writeLogFileN(value, value_length);
 }
 
 void bs_writeLogFileV(
@@ -1000,10 +1006,16 @@ void bs_populateVertexDeclaration(
 }
 
 void bs_beginComment(
+    char* value)
+{
+    next.bs_beginComment(value);
+}
+
+void bs_beginCommentN(
     char* value, 
     int value_length)
 {
-    next.bs_beginComment(value, value_length);
+    next.bs_beginCommentN(value, value_length);
 }
 
 void bs_beginCommentV(
@@ -1259,10 +1271,17 @@ bs_Result bs_batch(
 
 bs_Attribute* bs_queryAttribute(
     bs_Batch* batch, 
+    char* name)
+{
+    return next.bs_queryAttribute(batch, name);
+}
+
+bs_Attribute* bs_queryAttributeN(
+    bs_Batch* batch, 
     char* name, 
     int name_length)
 {
-    return next.bs_queryAttribute(batch, name, name_length);
+    return next.bs_queryAttributeN(batch, name, name_length);
 }
 
 bs_Attribute* bs_queryAttributeV(
@@ -1822,10 +1841,17 @@ void bs_transition(
 
 bs_Result bs_peekPng(
     bs_PngData* out_png_data, 
+    char* path)
+{
+    return next.bs_peekPng(out_png_data, path);
+}
+
+bs_Result bs_peekPngN(
+    bs_PngData* out_png_data, 
     char* path, 
     int path_length)
 {
-    return next.bs_peekPng(out_png_data, path, path_length);
+    return next.bs_peekPngN(out_png_data, path, path_length);
 }
 
 bs_Result bs_peekPngV(
@@ -1865,14 +1891,31 @@ bs_Result bs_loadPng(
     return next.bs_loadPng(path, channels_count, out_png_data);
 }
 
+bs_Result bs_peekFile(
+    bs_FileInfo* out, 
+    char* path, 
+    int path_length)
+{
+    return next.bs_peekFile(out, path, path_length);
+}
+
 bs_Result bs_savePng(
+    char* data, 
+    bs_ivec2 resolution, 
+    bs_PngType type, 
+    char* path)
+{
+    return next.bs_savePng(data, resolution, type, path);
+}
+
+bs_Result bs_savePngN(
     char* data, 
     bs_ivec2 resolution, 
     bs_PngType type, 
     char* path, 
     int path_length)
 {
-    return next.bs_savePng(data, resolution, type, path, path_length);
+    return next.bs_savePngN(data, resolution, type, path, path_length);
 }
 
 bs_Result bs_savePngV(
@@ -1970,10 +2013,19 @@ bs_Result bs_loadImage(
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
+    char* path)
+{
+    return next.bs_loadImage(object, package_id, flags, path);
+}
+
+bs_Result bs_loadImageN(
+    bs_Object* object, 
+    int package_id, 
+    bs_ImageBits flags, 
     char* path, 
     int path_length)
 {
-    return next.bs_loadImage(object, package_id, flags, path, path_length);
+    return next.bs_loadImageN(object, package_id, flags, path, path_length);
 }
 
 bs_Result bs_loadImageV(
@@ -2036,10 +2088,19 @@ bs_Result bs_loadAtlas(
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
+    char* path)
+{
+    return next.bs_loadAtlas(object, package_id, flags, path);
+}
+
+bs_Result bs_loadAtlasN(
+    bs_Object* object, 
+    int package_id, 
+    bs_U32 flags, 
     char* path, 
     int path_length)
 {
-    return next.bs_loadAtlas(object, package_id, flags, path, path_length);
+    return next.bs_loadAtlasN(object, package_id, flags, path, path_length);
 }
 
 bs_Result bs_loadAtlasV(
@@ -2174,10 +2235,18 @@ bs_Result bs_pushQueue(
 void bsi_nameHandle(
     bs_U64 handle, 
     bs_U32 type, 
+    char* value)
+{
+    next.bsi_nameHandle(handle, type, value);
+}
+
+void bsi_nameHandleN(
+    bs_U64 handle, 
+    bs_U32 type, 
     char* value, 
     int value_length)
 {
-    next.bsi_nameHandle(handle, type, value, value_length);
+    next.bsi_nameHandleN(handle, type, value, value_length);
 }
 
 void bsi_nameHandleV(
@@ -2261,10 +2330,17 @@ bs_Result bs_json(
 
 bs_Result bs_loadJson(
     bs_Json* out, 
+    char* path)
+{
+    return next.bs_loadJson(out, path);
+}
+
+bs_Result bs_loadJsonN(
+    bs_Json* out, 
     char* path, 
     int path_length)
 {
-    return next.bs_loadJson(out, path, path_length);
+    return next.bs_loadJsonN(out, path, path_length);
 }
 
 bs_Result bs_loadJsonV(
@@ -2302,10 +2378,18 @@ bs_JsonValue bs_parseJsonValue(
 bs_JsonValue bs_fetchJson(
     bs_Json* root, 
     bs_JsonType expect, 
+    char* path)
+{
+    return next.bs_fetchJson(root, expect, path);
+}
+
+bs_JsonValue bs_fetchJsonN(
+    bs_Json* root, 
+    bs_JsonType expect, 
     char* path, 
     int path_length)
 {
-    return next.bs_fetchJson(root, expect, path, path_length);
+    return next.bs_fetchJsonN(root, expect, path, path_length);
 }
 
 bs_JsonValue bs_fetchJsonV(
@@ -2332,10 +2416,17 @@ bs_JsonValue bs_fetchJsonF(
 
 void bs_deleteJson(
     bs_Json* root, 
+    char* path)
+{
+    next.bs_deleteJson(root, path);
+}
+
+void bs_deleteJsonN(
+    bs_Json* root, 
     char* path, 
     int path_length)
 {
-    next.bs_deleteJson(root, path, path_length);
+    next.bs_deleteJsonN(root, path, path_length);
 }
 
 void bs_deleteJsonV(
@@ -2360,10 +2451,18 @@ void bs_deleteJsonF(
 bs_Result bs_ensureJson(
     bs_Json* root, 
     bs_JsonValue value, 
+    char* path)
+{
+    return next.bs_ensureJson(root, value, path);
+}
+
+bs_Result bs_ensureJsonN(
+    bs_Json* root, 
+    bs_JsonValue value, 
     char* path, 
     int path_length)
 {
-    return next.bs_ensureJson(root, value, path, path_length);
+    return next.bs_ensureJsonN(root, value, path, path_length);
 }
 
 bs_Result bs_ensureJsonV(
@@ -2475,10 +2574,16 @@ bs_JsonValue bs_jsonRGBA(
 }
 
 void bs_logSection(
+    char* value)
+{
+    next.bs_logSection(value);
+}
+
+void bs_logSectionN(
     char* value, 
     int value_length)
 {
-    next.bs_logSection(value, value_length);
+    next.bs_logSectionN(value, value_length);
 }
 
 void bs_logSectionV(
@@ -2505,10 +2610,17 @@ void bs_logEndOfSection()
 
 void bs_logWithTimestamp(
     bs_MessageLevel level, 
+    char* value)
+{
+    next.bs_logWithTimestamp(level, value);
+}
+
+void bs_logWithTimestampN(
+    bs_MessageLevel level, 
     char* value, 
     int value_length)
 {
-    next.bs_logWithTimestamp(level, value, value_length);
+    next.bs_logWithTimestampN(level, value, value_length);
 }
 
 void bs_logWithTimestampV(
@@ -2531,10 +2643,16 @@ void bs_logWithTimestampF(
 }
 
 void bs_log(
+    char* message)
+{
+    next.bs_log(message);
+}
+
+void bs_logN(
     char* message, 
     int message_length)
 {
-    next.bs_log(message, message_length);
+    next.bs_logN(message, message_length);
 }
 
 void bs_logV(
@@ -2555,10 +2673,16 @@ void bs_logF(
 }
 
 void bs_info(
+    char* message)
+{
+    next.bs_info(message);
+}
+
+void bs_infoN(
     char* message, 
     int message_length)
 {
-    next.bs_info(message, message_length);
+    next.bs_infoN(message, message_length);
 }
 
 void bs_infoV(
@@ -2579,10 +2703,16 @@ void bs_infoF(
 }
 
 void bs_warn(
+    char* message)
+{
+    next.bs_warn(message);
+}
+
+void bs_warnN(
     char* message, 
     int message_length)
 {
-    next.bs_warn(message, message_length);
+    next.bs_warnN(message, message_length);
 }
 
 void bs_warnV(
@@ -2603,10 +2733,16 @@ void bs_warnF(
 }
 
 void bs_critical(
+    char* message)
+{
+    next.bs_critical(message);
+}
+
+void bs_criticalN(
     char* message, 
     int message_length)
 {
-    next.bs_critical(message, message_length);
+    next.bs_criticalN(message, message_length);
 }
 
 void bs_criticalV(
@@ -2667,10 +2803,16 @@ bs_IO* bs_io()
 }
 
 void bs_system(
+    char* value)
+{
+    next.bs_system(value);
+}
+
+void bs_systemN(
     char* value, 
     int value_length)
 {
-    next.bs_system(value, value_length);
+    next.bs_systemN(value, value_length);
 }
 
 void bs_systemV(
@@ -2726,10 +2868,17 @@ bs_String* bs_emptyString(
 
 bs_String* bs_string(
     bs_String* old, 
+    char* value)
+{
+    return next.bs_string(old, value);
+}
+
+bs_String* bs_stringN(
+    bs_String* old, 
     char* value, 
     int value_length)
 {
-    return next.bs_string(old, value, value_length);
+    return next.bs_stringN(old, value, value_length);
 }
 
 bs_String* bs_stringV(
@@ -2813,10 +2962,16 @@ bs_String* bs_workingDirectory()
 }
 
 bs_Result bs_setWorkingDirectory(
+    char* path)
+{
+    return next.bs_setWorkingDirectory(path);
+}
+
+bs_Result bs_setWorkingDirectoryN(
     char* path, 
     int path_length)
 {
-    return next.bs_setWorkingDirectory(path, path_length);
+    return next.bs_setWorkingDirectoryN(path, path_length);
 }
 
 bs_Result bs_setWorkingDirectoryV(
@@ -3104,10 +3259,16 @@ int bs_numDigits(
 }
 
 bool bs_directoryExists(
+    char* path)
+{
+    return next.bs_directoryExists(path);
+}
+
+bool bs_directoryExistsN(
     char* path, 
     int path_length)
 {
-    return next.bs_directoryExists(path, path_length);
+    return next.bs_directoryExistsN(path, path_length);
 }
 
 bool bs_directoryExistsV(
@@ -3150,10 +3311,18 @@ char* bs_fileName(
 bs_Result bs_appendFile(
     char* data, 
     bs_U32 data_len, 
+    char* value)
+{
+    return next.bs_appendFile(data, data_len, value);
+}
+
+bs_Result bs_appendFileN(
+    char* data, 
+    bs_U32 data_len, 
     char* value, 
     int value_length)
 {
-    return next.bs_appendFile(data, data_len, value, value_length);
+    return next.bs_appendFileN(data, data_len, value, value_length);
 }
 
 bs_Result bs_appendFileV(
@@ -3181,10 +3350,18 @@ bs_Result bs_appendFileF(
 bs_Result bs_saveFile(
     char* data, 
     bs_U32 data_len, 
+    char* path)
+{
+    return next.bs_saveFile(data, data_len, path);
+}
+
+bs_Result bs_saveFileN(
+    char* data, 
+    bs_U32 data_len, 
     char* path, 
     int path_length)
 {
-    return next.bs_saveFile(data, data_len, path, path_length);
+    return next.bs_saveFileN(data, data_len, path, path_length);
 }
 
 bs_Result bs_saveFileV(
@@ -3210,10 +3387,16 @@ bs_Result bs_saveFileF(
 }
 
 void bs_convertWin32Path(
+    char* path)
+{
+    next.bs_convertWin32Path(path);
+}
+
+void bs_convertWin32PathN(
     char* path, 
     int path_length)
 {
-    next.bs_convertWin32Path(path, path_length);
+    next.bs_convertWin32PathN(path, path_length);
 }
 
 void bs_convertWin32PathV(
@@ -3234,10 +3417,16 @@ void bs_convertWin32PathF(
 }
 
 bs_Result bs_ensureDirectory(
+    char* path)
+{
+    return next.bs_ensureDirectory(path);
+}
+
+bs_Result bs_ensureDirectoryN(
     char* path, 
     int path_length)
 {
-    return next.bs_ensureDirectory(path, path_length);
+    return next.bs_ensureDirectoryN(path, path_length);
 }
 
 bs_Result bs_ensureDirectoryV(
@@ -3260,10 +3449,17 @@ bs_Result bs_ensureDirectoryF(
 
 bs_Result bs_fileModifiedDate(
     bs_DateTime* out, 
+    char* path)
+{
+    return next.bs_fileModifiedDate(out, path);
+}
+
+bs_Result bs_fileModifiedDateN(
+    bs_DateTime* out, 
     char* path, 
     int path_length)
 {
-    return next.bs_fileModifiedDate(out, path, path_length);
+    return next.bs_fileModifiedDateN(out, path, path_length);
 }
 
 bs_Result bs_fileModifiedDateV(
@@ -3288,10 +3484,17 @@ bs_Result bs_fileModifiedDateF(
 
 bs_Result bs_setFileModifiedDate(
     bs_DateTime* date, 
+    char* path)
+{
+    return next.bs_setFileModifiedDate(date, path);
+}
+
+bs_Result bs_setFileModifiedDateN(
+    bs_DateTime* date, 
     char* path, 
     int path_length)
 {
-    return next.bs_setFileModifiedDate(date, path, path_length);
+    return next.bs_setFileModifiedDateN(date, path, path_length);
 }
 
 bs_Result bs_setFileModifiedDateV(
@@ -3323,10 +3526,16 @@ bs_String* bs_fullPath(
 }
 
 bool bs_fileExists(
+    char* path)
+{
+    return next.bs_fileExists(path);
+}
+
+bool bs_fileExistsN(
     char* path, 
     int path_length)
 {
-    return next.bs_fileExists(path, path_length);
+    return next.bs_fileExistsN(path, path_length);
 }
 
 bool bs_fileExistsV(
@@ -3577,10 +3786,11 @@ void bs_destroyResource(
 
 bs_Result bs_queryResource(
     int package_id, 
+    int resource_type, 
     const char* name, 
     bs_Resource** out)
 {
-    return next.bs_queryResource(package_id, name, out);
+    return next.bs_queryResource(package_id, resource_type, name, out);
 }
 
 int bs_queryPackage(
@@ -3593,10 +3803,19 @@ bs_Result bs_loadResource(
     int package_id, 
     bs_U32 flags, 
     bs_Resource** out, 
+    char* value)
+{
+    return next.bs_loadResource(package_id, flags, out, value);
+}
+
+bs_Result bs_loadResourceN(
+    int package_id, 
+    bs_U32 flags, 
+    bs_Resource** out, 
     char* value, 
     int value_length)
 {
-    return next.bs_loadResource(package_id, flags, out, value, value_length);
+    return next.bs_loadResourceN(package_id, flags, out, value, value_length);
 }
 
 bs_Result bs_loadResourceV(
@@ -3624,10 +3843,38 @@ bs_Result bs_loadResourceF(
 }
 
 bs_Result bs_loadPackage(
-    const char* path, 
-    int* out)
+    int* out, 
+    char* path)
 {
-    return next.bs_loadPackage(path, out);
+    return next.bs_loadPackage(out, path);
+}
+
+bs_Result bs_loadPackageN(
+    int* out, 
+    char* path, 
+    int path_length)
+{
+    return next.bs_loadPackageN(out, path, path_length);
+}
+
+bs_Result bs_loadPackageV(
+    int* out, 
+    char* format, 
+    va_list args)
+{
+    return next.bs_loadPackageV(out, format, args);
+}
+
+bs_Result bs_loadPackageF(
+    int* out, 
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    bs_Result _return = next.bs_loadPackageV(out, format, args);
+    va_end(args);
+    return _return;
 }
 
 int bs_configureSource(
@@ -4050,10 +4297,16 @@ bs_ivec2 bs_resolution()
 }
 
 void bs_titleWindow(
+    char* name)
+{
+    next.bs_titleWindow(name);
+}
+
+void bs_titleWindowN(
     char* name, 
     int name_length)
 {
-    next.bs_titleWindow(name, name_length);
+    next.bs_titleWindowN(name, name_length);
 }
 
 void bs_titleWindowV(
@@ -4096,10 +4349,16 @@ void bs_checkTimer(
 }
 
 void bs_copyToClipboard(
+    char* value)
+{
+    next.bs_copyToClipboard(value);
+}
+
+void bs_copyToClipboardN(
     char* value, 
     int value_length)
 {
-    next.bs_copyToClipboard(value, value_length);
+    next.bs_copyToClipboardN(value, value_length);
 }
 
 void bs_copyToClipboardV(
@@ -4121,10 +4380,17 @@ void bs_copyToClipboardF(
 
 bs_String* bs_appendString(
     bs_String* destination, 
+    char* value)
+{
+    return next.bs_appendString(destination, value);
+}
+
+bs_String* bs_appendStringN(
+    bs_String* destination, 
     char* value, 
     int value_length)
 {
-    return next.bs_appendString(destination, value, value_length);
+    return next.bs_appendStringN(destination, value, value_length);
 }
 
 bs_String* bs_appendStringV(
@@ -4150,10 +4416,18 @@ bs_String* bs_appendStringF(
 bs_Result bs_foreachFile(
     bs_ForeachDocumentFunction x, 
     void* param, 
+    char* value)
+{
+    return next.bs_foreachFile(x, param, value);
+}
+
+bs_Result bs_foreachFileN(
+    bs_ForeachDocumentFunction x, 
+    void* param, 
     char* value, 
     int value_length)
 {
-    return next.bs_foreachFile(x, param, value, value_length);
+    return next.bs_foreachFileN(x, param, value, value_length);
 }
 
 bs_Result bs_foreachFileV(
@@ -4181,10 +4455,18 @@ bs_Result bs_foreachFileF(
 bs_Result bs_foreachDirectory(
     bs_ForeachDocumentFunction x, 
     void* param, 
+    char* path)
+{
+    return next.bs_foreachDirectory(x, param, path);
+}
+
+bs_Result bs_foreachDirectoryN(
+    bs_ForeachDocumentFunction x, 
+    void* param, 
     char* path, 
     int path_length)
 {
-    return next.bs_foreachDirectory(x, param, path, path_length);
+    return next.bs_foreachDirectoryN(x, param, path, path_length);
 }
 
 bs_Result bs_foreachDirectoryV(
@@ -4210,10 +4492,16 @@ bs_Result bs_foreachDirectoryF(
 }
 
 int bs_numFiles(
+    char* path)
+{
+    return next.bs_numFiles(path);
+}
+
+int bs_numFilesN(
     char* path, 
     int path_length)
 {
-    return next.bs_numFiles(path, path_length);
+    return next.bs_numFilesN(path, path_length);
 }
 
 int bs_numFilesV(
@@ -4235,10 +4523,16 @@ int bs_numFilesF(
 }
 
 int bs_numDirectories(
+    char* path)
+{
+    return next.bs_numDirectories(path);
+}
+
+int bs_numDirectoriesN(
     char* path, 
     int path_length)
 {
-    return next.bs_numDirectories(path, path_length);
+    return next.bs_numDirectoriesN(path, path_length);
 }
 
 int bs_numDirectoriesV(
@@ -4262,10 +4556,18 @@ int bs_numDirectoriesF(
 bs_Result bs_openFile(
     const char* mode, 
     bs_File* out, 
+    char* path)
+{
+    return next.bs_openFile(mode, out, path);
+}
+
+bs_Result bs_openFileN(
+    const char* mode, 
+    bs_File* out, 
     char* path, 
     int path_length)
 {
-    return next.bs_openFile(mode, out, path, path_length);
+    return next.bs_openFileN(mode, out, path, path_length);
 }
 
 bs_Result bs_openFileV(
@@ -4298,10 +4600,17 @@ void bs_closeFile(
 
 bs_Result bs_loadFile(
     bs_String** out, 
+    char* path)
+{
+    return next.bs_loadFile(out, path);
+}
+
+bs_Result bs_loadFileN(
+    bs_String** out, 
     char* path, 
     int path_length)
 {
-    return next.bs_loadFile(out, path, path_length);
+    return next.bs_loadFileN(out, path, path_length);
 }
 
 bs_Result bs_loadFileV(
@@ -4328,10 +4637,19 @@ bs_Result bs_loadFileChunk(
     long offset, 
     size_t size, 
     bs_String** out, 
+    char* path)
+{
+    return next.bs_loadFileChunk(offset, size, out, path);
+}
+
+bs_Result bs_loadFileChunkN(
+    long offset, 
+    size_t size, 
+    bs_String** out, 
     char* path, 
     int path_length)
 {
-    return next.bs_loadFileChunk(offset, size, out, path, path_length);
+    return next.bs_loadFileChunkN(offset, size, out, path, path_length);
 }
 
 bs_Result bs_loadFileChunkV(
@@ -4359,10 +4677,16 @@ bs_Result bs_loadFileChunkF(
 }
 
 bs_Result bs_deleteFile(
+    char* path)
+{
+    return next.bs_deleteFile(path);
+}
+
+bs_Result bs_deleteFileN(
     char* path, 
     int path_length)
 {
-    return next.bs_deleteFile(path, path_length);
+    return next.bs_deleteFileN(path, path_length);
 }
 
 bs_Result bs_deleteFileV(
@@ -4384,10 +4708,16 @@ bs_Result bs_deleteFileF(
 }
 
 bs_Result bs_deleteDirectoryContents(
+    char* path)
+{
+    return next.bs_deleteDirectoryContents(path);
+}
+
+bs_Result bs_deleteDirectoryContentsN(
     char* path, 
     int path_length)
 {
-    return next.bs_deleteDirectoryContents(path, path_length);
+    return next.bs_deleteDirectoryContentsN(path, path_length);
 }
 
 bs_Result bs_deleteDirectoryContentsV(
@@ -4409,10 +4739,16 @@ bs_Result bs_deleteDirectoryContentsF(
 }
 
 bs_Result bs_deleteDirectory(
+    char* path)
+{
+    return next.bs_deleteDirectory(path);
+}
+
+bs_Result bs_deleteDirectoryN(
     char* path, 
     int path_length)
 {
-    return next.bs_deleteDirectory(path, path_length);
+    return next.bs_deleteDirectoryN(path, path_length);
 }
 
 bs_Result bs_deleteDirectoryV(

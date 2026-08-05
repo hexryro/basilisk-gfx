@@ -47,7 +47,7 @@ static void _bsgfx_loResSubpass0() {
  Writes to BSGFX_IMAGE_LO_RES_RESULT
  */
 static void _bsgfx_loResSubpass1() {
-    bs_beginComment(BS_CONSTANT_STRING("Low Resolution Subpass 1"));
+    bs_beginCommentN(BS_CONSTANT_STRING("Low Resolution Subpass 1"));
 
     if (bs_exists(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)) {
         bs_barrier(0,
@@ -92,7 +92,7 @@ static void basilisk_hiResSubpass0() {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
-    bs_beginComment(BS_CONSTANT_STRING("High Resolution Subpass 0"));
+    bs_beginCommentN(BS_CONSTANT_STRING("High Resolution Subpass 0"));
 
     bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
     bs_clearColor(0, bs_resolution(), BS_RGBA(75, 75, 75, 255));
@@ -121,7 +121,7 @@ static void basilisk_hiResSubpass0() {
         hash.shaders[1] = $fs_bsgfx_pixelation();
 
         if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-            bs_beginComment(BS_CONSTANT_STRING("Post processing"));
+            bs_beginCommentN(BS_CONSTANT_STRING("Post processing"));
 
             bs_ivec2 resolution = bs_resolution();
             struct {

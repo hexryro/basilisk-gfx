@@ -433,7 +433,7 @@ BSAPI bs_Result _val_bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 
 }
 
 BSAPI bs_Result _bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_RayTracer** ray_tracers, int ray_tracers_count) {
-    _bs_warn(BS_CONSTANT_STRING("_bs_bindAccelerationStructures has not been implemented yet"));
+    _bs_warnN(BS_CONSTANT_STRING("_bs_bindAccelerationStructures has not been implemented yet"));
     return BS_RESULT_NOT_IMPLEMENTED;
 }
 
@@ -534,7 +534,7 @@ BSAPI void _bs_loadBinding(bs_Binding* binding, int bind_set, int bind_point, in
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, 0, &resource, path, strlen(path));
+    result = _bs_loadResource(package_id, 0, &resource, path);
     if (result != BS_RESULT_OK) {
         return;
     }
@@ -566,7 +566,7 @@ static int _bs_loadPackageBindings(bs_Package* package, int package_id) {
     int descriptors_count = 0;
     for (int i = 0; i < package->resource_headers_count; i++) {
         bs_ResourceHeader* resource_header = package->resource_headers + i;
-        if (resource_header->header.type != BS_RESOURCE_BINDING)
+        if (resource_header->type != BS_RESOURCE_BINDING)
             continue;
 
         char* bind_set_string = strchr(resource_header->name, '/');
@@ -685,7 +685,7 @@ BSAPI void _bs_loadBindings() {
         }
     }
 
-    bs_log(s->value, s->len);
+    bs_logN(s->value, s->len);
 
    /**
     Create lookup table
@@ -778,7 +778,7 @@ BSAPI bs_Result _bs_shader(int package_id, const char* name, bs_U32 flags, bs_Re
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, flags, &resource, name, strlen(name));
+    result = _bs_loadResource(package_id, flags, &resource, name);
     if (result != BS_RESULT_OK)
         return result;
 
@@ -892,7 +892,7 @@ BSAPI bs_Result _bs_shader(int package_id, const char* name, bs_U32 flags, bs_Re
     resource->shader = _bs_malloc(sizeof(bs_Shader)); // todo dont do this
     memcpy(resource->shader, &shader, sizeof(bs_Shader));
 
-    bsi_nameHandle(shader.vk_module, VK_OBJECT_TYPE_SHADER_MODULE, name, strlen(name));
+    bsi_nameHandle(shader.vk_module, VK_OBJECT_TYPE_SHADER_MODULE, name);
     *out = resource;
 
     return BS_RESULT_OK;
@@ -1383,7 +1383,7 @@ BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
     }
 
     pipeline->name = _bs_stringF(pipeline->name, BS_PRINT_COLOR("%" PRIx64, BS_PRINT_BLUE_BRIGHT), pipeline->hash);
-    bsi_nameHandle(pipeline->vk_pipeline, VK_OBJECT_TYPE_PIPELINE, pipeline->name->value, pipeline->name->len);
+    bsi_nameHandleN(pipeline->vk_pipeline, VK_OBJECT_TYPE_PIPELINE, pipeline->name->value, pipeline->name->len);
 
     char* vs_name = vs ? vs->resource->name : NULL;
     char* fs_name = fs ? fs->resource->name : NULL;

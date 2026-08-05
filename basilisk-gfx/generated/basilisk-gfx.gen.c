@@ -221,10 +221,16 @@ void bsgfx_loadMaterials()
 }
 
 bsgfx_Material* bsgfx_material(
+    char* name)
+{
+    return next.bsgfx_material(name);
+}
+
+bsgfx_Material* bsgfx_materialN(
     char* name, 
     int name_length)
 {
-    return next.bsgfx_material(name, name_length);
+    return next.bsgfx_materialN(name, name_length);
 }
 
 bsgfx_Material* bsgfx_materialV(
@@ -592,10 +598,20 @@ void bsgfx_instanceText(
     bsgfx_Font* font, 
     bsgfx_Text* params, 
     bs_vec2* out_text_size, 
+    char* value)
+{
+    next.bsgfx_instanceText(subtype, font, params, out_text_size, value);
+}
+
+void bsgfx_instanceTextN(
+    int subtype, 
+    bsgfx_Font* font, 
+    bsgfx_Text* params, 
+    bs_vec2* out_text_size, 
     char* value, 
     int value_length)
 {
-    next.bsgfx_instanceText(subtype, font, params, out_text_size, value, value_length);
+    next.bsgfx_instanceTextN(subtype, font, params, out_text_size, value, value_length);
 }
 
 void bsgfx_instanceTextV(

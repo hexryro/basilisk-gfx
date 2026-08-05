@@ -128,11 +128,11 @@ BSAPI bs_Result _bs_json(char* raw, int len, bs_Json* out_json) {
 	return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_loadJson(bs_Json* out, char* path, int path_length) {
+BSAPI bs_Result _bs_loadJsonN(bs_Json* out, char* path, int path_length) {
 	bs_String* raw;
 	bs_Result result;
 
-	result = _bs_loadFile(&raw, path, path_length);
+	result = _bs_loadFileN(&raw, path, path_length);
 	if (result != BS_RESULT_OK) {
 		return result;
 	}
@@ -369,7 +369,7 @@ BSAPI bs_JsonValue _bs_parseJsonValue(char* raw) {
 	return _bs_createJsonValue(false, root, NULL, BS_JSON_UNDEFINED);
 }
 
-static bs_JsonValue _bs_fetchJsonN(bs_Json* root, bs_JsonType expect, char* path, int len, bool delete) {
+static bs_JsonValue _bs_fetchJsonOpt(bs_Json* root, bs_JsonType expect, char* path, int len, bool delete) {
 	char* old = path;
 	path = strdup(path);
 	
@@ -511,32 +511,32 @@ static bs_JsonValue _bs_fetchJsonN(bs_Json* root, bs_JsonType expect, char* path
 
 }
 
-BSAPI bs_JsonValue _bs_fetchJson(bs_Json* root, bs_JsonType expect, char* path, int path_length) {
-	return _bs_fetchJsonN(root, expect, path, path_length, false);
+BSAPI bs_JsonValue _bs_fetchJsonN(bs_Json* root, bs_JsonType expect, char* path, int path_length) {
+	return _bs_fetchJsonOpt(root, expect, path, path_length, false);
 }
 
 BSAPI void _val_bs_deleteJson(bs_Json* root, char* path, int path_length) {
 	BS_VALIDATE(root->is_mutable == true,, );
 
-	_bs_deleteJson(root, path, path_length);
+	_bs_deleteJsonN(root, path, path_length);
 }
 
-BSAPI void _bs_deleteJson(bs_Json* root, char* path, int path_length) {
+BSAPI void _bs_deleteJsonN(bs_Json* root, char* path, int path_length) {
 	_bs_ensureJsonMutable(root);
-	_bs_fetchJsonN(root, 0, path, path_length, true);
+	_bs_fetchJsonOpt(root, 0, path, path_length, true);
 }
 
 static inline void _bs_warnFailedToUpdate(char* type, char* token, char* path) {
 	_bs_warnF("Failed to update JSON %s \"%s\" in path \"%s\"", type, token, path);
 }
 
-BSAPI bs_Result _val_bs_ensureJson(bs_Json* root, bs_JsonValue value, char* path, int path_length) {
+BSAPI bs_Result _val_bs_ensureJsonN(bs_Json* root, bs_JsonValue value, char* path, int path_length) {
 	BS_VALIDATE(root->is_mutable == true, false,);
 
-	return _bs_ensureJson(root, value, path, path_length);
+	return _bs_ensureJsonN(root, value, path, path_length);
 }
 
-BSAPI bs_Result _bs_ensureJson(bs_Json* root, bs_JsonValue value, char* path, int path_length) {
+BSAPI bs_Result _bs_ensureJsonN(bs_Json* root, bs_JsonValue value, char* path, int path_length) {
 	bs_Result result = BS_RESULT_OK;
 
 	char* old_path = path;

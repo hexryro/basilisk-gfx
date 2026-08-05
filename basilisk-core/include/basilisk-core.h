@@ -98,6 +98,55 @@
 
 #endif
 
+#define BS_WARN_UNSUPPORTED_VERSION(resource_type, path)             \
+    bs_criticalF("Unsupported version for %s \"%s\"", resource_type, path)
+   // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, BS_RESULT_CORRUPTED, BS_RESULT_CORRUPTED, __func__, __FILE__, __LINE__, "Unsupported version for %s \"%s\"", resource_type, path)
+
+#define BS_WARN_INVALID_MAGIC(resource_type, path)                   \
+    bs_criticalF("Invalid magic for %s \"%s\"", resource_type, path)
+   // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, BS_RESULT_CORRUPTED, BS_RESULT_CORRUPTED, __func__, __FILE__, __LINE__, "Invalid magic for %s \"%s\"", resource_type, path)
+
+
+
+  /*==============================================================================
+   * BPAK Format
+   *============================================================================*/
+
+ /**
+  Header
+  */
+#define BS_BPAK_MAGIC_OFFSET                    0 // U32
+#define BS_BPAK_RESOURCES_COUNT_OFFSET          4 // U32
+#define BS_BPAK_RESOURCES_TYPES_COUNT_OFFSET    8 // U32
+#define BS_BPAK_RESOURCES_RESERVED             12 // U32
+
+#define BS_BPAK_HEADER_SIZE                    16
+
+ /**
+  Resource types
+  */
+#define BS_BPAK_RESOURCE_TYPES_OFFSET          BS_BPAK_HEADER_SIZE
+
+#define BS_BPAK_RESOURCE_TYPE_START_OFFSET     0 // U32
+#define BS_BPAK_RESOURCE_TYPE_COUNT_OFFSET     4 // U32
+
+#define BS_BPAK_RESOURCE_TYPE_SIZE             8
+
+ /**
+  Resources
+
+  Ends with resource name + \n\0
+  */
+#define BS_BPAK_RESOURCE_NAME_HASH_OFFSET      0 // U64
+#define BS_BPAK_RESOURCE_CHUNK_OFFSET          8 // I32
+#define BS_BPAK_RESOURCE_START_OFFSET         12 // I32
+#define BS_BPAK_RESOURCE_SIZE_OFFSET          16 // I32
+#define BS_BPAK_RESOURCE_NAME_LENGTH_OFFSET   20 // I32
+#define BS_BPAK_RESOURCE_TYPE_OFFSET          24 // I32
+#define BS_BPAK_RESOURCE_RESERVED             28 // I32
+
+#define BS_BPAK_RESOURCE_SIZE                  32
+
 
 
   /*==============================================================================
@@ -113,8 +162,8 @@
  /**
   Font header
   */
-#define BS_BFNT_1_MAGIC_OFFSET            0 // U32
-#define BS_BFNT_1_VERSION_OFFSET          4 // U32
+#define BS_BFNT_MAGIC_OFFSET              0 // U32
+#define BS_BFNT_VERSION_OFFSET            4 // U32
 #define BS_BFNT_1_BLOCKS_COUNT_OFFSET     8 // U16
 #define BS_BFNT_1_RESERVED_0             10 // U16
 #define BS_BFNT_1_RESERVED_1             12 // U32

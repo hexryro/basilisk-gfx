@@ -27,7 +27,7 @@
 #include <stb_rect_pack/stb_rect_pack.h>
 #include <string.h>
 
-BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* name, int name_length) {
+BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* name, int name_length) {
 	bsmod_TextureInfo info = {
 		.name = strdup(name),
 		.name_length = name_length,
@@ -44,9 +44,9 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, b
 	return bs_pushBack(&packer->info, &info);
 }
 
-BSMODAPI bsmod_AtlasPacker _bsmod_createAtlasPacker(int info_stride) {
+BSMODAPI bsmod_AtlasPacker _bsmod_createAtlasPacker() {
 	return (bsmod_AtlasPacker) {
-		.info = bs_list(info_stride, 64),
+		.info = bs_list(sizeof(bsmod_TextureInfo), 64),
 		.rects = bs_list(sizeof(stbrp_rect), 64),
 	};
 }
@@ -186,7 +186,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 
 	//result = bs_savePng(batl + header.binary_offset, BS_IV2(width, height), BS_PNG_RGBA, BS_CONSTANT_STRING("test.png"));
 
-	result = _bsmod_packResource(BS_RESOURCE_ATLAS, batl, total_size, package_name, resource_name, strlen(resource_name));
+	result = _bsmod_packResource(BS_RESOURCE_ATLAS, batl, total_size, package_name, resource_name);
 	bs_free(batl);
 //	if (result != BS_RESULT_OK)
 //		return result;

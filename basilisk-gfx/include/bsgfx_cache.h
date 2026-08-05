@@ -61,7 +61,7 @@ static inline bs_vec4 _bsgfx_convertColor(bs_RGBA color) {
     inline bsgfx_Material* $##name() {                                              \
         static int id = -1;                                                         \
         if (id == -1) {                                                             \
-            id = bsgfx_material(BS_CONSTANT_STRING(#name))->id;                     \
+            id = bsgfx_materialN(BS_CONSTANT_STRING(#name))->id;                    \
             bsgfx_Material* material = bs_fetchUnit(bsgfx_materials(), id);         \
             material->category = BSGFX_CATEGORY;                                    \
             material->contract->color = _bsgfx_convertColor(_color);                \

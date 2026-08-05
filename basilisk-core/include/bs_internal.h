@@ -84,14 +84,6 @@ BSAPI void _bs_writeLogger(
 #define BS_VALIDATE_OBJECT_TYPE(object, object_type, _return)        \
     BS_VALIDATE(((bs_ObjectSource*)bs_fetchUnit(bs_objectSources(), object_type))->type == object_type, _return,,)
 
-#define BS_WARN_INVALID_MAGIC(resource_type, path)                   \
-    _bs_criticalF("Invalid magic for %s \"%s\"", resource_type, path)
-   // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, BS_RESULT_CORRUPTED, BS_RESULT_CORRUPTED, __func__, __FILE__, __LINE__, "Invalid magic for %s \"%s\"", resource_type, path)
-
-#define BS_WARN_UNSUPPORTED_VERSION(resource_type, path)             \
-    _bs_criticalF("Unsupported version for %s \"%s\"", resource_type, path)
-   // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, BS_RESULT_CORRUPTED, BS_RESULT_CORRUPTED, __func__, __FILE__, __LINE__, "Unsupported version for %s \"%s\"", resource_type, path)
-
 #define BS_WARN_YYJSON_ERROR(function, code, format, ...)            \
     _bs_criticalF(format __VA_OPT__(, ) __VA_ARGS__)
    // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, _bs_convertYyjsonError(code), code, __func__, __FILE__, __LINE__, format __VA_OPT__(, ) __VA_ARGS__)

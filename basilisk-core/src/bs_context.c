@@ -209,7 +209,7 @@ static void _bs_preparePhysicalDevice() {
     bs_U32 num_devices = 0;
     vkEnumeratePhysicalDevices(_bs_instance_->instance, &num_devices, NULL);
     if (num_devices == 0) {
-        _bs_critical(BS_CONSTANT_STRING("No GPU with Vulkan support was found"));
+        _bs_criticalN(BS_CONSTANT_STRING("No GPU with Vulkan support was found"));
         return;
     }
 
@@ -265,7 +265,7 @@ static void _bs_queryPhysicalDevice(VkQueueFlags required_flags, bool supports_p
         }
     }
 
-    _bs_critical(BS_CONSTANT_STRING("No GPU with graphics and present support was found"));
+    _bs_criticalN(BS_CONSTANT_STRING("No GPU with graphics and present support was found"));
 }
 
 
@@ -449,7 +449,7 @@ static void _bs_querySwapchainFormat(VkFormat candidates[], int candidates_count
         }
     }
 
-    _bs_critical(BS_CONSTANT_STRING("Failed to query swapchain surface format"));
+    _bs_criticalN(BS_CONSTANT_STRING("Failed to query swapchain surface format"));
 }
 
 static void _bs_querySwapchainMode(VkPresentModeKHR candidates[], int candidates_count) {
@@ -471,7 +471,7 @@ static void _bs_querySwapchainMode(VkPresentModeKHR candidates[], int candidates
         }
     }
 
-    _bs_critical(BS_CONSTANT_STRING("Failed to query swapchain present mode"));
+    _bs_criticalN(BS_CONSTANT_STRING("Failed to query swapchain present mode"));
 }
 
 static void _bs_prepareSwapchain() {
@@ -886,7 +886,7 @@ BSAPI void _bs_checkTimer(bs_Timer* timer) {
     timer->seconds = timer->microseconds / 1000000.0;
 }
 
-BSAPI void _bs_titleWindow(char* name, int name_length) {
+BSAPI void _bs_titleWindowN(char* name, int name_length) {
 	_bs_context_->title = name; // todo
 }
 

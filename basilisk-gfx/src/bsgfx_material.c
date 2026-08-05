@@ -70,13 +70,13 @@ BSGFXAPI bsgfx_Material* _bsgfx_fetchMaterial(int id) {
  /**
   Create material
   */
-BSGFXAPI bsgfx_Material* _val_bsgfx_material(char* name, int name_length) {
+BSGFXAPI bsgfx_Material* _val_bsgfx_materialN(char* name, int name_length) {
     BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_MATERIALS), NULL,);
 
-    return _bsgfx_material(name, name_length);
+    return _bsgfx_materialN(name, name_length);
 }
 
-BSGFXAPI bsgfx_Material* _bsgfx_material(char* name, int name_length) {
+BSGFXAPI bsgfx_Material* _bsgfx_materialN(char* name, int name_length) {
     bs_Buffer* materials_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_MATERIALS)->buffer;
     bsgfx_MaterialContract* contract = bs_bufferMap(bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_MATERIALS)->buffer);
 
@@ -113,7 +113,7 @@ void _bsgfx_allocateMaterials() {
 
     bs_bindBuffer(BSGFX_SET_MATERIALS, BSGFX_BINDING_MATERIALS, materials_buffer);
 
-    bsgfx_Material* material = bs_fetchUnit(&_bsgfx_materials_, _bsgfx_material(BS_CONSTANT_STRING("blank"))->id);
+    bsgfx_Material* material = bs_fetchUnit(&_bsgfx_materials_, _bsgfx_materialN(BS_CONSTANT_STRING("blank"))->id);
     material->contract->color = BS_V4(1.0, 1.0, 1.0, 1.0);
 }
 

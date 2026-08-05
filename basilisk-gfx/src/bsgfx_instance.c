@@ -710,7 +710,7 @@ BSGFXAPI void _bsgfx_instanceDepthlessCircle(const bs_mat4* transform, int segme
 	*out = result;
 }
 
-BSGFXAPI void _bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* text, int text_length) {
+BSGFXAPI void _bsgfx_instanceTextN(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* text, int text_length) {
 	/*
 	if (!text)
 		text = "(null)";

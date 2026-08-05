@@ -59,7 +59,7 @@ typedef enum bsmod_SideMenuTabId bsmod_SideMenuTabId;
     _declspec(dllexport)
 
 #define BSMOD_CONTENT_PATH                                           \
-    "content/bsmod"
+    "content/bsmod.bpak"
 
 #define BSMOD_CONFIG_PATH                                            \
     "project/bsmod_config.json"
@@ -153,11 +153,12 @@ struct bsmod_TrackParams {
 };
 
 struct bsmod_UnicodeBlockRange {
-    bs_U32  offset;
-    bs_U32  count;
-    bs_U32  size;
-    bsgfx_UnicodeBlock  block;
-    bool  rasterize;
+    bs_U32 offset;
+    bs_U32 count;
+    bs_U32 size;
+    bsgfx_UnicodeBlock block;
+    bool rasterize;
+    bool keep_ttf;
 };
 
 struct bsmod_QueueLoad {
@@ -190,15 +191,22 @@ struct bsmod_Chunk {
 };
 
 struct bsmod_Package {
-    const char* name;
     bs_U64 name_hash;
+    char* name;
+    bs_U64 directory_hash;
+    char* directory;
     bs_List chunks;
     bs_List resources;
     bool has_changes;
 };
 
 struct bsmod_Resource {
-    bs_ResourceHeaderData header;
+    bs_U64 name_hash;
+    bs_I32 chunk;
+    bs_I32 offset;
+    bs_I32 size;
+    bs_I32 name_length;
+    bs_I32 type;
     char* name;
     bool has_changes;
 };
@@ -335,14 +343,6 @@ bsmod_onConvertFont(
   @return void
   */
 BSMODAPI void
-bsmod_onConvertBMFont(
-    bsmod_TrackParams params);
-
- /**
-  @param params
-  @return void
-  */
-BSMODAPI void
 bsmod_onPackAtlas(
     bsmod_TrackParams params);
 
@@ -399,11 +399,29 @@ bsmod_packFont(
   @param height
   @param category
   @param name
-  @param name_length
   @return bsmod_TextureInfo*
   */
 BSMODAPI bsmod_TextureInfo*
 bsmod_packAtlasTexture(
+    bsmod_AtlasPacker* packer,
+    bs_RGBA* data,
+    int width,
+    int height,
+    int category,
+    char* name);
+
+ /**
+  @param packer
+  @param data
+  @param width
+  @param height
+  @param category
+  @param name
+  @param name_length
+  @return bsmod_TextureInfo*
+  */
+BSMODAPI bsmod_TextureInfo*
+bsmod_packAtlasTextureN(
     bsmod_AtlasPacker* packer,
     bs_RGBA* data,
     int width,
@@ -552,21 +570,39 @@ bsmod_ensurePackage(
 
  /**
   @param package
+  @param type
   @param name
   @return bsmod_Resource*
   */
 BSMODAPI bsmod_Resource*
 bsmod_queryResource(
     bsmod_Package* package,
+    bs_ResourceType type,
     const char* name);
 
  /**
-  @param package_name
+  @param package_id
   @return bs_Result
   */
 BSMODAPI bs_Result
 bsmod_iniPackage(
-    const char* package_name);
+    int package_id);
+
+ /**
+  @param type
+  @param data
+  @param data_size
+  @param package_name
+  @param resource_name
+  @return bs_Result
+  */
+BSMODAPI bs_Result
+bsmod_packResource(
+    bs_ResourceType type,
+    unsigned char* data,
+    size_t data_size,
+    const char* package_name,
+    char* resource_name);
 
  /**
   @param type
@@ -578,7 +614,7 @@ bsmod_iniPackage(
   @return bs_Result
   */
 BSMODAPI bs_Result
-bsmod_packResource(
+bsmod_packResourceN(
     bs_ResourceType type,
     unsigned char* data,
     size_t data_size,
@@ -623,12 +659,12 @@ bsmod_packResourceF(
      ...);
 
  /**
-  @param name
+  @param path
   @return bs_Result
   */
 BSMODAPI bs_Result
 bsmod_savePackage(
-    const char* name);
+    char* path);
 
  /**
   @return void
@@ -759,11 +795,21 @@ bsmod_deleteSelected(
  /**
   @param id
   @param value
-  @param value_length
   @return bs_Result
   */
 BSMODAPI bs_Result
 bsmod_saveType(
+    bsgfx_TypeId id,
+    char* value);
+
+ /**
+  @param id
+  @param value
+  @param value_length
+  @return bs_Result
+  */
+BSMODAPI bs_Result
+bsmod_saveTypeN(
     bsgfx_TypeId id,
     char* value,
     int value_length);

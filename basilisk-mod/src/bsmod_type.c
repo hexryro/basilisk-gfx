@@ -58,7 +58,7 @@ BSMODAPI void _bsmod_delete(bsgfx_TypeId type_id, int id) {
 	type->count--;
 	_bsmod_deselectAll();
 
-	_bsmod_saveType(type_id, "Deleted %s", type->singular);
+	_bsmod_saveTypeF(type_id, "Deleted %s", type->singular);
 }
 
 BSMODAPI void _bsmod_deleteSelected(bsgfx_TypeId type_id) {
@@ -116,7 +116,7 @@ static int bs_compareAccessorZ(const int* a_id, const int* b_id) {
 }
 */
 
-BSMODAPI bs_Result _bsmod_saveType(bsgfx_TypeId id, char* comment, int comment_length) {
+BSMODAPI bs_Result _bsmod_saveTypeN(bsgfx_TypeId id, char* comment, int comment_length) {
 	bs_Result result;
 
 	bsgfx_Type* type = bsgfx_getType(id);
@@ -139,7 +139,7 @@ BSMODAPI bs_Result _bsmod_saveType(bsgfx_TypeId id, char* comment, int comment_l
 	memcpy(data->accessors, type->unmapped_accessors, type->count * sizeof(int));
 	memcpy(data->accessors + type->count, type->unmapped, type->count * type->unmapped_unit_size + type->flexible_count * type->unmapped_flexible_size);
 
-	bsgfx_ResourceType resource_type = 0;
+	bs_ResourceType resource_type = 0;
 	switch (id) {
 	case BSGFX_TYPE_PRIMITIVE: resource_type = BSGFX_RESOURCE_PRIMITIVE; break;
 	case BSGFX_TYPE_PREFAB: resource_type = BSGFX_RESOURCE_PREFAB; break;
@@ -159,7 +159,7 @@ BSMODAPI bs_Result _bsmod_saveType(bsgfx_TypeId id, char* comment, int comment_l
 	if (result != BS_RESULT_OK)
 		return result;
 
-	bs_logWithTimestamp(BS_MESSAGE_INFO, comment, comment_length);
+	bs_logWithTimestampN(BS_MESSAGE_INFO, comment, comment_length);
 
 	return BS_RESULT_OK;
 }
@@ -459,7 +459,7 @@ static bs_Result _bsmod_convertTileVersion(int package_id, bsgfx_Scene* scene) {
 	s = bs_stringF(s, "levels/%s_tiles", scene->name);
 
 	bs_Resource* tiles;
-	result = bs_loadResource(package_id, 0, &tiles, s->value, s->len);
+	result = bs_loadResourceN(package_id, 0, &tiles, s->value, s->len);
 	if (result != BS_RESULT_OK)
 		return result;
 
@@ -484,7 +484,7 @@ static bs_Result _bsmod_convertTileVersion(int package_id, bsgfx_Scene* scene) {
 		bs_warnF("Tile version %d converter\n", old_tiles->version); // TODO: BSMOD warn
 	}
 
-	result = _bsmod_packResource(BSGFX_RESOURCE_TILE, new_tiles, size, bs_fileName(package->path), s->value, s->len);
+	result = _bsmod_packResourceN(BSGFX_RESOURCE_TILE, new_tiles, size, bs_fileName(package->path), s->value, s->len);
 	bs_free(new_tiles);
 
 	return BS_RESULT_OK;
@@ -492,10 +492,7 @@ static bs_Result _bsmod_convertTileVersion(int package_id, bsgfx_Scene* scene) {
 
 /***/
 BSMODAPI void _bsmod_ensureTypeVersionsAreUpToDate(int package_id) {
-	bs_Package* package = bs_fetchUnit(bs_packages(), package_id);
-
-	char* package_name = bs_fileName(package->path);
-	_bsmod_iniPackage(package_name);
+	_bsmod_iniPackage(package_id);
 
 	bs_Result result = _bsmod_convertTileVersion(package_id, bsgfx_currentScene());
 	if (!result)
@@ -508,7 +505,7 @@ BSMODAPI void _bsmod_ensureTypeVersionsAreUpToDate(int package_id) {
 	//bs_Resource* prefabs = bs_loadResource(package_id, (s = bs_stringF(s, "levels/%s_prefabs", scene->name))->value, 0);
 	//bs_except(0);
 
-	_bsmod_savePackage(package_name);
+	_bsmod_savePackage(package_id);
 }
 
 

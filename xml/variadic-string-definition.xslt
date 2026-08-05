@@ -12,7 +12,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	</xsl:template>
 
 	<xsl:template match="variadicStringTemplate">
-		<function name="{@name}">
+		<function name="{@name}N">
 			<xsl:copy-of select="return | param"/>
 			<xsl:choose>
 				<xsl:when test="@string">
@@ -26,6 +26,35 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			</xsl:choose>
 		</function>
 
+		<function name="{@name}" type="allowBody">
+			<xsl:copy-of select="return | param"/>
+			<xsl:choose>
+				<xsl:when test="@string">
+					<param><type>char*</type><name><xsl:value-of select="@string"/></name></param>
+				</xsl:when>
+				<xsl:otherwise>
+					<param><type>char*</type><name>value</name></param>
+				</xsl:otherwise>
+			</xsl:choose>
+			<body>
+				<xsl:text>    </xsl:text>
+				<xsl:if test="not(return = 'void')">
+					<xsl:text>return </xsl:text>
+				</xsl:if>
+
+				<xsl:text>_</xsl:text>
+				<xsl:value-of select="@name"/>
+				<xsl:text>(</xsl:text>
+				<xsl:for-each select="param">
+					<xsl:value-of select="name"/>
+					<xsl:text>, </xsl:text>
+				</xsl:for-each>
+				<xsl:text>strlen(</xsl:text>
+				<xsl:value-of select="@name"/>
+				<xsl:text>));</xsl:text>
+			</body>
+		</function>
+		
 		<function name="{@name}V" type="allowBody">
 			<xsl:copy-of select="return | param"/>
 			<param>
@@ -48,7 +77,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 				<xsl:text>_</xsl:text>
 				<xsl:value-of select="@name"/>
-				<xsl:text>(</xsl:text>
+				<xsl:text>N(</xsl:text>
 				<xsl:for-each select="param">
 					<xsl:value-of select="name"/>
 					<xsl:text>, </xsl:text>

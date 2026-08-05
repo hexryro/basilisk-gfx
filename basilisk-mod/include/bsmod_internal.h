@@ -98,7 +98,7 @@ typedef struct {
 BSMODAPI extern Bsmod _bsmod_;
 
 static inline const char* _bsmod_applicationContentPath() {
-	return bs_fetchJson(&_bsmod_config_, BS_JSON_STRING, BS_CONSTANT_STRING("application.content_path")).as_string;
+	return bs_fetchJsonN(&_bsmod_config_, BS_JSON_STRING, BS_CONSTANT_STRING("application.content_path")).as_string;
 }
 
 #define BSMOD_WARN_SPVC_ERROR(function, code, format, ...)            \

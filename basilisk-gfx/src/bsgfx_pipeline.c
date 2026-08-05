@@ -138,7 +138,7 @@ BSGFXAPI void _bsgfx_renderPrimitiveTiles() {
         .camera = _poser_->camera.result,
     };
 
-    bs_beginComment(BS_CONSTANT_STRING("Tiles"));
+    bs_beginCommentN(BS_CONSTANT_STRING("Tiles"));
 
     bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
     bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_PRIMITIVE_TILES)->batch, pipeline, 0, BS_U32_MAX, 0, 1);
@@ -158,7 +158,7 @@ BSGFXAPI void _bsgfx_renderAtlas() {
     if (bs_pipeline(&hash, &pipeline) != BS_RESULT_OK)
         return;
 
-    bs_beginComment(BS_CONSTANT_STRING("Atlas"));
+    bs_beginCommentN(BS_CONSTANT_STRING("Atlas"));
 
     bs_pushConstant(pipeline, 0, sizeof(_poser_->world_camera.result), &_poser_->world_camera.result);
     _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS], pipeline);

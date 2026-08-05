@@ -80,7 +80,6 @@ typedef struct bs_Header bs_Header;
 typedef struct bs_Object bs_Object;
 typedef struct bs_ResourceParams bs_ResourceParams;
 typedef struct bs_Resource bs_Resource;
-typedef struct bs_ResourceHeaderData bs_ResourceHeaderData;
 typedef struct bs_ResourceHeader bs_ResourceHeader;
 typedef struct bs_PackageHeader bs_PackageHeader;
 typedef struct bs_Package bs_Package;
@@ -1633,7 +1632,11 @@ enum bs_ResourceType {
     BS_RESOURCE_ATLAS = 5,
     BS_RESOURCE_FONT = 6,
     BS_RESOURCE_BINDING = 7,
-    BS_RESOURCE_TYPE_COUNT = 8,
+    BSGFX_RESOURCE_PRIMITIVE = 8,
+    BSGFX_RESOURCE_PREFAB = 9,
+    BSGFX_RESOURCE_TILE = 10,
+    BSGFX_RESOURCE_LIGHT = 11,
+    BS_RESOURCE_TYPE_COUNT = 12,
 };
 
 enum bs_ImageBit {
@@ -2380,18 +2383,13 @@ struct bs_Resource {
     };
 };
 
-struct bs_ResourceHeaderData {
+struct bs_ResourceHeader {
     bs_U64 name_hash;
     bs_I32 chunk;
     bs_I32 offset;
     bs_I32 size;
     bs_I32 name_length;
     bs_I32 type;
-    bs_I32 reserved;
-};
-
-struct bs_ResourceHeader {
-    bs_ResourceHeaderData header;
     char* name;
     bs_Resource* resource;
 };
@@ -3208,11 +3206,19 @@ bs_rendererSwapsCount(
 
  /**
   @param value
-  @param value_length
   @return void
   */
 BSAPI void
 bs_writeLogFile(
+    char* value);
+
+ /**
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bs_writeLogFileN(
     char* value,
     int value_length);
 
@@ -4502,11 +4508,19 @@ bs_populateVertexDeclaration(
 
  /**
   @param value
-  @param value_length
   @return void
   */
 BSAPI void
 bs_beginComment(
+    char* value);
+
+ /**
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bs_beginCommentN(
     char* value,
     int value_length);
 
@@ -4877,11 +4891,21 @@ bs_batch(
  /**
   @param batch
   @param name
-  @param name_length
   @return bs_Attribute*
   */
 BSAPI bs_Attribute*
 bs_queryAttribute(
+    bs_Batch* batch,
+    char* name);
+
+ /**
+  @param batch
+  @param name
+  @param name_length
+  @return bs_Attribute*
+  */
+BSAPI bs_Attribute*
+bs_queryAttributeN(
     bs_Batch* batch,
     char* name,
     int name_length);
@@ -5699,11 +5723,21 @@ bs_transition(
  /**
   @param out_png_data
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_peekPng(
+    bs_PngData* out_png_data,
+    char* path);
+
+ /**
+  @param out_png_data
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_peekPngN(
     bs_PngData* out_png_data,
     char* path,
     int path_length);
@@ -5759,6 +5793,32 @@ bs_loadPng(
     bs_PngData* out_png_data);
 
  /**
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_peekFile(
+    bs_FileInfo* out,
+    char* path,
+    int path_length);
+
+ /**
+  @param data
+  @param resolution
+  @param type
+  @param path
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_savePng(
+    char* data,
+    bs_ivec2 resolution,
+    bs_PngType type,
+    char* path);
+
+ /**
   @param data
   @param resolution
   @param type
@@ -5767,7 +5827,7 @@ bs_loadPng(
   @return bs_Result
   */
 BSAPI bs_Result
-bs_savePng(
+bs_savePngN(
     char* data,
     bs_ivec2 resolution,
     bs_PngType type,
@@ -5913,11 +5973,25 @@ bs_blit(
   @param package_id
   @param flags
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_loadImage(
+    bs_Object* object,
+    int package_id,
+    bs_ImageBits flags,
+    char* path);
+
+ /**
+  @param object
+  @param package_id
+  @param flags
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadImageN(
     bs_Object* object,
     int package_id,
     bs_ImageBits flags,
@@ -6005,11 +6079,25 @@ bs_sampler(
   @param package_id
   @param flags
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_loadAtlas(
+    bs_Object* object,
+    int package_id,
+    bs_U32 flags,
+    char* path);
+
+ /**
+  @param object
+  @param package_id
+  @param flags
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadAtlasN(
     bs_Object* object,
     int package_id,
     bs_U32 flags,
@@ -6198,11 +6286,23 @@ bs_pushQueue(
   @param handle
   @param type
   @param value
-  @param value_length
   @return void
   */
 BSAPI void
 bsi_nameHandle(
+    bs_U64 handle,
+    bs_U32 type,
+    char* value);
+
+ /**
+  @param handle
+  @param type
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bsi_nameHandleN(
     bs_U64 handle,
     bs_U32 type,
     char* value,
@@ -6319,11 +6419,21 @@ bs_json(
  /**
   @param out
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_loadJson(
+    bs_Json* out,
+    char* path);
+
+ /**
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadJsonN(
     bs_Json* out,
     char* path,
     int path_length);
@@ -6372,11 +6482,23 @@ bs_parseJsonValue(
   @param root
   @param expect
   @param path
-  @param path_length
   @return bs_JsonValue
   */
 BSAPI bs_JsonValue
 bs_fetchJson(
+    bs_Json* root,
+    bs_JsonType expect,
+    char* path);
+
+ /**
+  @param root
+  @param expect
+  @param path
+  @param path_length
+  @return bs_JsonValue
+  */
+BSAPI bs_JsonValue
+bs_fetchJsonN(
     bs_Json* root,
     bs_JsonType expect,
     char* path,
@@ -6413,11 +6535,21 @@ bs_fetchJsonF(
  /**
   @param root
   @param path
-  @param path_length
   @return void
   */
 BSAPI void
 bs_deleteJson(
+    bs_Json* root,
+    char* path);
+
+ /**
+  @param root
+  @param path
+  @param path_length
+  @return void
+  */
+BSAPI void
+bs_deleteJsonN(
     bs_Json* root,
     char* path,
     int path_length);
@@ -6450,11 +6582,23 @@ bs_deleteJsonF(
   @param root
   @param value
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_ensureJson(
+    bs_Json* root,
+    bs_JsonValue value,
+    char* path);
+
+ /**
+  @param root
+  @param value
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_ensureJsonN(
     bs_Json* root,
     bs_JsonValue value,
     char* path,
@@ -6606,11 +6750,19 @@ bs_jsonRGBA(
 
  /**
   @param value
-  @param value_length
   @return void
   */
 BSAPI void
 bs_logSection(
+    char* value);
+
+ /**
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bs_logSectionN(
     char* value,
     int value_length);
 
@@ -6643,11 +6795,21 @@ bs_logEndOfSection();
  /**
   @param level
   @param value
-  @param value_length
   @return void
   */
 BSAPI void
 bs_logWithTimestamp(
+    bs_MessageLevel level,
+    char* value);
+
+ /**
+  @param level
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bs_logWithTimestampN(
     bs_MessageLevel level,
     char* value,
     int value_length);
@@ -6678,11 +6840,19 @@ bs_logWithTimestampF(
 
  /**
   @param message
-  @param message_length
   @return void
   */
 BSAPI void
 bs_log(
+    char* message);
+
+ /**
+  @param message
+  @param message_length
+  @return void
+  */
+BSAPI void
+bs_logN(
     char* message,
     int message_length);
 
@@ -6708,11 +6878,19 @@ bs_logF(
 
  /**
   @param message
-  @param message_length
   @return void
   */
 BSAPI void
 bs_info(
+    char* message);
+
+ /**
+  @param message
+  @param message_length
+  @return void
+  */
+BSAPI void
+bs_infoN(
     char* message,
     int message_length);
 
@@ -6738,11 +6916,19 @@ bs_infoF(
 
  /**
   @param message
-  @param message_length
   @return void
   */
 BSAPI void
 bs_warn(
+    char* message);
+
+ /**
+  @param message
+  @param message_length
+  @return void
+  */
+BSAPI void
+bs_warnN(
     char* message,
     int message_length);
 
@@ -6768,11 +6954,19 @@ bs_warnF(
 
  /**
   @param message
-  @param message_length
   @return void
   */
 BSAPI void
 bs_critical(
+    char* message);
+
+ /**
+  @param message
+  @param message_length
+  @return void
+  */
+BSAPI void
+bs_criticalN(
     char* message,
     int message_length);
 
@@ -6846,11 +7040,19 @@ bs_io();
 
  /**
   @param value
-  @param value_length
   @return void
   */
 BSAPI void
 bs_system(
+    char* value);
+
+ /**
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bs_systemN(
     char* value,
     int value_length);
 
@@ -6925,11 +7127,21 @@ bs_emptyString(
  /**
   @param old
   @param value
-  @param value_length
   @return bs_String*
   */
 BSAPI bs_String*
 bs_string(
+    bs_String* old,
+    char* value);
+
+ /**
+  @param old
+  @param value
+  @param value_length
+  @return bs_String*
+  */
+BSAPI bs_String*
+bs_stringN(
     bs_String* old,
     char* value,
     int value_length);
@@ -7044,11 +7256,19 @@ bs_workingDirectory();
 
  /**
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_setWorkingDirectory(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_setWorkingDirectoryN(
     char* path,
     int path_length);
 
@@ -7446,11 +7666,19 @@ bs_numDigits(
 
  /**
   @param path
-  @param path_length
   @return bool
   */
 BSAPI bool
 bs_directoryExists(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bool
+  */
+BSAPI bool
+bs_directoryExistsN(
     char* path,
     int path_length);
 
@@ -7504,11 +7732,23 @@ bs_fileName(
   @param data
   @param data_len
   @param value
-  @param value_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_appendFile(
+    char* data,
+    bs_U32 data_len,
+    char* value);
+
+ /**
+  @param data
+  @param data_len
+  @param value
+  @param value_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_appendFileN(
     char* data,
     bs_U32 data_len,
     char* value,
@@ -7546,11 +7786,23 @@ bs_appendFileF(
   @param data
   @param data_len
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_saveFile(
+    char* data,
+    bs_U32 data_len,
+    char* path);
+
+ /**
+  @param data
+  @param data_len
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_saveFileN(
     char* data,
     bs_U32 data_len,
     char* path,
@@ -7586,11 +7838,19 @@ bs_saveFileF(
 
  /**
   @param path
-  @param path_length
   @return void
   */
 BSAPI void
 bs_convertWin32Path(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return void
+  */
+BSAPI void
+bs_convertWin32PathN(
     char* path,
     int path_length);
 
@@ -7616,11 +7876,19 @@ bs_convertWin32PathF(
 
  /**
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_ensureDirectory(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_ensureDirectoryN(
     char* path,
     int path_length);
 
@@ -7647,11 +7915,21 @@ bs_ensureDirectoryF(
  /**
   @param out
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_fileModifiedDate(
+    bs_DateTime* out,
+    char* path);
+
+ /**
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_fileModifiedDateN(
     bs_DateTime* out,
     char* path,
     int path_length);
@@ -7683,11 +7961,21 @@ bs_fileModifiedDateF(
  /**
   @param date
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_setFileModifiedDate(
+    bs_DateTime* date,
+    char* path);
+
+ /**
+  @param date
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_setFileModifiedDateN(
     bs_DateTime* date,
     char* path,
     int path_length);
@@ -7730,11 +8018,19 @@ bs_fullPath(
 
  /**
   @param path
-  @param path_length
   @return bool
   */
 BSAPI bool
 bs_fileExists(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bool
+  */
+BSAPI bool
+bs_fileExistsN(
     char* path,
     int path_length);
 
@@ -8092,6 +8388,7 @@ bs_destroyResource(
 
  /**
   @param package_id
+  @param resource_type
   @param name
   @param out
   @return bs_Result
@@ -8099,6 +8396,7 @@ bs_destroyResource(
 BSAPI bs_Result
 bs_queryResource(
     int package_id,
+    int resource_type,
     const char* name,
     bs_Resource** out);
 
@@ -8115,11 +8413,25 @@ bs_queryPackage(
   @param flags
   @param out
   @param value
-  @param value_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_loadResource(
+    int package_id,
+    bs_U32 flags,
+    bs_Resource** out,
+    char* value);
+
+ /**
+  @param package_id
+  @param flags
+  @param out
+  @param value
+  @param value_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadResourceN(
     int package_id,
     bs_U32 flags,
     bs_Resource** out,
@@ -8159,14 +8471,50 @@ bs_loadResourceF(
      ...);
 
  /**
-  @param path
   @param out
+  @param path
   @return bs_Result
   */
 BSAPI bs_Result
 bs_loadPackage(
-    const char* path,
-    int* out);
+    int* out,
+    char* path);
+
+ /**
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadPackageN(
+    int* out,
+    char* path,
+    int path_length);
+
+ /**
+  @param out
+  @param format
+  @param args
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadPackageV(
+    int* out,
+    char* format,
+    va_list args);
+
+ /**
+  @param out
+  @param format
+  @param ...
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadPackageF(
+    int* out,
+    char* format,
+     ...);
 
  /**
   @param type
@@ -8744,11 +9092,19 @@ bs_resolution();
 
  /**
   @param name
-  @param name_length
   @return void
   */
 BSAPI void
 bs_titleWindow(
+    char* name);
+
+ /**
+  @param name
+  @param name_length
+  @return void
+  */
+BSAPI void
+bs_titleWindowN(
     char* name,
     int name_length);
 
@@ -8802,11 +9158,19 @@ bs_checkTimer(
 
  /**
   @param value
-  @param value_length
   @return void
   */
 BSAPI void
 bs_copyToClipboard(
+    char* value);
+
+ /**
+  @param value
+  @param value_length
+  @return void
+  */
+BSAPI void
+bs_copyToClipboardN(
     char* value,
     int value_length);
 
@@ -8833,11 +9197,21 @@ bs_copyToClipboardF(
  /**
   @param destination
   @param value
-  @param value_length
   @return bs_String*
   */
 BSAPI bs_String*
 bs_appendString(
+    bs_String* destination,
+    char* value);
+
+ /**
+  @param destination
+  @param value
+  @param value_length
+  @return bs_String*
+  */
+BSAPI bs_String*
+bs_appendStringN(
     bs_String* destination,
     char* value,
     int value_length);
@@ -8870,11 +9244,23 @@ bs_appendStringF(
   @param x
   @param param
   @param value
-  @param value_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_foreachFile(
+    bs_ForeachDocumentFunction x,
+    void* param,
+    char* value);
+
+ /**
+  @param x
+  @param param
+  @param value
+  @param value_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_foreachFileN(
     bs_ForeachDocumentFunction x,
     void* param,
     char* value,
@@ -8912,11 +9298,23 @@ bs_foreachFileF(
   @param x
   @param param
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_foreachDirectory(
+    bs_ForeachDocumentFunction x,
+    void* param,
+    char* path);
+
+ /**
+  @param x
+  @param param
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_foreachDirectoryN(
     bs_ForeachDocumentFunction x,
     void* param,
     char* path,
@@ -8952,11 +9350,19 @@ bs_foreachDirectoryF(
 
  /**
   @param path
-  @param path_length
   @return int
   */
 BSAPI int
 bs_numFiles(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return int
+  */
+BSAPI int
+bs_numFilesN(
     char* path,
     int path_length);
 
@@ -8982,11 +9388,19 @@ bs_numFilesF(
 
  /**
   @param path
-  @param path_length
   @return int
   */
 BSAPI int
 bs_numDirectories(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return int
+  */
+BSAPI int
+bs_numDirectoriesN(
     char* path,
     int path_length);
 
@@ -9014,11 +9428,23 @@ bs_numDirectoriesF(
   @param mode
   @param out
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_openFile(
+    const char* mode,
+    bs_File* out,
+    char* path);
+
+ /**
+  @param mode
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_openFileN(
     const char* mode,
     bs_File* out,
     char* path,
@@ -9063,11 +9489,21 @@ bs_closeFile(
  /**
   @param out
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_loadFile(
+    bs_String** out,
+    char* path);
+
+ /**
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadFileN(
     bs_String** out,
     char* path,
     int path_length);
@@ -9101,11 +9537,25 @@ bs_loadFileF(
   @param size
   @param out
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_loadFileChunk(
+    long offset,
+    size_t size,
+    bs_String** out,
+    char* path);
+
+ /**
+  @param offset
+  @param size
+  @param out
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_loadFileChunkN(
     long offset,
     size_t size,
     bs_String** out,
@@ -9146,11 +9596,19 @@ bs_loadFileChunkF(
 
  /**
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_deleteFile(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_deleteFileN(
     char* path,
     int path_length);
 
@@ -9176,11 +9634,19 @@ bs_deleteFileF(
 
  /**
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_deleteDirectoryContents(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_deleteDirectoryContentsN(
     char* path,
     int path_length);
 
@@ -9206,11 +9672,19 @@ bs_deleteDirectoryContentsF(
 
  /**
   @param path
-  @param path_length
   @return bs_Result
   */
 BSAPI bs_Result
 bs_deleteDirectory(
+    char* path);
+
+ /**
+  @param path
+  @param path_length
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_deleteDirectoryN(
     char* path,
     int path_length);
 

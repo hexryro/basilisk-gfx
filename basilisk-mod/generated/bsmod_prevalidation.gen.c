@@ -109,10 +109,6 @@ BSMODAPI void _preval_bsmod_onConvertFont(bsmod_TrackParams params) {
     next.bsmod_onConvertFont(params);
 }
 
-BSMODAPI void _preval_bsmod_onConvertBMFont(bsmod_TrackParams params) {
-    next.bsmod_onConvertBMFont(params);
-}
-
 BSMODAPI void _preval_bsmod_onPackAtlas(bsmod_TrackParams params) {
     next.bsmod_onPackAtlas(params);
 }
@@ -136,11 +132,18 @@ BSMODAPI bs_Result _preval_bsmod_packFont(char* package_name, char* ttf_path, bs
     return next.bsmod_packFont(package_name, ttf_path, blocks, blocks_count, pt_sizes, pt_sizes_count, resource_name, resource_name_length);
 }
 
-BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* name, int name_length) {
+BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* name) {
     BSMOD_VALIDATE(packer != NULL, NULL,);
     BSMOD_VALIDATE(data != NULL, NULL,);
     BSMOD_VALIDATE(name != NULL, NULL,);
-    return next.bsmod_packAtlasTexture(packer, data, width, height, category, name, name_length);
+    return next.bsmod_packAtlasTexture(packer, data, width, height, category, name);
+}
+
+BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTextureN(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* name, int name_length) {
+    BSMOD_VALIDATE(packer != NULL, NULL,);
+    BSMOD_VALIDATE(data != NULL, NULL,);
+    BSMOD_VALIDATE(name != NULL, NULL,);
+    return next.bsmod_packAtlasTextureN(packer, data, width, height, category, name, name_length);
 }
 
 BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTextureV(bsmod_AtlasPacker* packer, bs_RGBA* data, int width, int height, int category, char* format, va_list args) {
@@ -199,22 +202,28 @@ BSMODAPI bsmod_Package* _preval_bsmod_ensurePackage(const char* name) {
     return next.bsmod_ensurePackage(name);
 }
 
-BSMODAPI bsmod_Resource* _preval_bsmod_queryResource(bsmod_Package* package, const char* name) {
+BSMODAPI bsmod_Resource* _preval_bsmod_queryResource(bsmod_Package* package, bs_ResourceType type, const char* name) {
     BSMOD_VALIDATE(package != NULL, NULL,);
     BSMOD_VALIDATE(name != NULL, NULL,);
-    return next.bsmod_queryResource(package, name);
+    return next.bsmod_queryResource(package, type, name);
 }
 
-BSMODAPI bs_Result _preval_bsmod_iniPackage(const char* package_name) {
-    BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_iniPackage(package_name);
+BSMODAPI bs_Result _preval_bsmod_iniPackage(int package_id) {
+    return next.bsmod_iniPackage(package_id);
 }
 
-BSMODAPI bs_Result _preval_bsmod_packResource(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length) {
+BSMODAPI bs_Result _preval_bsmod_packResource(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name) {
     BSMOD_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_packResource(type, data, data_size, package_name, resource_name, resource_name_length);
+    return next.bsmod_packResource(type, data, data_size, package_name, resource_name);
+}
+
+BSMODAPI bs_Result _preval_bsmod_packResourceN(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length) {
+    BSMOD_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsmod_packResourceN(type, data, data_size, package_name, resource_name, resource_name_length);
 }
 
 BSMODAPI bs_Result _preval_bsmod_packResourceV(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, va_list args) {
@@ -224,9 +233,9 @@ BSMODAPI bs_Result _preval_bsmod_packResourceV(bs_ResourceType type, unsigned ch
     return next.bsmod_packResourceV(type, data, data_size, package_name, format, args);
 }
 
-BSMODAPI bs_Result _preval_bsmod_savePackage(const char* name) {
-    BSMOD_VALIDATE(name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_savePackage(name);
+BSMODAPI bs_Result _preval_bsmod_savePackage(char* path) {
+    BSMOD_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsmod_savePackage(path);
 }
 
 BSMODAPI void _preval_bsmod_loadShaderReferences() {
@@ -293,9 +302,14 @@ BSMODAPI void _preval_bsmod_deleteSelected(bsgfx_TypeId type_id) {
     next.bsmod_deleteSelected(type_id);
 }
 
-BSMODAPI bs_Result _preval_bsmod_saveType(bsgfx_TypeId id, char* value, int value_length) {
+BSMODAPI bs_Result _preval_bsmod_saveType(bsgfx_TypeId id, char* value) {
     BSMOD_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_saveType(id, value, value_length);
+    return next.bsmod_saveType(id, value);
+}
+
+BSMODAPI bs_Result _preval_bsmod_saveTypeN(bsgfx_TypeId id, char* value, int value_length) {
+    BSMOD_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsmod_saveTypeN(id, value, value_length);
 }
 
 BSMODAPI bs_Result _preval_bsmod_saveTypeV(bsgfx_TypeId id, char* format, va_list args) {
@@ -527,13 +541,13 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_onPackBindings = _preval_bsmod_onPackBindings;
     functions.bsmod_onCompileShader = _preval_bsmod_onCompileShader;
     functions.bsmod_onConvertFont = _preval_bsmod_onConvertFont;
-    functions.bsmod_onConvertBMFont = _preval_bsmod_onConvertBMFont;
     functions.bsmod_onPackAtlas = _preval_bsmod_onPackAtlas;
     functions.bsmod_onPackModels = _preval_bsmod_onPackModels;
     functions.bsmod_onPackBinary = _preval_bsmod_onPackBinary;
     functions.bsmod_onPackTextureArray = _preval_bsmod_onPackTextureArray;
     functions.bsmod_packFont = _preval_bsmod_packFont;
     functions.bsmod_packAtlasTexture = _preval_bsmod_packAtlasTexture;
+    functions.bsmod_packAtlasTextureN = _preval_bsmod_packAtlasTextureN;
     functions.bsmod_packAtlasTextureV = _preval_bsmod_packAtlasTextureV;
     functions.bsmod_packAtlas = _preval_bsmod_packAtlas;
     functions.bsmod_createAtlasPacker = _preval_bsmod_createAtlasPacker;
@@ -547,6 +561,7 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_queryResource = _preval_bsmod_queryResource;
     functions.bsmod_iniPackage = _preval_bsmod_iniPackage;
     functions.bsmod_packResource = _preval_bsmod_packResource;
+    functions.bsmod_packResourceN = _preval_bsmod_packResourceN;
     functions.bsmod_packResourceV = _preval_bsmod_packResourceV;
     functions.bsmod_savePackage = _preval_bsmod_savePackage;
     functions.bsmod_loadShaderReferences = _preval_bsmod_loadShaderReferences;
@@ -564,6 +579,7 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_delete = _preval_bsmod_delete;
     functions.bsmod_deleteSelected = _preval_bsmod_deleteSelected;
     functions.bsmod_saveType = _preval_bsmod_saveType;
+    functions.bsmod_saveTypeN = _preval_bsmod_saveTypeN;
     functions.bsmod_saveTypeV = _preval_bsmod_saveTypeV;
     functions.bsmod_add = _preval_bsmod_add;
     functions.bsmod_isSelected = _preval_bsmod_isSelected;

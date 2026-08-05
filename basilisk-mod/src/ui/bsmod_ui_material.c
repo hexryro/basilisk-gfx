@@ -38,7 +38,7 @@ BSMODAPI void _bsmod_onDragMaterial(bsmod_DraggingParams params) {
         bsgfx_RawPrefab* raw_prefab = bsgfx_getRaw(BSGFX_TYPE_PREFAB, _bsmod_.hovering.instance_id);
         if (bs_leftClickUpOnce()) {
             raw_prefab->material_hash = bsgfx_fetchMaterial(_bsmod_.dragging_id)->hash;
-            _bsmod_saveType(BSGFX_TYPE_PREFAB, BS_CONSTANT_STRING("Changed prefab material"));
+            _bsmod_saveTypeN(BSGFX_TYPE_PREFAB, BS_CONSTANT_STRING("Changed prefab material"));
         }
     }
 
@@ -81,7 +81,7 @@ BSMODAPI void _bsmod_onClickMaterialMenu(bsmod_GridClickParams params) {
     bs_RGBA rgba = BS_RGBA(rgba_f.x, rgba_f.y, rgba_f.z, rgba_f.w);
     bsgfx_onChangeColor(NULL, rgba);
 
-    _bsmod_material_name = bs_string(_bsmod_material_name, name, strlen(name));
+    _bsmod_material_name = bs_string(_bsmod_material_name, name);
     _bsmod_material_hsva.xyz = bs_rgbToHsv(&rgba);
     _bsmod_material_hsva.w = _bsmod_selected_material->contract->color.w;
     _bsmod_selected_material->contract->hsva = _bsmod_material_hsva;

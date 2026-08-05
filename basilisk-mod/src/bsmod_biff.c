@@ -104,7 +104,7 @@ BSMODAPI bs_Result _bsmod_packImageDirectory(char* directory_name, char* package
 		.resource_name = resource_name,
 	};
 
-	result = bs_foreachFile(_bsmod_gatherFileInfo, &param, directory_name, strlen(directory_name));
+	result = bs_foreachFile(_bsmod_gatherFileInfo, &param, directory_name);
 	if (result != BS_RESULT_OK)
 		return result;
 
@@ -147,7 +147,7 @@ BSMODAPI bs_Result _bsmod_packImageDirectory(char* directory_name, char* package
 
 	bs_destroyList(&images);
 
-	result = _bsmod_packResource(BS_RESOURCE_IMAGE, biff, total_size, package_name, resource_name, strlen(resource_name));
+	result = _bsmod_packResource(BS_RESOURCE_IMAGE, biff, total_size, package_name, resource_name);
 	bs_free(biff);
 	if (result != BS_RESULT_OK)
 		return result;

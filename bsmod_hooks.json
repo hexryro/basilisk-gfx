@@ -2,7 +2,7 @@
     {
         "path": "project/basilisk-gfx/shaders",
         "function": "bsmod_onCompileShader",
-        "package": "content/bsgfx",
+        "package": "content/bsgfx.bpak",
         "prefix": "",
         "callOnce": false,
         "lastModified": "2026-07-30 20:08:22",
@@ -88,7 +88,7 @@
     {
         "path": "project/basilisk-mod/shaders",
         "function": "bsmod_onCompileShader",
-        "package": "content/bsmod",
+        "package": "content/bsmod.bpak",
         "prefix": "",
         "callOnce": false,
         "lastModified": "2026-07-30 19:34:20",
@@ -103,7 +103,7 @@
     {
         "path": "project/basilisk-gfx/bsgfx_contracts.h",
         "function": "bsmod_onCompileShader",
-        "package": "content/bsgfx",
+        "package": "content/bsgfx.bpak",
         "prefix": "",
         "callOnce": false,
         "lastModified": "2026-07-27 15:26:11"
@@ -111,10 +111,10 @@
     {
         "path": "project/basilisk-mod/atlas/ui",
         "function": "bsmod_onPackAtlas",
-        "package": "content/bsmod",
+        "package": "content/bsmod.bpak",
         "prefix": "",
         "callOnce": true,
-        "lastModified": "2026-07-30 21:49:12",
+        "lastModified": "2026-08-04 06:20:24",
         "entries": [
             "project/basilisk-mod/atlas/ui/circle.png",
             "project/basilisk-mod/atlas/ui/expand.png",
@@ -140,7 +140,7 @@
     {
         "path": "project/basilisk-mod/atlas/temp",
         "function": "bsmod_onPackAtlas",
-        "package": "content/basilisk",
+        "package": "content/basilisk.bpak",
         "prefix": "",
         "callOnce": true,
         "lastModified": "2026-07-30 09:46:52",
@@ -251,10 +251,10 @@
     {
         "path": "project/fonts",
         "function": "bsmod_onConvertFont",
-        "package": "content/basilisk-fonts",
+        "package": "content/basilisk-fonts.bpak",
         "prefix": "fonts/",
         "callOnce": false,
-        "lastModified": "2026-07-26 21:07:32",
+        "lastModified": "2026-08-04 10:53:41",
         "entries": [
             "project/fonts/notonaskharabic.ttf",
             "project/fonts/segoeui.ttf"

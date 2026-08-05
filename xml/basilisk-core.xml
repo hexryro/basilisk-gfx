@@ -251,7 +251,13 @@
 			<line><name>BS_RESOURCE_ATLAS</name><value>5</value></line>
 			<line><name>BS_RESOURCE_FONT</name><value>6</value></line>
 			<line><name>BS_RESOURCE_BINDING</name><value>7</value></line>
-			<line><name>BS_RESOURCE_TYPE_COUNT</name><value>8</value></line>
+			
+			<line><name>BSGFX_RESOURCE_PRIMITIVE</name><value>8</value></line>
+			<line><name>BSGFX_RESOURCE_PREFAB</name><value>9</value></line>
+			<line><name>BSGFX_RESOURCE_TILE</name><value>10</value></line>
+			<line><name>BSGFX_RESOURCE_LIGHT</name><value>11</value></line>
+			
+			<line><name>BS_RESOURCE_TYPE_COUNT</name><value>12</value></line>
 		</enum>
 		<enum name="bs_ImageBit">
 			<line><name>BS_IMAGE_SWAPS_BIT</name><value>1 &lt;&lt; 0</value></line>
@@ -1189,17 +1195,13 @@
                 <field><type>bs_Image*</type><name>image</name></field>
             </structure>
         </structure>
-        <structure name="bs_ResourceHeaderData">
-            <field><type>bs_U64</type><name>name_hash</name></field>
+        <structure name="bs_ResourceHeader">
+			<field><type>bs_U64</type><name>name_hash</name></field>
             <field><type>bs_I32</type><name>chunk</name></field>
             <field><type>bs_I32</type><name>offset</name></field>
             <field><type>bs_I32</type><name>size</name></field>
             <field><type>bs_I32</type><name>name_length</name></field>
             <field><type>bs_I32</type><name>type</name></field>
-            <field><type>bs_I32</type><name>reserved</name></field>
-        </structure>
-        <structure name="bs_ResourceHeader">
-            <field><type>bs_ResourceHeaderData</type><name>header</name></field>
             <field><type>char*</type><name>name</name></field>
             <field><type>bs_Resource*</type><name>resource</name></field>
         </structure>
@@ -2901,7 +2903,13 @@
             <param><type>int</type><name>channels_count</name></param>
             <param><type>bs_PngData*</type><name>out_png_data</name></param>
         </function>
-        <variadicStringTemplate name="bs_savePng" string="path">
+		<function name="bs_peekFile">
+            <return>bs_Result</return>
+            <param><type>bs_FileInfo*</type><name>out</name></param>
+            <param><type>char*</type><name>path</name></param>
+            <param><type>int</type><name>path_length</name></param>
+        </function>
+		<variadicStringTemplate name="bs_savePng" string="path">
 			<return>bs_Result</return>
             <param><type>char*</type><name>data</name></param>
             <param><type>bs_ivec2</type><name>resolution</name></param>
@@ -3710,6 +3718,7 @@
         <function name="bs_queryResource">
             <return>bs_Result</return>
             <param><type>int</type><name>package_id</name></param>
+            <param><type>int</type><name>resource_type</name></param>
             <param><type>const char*</type><name>name</name></param>
             <param><type>bs_Resource**</type><name>out</name></param>
         </function>
@@ -3723,11 +3732,10 @@
             <param><type>bs_U32</type><name>flags</name></param>
             <param><type>bs_Resource**</type><name>out</name></param>
         </variadicStringTemplate>
-        <function name="bs_loadPackage">
+		<variadicStringTemplate name="bs_loadPackage" string="path">
             <return>bs_Result</return>
-            <param><type>const char*</type><name>path</name></param>
             <param><type>int*</type><name>out</name></param>
-        </function>
+        </variadicStringTemplate>
         <function name="bs_configureSource">
             <return>int</return>
             <param><type>bs_ObjectType</type><name>type</name></param>

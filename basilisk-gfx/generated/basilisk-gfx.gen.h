@@ -89,7 +89,6 @@ typedef struct bsgfx_Menu bsgfx_Menu;
 typedef struct bsgfx_TitleBar bsgfx_TitleBar;
 
 typedef enum bsgfx_Subtype bsgfx_Subtype;
-typedef enum bsgfx_ResourceType bsgfx_ResourceType;
 typedef enum bsgfx_MaterialCategory bsgfx_MaterialCategory;
 typedef enum bsgfx_CollisionType bsgfx_CollisionType;
 typedef enum bsgfx_AnimatorTypeBit bsgfx_AnimatorTypeBit;
@@ -145,7 +144,7 @@ typedef enum bsgfx_UnicodeBlock bsgfx_UnicodeBlock;
     " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 
 #define BSGFX_CONTENT_PATH                                           \
-    "content/bsgfx"
+    "content/bsgfx.bpak"
 
 #define BSGFX_PARSE_FORMAT(format, data, len)                        \
         do {                                                         \
@@ -302,14 +301,6 @@ enum bsgfx_Subtype {
     BSGFX_SUBTYPE_LINE_2D,
     BSGFX_SUBTYPE_LINE_DEPTHLESS,
     BSGFX_SUBTYPE_COUNT,
-};
-
-enum bsgfx_ResourceType {
-    BSGFX_RESOURCE_PRIMITIVE = BS_RESOURCE_TYPE_COUNT,
-    BSGFX_RESOURCE_PREFAB,
-    BSGFX_RESOURCE_TILE,
-    BSGFX_RESOURCE_LIGHT,
-    BSGFX_RESOURCE_TYPE_COUNT,
 };
 
 enum bsgfx_MaterialCategory {
@@ -2324,11 +2315,19 @@ bsgfx_loadMaterials();
 
  /**
   @param name
-  @param name_length
   @return bsgfx_Material*
   */
 BSGFXAPI bsgfx_Material*
 bsgfx_material(
+    char* name);
+
+ /**
+  @param name
+  @param name_length
+  @return bsgfx_Material*
+  */
+BSGFXAPI bsgfx_Material*
+bsgfx_materialN(
     char* name,
     int name_length);
 
@@ -2862,11 +2861,27 @@ bsgfx_instanceAtlasFlipped(
   @param params
   @param out_text_size
   @param value
-  @param value_length
   @return void
   */
 BSGFXAPI void
 bsgfx_instanceText(
+    int subtype,
+    bsgfx_Font* font,
+    bsgfx_Text* params,
+    bs_vec2* out_text_size,
+    char* value);
+
+ /**
+  @param subtype
+  @param font
+  @param params
+  @param out_text_size
+  @param value
+  @param value_length
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instanceTextN(
     int subtype,
     bsgfx_Font* font,
     bsgfx_Text* params,

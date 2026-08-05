@@ -325,7 +325,7 @@ BSMODAPI void _bsmod_renderBillboards() {
             .view = poser()->camera.view,
         };
 
-        bs_beginComment(BS_CONSTANT_STRING("Billboards"));
+        bs_beginCommentN(BS_CONSTANT_STRING("Billboards"));
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
         bsgfx_renderSubtype(_bsmod_subtypes_[BSMOD_SUBTYPE_BILLBOARD], pipeline);

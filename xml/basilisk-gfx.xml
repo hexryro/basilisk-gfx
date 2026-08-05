@@ -95,14 +95,6 @@
 			<line><name>BSGFX_SUBTYPE_COUNT</name></line>
 		</enum>
 
-		<enum name="bsgfx_ResourceType">
-			<line><name>BSGFX_RESOURCE_PRIMITIVE</name><value>BS_RESOURCE_TYPE_COUNT</value></line>
-			<line><name>BSGFX_RESOURCE_PREFAB</name></line>
-			<line><name>BSGFX_RESOURCE_TILE</name></line>
-			<line><name>BSGFX_RESOURCE_LIGHT</name></line>
-			<line><name>BSGFX_RESOURCE_TYPE_COUNT</name></line>
-		</enum>
-
 		<enum name="bsgfx_MaterialCategory">
 			<line><name>BSGFX_MATERIAL_CATEGORY_NONE</name></line>
 			<line><name>BSGFX_MATERIAL_CATEGORY_UI_COLOR_SCHEME</name></line>
@@ -1323,7 +1315,7 @@
 
         <macro><name>#define BSGFX_ALPHABET_DEFAULT</name><line>" !\"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"</line></macro>
 
-        <macro><name>#define BSGFX_CONTENT_PATH</name><line>"content/bsgfx"</line></macro>
+        <macro><name>#define BSGFX_CONTENT_PATH</name><line>"content/bsgfx.bpak"</line></macro>
 
         <macro>
             <name>#define BSGFX_PARSE_FORMAT(format, data, len)</name>

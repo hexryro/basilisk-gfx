@@ -375,7 +375,7 @@ static void _bsgfx_loadTileTextures(int package_id) {
         return;
 
     bs_Object* tile_image = BS_IMAGE(BSGFX_IMAGES, BSGFX_IMAGE_TILE, BS_OBJECT_FORCE_DESTROY);
-    result = bs_loadImage(
+    result = bs_loadImageN(
         tile_image, 
         package_id, 
         BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_DST_BIT,
@@ -411,7 +411,7 @@ static void _bsgfx_loadTileTextures(int package_id) {
 
     bs_destroyBuffer(staging_buffer);
 
-    bs_info(BS_CONSTANT_STRING("Loaded tile textures\n"));
+    bs_infoN(BS_CONSTANT_STRING("Loaded tile textures\n"));
 }
 
 static void _bsgfx_mapTile(const bsgfx_RawTile* unmapped, bsgfx_Tile* mapped) {

@@ -63,9 +63,10 @@ static void onLoadScene() {
 	//basilisk_loadFonts();
 
 	bs_loadPackage("content/basilisk", &basilisk.package_id);
+	bsmod_iniPackage("content/basilisk");
 
 	bs_Object* atlas = BS_ATLAS(-1, -1, 0);
-	bs_loadAtlas(atlas, basilisk.package_id, 0, BS_CONSTANT_STRING("temp"));
+	bs_loadAtlasN(atlas, basilisk.package_id, 0, BS_CONSTANT_STRING("temp"));
 
 	bsmod_onLoad();
 	bsmod_bindAtlases();
@@ -92,7 +93,6 @@ static void onModTick() {
 
 static void onIni() {
 	bsmod_onIni();
-	bsmod_iniPackage("content/basilisk");
 
 	bsmod_onTrack();
 }

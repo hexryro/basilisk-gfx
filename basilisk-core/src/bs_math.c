@@ -377,7 +377,7 @@ BSAPI bool _val_bs_lineVsLine(const bs_vec2* l1_start, const bs_vec2* l1_end, co
     bool result = _bs_lineVsLine(l1_start, l1_end, l2_start, l2_end, out);
 
     if (!isfinite(out->point.x) || !isfinite(out->point.y)) {
-        _bs_warn(BS_CONSTANT_STRING("_bs_lineVsLine returned an infinite number\n"));
+        _bs_warnN(BS_CONSTANT_STRING("_bs_lineVsLine returned an infinite number\n"));
     }
 
     return result;

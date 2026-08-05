@@ -34,6 +34,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+bsgfx_Material* _bsgfx_material(
+    char* name)
+{
+    return _bsgfx_material(strlen(bsgfx_material));
+}
+
 bsgfx_Material* _bsgfx_materialV(
     char* format, 
     va_list args)
@@ -41,7 +47,7 @@ bsgfx_Material* _bsgfx_materialV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bsgfx_material(_formatted, _length);
+    return _bsgfx_materialN(_formatted, _length);
 }
 
 bsgfx_Material* _bsgfx_materialF(
@@ -55,6 +61,16 @@ bsgfx_Material* _bsgfx_materialF(
     return _return;
 }
 
+void _bsgfx_instanceText(
+    int subtype, 
+    bsgfx_Font* font, 
+    bsgfx_Text* params, 
+    bs_vec2* out_text_size, 
+    char* value)
+{
+    _bsgfx_instanceText(subtype, font, params, out_text_size, strlen(bsgfx_instanceText));
+}
+
 void _bsgfx_instanceTextV(
     int subtype, 
     bsgfx_Font* font, 
@@ -66,7 +82,7 @@ void _bsgfx_instanceTextV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    _bsgfx_instanceText(subtype, font, params, out_text_size, _formatted, _length);
+    _bsgfx_instanceTextN(subtype, font, params, out_text_size, _formatted, _length);
 }
 
 void _bsgfx_instanceTextF(

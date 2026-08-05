@@ -165,9 +165,14 @@ BSGFXAPI void _preval_bsgfx_loadMaterials() {
     next.bsgfx_loadMaterials();
 }
 
-BSGFXAPI bsgfx_Material* _preval_bsgfx_material(char* name, int name_length) {
+BSGFXAPI bsgfx_Material* _preval_bsgfx_material(char* name) {
     BSGFX_VALIDATE(name != NULL, NULL,);
-    return next.bsgfx_material(name, name_length);
+    return next.bsgfx_material(name);
+}
+
+BSGFXAPI bsgfx_Material* _preval_bsgfx_materialN(char* name, int name_length) {
+    BSGFX_VALIDATE(name != NULL, NULL,);
+    return next.bsgfx_materialN(name, name_length);
 }
 
 BSGFXAPI bsgfx_Material* _preval_bsgfx_materialV(char* format, va_list args) {
@@ -384,12 +389,20 @@ BSGFXAPI int _preval_bsgfx_instanceAtlasFlipped(int subtype, bs_mat4x3 transform
     return next.bsgfx_instanceAtlasFlipped(subtype, transform, texture, flags, id, material);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length) {
+BSGFXAPI void _preval_bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value) {
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(params != NULL, ,);
     BSGFX_VALIDATE(out_text_size != NULL, ,);
     BSGFX_VALIDATE(value != NULL, ,);
-    next.bsgfx_instanceText(subtype, font, params, out_text_size, value, value_length);
+    next.bsgfx_instanceText(subtype, font, params, out_text_size, value);
+}
+
+BSGFXAPI void _preval_bsgfx_instanceTextN(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length) {
+    BSGFX_VALIDATE(font != NULL, ,);
+    BSGFX_VALIDATE(params != NULL, ,);
+    BSGFX_VALIDATE(out_text_size != NULL, ,);
+    BSGFX_VALIDATE(value != NULL, ,);
+    next.bsgfx_instanceTextN(subtype, font, params, out_text_size, value, value_length);
 }
 
 BSGFXAPI void _preval_bsgfx_instanceTextV(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args) {
@@ -706,6 +719,7 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_queryMaterial = _preval_bsgfx_queryMaterial;
     functions.bsgfx_loadMaterials = _preval_bsgfx_loadMaterials;
     functions.bsgfx_material = _preval_bsgfx_material;
+    functions.bsgfx_materialN = _preval_bsgfx_materialN;
     functions.bsgfx_materialV = _preval_bsgfx_materialV;
     functions.bsgfx_highlightMaterial = _preval_bsgfx_highlightMaterial;
     functions.bsgfx_unhighlightMaterial = _preval_bsgfx_unhighlightMaterial;
@@ -753,6 +767,7 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_instanceAtlas = _preval_bsgfx_instanceAtlas;
     functions.bsgfx_instanceAtlasFlipped = _preval_bsgfx_instanceAtlasFlipped;
     functions.bsgfx_instanceText = _preval_bsgfx_instanceText;
+    functions.bsgfx_instanceTextN = _preval_bsgfx_instanceTextN;
     functions.bsgfx_instanceTextV = _preval_bsgfx_instanceTextV;
     functions.bsgfx_matrix = _preval_bsgfx_matrix;
     functions.bsgfx_renderFineShadowVolumes = _preval_bsgfx_renderFineShadowVolumes;

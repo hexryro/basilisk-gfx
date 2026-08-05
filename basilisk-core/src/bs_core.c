@@ -67,7 +67,7 @@ BSAPI bs_IO* _bs_io() { return &_bs_io_; }
 BSAPI bs_Context* _bs_context() { return _bs_context_; }
 BSAPI bs_Callbacks* _bs_callbacks() { return &_bs_callbacks_; }
 
-BSAPI void _bsi_nameHandle(bs_U64 handle, bs_U32 type, char* name, int name_length) {
+BSAPI void _bsi_nameHandleN(bs_U64 handle, bs_U32 type, char* name, int name_length) {
     PFN_vkSetDebugUtilsObjectNameEXT pfn_vkSetDebugUtilsObjectNameEXT =
         (PFN_vkSetDebugUtilsObjectNameEXT)vkGetDeviceProcAddr(_bs_instance_->device, "vkSetDebugUtilsObjectNameEXT");
 
@@ -103,10 +103,10 @@ BSAPI bs_Procedure* _bs_procedures() {
   */
 BSAPI void _val_bs_beginComment(char* message, int message_len) {
     BS_VALIDATE(_bs_procs_.vkCmdBeginDebugUtilsLabelEXT != NULL, , );
-    _bs_beginComment(message, message_len);
+    _bs_beginCommentN(message, message_len);
 }
 
-BSAPI void _bs_beginComment(char* message, int message_len) {
+BSAPI void _bs_beginCommentN(char* message, int message_len) {
     VkDebugUtilsLabelEXT label = {
         .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
         .pLabelName = message,
@@ -173,7 +173,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL _bs_debugCallback(
             }
         }
 
-        _bs_warn(message->value, message->len);
+        _bs_warnN(message->value, message->len);
     }
     else {
         _bs_warnF("%s", data->pMessage);
@@ -344,9 +344,10 @@ static void _bs_prepareInstance() {
         create_reporter(_bs_instance_->instance, &report_ci, NULL, &reporter);
 }
 
+void _bs_findExecutablePaths();
 void _bs_iniLogger();
 BSAPI void _bs_ini() {
-    _bs_io_.log = _bs_string(_bs_io_.log, "", 0);
+    _bs_io_.log = _bs_stringN(_bs_io_.log, "", 0);
     _bs_instance_ = _bs_calloc(1, sizeof(bs_Instance));
 
     _bs_iniLogger();
@@ -374,7 +375,7 @@ BSAPI void _bs_load(
     if (!_bs_instance_->single_times_queue) {
         bs_Object* object = BS_QUEUE(-1, 0, 0);
         if (_bs_queue(object, BS_QUEUE_TRANSFER_BIT | BS_QUEUE_COMPUTE_BIT | BS_QUEUE_SINGLE_TIMES_BIT) != BS_RESULT_OK) {
-            _bs_critical(BS_CONSTANT_STRING("Failed to create single times queue"));
+            _bs_criticalN(BS_CONSTANT_STRING("Failed to create single times queue"));
             return;
         }
 
@@ -489,7 +490,7 @@ static void _bs_nameBuffer(bs_Object* object, const char* name) {
     int name_length = strlen(name);
     object->buffer->flags |= BS_BUFFER_IS_NAMED;
     for (int i = 0; i < _bs_bufferSwapsCount(object->buffer); i++)
-        bsi_nameHandle(object->buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
+        bsi_nameHandleN(object->buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
 }
 
  /**
@@ -1134,15 +1135,15 @@ BSAPI void _bs_batchSphere(bs_Batch* batch, bs_U32* offset, bs_vec3 position, fl
 BSAPI void _bs_batchPrimitive(
     bs_Batch* batch, bs_U32* offset, bs_Primitive* primitive
 ) {
-    _bs_warn(BS_CONSTANT_STRING("_bs_batchPrimitive has not been implemented\n"));
+    _bs_warnN(BS_CONSTANT_STRING("_bs_batchPrimitive has not been implemented\n"));
 }
 
 BSAPI void _bs_batchMesh(bs_Batch* batch, bs_U32* offset, bs_Mesh* mesh) {
-    _bs_warn(BS_CONSTANT_STRING("_bs_batchMesh has not been implemented\n"));
+    _bs_warnN(BS_CONSTANT_STRING("_bs_batchMesh has not been implemented\n"));
 }
 
 BSAPI void _bs_batchModel(bs_Batch* batch, bs_U32* offset, bs_Model* model) {
-    _bs_warn(BS_CONSTANT_STRING("_bs_batchModel has not been implemented\n"));
+    _bs_warnN(BS_CONSTANT_STRING("_bs_batchModel has not been implemented\n"));
 }
 
 
@@ -1422,7 +1423,7 @@ void _bs_pushText(bs_Batch* batch, bsgfx_Font* font, bs_vec3 pos, bs_RGBA col, f
    * Batches
    *============================================================================*/
 
-BSAPI bs_Attribute* _bs_queryAttribute(bs_Batch* batch, char* name, int name_length) {
+BSAPI bs_Attribute* _bs_queryAttributeN(bs_Batch* batch, char* name, int name_length) {
     bs_U64 name_hash = _bs_stringHash(name);
     for (int i = 0; i < batch->attributes_count; i++) {
         bs_Attribute* attribute = batch->attributes + i;
@@ -1688,9 +1689,9 @@ BSAPI void _bs_destroyBatch(bs_Batch* batch) {
 static void _bs_nameRenderer(bs_Object* object, const char* name) {
     int name_length = strlen(name);
 
-    bsi_nameHandle(object->renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, name, name_length);
+    bsi_nameHandleN(object->renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, name, name_length);
     for (int i = 0; i < _bs_rendererSwapsCount(object->renderer); i++) {
-        bsi_nameHandle(object->renderer->_[i].framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, name, name_length);
+        bsi_nameHandleN(object->renderer->_[i].framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, name, name_length);
     }
 }
 
@@ -2151,8 +2152,8 @@ BSAPI void _bs_dispatchAsync(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z
 static void _bs_nameRayTracer(bs_Object* object, const char* name) {
     int name_length = strlen(name);
 
-    bsi_nameHandle(object->ray_tracer->TLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
-    bsi_nameHandle(object->ray_tracer->BLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+    bsi_nameHandleN(object->ray_tracer->TLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+    bsi_nameHandleN(object->ray_tracer->BLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
 }
 
 BSAPI void _bs_rayTrace(bs_RayTracer* ray_tracer, bs_Pipeline* pipeline, bs_U32 width, bs_U32 height, bs_U32 depth) {
@@ -2625,15 +2626,15 @@ static void _bs_nameQueue(bs_Object* object, const char* name) {
     int name_length = strlen(name);
     //object->queue->flags |= BS_QUEUE_IS_NAMED;
 
-    bsi_nameHandle(object->queue->queue, VK_OBJECT_TYPE_QUEUE, name, name_length);
+    bsi_nameHandleN(object->queue->queue, VK_OBJECT_TYPE_QUEUE, name, name_length);
 
     for (int i = 0; i < _bs_queueSwapsCount(object->queue); i++) {
         if (object->queue->_[i].fence)
-            bsi_nameHandle(object->queue->_[i].fence, VK_OBJECT_TYPE_FENCE, name, name_length);
+            bsi_nameHandleN(object->queue->_[i].fence, VK_OBJECT_TYPE_FENCE, name, name_length);
         if (object->queue->_[i].semaphore)
-            bsi_nameHandle(object->queue->_[i].semaphore, VK_OBJECT_TYPE_SEMAPHORE, name, name_length);
+            bsi_nameHandleN(object->queue->_[i].semaphore, VK_OBJECT_TYPE_SEMAPHORE, name, name_length);
         if (object->queue->_[i].command_buffer)
-            bsi_nameHandle(object->queue->_[i].command_buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, name, name_length);
+            bsi_nameHandleN(object->queue->_[i].command_buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, name, name_length);
     }
 }
 
@@ -3069,9 +3070,9 @@ BSAPI void _bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues
     VkResult result = vkQueuePresentKHR(queue->queue, &present_i);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-        _bs_critical(BS_CONSTANT_STRING("Window was resized"));
+        _bs_criticalN(BS_CONSTANT_STRING("Window was resized"));
     else if (result != VK_SUCCESS)
-        _bs_warn(BS_CONSTANT_STRING("Failed to present swapchain image"));
+        _bs_warnN(BS_CONSTANT_STRING("Failed to present swapchain image"));
 
     _bs_context_->frame = (_bs_context_->frame + 1) % _bs_context_->frames_in_flight;
     _bs_context_->image_acquired = false;
