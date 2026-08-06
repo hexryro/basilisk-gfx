@@ -399,13 +399,13 @@
             <line>3.402823466e+38F</line>
         </macro>
 
-        <macro><name>#define BS_BPAK_MAGIC</name><line>0x6B617062</line></macro>
+        <macro><name>#define BPAK_MAGIC</name><line>0x6B617062</line></macro>
 		
         <macro><name>#define BS_BSHA_MAGIC</name><line>0x61687362</line></macro>
         <macro><name>#define BS_BBND_MAGIC</name><line>0x646E6262</line></macro>
         <macro><name>#define BS_BATL_MAGIC</name><line>0x6C746162</line></macro>
         <macro><name>#define BS_BIFF_MAGIC</name><line>0x66666962</line></macro>
-        <macro><name>#define BS_BFNT_MAGIC</name><line>0x746E6662</line></macro>
+        <macro><name>#define BFNT_MAGIC</name><line>0x746E6662</line></macro>
 		
         <macro><name>#define BS_CONSTANT_STRING(s)</name><line>s, sizeof(s) - 1</line></macro>
 
@@ -3731,6 +3731,7 @@
             <return>bs_Result</return>
             <param><type>int</type><name>package_id</name></param>
             <param><type>bs_U32</type><name>flags</name></param>
+            <param><type>bs_ResourceType</type><name>type</name></param>
             <param><type>bs_Resource**</type><name>out</name></param>
         </variadicStringTemplate>
 		<variadicStringTemplate name="bs_loadPackage" string="path">

@@ -538,7 +538,7 @@ BSAPI void _bs_loadBinding(bs_Binding* binding, int bind_set, int bind_point, in
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, 0, &resource, path);
+    result = _bs_loadResource(package_id, 0, BS_RESOURCE_BINDING, &resource, path);
     if (result != BS_RESULT_OK) {
         return;
     }
@@ -782,7 +782,7 @@ BSAPI bs_Result _bs_shader(int package_id, const char* name, bs_U32 flags, bs_Re
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, flags, &resource, name);
+    result = _bs_loadResource(package_id, flags, BS_RESOURCE_SHADER, &resource, name);
     if (result != BS_RESULT_OK)
         return result;
 

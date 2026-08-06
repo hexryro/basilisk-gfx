@@ -109,7 +109,7 @@ BSAPI int _bs_queryPackage(const char* name) {
     return -1;
 }
 
-BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** out, char* resource_name, int resource_name_length) {
+BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_ResourceType type, bs_Resource** out, char* resource_name, int resource_name_length) {
     if (package_id < 0)
         return BS_RESULT_OUT_OF_BOUNDS;
 
@@ -118,8 +118,8 @@ BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** ou
     bs_U64 hash = _bs_stringHash(resource_name);
 
     bs_ResourceHeader* existing = NULL;
-    for (int i = 0; i < package->resource_headers_count; i++) {
-        bs_ResourceHeader* resource = package->resource_headers + i;
+    for (int i = 0; i < package->resource_type_offsets[type].num; i++) {
+        bs_ResourceHeader* resource = package->resource_headers + package->resource_type_offsets[type].offset + i;
         if (resource->name_hash == hash) {
             existing = resource;
             break;
@@ -170,20 +170,20 @@ BSAPI bs_Result _bs_loadPackageN(int* out, const char* path, int path_length) {
 
     unsigned char* data = raw->value;
 
-    bs_U32 magic = bs_getLittleEndian32(data + BS_BPAK_MAGIC_OFFSET);
-    if (magic != BS_BPAK_MAGIC) {
+    bs_U32 magic = bs_getLittleEndian32(data + BPAK_MAGIC_OFFSET);
+    if (magic != BPAK_MAGIC) {
         bs_free(raw);
         BS_WARN_INVALID_MAGIC("package", path);
         return BS_RESULT_CORRUPTED;
     }
 
-    bs_U32 resources_count = bs_getLittleEndian32(data + BS_BPAK_RESOURCES_COUNT_OFFSET);
+    bs_U32 resources_count = bs_getLittleEndian32(data + BPAK_RESOURCES_COUNT_OFFSET);
     if (resources_count == 0) {
         bs_warnF("%s at %s:%d: No resources in package \"%s\"", __func__, __FILE__, __LINE__, path); // TODO: warn macro
         return BS_RESULT_CORRUPTED;
     }
 
-    bs_U32 resources_types_count = bs_getLittleEndian32(data + BS_BPAK_RESOURCES_TYPES_COUNT_OFFSET);
+    bs_U32 resources_types_count = bs_getLittleEndian32(data + BPAK_RESOURCES_TYPES_COUNT_OFFSET);
     if (resources_types_count == 0) {
         bs_warnF("%s at %s:%d: No resource types in package \"%s\"", __func__, __FILE__, __LINE__, path); // TODO: warn macro
         return BS_RESULT_CORRUPTED;
@@ -227,23 +227,23 @@ BSAPI bs_Result _bs_loadPackageN(int* out, const char* path, int path_length) {
         return BS_RESULT_CORRUPTED;
     }
 
-    unsigned char* resource_types_offset = data + BS_BPAK_RESOURCE_TYPES_OFFSET;
+    unsigned char* resource_types_offset = data + BPAK_RESOURCE_TYPES_OFFSET;
     for (int i = 0; i < resources_types_count; i++) {
-        existing->resource_type_offsets[i].offset = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_START_OFFSET);
-        existing->resource_type_offsets[i].num = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_COUNT_OFFSET);
+        existing->resource_type_offsets[i].offset = bs_getLittleEndian32(resource_types_offset + BPAK_RESOURCE_TYPE_START_OFFSET);
+        existing->resource_type_offsets[i].num = bs_getLittleEndian32(resource_types_offset + BPAK_RESOURCE_TYPE_COUNT_OFFSET);
 
-        resource_types_offset += BS_BPAK_RESOURCE_TYPE_SIZE;
+        resource_types_offset += BPAK_RESOURCE_TYPE_SIZE;
     }
 
     int actual_resources_count = 0;
     for (int i = 0; i < resources_count; i++) {
 
-        bs_U64 name_hash = bs_getLittleEndian64(resource_types_offset + BS_BPAK_RESOURCE_NAME_HASH_OFFSET);
-        bs_I32 chunk = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_CHUNK_OFFSET);
-        bs_I32 offset = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_START_OFFSET);
-        bs_I32 size = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_SIZE_OFFSET);
-        bs_I32 name_length = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_NAME_LENGTH_OFFSET);
-        bs_I32 type = bs_getLittleEndian32(resource_types_offset + BS_BPAK_RESOURCE_TYPE_OFFSET);
+        bs_U64 name_hash = bs_getLittleEndian64(resource_types_offset + BPAK_RESOURCE_NAME_HASH_OFFSET);
+        bs_I32 chunk = bs_getLittleEndian32(resource_types_offset + BPAK_RESOURCE_CHUNK_OFFSET);
+        bs_I32 offset = bs_getLittleEndian32(resource_types_offset + BPAK_RESOURCE_START_OFFSET);
+        bs_I32 size = bs_getLittleEndian32(resource_types_offset + BPAK_RESOURCE_SIZE_OFFSET);
+        bs_I32 name_length = bs_getLittleEndian32(resource_types_offset + BPAK_RESOURCE_NAME_LENGTH_OFFSET);
+        bs_I32 type = bs_getLittleEndian32(resource_types_offset + BPAK_RESOURCE_TYPE_OFFSET);
 
 #ifdef _DEBUG
         if (chunk < 0 || offset < 0 || size < 0 || name_length < 0 || type < 0) {
@@ -252,7 +252,7 @@ BSAPI bs_Result _bs_loadPackageN(int* out, const char* path, int path_length) {
         }
 #endif
 
-        resource_types_offset += BS_BPAK_RESOURCE_SIZE;
+        resource_types_offset += BPAK_RESOURCE_SIZE;
         unsigned char* resource_name = resource_types_offset;
 
         char* end = strchr(resource_name, '\n');

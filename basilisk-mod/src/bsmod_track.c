@@ -221,7 +221,8 @@ static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* 
 			png_data.width, 
 			png_data.height, 
 			0,
-			0, 
+			0,
+			0,
 			name
 		);
 
@@ -243,6 +244,7 @@ BSMODAPI void _bsmod_onPackAtlas(bsmod_TrackParams params) {
 
 	extension[-1] = '\0';
 	_bsmod_packAtlas(&packer, 1024, 1024, 4, params.package, directory_name, true);
+	_bsmod_destroyAtlasPacker(&packer);
 	extension[-1] = '.';
 	file_name[-1] = '/';
 }

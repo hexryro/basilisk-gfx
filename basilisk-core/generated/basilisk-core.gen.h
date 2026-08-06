@@ -213,7 +213,7 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_FLT_MAX                                                   \
     3.402823466e+38F
 
-#define BS_BPAK_MAGIC                                                \
+#define BPAK_MAGIC                                                   \
     0x6B617062
 
 #define BS_BSHA_MAGIC                                                \
@@ -228,7 +228,7 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_BIFF_MAGIC                                                \
     0x66666962
 
-#define BS_BFNT_MAGIC                                                \
+#define BFNT_MAGIC                                                   \
     0x746E6662
 
 #define BS_CONSTANT_STRING(s)                                        \
@@ -8412,6 +8412,7 @@ bs_queryPackage(
  /**
   @param package_id
   @param flags
+  @param type
   @param out
   @param value
   @return bs_Result
@@ -8420,12 +8421,14 @@ BSAPI bs_Result
 bs_loadResource(
     int package_id,
     bs_U32 flags,
+    bs_ResourceType type,
     bs_Resource** out,
     char* value);
 
  /**
   @param package_id
   @param flags
+  @param type
   @param out
   @param value
   @param value_length
@@ -8435,6 +8438,7 @@ BSAPI bs_Result
 bs_loadResourceN(
     int package_id,
     bs_U32 flags,
+    bs_ResourceType type,
     bs_Resource** out,
     char* value,
     int value_length);
@@ -8442,6 +8446,7 @@ bs_loadResourceN(
  /**
   @param package_id
   @param flags
+  @param type
   @param out
   @param format
   @param args
@@ -8451,6 +8456,7 @@ BSAPI bs_Result
 bs_loadResourceV(
     int package_id,
     bs_U32 flags,
+    bs_ResourceType type,
     bs_Resource** out,
     char* format,
     va_list args);
@@ -8458,6 +8464,7 @@ bs_loadResourceV(
  /**
   @param package_id
   @param flags
+  @param type
   @param out
   @param format
   @param ...
@@ -8467,6 +8474,7 @@ BSAPI bs_Result
 bs_loadResourceF(
     int package_id,
     bs_U32 flags,
+    bs_ResourceType type,
     bs_Resource** out,
     char* format,
      ...);

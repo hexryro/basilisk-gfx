@@ -788,7 +788,7 @@ BSAPI bs_Result _bs_loadImageN(bs_Object* object, int package_id, bs_ImageBits f
         return BS_RESULT_OK;
 
     bs_Resource* resource;
-    result = _bs_loadResourceN(package_id, 0, &resource, path, path_length);
+    result = _bs_loadResourceN(package_id, 0, BS_RESOURCE_IMAGE, &resource, path, path_length);
     if (result != BS_RESULT_OK)
         return result;
 
@@ -1092,7 +1092,7 @@ BSAPI bs_Result _bs_loadAtlasN(bs_Object* object, int package_id, bs_U32 flags, 
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResourceN(package_id, 0, &resource, path, path_length);
+    result = _bs_loadResourceN(package_id, 0, BS_RESOURCE_ATLAS, &resource, path, path_length);
     if (result != BS_RESULT_OK)
         return result;
 

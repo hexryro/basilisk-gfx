@@ -459,7 +459,7 @@ static bs_Result _bsmod_convertTileVersion(int package_id, bsgfx_Scene* scene) {
 	s = bs_stringF(s, "levels/%s_tiles", scene->name);
 
 	bs_Resource* tiles;
-	result = bs_loadResourceN(package_id, 0, &tiles, s->value, s->len);
+	result = bs_loadResourceN(package_id, 0, BSGFX_RESOURCE_TILE, &tiles, s->value, s->len);
 	if (result != BS_RESULT_OK)
 		return result;
 

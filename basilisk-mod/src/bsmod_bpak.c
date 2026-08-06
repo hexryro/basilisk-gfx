@@ -460,9 +460,9 @@ BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length) {
 	 Headers
 	 */
 	size_t size;
-	size = BS_BPAK_HEADER_SIZE;
-	size += BS_RESOURCE_TYPE_COUNT * BS_BPAK_RESOURCE_TYPE_SIZE;
-	size += package->resources.count * BS_BPAK_RESOURCE_SIZE;
+	size = BPAK_HEADER_SIZE;
+	size += BS_RESOURCE_TYPE_COUNT * BPAK_RESOURCE_TYPE_SIZE;
+	size += package->resources.count * BPAK_RESOURCE_SIZE;
 
 	for (int i = 0; i < package->resources.count; i++) {
 		bsmod_Resource* resource = bs_fetchUnit(&package->resources, i);
@@ -471,13 +471,13 @@ BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length) {
 
 	unsigned char* data = bs_malloc(size);
 
-	bs_setLittleEndian32(BS_BPAK_MAGIC, data + BS_BPAK_MAGIC_OFFSET);
-	bs_setLittleEndian32(package->resources.count, data + BS_BPAK_RESOURCES_COUNT_OFFSET);
-	bs_setLittleEndian32(BS_RESOURCE_TYPE_COUNT, data + BS_BPAK_RESOURCES_TYPES_COUNT_OFFSET);
-	bs_setLittleEndian32(0, data + BS_BPAK_RESOURCES_RESERVED);
+	bs_setLittleEndian32(BPAK_MAGIC, data + BPAK_MAGIC_OFFSET);
+	bs_setLittleEndian32(package->resources.count, data + BPAK_RESOURCES_COUNT_OFFSET);
+	bs_setLittleEndian32(BS_RESOURCE_TYPE_COUNT, data + BPAK_RESOURCES_TYPES_COUNT_OFFSET);
+	bs_setLittleEndian32(0, data + BPAK_RESOURCES_RESERVED);
 
-	unsigned char* resource_types_data = data + BS_BPAK_RESOURCE_TYPES_OFFSET;
-	memset(resource_types_data, 0, BS_RESOURCE_TYPE_COUNT * BS_BPAK_RESOURCE_TYPE_SIZE);
+	unsigned char* resource_types_data = data + BPAK_RESOURCE_TYPES_OFFSET;
+	memset(resource_types_data, 0, BS_RESOURCE_TYPE_COUNT * BPAK_RESOURCE_TYPE_SIZE);
 
 	bs_ResourceType last_type = -1;
 	for (int i = 0; i < package->resources.count; i++) {
@@ -490,31 +490,31 @@ BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length) {
 			assert(last_type >= 0);
 			assert(last_type < BS_RESOURCE_TYPE_COUNT);
 
-			resource_type_data = resource_types_data + last_type * BS_BPAK_RESOURCE_TYPE_SIZE;
+			resource_type_data = resource_types_data + last_type * BPAK_RESOURCE_TYPE_SIZE;
 
-			bs_setLittleEndian32(i, resource_type_data + BS_BPAK_RESOURCE_TYPE_START_OFFSET);
+			bs_setLittleEndian32(i, resource_type_data + BPAK_RESOURCE_TYPE_START_OFFSET);
 		}
 		else
-			resource_type_data = resource_types_data + last_type * BS_BPAK_RESOURCE_TYPE_SIZE;
+			resource_type_data = resource_types_data + last_type * BPAK_RESOURCE_TYPE_SIZE;
 
 
-		bs_U32 num = bs_getLittleEndian32(resource_type_data + BS_BPAK_RESOURCE_TYPE_COUNT_OFFSET);
-		bs_setLittleEndian32(num + 1, resource_type_data + BS_BPAK_RESOURCE_TYPE_COUNT_OFFSET);
+		bs_U32 num = bs_getLittleEndian32(resource_type_data + BPAK_RESOURCE_TYPE_COUNT_OFFSET);
+		bs_setLittleEndian32(num + 1, resource_type_data + BPAK_RESOURCE_TYPE_COUNT_OFFSET);
 	}
 
-	unsigned char* resources_data = resource_types_data + BS_RESOURCE_TYPE_COUNT * BS_BPAK_RESOURCE_TYPE_SIZE;
+	unsigned char* resources_data = resource_types_data + BS_RESOURCE_TYPE_COUNT * BPAK_RESOURCE_TYPE_SIZE;
 
 	for (int i = 0; i < package->resources.count; i++) {
 		bsmod_Resource* resource = bs_fetchUnit(&package->resources, i);
 
-		bs_setLittleEndian64(resource->name_hash, resources_data + BS_BPAK_RESOURCE_NAME_HASH_OFFSET);
-		bs_setLittleEndian32(resource->chunk, resources_data + BS_BPAK_RESOURCE_CHUNK_OFFSET);
-		bs_setLittleEndian32(resource->offset, resources_data + BS_BPAK_RESOURCE_START_OFFSET);
-		bs_setLittleEndian32(resource->size, resources_data + BS_BPAK_RESOURCE_SIZE_OFFSET);
-		bs_setLittleEndian32(resource->name_length, resources_data + BS_BPAK_RESOURCE_NAME_LENGTH_OFFSET);
-		bs_setLittleEndian32(resource->type, resources_data + BS_BPAK_RESOURCE_TYPE_OFFSET);
-		bs_setLittleEndian32(0, resources_data + BS_BPAK_RESOURCE_RESERVED);
-		resources_data += BS_BPAK_RESOURCE_SIZE;
+		bs_setLittleEndian64(resource->name_hash, resources_data + BPAK_RESOURCE_NAME_HASH_OFFSET);
+		bs_setLittleEndian32(resource->chunk, resources_data + BPAK_RESOURCE_CHUNK_OFFSET);
+		bs_setLittleEndian32(resource->offset, resources_data + BPAK_RESOURCE_START_OFFSET);
+		bs_setLittleEndian32(resource->size, resources_data + BPAK_RESOURCE_SIZE_OFFSET);
+		bs_setLittleEndian32(resource->name_length, resources_data + BPAK_RESOURCE_NAME_LENGTH_OFFSET);
+		bs_setLittleEndian32(resource->type, resources_data + BPAK_RESOURCE_TYPE_OFFSET);
+		bs_setLittleEndian32(0, resources_data + BPAK_RESOURCE_RESERVED);
+		resources_data += BPAK_RESOURCE_SIZE;
 
 		memcpy(resources_data, resource->name, resource->name_length);
 		resources_data += resource->name_length;

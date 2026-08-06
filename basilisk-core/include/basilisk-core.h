@@ -115,37 +115,37 @@
  /**
   Header
   */
-#define BS_BPAK_MAGIC_OFFSET                    0 // U32
-#define BS_BPAK_RESOURCES_COUNT_OFFSET          4 // U32
-#define BS_BPAK_RESOURCES_TYPES_COUNT_OFFSET    8 // U32
-#define BS_BPAK_RESOURCES_RESERVED             12 // U32
+#define BPAK_MAGIC_OFFSET                    0 // U32
+#define BPAK_RESOURCES_COUNT_OFFSET          4 // U32
+#define BPAK_RESOURCES_TYPES_COUNT_OFFSET    8 // U32
+#define BPAK_RESOURCES_RESERVED             12 // U32
 
-#define BS_BPAK_HEADER_SIZE                    16
+#define BPAK_HEADER_SIZE                    16
 
  /**
   Resource types
   */
-#define BS_BPAK_RESOURCE_TYPES_OFFSET          BS_BPAK_HEADER_SIZE
+#define BPAK_RESOURCE_TYPES_OFFSET          BPAK_HEADER_SIZE
 
-#define BS_BPAK_RESOURCE_TYPE_START_OFFSET     0 // U32
-#define BS_BPAK_RESOURCE_TYPE_COUNT_OFFSET     4 // U32
+#define BPAK_RESOURCE_TYPE_START_OFFSET     0 // U32
+#define BPAK_RESOURCE_TYPE_COUNT_OFFSET     4 // U32
 
-#define BS_BPAK_RESOURCE_TYPE_SIZE             8
+#define BPAK_RESOURCE_TYPE_SIZE             8
 
  /**
   Resources
 
   Ends with resource name + \n
   */
-#define BS_BPAK_RESOURCE_NAME_HASH_OFFSET      0 // U64
-#define BS_BPAK_RESOURCE_CHUNK_OFFSET          8 // I32
-#define BS_BPAK_RESOURCE_START_OFFSET         12 // I32
-#define BS_BPAK_RESOURCE_SIZE_OFFSET          16 // I32
-#define BS_BPAK_RESOURCE_NAME_LENGTH_OFFSET   20 // I32
-#define BS_BPAK_RESOURCE_TYPE_OFFSET          24 // I32
-#define BS_BPAK_RESOURCE_RESERVED             28 // I32
+#define BPAK_RESOURCE_NAME_HASH_OFFSET      0 // U64
+#define BPAK_RESOURCE_CHUNK_OFFSET          8 // I32
+#define BPAK_RESOURCE_START_OFFSET         12 // I32
+#define BPAK_RESOURCE_SIZE_OFFSET          16 // I32
+#define BPAK_RESOURCE_NAME_LENGTH_OFFSET   20 // I32
+#define BPAK_RESOURCE_TYPE_OFFSET          24 // I32
+#define BPAK_RESOURCE_RESERVED             28 // I32
 
-#define BS_BPAK_RESOURCE_SIZE                  32
+#define BPAK_RESOURCE_SIZE                 32
 
 
 
@@ -162,31 +162,51 @@
  /**
   Font header
   */
-#define BS_BFNT_MAGIC_OFFSET              0 // U32
-#define BS_BFNT_VERSION_OFFSET            4 // U32
-#define BS_BFNT_1_BLOCKS_COUNT_OFFSET     8 // U16
-#define BS_BFNT_1_RESERVED_0             10 // U16
-#define BS_BFNT_1_RESERVED_1             12 // U32
+#define BFNT_MAGIC_OFFSET               0 // U32
+#define BFNT_VERSION_OFFSET             4 // U32
+#define BFNT_BLOCKS_COUNT_OFFSET        8 // U16
+#define BFNT_PT_SIZES_COUNT_OFFSET     10 // U16
+#define BFNT_RESERVED_0                12 // U32
 
  /**
   Mapping all 355 codepoint blocks found in Unicode 18.0.0 to an 
   index pointing to an element in the font specific codepoints
   */
-#define BS_BFNT_1_BLOCK_LOOKUP_OFFSET    16
-#define BS_BFNT_1_BLOCK_LOOKUP_LENGTH   355 // 355 * U16
+//#define BFNT_BLOCK_LOOKUP_OFFSET       16
+//#define BFNT_BLOCK_LOOKUP_LENGTH      355 // 355 * U16
+//
+//#define BFNT_HEADER_SIZE (BFNT_BLOCK_LOOKUP_OFFSET + BFNT_BLOCK_LOOKUP_LENGTH)
 
-#define BS_BFNT_1_HEADER_SIZE (BS_BFNT_1_BLOCK_LOOKUP_OFFSET + BS_BFNT_1_BLOCK_LOOKUP_LENGTH)
+#define BFNT_HEADER_SIZE                16
+
+ /**
+  Rasterized pt sizes
+  */
+#define BFNT_POINTS_OFFSET              BFNT_HEADER_SIZE
+#define BFNT_POINT_SIZE_OFFSET          0 // U32
+#define BFNT_POINT_SIZE                 4
 
  /**
   Font specific codepoint ranges
   */
-#define BS_BFNT_1_BLOCKS_OFFSET         BS_BFNT_1_HEADER_SIZE
-#define BS_BFNT_1_BLOCK_START_OFFSET     0 // U32
-#define BS_BFNT_1_BLOCK_LENGTH_OFFSET    4 // U16
-#define BS_BFNT_1_BLOCK_SIZE_OFFSET      6 // U16
-#define BS_BFNT_1_BLOCK_ATLAS_OFFSET     8 // U32 - Value is 0 if no atlas is available
+#define BFNT_BLOCK_START_OFFSET         0 // U32
+#define BFNT_BLOCK_LENGTH_OFFSET        4 // U16
+#define BFNT_BLOCK_SIZE_OFFSET          6 // U16
+#define BFNT_BLOCK_GLYPHS_OFFSET        8 // U32 - Value is 0 if no atlas is available
 
-#define BS_BFNT_1_BLOCK_SIZE             12
+#define BFNT_BLOCK_SIZE                12
+
+ /**
+  Rasterized glyphs 
+  */
+#define BFNT_GLYPH_PAGE_OFFSET          0 // U16
+#define BFNT_GLYPH_RESERVED_0           2 // U16
+#define BFNT_GLYPH_ATLAS_INDEX          4 // U32
+#define BFNT_GLYPH_GLYPH_INDEX          8 // U32
+#define BFNT_GLYPH_CODEPOINT           12 // U32
+
+#define BFNT_GLYPH_SIZE                16
+
 
 
   /*==============================================================================

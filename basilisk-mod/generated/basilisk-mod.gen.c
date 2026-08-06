@@ -194,10 +194,11 @@ bsmod_TextureInfo* bsmod_packAtlasTexture(
     int width, 
     int height, 
     int category, 
-    int id, 
+    int id1, 
+    int id2, 
     char* name)
 {
-    return next.bsmod_packAtlasTexture(packer, data, get_data, param, width, height, category, id, name);
+    return next.bsmod_packAtlasTexture(packer, data, get_data, param, width, height, category, id1, id2, name);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTextureN(
@@ -208,11 +209,12 @@ bsmod_TextureInfo* bsmod_packAtlasTextureN(
     int width, 
     int height, 
     int category, 
-    int id, 
+    int id1, 
+    int id2, 
     char* name, 
     int name_length)
 {
-    return next.bsmod_packAtlasTextureN(packer, data, get_data, param, width, height, category, id, name, name_length);
+    return next.bsmod_packAtlasTextureN(packer, data, get_data, param, width, height, category, id1, id2, name, name_length);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTextureV(
@@ -223,11 +225,12 @@ bsmod_TextureInfo* bsmod_packAtlasTextureV(
     int width, 
     int height, 
     int category, 
-    int id, 
+    int id1, 
+    int id2, 
     char* format, 
     va_list args)
 {
-    return next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id, format, args);
+    return next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id1, id2, format, args);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTextureF(
@@ -238,15 +241,22 @@ bsmod_TextureInfo* bsmod_packAtlasTextureF(
     int width, 
     int height, 
     int category, 
-    int id, 
+    int id1, 
+    int id2, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    bsmod_TextureInfo* _return = next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id, format, args);
+    bsmod_TextureInfo* _return = next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id1, id2, format, args);
     va_end(args);
     return _return;
+}
+
+void bsmod_destroyAtlasPacker(
+    bsmod_AtlasPacker* packer)
+{
+    next.bsmod_destroyAtlasPacker(packer);
 }
 
 bs_Result bsmod_packAtlas(

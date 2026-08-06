@@ -80,6 +80,8 @@ typedef struct bsgfx_ButtonParams bsgfx_ButtonParams;
 typedef struct bsgfx_TableField bsgfx_TableField;
 typedef struct bsgfx_Scrollbar bsgfx_Scrollbar;
 typedef struct bsgfx_GridParams bsgfx_GridParams;
+typedef struct bsgfx_Glyph bsgfx_Glyph;
+typedef struct bsgfx_UnicodeBlock2 bsgfx_UnicodeBlock2;
 typedef struct bsgfx_Font bsgfx_Font;
 typedef struct bsgfx_Widget bsgfx_Widget;
 typedef struct bsgfx_AtlasCache bsgfx_AtlasCache;
@@ -1863,27 +1865,29 @@ struct bsgfx_GridParams {
     int index;
 };
 
+struct bsgfx_Glyph {
+    int atlas_page;
+    int atlas_index;
+    int glyph_index;
+    int advance_x;
+    int advance_y;
+};
+
+struct bsgfx_UnicodeBlock2 {
+    bs_U32 offset;
+    bs_U16 count;
+    bs_U16 reserved;
+    bs_U32 glyphs_offset;
+};
+
 struct bsgfx_Font {
-    const char* alphabet;
-    bs_Atlas* atlas;
-    int min_y_shift;
-    int size;
-    int units_per_em;
-    int height;
-    float spacing;
-    int pairs_count;
-    struct {
-        int right;
-        float value;
-    }* pairs;
-    struct {
-        int y_offset;
-        float advance_width;
-        float left_side_bearing;
-        int kerning_pair_offset;
-        int kerning_pair_count;
-    }* glyphs;
-    char table[256];
+    int blocks_count;
+    int pt_sizes_count;
+    int glyphs_count;
+    bs_Object* atlas_object;
+    bsgfx_UnicodeBlock2* blocks;
+    bsgfx_Glyph* glyphs;
+    int* pt_sizes;
     struct {
         void* unused;
     }_[];

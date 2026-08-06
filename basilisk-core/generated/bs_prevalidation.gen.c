@@ -2157,22 +2157,22 @@ BSAPI int _preval_bs_queryPackage(const char* name) {
     return next.bs_queryPackage(name);
 }
 
-BSAPI bs_Result _preval_bs_loadResource(int package_id, bs_U32 flags, bs_Resource** out, char* value) {
+BSAPI bs_Result _preval_bs_loadResource(int package_id, bs_U32 flags, bs_ResourceType type, bs_Resource** out, char* value) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadResource(package_id, flags, out, value);
+    return next.bs_loadResource(package_id, flags, type, out, value);
 }
 
-BSAPI bs_Result _preval_bs_loadResourceN(int package_id, bs_U32 flags, bs_Resource** out, char* value, int value_length) {
+BSAPI bs_Result _preval_bs_loadResourceN(int package_id, bs_U32 flags, bs_ResourceType type, bs_Resource** out, char* value, int value_length) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadResourceN(package_id, flags, out, value, value_length);
+    return next.bs_loadResourceN(package_id, flags, type, out, value, value_length);
 }
 
-BSAPI bs_Result _preval_bs_loadResourceV(int package_id, bs_U32 flags, bs_Resource** out, char* format, va_list args) {
+BSAPI bs_Result _preval_bs_loadResourceV(int package_id, bs_U32 flags, bs_ResourceType type, bs_Resource** out, char* format, va_list args) {
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_loadResourceV(package_id, flags, out, format, args);
+    return next.bs_loadResourceV(package_id, flags, type, out, format, args);
 }
 
 BSAPI bs_Result _preval_bs_loadPackage(int* out, char* path) {

@@ -730,7 +730,7 @@ BSAPI bs_Result _bs_model(int package_id, const char* name, bs_U32 flags, bs_Res
     bs_Result result;
 
     bs_Resource* resource;
-    result = _bs_loadResource(package_id, flags, &resource, name);
+    result = _bs_loadResource(package_id, flags, BS_RESOURCE_MODEL, &resource, name);
     if (result != BS_RESULT_OK)
         return result;
 

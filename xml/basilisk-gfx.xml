@@ -1758,27 +1758,29 @@
 			<field><type>int</type><name>index</name></field>
 		</structure>
 
+		<structure name="bsgfx_Glyph">
+            <field><type>int</type><name>atlas_page</name></field>
+            <field><type>int</type><name>atlas_index</name></field>
+            <field><type>int</type><name>glyph_index</name></field>
+            <field><type>int</type><name>advance_x</name></field>
+            <field><type>int</type><name>advance_y</name></field>
+        </structure>
+		
+		<structure name="bsgfx_UnicodeBlock2">
+            <field><type>bs_U32</type><name>offset</name></field>
+            <field><type>bs_U16</type><name>count</name></field>
+            <field><type>bs_U16</type><name>reserved</name></field>
+            <field><type>bs_U32</type><name>glyphs_offset</name></field>
+        </structure>
+		
 		<structure name="bsgfx_Font">
-            <field><type>const char*</type><name>alphabet</name></field>
-            <field><type>bs_Atlas*</type><name>atlas</name></field>
-            <field><type>int</type><name>min_y_shift</name></field>
-            <field><type>int</type><name>size</name></field>
-            <field><type>int</type><name>units_per_em</name></field>
-            <field><type>int</type><name>height</name></field>
-            <field><type>float</type><name>spacing</name></field>
-            <field><type>int</type><name>pairs_count</name></field>
-            <structure instance="* pairs">
-                <field><type>int</type><name>right</name></field>
-                <field><type>float</type><name>value</name></field>
-            </structure>
-            <structure instance="* glyphs">
-                <field><type>int</type><name>y_offset</name></field>
-                <field><type>float</type><name>advance_width</name></field>
-                <field><type>float</type><name>left_side_bearing</name></field>
-                <field><type>int</type><name>kerning_pair_offset</name></field>
-                <field><type>int</type><name>kerning_pair_count</name></field>
-            </structure>
-            <field><type>char</type><name>table</name><size>256</size></field>
+            <field><type>int</type><name>blocks_count</name></field>
+            <field><type>int</type><name>pt_sizes_count</name></field>
+            <field><type>int</type><name>glyphs_count</name></field>
+            <field><type>bs_Object*</type><name>atlas_object</name></field>
+            <field><type>bsgfx_UnicodeBlock2*</type><name>blocks</name></field>
+            <field><type>bsgfx_Glyph*</type><name>glyphs</name></field>
+            <field><type>int*</type><name>pt_sizes</name></field>
             <structure instance="_[]">
                 <field><type>void*</type><name>unused</name></field>
             </structure>

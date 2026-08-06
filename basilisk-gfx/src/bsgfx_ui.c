@@ -615,14 +615,14 @@ static bool _bsgfx_instanceString(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	if (widget->align_height == 0.0)
 		widget->align_height = text_dimensions.y;
 
-	position.y -= (widget->align_height + text_dimensions.y) / 2.0 + font->min_y_shift;
+	//position.y -= (widget->align_height + text_dimensions.y) / 2.0 + font->min_y_shift; // TODO: Font rework
 	const bsgfx_Text text = {
 		.position = {
 			position.x,
 			position.y,
 			position.z + 2, 1
 		},
-		.scale = font->size,
+	//	.scale = font->size, // TODO: Font rework
 	};
 
 	bs_vec2 text_size;
@@ -671,7 +671,7 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 				position.y + (size.y - text_dimensions.y) / 2.0,
 				position.z + 2, 1
 			},
-			.scale = font->size,
+			//.scale = font->size, // TODO: Font rework
 		};
 
 		bs_vec2 text_size;
@@ -968,6 +968,8 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 static bs_U64 _bsgfx_selected_input = 0;
 
 static inline void _bsgfx_findClosestX(bsgfx_Font* font, bs_String* input, int* select_position, float* select_draw_position_x, float target) {
+	const float spacing = 16.0; // TODO: Font rework
+
 	float result_draw_position_x = 0.0;
 
 	for (; *select_position < input->len; (*select_position)++) {
@@ -977,7 +979,8 @@ static inline void _bsgfx_findClosestX(bsgfx_Font* font, bs_String* input, int* 
 		if (c == '\n')
 			break;
 
-		float size = c == ' ' ? font->spacing : bs_atlasSize(font->atlas, font->table[c]).x;
+	//	float size = c == ' ' ? spacing : bs_atlasSize(font->batl->atlas, font->table[c]).x;
+		float size = 16.0; // TODO: Font rework
 		float next_draw_position_x = result_draw_position_x + size * BSGFX_PIXEL_SCALE;
 
 		// found
@@ -1325,6 +1328,8 @@ static bool _bsgfx_instanceInput(
 				_bsgfx_deserializeInputValue(widget, string);
 			}
 			else {
+				// TODO: Font rework
+				/*
 				for (int i = 0; font->alphabet[i] != '\0'; i++) {
 					if (bs_charDown(font->alphabet[i])) {
 						if (select_size != 0)
@@ -1339,6 +1344,7 @@ static bool _bsgfx_instanceInput(
 						break;
 					}
 				}
+				*/
 			}
 		}
 
@@ -1356,7 +1362,8 @@ static bool _bsgfx_instanceInput(
 		if (_bsgfx_selected_input == widget->input.hash && blinking_underscore == '|') {
 			char c[2] = { blinking_underscore, '\0' };
 			bsgfx_Text text = {
-				.position = { position.x + select_draw_position.x, position.y + select_draw_position.y - font->min_y_shift, position.z + 4, 1 },
+				// TODO: Font rework
+				//.position = { position.x + select_draw_position.x, position.y + select_draw_position.y - font->min_y_shift, position.z + 4, 1 },
 				.scale = 16.0, // todo font scale
 				.material_id = $black_material()->id,
 			};
@@ -1375,7 +1382,8 @@ static bool _bsgfx_instanceInput(
 		.colors = {
 			BS_BLACK, BS_RED, BS_GREEN, BS_YELLOW, BS_BLUE, BS_MAGENTA, BS_CYAN, BS_WHITE
 		},
-		.position = { position.x, position.y - font->min_y_shift, position.z + 4, 1 },
+		// TODO: Font rework
+		//.position = { position.x, position.y - font->min_y_shift, position.z + 4, 1 },
 		.scale = 16.0, // todo font scale
 		.select_start = start,
 		.select_end = end,

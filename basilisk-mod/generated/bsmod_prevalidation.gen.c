@@ -132,28 +132,33 @@ BSMODAPI bs_Result _preval_bsmod_packFont(char* package_name, char* ttf_path, bs
     return next.bsmod_packFont(package_name, ttf_path, blocks, blocks_count, pt_sizes, pt_sizes_count, resource_name, resource_name_length);
 }
 
-BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* name) {
+BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id1, int id2, char* name) {
     BSMOD_VALIDATE(packer != NULL, NULL,);
     BSMOD_VALIDATE(data != NULL, NULL,);
     BSMOD_VALIDATE(param != NULL, NULL,);
     BSMOD_VALIDATE(name != NULL, NULL,);
-    return next.bsmod_packAtlasTexture(packer, data, get_data, param, width, height, category, id, name);
+    return next.bsmod_packAtlasTexture(packer, data, get_data, param, width, height, category, id1, id2, name);
 }
 
-BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTextureN(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* name, int name_length) {
+BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTextureN(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id1, int id2, char* name, int name_length) {
     BSMOD_VALIDATE(packer != NULL, NULL,);
     BSMOD_VALIDATE(data != NULL, NULL,);
     BSMOD_VALIDATE(param != NULL, NULL,);
     BSMOD_VALIDATE(name != NULL, NULL,);
-    return next.bsmod_packAtlasTextureN(packer, data, get_data, param, width, height, category, id, name, name_length);
+    return next.bsmod_packAtlasTextureN(packer, data, get_data, param, width, height, category, id1, id2, name, name_length);
 }
 
-BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTextureV(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* format, va_list args) {
+BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTextureV(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id1, int id2, char* format, va_list args) {
     BSMOD_VALIDATE(packer != NULL, NULL,);
     BSMOD_VALIDATE(data != NULL, NULL,);
     BSMOD_VALIDATE(param != NULL, NULL,);
     BSMOD_VALIDATE(format != NULL, NULL,);
-    return next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id, format, args);
+    return next.bsmod_packAtlasTextureV(packer, data, get_data, param, width, height, category, id1, id2, format, args);
+}
+
+BSMODAPI void _preval_bsmod_destroyAtlasPacker(bsmod_AtlasPacker* packer) {
+    BSMOD_VALIDATE(packer != NULL, ,);
+    next.bsmod_destroyAtlasPacker(packer);
 }
 
 BSMODAPI bs_Result _preval_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, int channels_count, char* package, char* resource_name, bool allow_paging) {
@@ -562,6 +567,7 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_packAtlasTexture = _preval_bsmod_packAtlasTexture;
     functions.bsmod_packAtlasTextureN = _preval_bsmod_packAtlasTextureN;
     functions.bsmod_packAtlasTextureV = _preval_bsmod_packAtlasTextureV;
+    functions.bsmod_destroyAtlasPacker = _preval_bsmod_destroyAtlasPacker;
     functions.bsmod_packAtlas = _preval_bsmod_packAtlas;
     functions.bsmod_createAtlasPacker = _preval_bsmod_createAtlasPacker;
     functions.bsmod_packImageDirectory = _preval_bsmod_packImageDirectory;

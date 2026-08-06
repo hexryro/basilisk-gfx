@@ -35,7 +35,8 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 	int width, 
 	int height, 
 	int category, 
-	int id, 
+	int id1,
+	int id2,
 	char* name, 
 	int name_length) 
 {
@@ -45,13 +46,15 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 		.data = data,
 		.get_data = get_data,
 		.param = param,
-		.id = id,
+		.id1 = id1,
+		.id2 = id2,
 		.category = category,
 	};
 
 	stbrp_rect rect = {
 		.w = width,
 		.h = height,
+		.id = packer->info.count
 	};
 
 	bs_pushBack(&packer->rects, &rect);
@@ -63,6 +66,11 @@ BSMODAPI bsmod_AtlasPacker _bsmod_createAtlasPacker() {
 		.info = bs_list(sizeof(bsmod_TextureInfo), 64),
 		.rects = bs_list(sizeof(stbrp_rect), 64),
 	};
+}
+
+BSMODAPI void _bsmod_destroyAtlasPacker(bsmod_AtlasPacker* packer) {
+	bs_destroyList(&packer->rects);
+	bs_destroyList(&packer->info);
 }
 
 BSMODAPI bs_Result _val_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, int channels_count, char* package_name, char* resource_name, bool allow_paging) {
@@ -197,9 +205,6 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 	}
 
 	memcpy(batl, &header, sizeof(bs_BatlHeader));
-
-	bs_destroyList(&packer->rects);
-	bs_destroyList(&packer->info);
 
 	//result = bs_savePng(batl + header.binary_offset, BS_IV2(width, height), BS_PNG_RGBA, BS_CONSTANT_STRING("test.png"));
 

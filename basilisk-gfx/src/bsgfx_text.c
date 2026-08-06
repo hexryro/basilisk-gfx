@@ -30,6 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <uchar.h>
 
 #define KB_TEXT_SHAPE_IMPLEMENTATION
 #define KB_TEXT_SHAPE_STATIC
@@ -42,6 +43,7 @@ unsigned char image[HEIGHT][WIDTH];
 
 
 BSAPI bs_vec2 _bsgfx_textDimensions(bsgfx_Font* font, char* name, int length) {
+    /*
     float width = 0.0;
     float layout_scale = ((float)font->size / (float)font->units_per_em);
 
@@ -56,38 +58,256 @@ BSAPI bs_vec2 _bsgfx_textDimensions(bsgfx_Font* font, char* name, int length) {
     }
 
     return BS_V2(width, font->height);
+    */
+    return BS_V2(16, 16); // temp ofc
 }
+
+BSGFXAPI void _bsgfx_instanceTextN(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* text, int text_length) {
+	/*
+	if (!text)
+		text = "(null)";
+
+	bs_RGBA color = BS_WHITE;
+
+	bs_vec2 offset = { 0 };
+
+	bs_vec3 scale;
+	bs_v2MulS(&BS_V2(font->spacing, font->atlas->mapped[0].h), params->scale, &scale.xy);
+	scale.z = 0.0;
+
+	bs_mat4 transform = BS_MAT4_IDENTITY;
+	bs_m4Translate(&transform, &params->position.xyz, &transform);
+	bs_m4Rotate(&transform, &BS_QUAT_IDENTITY, &transform);
+	bs_m4Scale(&transform, &scale, &transform);
+
+	bs_U32 flags;
+	float layout_scale = (params->scale / (float)font->units_per_em);
+
+	for (int i = 0; i < text_length; i++) {
+		char c = text[i];
+		int index = font->table[c];
+		if (index >= font->atlas->count)
+			index = 0;
+
+		flags = params->flags;
+		if ((params->select_end || params->select_start) && (
+			(i >= params->select_start && i < params->select_end) ||
+			(i > params->select_end && i <= params->select_start))) {
+			flags |= BSGFX_ID_FONT_IS_SELECTED;
+		}
+
+		float spacing = font->glyphs[index].advance_width * layout_scale;
+		if (c == ' ') {
+			float new_offset = offset.x + spacing * layout_scale;
+			if (params->max_length > 0.0 && new_offset > params->max_length)
+				break;
+
+			transform.v[3].x = params->position.x + offset.x;
+			transform.v[3].y = params->position.y + offset.y;
+			transform.v[0].x = spacing * layout_scale;
+			transform.v[1].y = font->height * layout_scale;
+			//bsgfx_instanceQuad(subtype, bs_m4x3(transform), bs_v4(0, 0, 0, 0), flags, 0, 0);
+
+			offset.x = new_offset;
+			continue;
+		}
+		else if (c == '\n') {
+			offset.x = 0.0;
+			offset.y -= font->height * layout_scale;
+			continue;
+		}
+
+		bs_vec4 coords = bs_atlasCoordinates(font->atlas, index);
+		bs_vec2 size = bs_atlasSize(font->atlas, index);
+
+		float new_offset = offset.x + size.x * layout_scale;
+		if (params->max_length > 0.0 && new_offset > params->max_length)
+			break;
+
+		transform.v[3].x = params->position.x + offset.x;
+		transform.v[3].y = params->position.y + offset.y + ((float)font->glyphs[index].y_offset) * layout_scale;
+		transform.v[0].x = (size.x + font->glyphs[index].left_side_bearing) * layout_scale;
+		transform.v[1].y = size.y * layout_scale;
+
+		_bsgfx_instanceQuad(subtype, bs_m4x3(&transform), coords, flags, 0, params->material_id);
+		offset.x += spacing;
+
+		if (i <= (text_length - 1)) {
+			char next = text[i + 1];
+			int next_index = font->table[next];
+
+			for (int j = font->glyphs[index].kerning_pair_offset; j < (font->glyphs[index].kerning_pair_offset + font->glyphs[index].kerning_pair_count); j++) {
+				if (next_index == font->pairs[j].right) {
+					offset.x += font->pairs[j].value;
+					break;
+				}
+			}
+		}
+
+	}
+
+	*out_text_size = offset;
+	*/
+
+}
+
+static int _bsgfx_queryPtSize(bsgfx_Font* font, int pt_size) {
+    int id = -1;
+    for (int i = 0; i < font->pt_sizes_count; i++) {
+        id = i;
+        if (font->pt_sizes[i] >= pt_size)
+            return id;
+    }
+
+    return id;
+}
+
+static bsgfx_UnicodeBlock2* _bsgfx_queryUnicodeBlock(bsgfx_Font* font, char32_t c) {
+    for (int j = 0; j < font->blocks_count; j++) {
+        bsgfx_UnicodeBlock2* block = font->blocks + j;
+
+        bs_U32 offset = block->offset;
+        bs_U32 end = block->offset + block->count;
+
+        if (c >= offset && c < end)
+            return block;
+    }
+
+    return NULL;
+}
+
+static inline bsgfx_Glyph* _bsgfx_getGlyph(const bsgfx_Font* font, const bsgfx_UnicodeBlock2* block, char32_t c, int pt_size_id) {
+    const int pt_offset = pt_size_id * block->count;
+    int glyph_offset = block->glyphs_offset + pt_offset + (c - block->offset);
+
+    return font->glyphs + glyph_offset;
+}
+
+BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+    // TODO: check if basic latin block is available
+    int pt_size_id = _bsgfx_queryPtSize(font, pt_size);
+    assert(pt_size_id != -1);
+
+    bsgfx_UnicodeBlock2* block = font->blocks;
+    assert(block != NULL);
+    // assert basic latin
+    assert(block->offset == 0);
+    assert(block->count == 128);
+
+    int glyph_pt_offset = pt_size_id * block->count;
+
+    for (int i = 0; i < text_length; i++) {
+        char c = text[i];
+        if (c < 0)
+            continue;
+
+        bsgfx_Glyph* glyph = _bsgfx_getGlyph(font, block, c, pt_size_id);
+
+        // instanceAtlasTexture(glyph->atlas_page, glyph->atlas_index)
+
+        position.x += glyph->advance_x;
+    }
+}
+
+BSGFXAPI void _bsgfx_instanceUnicodeTextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char32_t* text, int text_length) {
+    int pt_size_id = _bsgfx_queryPtSize(font, pt_size);
+    assert(pt_size_id != -1);
+
+    for (int i = 0; i < text_length; i++) {
+        char32_t c = text[i];
+
+        bsgfx_UnicodeBlock2* block = _bsgfx_queryUnicodeBlock(font, c);
+
+        if (!block)
+            continue; // TODO: warn
+
+        bsgfx_Glyph* glyph = _bsgfx_getGlyph(font, block, c, pt_size_id);
+
+        position.x += glyph->advance_x;
+    }
+}
+
+// TODO: _bsgfx_instanceShapedTextN()
 
 BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flags, bs_Resource **out) {
     bs_Result result;
 
-    bs_Resource* resource;
-    result = bs_loadResourceN(package_id, flags, &resource, name, strlen(name));
+    bs_Resource* bfnt;
+    result = bs_loadResourceN(package_id, flags, BS_RESOURCE_FONT, &bfnt, name, strlen(name));
     if (result != BS_RESULT_OK)
         return result;
 
-    unsigned char* data = resource->data->value;
+    bs_Object* atlas_object = BS_ATLAS(-1, -1, 0);
+    bs_loadAtlas(atlas_object, bsgfx_package(), 0, name);
 
-    bs_U32 magic = bs_getLittleEndian32(data + BS_BFNT_MAGIC_OFFSET);
-    if (magic != BS_BFNT_MAGIC) {
+    unsigned char* data = bfnt->data->value;
+
+    bs_U32 magic = bs_getLittleEndian32(data + BFNT_MAGIC_OFFSET);
+    if (magic != BFNT_MAGIC) {
         BS_WARN_INVALID_MAGIC("font", name);
         return BS_RESULT_CORRUPTED;
     }
 
-    bs_U32 version = bs_getLittleEndian32(data + BS_BFNT_VERSION_OFFSET);
+    bs_U32 version = bs_getLittleEndian32(data + BFNT_VERSION_OFFSET);
     if (version != 1) {
         BS_WARN_UNSUPPORTED_VERSION("font", name);
         return BS_RESULT_NOT_SUPPORTED;
     }
 
-    bs_U16 blocks_count = bs_getLittleEndian16(data + BS_BFNT_1_BLOCKS_COUNT_OFFSET);
+    bsgfx_Font* font = bs_calloc(1, sizeof(bsgfx_Font));
+    font->atlas_object = atlas_object;
+    bfnt->model = font;
 
-    unsigned char* blocks_offset = data;
+    bs_U16 blocks_count = bs_getLittleEndian16(data + BFNT_BLOCKS_COUNT_OFFSET);
+    bs_U16 pt_sizes_count = bs_getLittleEndian16(data + BFNT_BLOCKS_COUNT_OFFSET);
+    //bs_U32 glyphs_count = bs_getLittleEndian32(data + BFNT_GLYPHS_COUNT_OFFSET);
+    bs_U32 glyphs_count = atlas_object->atlas->count;
+
+    font->blocks_count = blocks_count;
+    font->pt_sizes_count = pt_sizes_count;
+    font->glyphs_count = glyphs_count;
+
+    if (blocks_count > 0) font->blocks = bs_malloc(blocks_count * sizeof(bsgfx_UnicodeBlock2));
+    if (pt_sizes_count > 0) font->pt_sizes = bs_malloc(pt_sizes_count * sizeof(int));
+    if (glyphs_count > 0) font->glyphs = bs_malloc(glyphs_count * sizeof(bsgfx_Glyph));
+
+    unsigned char* pt_size_offset = data + BFNT_POINTS_OFFSET;
+    for (int i = 0; i < pt_sizes_count; i++) {
+        font->pt_sizes[i] = bs_getLittleEndian32(pt_size_offset + BFNT_POINT_SIZE_OFFSET);
+        pt_size_offset += BFNT_POINT_SIZE;
+    }
+
+    unsigned char* blocks_offset = pt_size_offset;
     for (int i = 0; i < blocks_count; i++) {
-        bs_U32 code_start = bs_getLittleEndian32(blocks_offset + BS_BFNT_1_BLOCK_START_OFFSET);
-        bs_U16 code_count = bs_getLittleEndian16(blocks_offset + BS_BFNT_1_BLOCKS_COUNT_OFFSET);
+        bs_U32 code_start = bs_getLittleEndian32(blocks_offset + BFNT_BLOCK_START_OFFSET);
+        bs_U16 code_count = bs_getLittleEndian16(blocks_offset + BFNT_BLOCKS_COUNT_OFFSET);
+        bs_U32 glyphs_offset = bs_getLittleEndian32(blocks_offset + BFNT_BLOCK_GLYPHS_OFFSET);
 
-        blocks_offset += BS_BFNT_1_BLOCK_SIZE;
+        font->blocks[i] = (bsgfx_UnicodeBlock2) {
+            .offset = code_start,
+            .count = code_count,
+            .glyphs_offset = glyphs_offset,
+        };
+
+        blocks_offset += BFNT_BLOCK_SIZE;
+    }
+
+    unsigned char* glyphs_offset = blocks_offset;
+    for (int i = 0; i < glyphs_count; i++) {
+        bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_PAGE_OFFSET);
+        bs_U32 atlas_index = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_ATLAS_INDEX);
+        bs_U32 glyph_index = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_GLYPH_INDEX);
+        bs_U32 codepoint = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_CODEPOINT);
+
+        font->glyphs[i] = (bsgfx_Glyph) {
+            .atlas_page = page,
+            .atlas_index = atlas_index,
+            .glyph_index = glyph_index,
+            .advance_x = atlas_object->atlas->mapped[atlas_index].w, // temp
+            .advance_y = 16.0, // temp
+        };
+
+        glyphs_offset += BFNT_GLYPH_SIZE;
     }
 
     return BS_RESULT_OK;
@@ -95,7 +315,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
 
 BSGFXAPI void _bsgfx_test() {
     int package_id = 0;
-    if (bs_loadPackage(&package_id, "content/basilisk-fonts") != BS_RESULT_OK)
+    if (bs_loadPackage(&package_id, "content/basilisk-fonts.bpak") != BS_RESULT_OK)
         return;
 
     bs_Resource* resource;

@@ -3802,42 +3802,46 @@ int bs_queryPackage(
 bs_Result bs_loadResource(
     int package_id, 
     bs_U32 flags, 
+    bs_ResourceType type, 
     bs_Resource** out, 
     char* value)
 {
-    return next.bs_loadResource(package_id, flags, out, value);
+    return next.bs_loadResource(package_id, flags, type, out, value);
 }
 
 bs_Result bs_loadResourceN(
     int package_id, 
     bs_U32 flags, 
+    bs_ResourceType type, 
     bs_Resource** out, 
     char* value, 
     int value_length)
 {
-    return next.bs_loadResourceN(package_id, flags, out, value, value_length);
+    return next.bs_loadResourceN(package_id, flags, type, out, value, value_length);
 }
 
 bs_Result bs_loadResourceV(
     int package_id, 
     bs_U32 flags, 
+    bs_ResourceType type, 
     bs_Resource** out, 
     char* format, 
     va_list args)
 {
-    return next.bs_loadResourceV(package_id, flags, out, format, args);
+    return next.bs_loadResourceV(package_id, flags, type, out, format, args);
 }
 
 bs_Result bs_loadResourceF(
     int package_id, 
     bs_U32 flags, 
+    bs_ResourceType type, 
     bs_Resource** out, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = next.bs_loadResourceV(package_id, flags, out, format, args);
+    bs_Result _return = next.bs_loadResourceV(package_id, flags, type, out, format, args);
     va_end(args);
     return _return;
 }

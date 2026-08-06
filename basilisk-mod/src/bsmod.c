@@ -429,7 +429,7 @@ BSMODAPI void _bsmod_onIni() {
     if (result == BS_RESULT_OK) {
 
         bs_Resource* resource;
-        result = bs_loadResourceN(_bsmod_.bsgfx_package, 0, &resource, BS_CONSTANT_STRING("bindings"));
+        result = bs_loadResourceN(_bsmod_.bsgfx_package, 0, BS_RESOURCE_BINARY, &resource, BS_CONSTANT_STRING("bindings"));
 
         if (result == BS_RESULT_OK) {
             result = bs_json(resource->data->value, resource->data->len, &_bsmod_.bindings_json);

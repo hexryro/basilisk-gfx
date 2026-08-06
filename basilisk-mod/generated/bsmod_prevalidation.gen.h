@@ -65,6 +65,7 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_onPackTextureArray = (PFN_bsmod_onPackTextureArray)GetProcAddress(module, "_preval_bsmod_onPackTextureArray");
     functions.bsmod_packFont = (PFN_bsmod_packFont)GetProcAddress(module, "_preval_bsmod_packFont");
     functions.bsmod_packAtlasTexture = (PFN_bsmod_packAtlasTexture)GetProcAddress(module, "_preval_bsmod_packAtlasTexture");
+    functions.bsmod_destroyAtlasPacker = (PFN_bsmod_destroyAtlasPacker)GetProcAddress(module, "_preval_bsmod_destroyAtlasPacker");
     functions.bsmod_packAtlas = (PFN_bsmod_packAtlas)GetProcAddress(module, "_preval_bsmod_packAtlas");
     functions.bsmod_createAtlasPacker = (PFN_bsmod_createAtlasPacker)GetProcAddress(module, "_preval_bsmod_createAtlasPacker");
     functions.bsmod_packImageDirectory = (PFN_bsmod_packImageDirectory)GetProcAddress(module, "_preval_bsmod_packImageDirectory");

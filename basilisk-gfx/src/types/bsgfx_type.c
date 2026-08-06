@@ -171,7 +171,7 @@ BSGFXAPI void _bsgfx_type(
     type->mapped_flexible_size = mapped_flexible_size;
 
     bs_Resource* resource;
-    result = bs_loadResourceF(package_id, 0, &resource, "levels/%s_%s", _bsgfx_current_scene_.name, plural);
+    result = bs_loadResourceF(package_id, 0, BS_RESOURCE_BINARY, &resource, "levels/%s_%s", _bsgfx_current_scene_.name, plural);
     if (result != BS_RESULT_OK)
         return;
 

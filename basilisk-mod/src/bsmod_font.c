@@ -26,6 +26,7 @@
 #include <bsmod_internal.h>
 
 #include <ft2build.h>
+#include <stb_rect_pack/stb_rect_pack.h>
 #include FT_FREETYPE_H
 
 FT_Library _freetype_library = NULL;
@@ -56,7 +57,7 @@ static unsigned char* _bsmod_getFontTextureData(bsmod_AtlasPacker* packer, int i
 	bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, index);
 	bs_List* bitmap = info->param;
 
-	return bitmap->data + info->id;
+	return bitmap->data + info->id1;
 }
 
 BSMODAPI bs_Result _bsmod_packFont(
@@ -102,39 +103,61 @@ BSMODAPI bs_Result _bsmod_packFont(
 
 	size_t total_size = 0;
 
-	total_size += BS_BFNT_1_HEADER_SIZE * sizeof(bs_U32);
-	total_size += blocks_count * BS_BFNT_1_BLOCK_SIZE;
+	total_size += BFNT_HEADER_SIZE * sizeof(bs_U32);
+	total_size += blocks_count * BFNT_BLOCK_SIZE;
+	total_size += pt_sizes_count * BFNT_POINT_SIZE;
 	total_size += ttf->len;
 
+	int total_glyphs_count = 0;
 	for (int i = 0; i < blocks_count; i++) {
 		assert(blocks[i].block >= 0);
-		assert(blocks[i].block < BS_BFNT_1_BLOCK_LOOKUP_LENGTH);
+		//assert(blocks[i].block < BFNT_BLOCK_LOOKUP_LENGTH);
+
+		if (blocks[i].rasterize)
+			total_glyphs_count += blocks[i].count * pt_sizes_count;
 	}
 
-	unsigned char* batl = bs_malloc(total_size);
+	total_size += total_glyphs_count * BFNT_GLYPH_SIZE;
 
-	memset(batl, 0, BS_BFNT_1_HEADER_SIZE);
+	unsigned char* data = bs_malloc(total_size);
 
-	bs_setLittleEndian32(BS_BFNT_MAGIC, batl + BS_BFNT_MAGIC_OFFSET);
-	bs_setLittleEndian32(1, batl + BS_BFNT_VERSION_OFFSET);
-	bs_setLittleEndian16(blocks_count, batl + BS_BFNT_1_BLOCKS_COUNT_OFFSET);
+	memset(data, 0, BFNT_HEADER_SIZE);
+
+	bs_setLittleEndian32(BFNT_MAGIC, data + BFNT_MAGIC_OFFSET);
+	bs_setLittleEndian32(1, data + BFNT_VERSION_OFFSET);
+	bs_setLittleEndian16(blocks_count, data + BFNT_BLOCKS_COUNT_OFFSET);
+	bs_setLittleEndian16(pt_sizes_count, data + BFNT_PT_SIZES_COUNT_OFFSET);
+	//bs_setLittleEndian32(total_glyphs_count, data + BFNT_GLYPHS_COUNT_OFFSET);
 
 	bs_List bitmap_data = bs_list(sizeof(unsigned char), 1024);
+
+	unsigned char* offset = data + BFNT_POINTS_OFFSET;
+
+   /**
+    Point sizes
+    */
+	for (int i = 0; i < pt_sizes_count; i++) {
+		bs_setLittleEndian32(pt_sizes[i], offset + BFNT_POINT_SIZE_OFFSET);
+		offset += BFNT_POINT_SIZE;
+	}
 
    /**
     Font specific codepoint ranges
 	*/
-	unsigned char* block_offset = batl + BS_BFNT_1_BLOCKS_OFFSET;
+	unsigned char* glyphs_offset = offset + blocks_count * BFNT_BLOCK_SIZE + pt_sizes_count * BFNT_POINT_SIZE;
 
-	for (int i = 0; i < blocks_count; i++) {
-		bs_setLittleEndian16(i, batl + BS_BFNT_1_BLOCK_LOOKUP_OFFSET + blocks[i].block * sizeof(bs_U16));
+	for (int i = 0, glyphs_block_offset = 0; i < blocks_count; i++) {
+		//bs_setLittleEndian16(i, data + BFNT_BLOCK_LOOKUP_OFFSET + blocks[i].block * sizeof(bs_U16));
 
-		bs_setLittleEndian32(blocks[i].offset, block_offset + BS_BFNT_1_BLOCK_START_OFFSET);
-		bs_setLittleEndian32(blocks[i].count, block_offset + BS_BFNT_1_BLOCK_LENGTH_OFFSET);
-		bs_setLittleEndian32(blocks[i].size, block_offset + BS_BFNT_1_BLOCK_SIZE_OFFSET);
+		bs_setLittleEndian32(blocks[i].offset, offset + BFNT_BLOCK_START_OFFSET);
+		bs_setLittleEndian32(blocks[i].count, offset + BFNT_BLOCK_LENGTH_OFFSET);
+		bs_setLittleEndian32(blocks[i].size, offset + BFNT_BLOCK_SIZE_OFFSET);
 
 		if (blocks[i].rasterize) {
+			bs_setLittleEndian32(glyphs_block_offset, offset + BFNT_BLOCK_GLYPHS_OFFSET);
+
 			for (int j = 0; j < pt_sizes_count; j++) {
+				int glyphs_pt_offset = glyphs_block_offset + blocks[i].count * j;
 
 				const int dpi = 100;
 				int pt_size = pt_sizes[j];
@@ -146,6 +169,8 @@ BSMODAPI bs_Result _bsmod_packFont(
 				}
 
 				for (int k = 0; k < blocks[i].count; k++) {
+					int glyph_offset = glyphs_pt_offset + k * BFNT_GLYPH_SIZE;
+
 					FT_ULong codepoint = (FT_ULong)(blocks[i].offset + k);
 					FT_UInt glyph_id = FT_Get_Char_Index(face, codepoint);
 
@@ -163,6 +188,9 @@ BSMODAPI bs_Result _bsmod_packFont(
 
 					if (face->glyph->bitmap.rows == 0)
 						continue;
+
+					bs_setLittleEndian32(codepoint, glyphs_offset + glyph_offset + BFNT_GLYPH_CODEPOINT);
+					bs_setLittleEndian32(glyph_id, glyphs_offset + glyph_offset + BFNT_GLYPH_GLYPH_INDEX);
 
 					FT_Bitmap* bmp = &face->glyph->bitmap;
 					bs_ensureSize(&bitmap_data, bmp->rows * bmp->width);
@@ -183,35 +211,53 @@ BSMODAPI bs_Result _bsmod_packFont(
 						bmp->rows, 
 						0, 
 						bitmap_data.count,
-						"%d", glyph_id
+						glyph_offset,
+						"%d", 
+						glyph_id
 					);
 
 					bitmap_data.count += bmp->rows * bmp->width;
 				}
 			}
+
+			glyphs_block_offset += blocks[i].count * pt_sizes_count;
 		}
 
-		block_offset += BS_BFNT_1_BLOCK_SIZE;
+		offset += BFNT_BLOCK_SIZE;
 	}
 
    /**
-    Copy TTF data
+    Pack into atlas
     */
-	unsigned char* ttf_offset = block_offset;
-
-	memcpy(ttf_offset, ttf->value, ttf->len);
-
 	result = _bsmod_packAtlas(&packer, 1024, 1024, 1, package_path, resource_name, true);
 	if (result != BS_RESULT_OK)
 		goto end;
 
-	result = _bsmod_packResource(BS_RESOURCE_FONT, batl, total_size, package_path, resource_name);
+	for (int i = 0; i < packer.rects.count; i++) {
+		stbrp_rect* rect = bs_fetchUnit(&packer.rects, i);
+
+		bsmod_TextureInfo* info = bs_fetchUnit(&packer.info, rect->id);
+
+		int glyph_offset = info->id2;
+		bs_setLittleEndian32(info->page, offset + glyph_offset + BFNT_GLYPH_PAGE_OFFSET);
+		bs_setLittleEndian32(i, offset + glyph_offset + BFNT_GLYPH_ATLAS_INDEX);
+		
+		offset += BFNT_GLYPH_SIZE;
+	}
+	_bsmod_destroyAtlasPacker(&packer);
+
+   /**
+    Copy TTF data
+    */
+	memcpy(offset, ttf->value, ttf->len);
+
+	result = _bsmod_packResource(BS_RESOURCE_FONT, data, total_size, package_path, resource_name);
 	
 end:
 	bs_destroyList(&bitmap_data);
 	FT_Done_Face(face);
 	bs_free(ttf);
-	bs_free(batl);
+	bs_free(data);
 	//	if (result != BS_RESULT_OK)
 	//		return result;
 

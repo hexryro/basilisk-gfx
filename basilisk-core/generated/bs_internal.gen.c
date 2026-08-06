@@ -900,15 +900,17 @@ bool _bs_fileExistsF(
 bs_Result _bs_loadResource(
     int package_id, 
     bs_U32 flags, 
+    bs_ResourceType type, 
     bs_Resource** out, 
     char* value)
 {
-    return _bs_loadResourceN(package_id, flags, out, value, strlen(value));
+    return _bs_loadResourceN(package_id, flags, type, out, value, strlen(value));
 }
 
 bs_Result _bs_loadResourceV(
     int package_id, 
     bs_U32 flags, 
+    bs_ResourceType type, 
     bs_Resource** out, 
     char* format, 
     va_list args)
@@ -916,19 +918,20 @@ bs_Result _bs_loadResourceV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bs_loadResourceN(package_id, flags, out, _formatted, _length);
+    return _bs_loadResourceN(package_id, flags, type, out, _formatted, _length);
 }
 
 bs_Result _bs_loadResourceF(
     int package_id, 
     bs_U32 flags, 
+    bs_ResourceType type, 
     bs_Resource** out, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = _bs_loadResourceV(package_id, flags, out, format, args);
+    bs_Result _return = _bs_loadResourceV(package_id, flags, type, out, format, args);
     va_end(args);
     return _return;
 }
