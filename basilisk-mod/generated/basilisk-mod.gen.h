@@ -187,6 +187,7 @@ struct bsmod_TextureInfo {
     int page;
     int id1;
     int id2;
+    int reserved;
 };
 
 struct bsmod_Chunk {

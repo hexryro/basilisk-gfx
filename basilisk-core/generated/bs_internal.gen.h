@@ -108,7 +108,7 @@ typedef bs_Result(__stdcall* PFN_bs_mapBuffer)(bs_Buffer* buffer, bs_U32 num_byt
 typedef void(__stdcall* PFN_bs_unmapBuffer)(bs_Buffer* buffer);
 typedef void(__stdcall* PFN_bs_stageNull)(bs_Buffer* buffer);
 typedef void(__stdcall* PFN_bs_stageList)(bs_Buffer* buffer, bs_List* list);
-typedef void(__stdcall* PFN_bs_stageImage)(bs_Buffer* buffer, bs_Format format, bs_ivec2 dim, const char* data);
+typedef void(__stdcall* PFN_bs_stageImage)(bs_Buffer* buffer, int channels_count, bs_ivec2 dim, const char* data);
 typedef void(__stdcall* PFN_bs_destroyBuffer)(bs_Buffer* buffer);
 typedef void(__stdcall* PFN_bs_copyAsync)(bs_Buffer* src, bs_Buffer* dst, bs_U32 src_offset, bs_U32 dst_offset, bs_U32 num_bytes);
 typedef void(__stdcall* PFN_bs_setBufferAsync)(bs_Buffer* buffer, bs_U32 offset, bs_U32 num_bytes, bs_U32 value);
@@ -1192,7 +1192,7 @@ BSAPI bs_Result _bs_mapBuffer(bs_Buffer* buffer, bs_U32 num_bytes);
 BSAPI void _bs_unmapBuffer(bs_Buffer* buffer);
 BSAPI void _bs_stageNull(bs_Buffer* buffer);
 BSAPI void _bs_stageList(bs_Buffer* buffer, bs_List* list);
-BSAPI void _bs_stageImage(bs_Buffer* buffer, bs_Format format, bs_ivec2 dim, const char* data);
+BSAPI void _bs_stageImage(bs_Buffer* buffer, int channels_count, bs_ivec2 dim, const char* data);
 BSAPI void _bs_destroyBuffer(bs_Buffer* buffer);
 BSAPI void _bs_copyAsync(bs_Buffer* src, bs_Buffer* dst, bs_U32 src_offset, bs_U32 dst_offset, bs_U32 num_bytes);
 BSAPI void _bs_setBufferAsync(bs_Buffer* buffer, bs_U32 offset, bs_U32 num_bytes, bs_U32 value);

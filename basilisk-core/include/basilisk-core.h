@@ -162,22 +162,24 @@
  /**
   Font header
   */
-#define BFNT_MAGIC_OFFSET               0 // U32
-#define BFNT_VERSION_OFFSET             4 // U32
-#define BFNT_BLOCKS_COUNT_OFFSET        8 // U16
-#define BFNT_PT_SIZES_COUNT_OFFSET     10 // U16
-#define BFNT_RESERVED_0                12 // U32
+#define BFNT_MAGIC_OFFSET                    0 // U32
+#define BFNT_VERSION_OFFSET                  4 // U32
+#define BFNT_BLOCKS_COUNT_OFFSET             8 // U16
+#define BFNT_PT_SIZES_COUNT_OFFSET          10 // U16
+#define BFNT_GLYPHS_COUNT_OFFSET            12 // U32
+#define BFNT_KERNING_PAIRS_COUNT_OFFSET     16 // U32
+#define BFNT_RESERVED_0                     20 // U32
 
  /**
   Mapping all 355 codepoint blocks found in Unicode 18.0.0 to an 
   index pointing to an element in the font specific codepoints
   */
-//#define BFNT_BLOCK_LOOKUP_OFFSET       16
+//#define BFNT_BLOCK_LOOKUP_OFFSET       24
 //#define BFNT_BLOCK_LOOKUP_LENGTH      355 // 355 * U16
 //
 //#define BFNT_HEADER_SIZE (BFNT_BLOCK_LOOKUP_OFFSET + BFNT_BLOCK_LOOKUP_LENGTH)
 
-#define BFNT_HEADER_SIZE                16
+#define BFNT_HEADER_SIZE                24
 
  /**
   Rasterized pt sizes
@@ -195,6 +197,14 @@
 #define BFNT_BLOCK_GLYPHS_OFFSET        8 // U32 - Value is 0 if no atlas is available
 
 #define BFNT_BLOCK_SIZE                12
+
+ /**
+  Kerning pairs
+  */
+#define BFNT_KERNING_PAIR_RIGHT_OFFSET  0 // U32
+#define BFNT_KERNING_PAIR_VALUE_OFFSET  4 // F32
+
+#define BFNT_KERNING_PAIR_SIZE          8
 
  /**
   Rasterized glyphs 
@@ -267,6 +277,15 @@ static inline void bs_setLittleEndian64(bs_U64 val, void* p) {
     _bs_setLittleEndian64(val, p);
 }
 
+static inline float bs_getLittleEndianF32(const void* p) {
+    bs_U32 bits = bs_getLittleEndian32(p);
+    return *(float*)&bits;
+}
+
+static inline void bs_setLittleEndianF32(float f, void* p) {
+    bs_setLittleEndian32(*(bs_U32*)&f, p);
+}
+
 
 
   /*==============================================================================
@@ -325,6 +344,15 @@ static inline void bs_setBigEndian32(bs_U32 val, void* p) {
 
 static inline void bs_setBigEndian64(bs_U64 val, void* p) {
     _bs_setBigEndian64(val, p);
+}
+
+static inline float bs_getBigEndianF32(const void* p) {
+    bs_U32 bits = bs_getBigEndian32(p);
+    return *(float*)&bits;
+}
+
+static inline void bs_setBigEndianF32(float f, void* p) {
+    bs_setBigEndian32(*(bs_U32*)&f, p);
 }
 
 #endif 

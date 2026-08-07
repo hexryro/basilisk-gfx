@@ -125,4 +125,16 @@ void basilisk_instanceTitleBarUI() {
         .shadow_material_id = $bsmod_grey_30()->id,
         .height = BSMOD_TAB_BAR_HEIGHT,
     });
+
+    int package = bs_queryPackage("content/basilisk-fonts.bpak");
+
+    if (package >= 0) {
+        bs_Resource* resource = NULL;
+        bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
+        if (resource && resource->model) {
+            bsgfx_Font* font = resource->model;
+            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(0, 0, 0), 44, BS_CONSTANT_STRING("abc123AV"));
+        }
+    }
+
 }

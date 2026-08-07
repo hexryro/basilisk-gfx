@@ -2585,7 +2585,7 @@
         <function name="bs_stageImage">
             <return>void</return>
             <param><type>bs_Buffer*</type><name>buffer</name></param>
-            <param><type>bs_Format</type><name>format</name></param>
+            <param><type>int</type><name>channels_count</name></param>
             <param><type>bs_ivec2</type><name>dim</name></param>
             <param><type>const char*</type><name>data</name></param>
         </function>

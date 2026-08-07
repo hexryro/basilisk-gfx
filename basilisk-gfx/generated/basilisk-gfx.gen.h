@@ -82,6 +82,7 @@ typedef struct bsgfx_Scrollbar bsgfx_Scrollbar;
 typedef struct bsgfx_GridParams bsgfx_GridParams;
 typedef struct bsgfx_Glyph bsgfx_Glyph;
 typedef struct bsgfx_UnicodeBlock2 bsgfx_UnicodeBlock2;
+typedef struct bsgfx_KerningPair bsgfx_KerningPair;
 typedef struct bsgfx_Font bsgfx_Font;
 typedef struct bsgfx_Widget bsgfx_Widget;
 typedef struct bsgfx_AtlasCache bsgfx_AtlasCache;
@@ -302,6 +303,7 @@ enum bsgfx_Subtype {
     BSGFX_SUBTYPE_LINE,
     BSGFX_SUBTYPE_LINE_2D,
     BSGFX_SUBTYPE_LINE_DEPTHLESS,
+    BSGFX_SUBTYPE_FONT,
     BSGFX_SUBTYPE_COUNT,
 };
 
@@ -1880,14 +1882,21 @@ struct bsgfx_UnicodeBlock2 {
     bs_U32 glyphs_offset;
 };
 
+struct bsgfx_KerningPair {
+    int right;
+    float value;
+};
+
 struct bsgfx_Font {
     int blocks_count;
     int pt_sizes_count;
     int glyphs_count;
+    int kerning_pairs_count;
     bs_Object* atlas_object;
     bsgfx_UnicodeBlock2* blocks;
     bsgfx_Glyph* glyphs;
     int* pt_sizes;
+    bsgfx_KerningPair* kerning_pairs;
     struct {
         void* unused;
     }_[];
@@ -2926,6 +2935,76 @@ bsgfx_instanceTextF(
     bsgfx_Font* font,
     bsgfx_Text* params,
     bs_vec2* out_text_size,
+    char* format,
+     ...);
+
+ /**
+  @param subtype
+  @param font
+  @param position
+  @param pt_size
+  @param text
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instanceASCIIText(
+    int subtype,
+    bsgfx_Font* font,
+    bs_vec3 position,
+    int pt_size,
+    char* text);
+
+ /**
+  @param subtype
+  @param font
+  @param position
+  @param pt_size
+  @param text
+  @param text_length
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instanceASCIITextN(
+    int subtype,
+    bsgfx_Font* font,
+    bs_vec3 position,
+    int pt_size,
+    char* text,
+    int text_length);
+
+ /**
+  @param subtype
+  @param font
+  @param position
+  @param pt_size
+  @param format
+  @param args
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instanceASCIITextV(
+    int subtype,
+    bsgfx_Font* font,
+    bs_vec3 position,
+    int pt_size,
+    char* format,
+    va_list args);
+
+ /**
+  @param subtype
+  @param font
+  @param position
+  @param pt_size
+  @param format
+  @param ...
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instanceASCIITextF(
+    int subtype,
+    bsgfx_Font* font,
+    bs_vec3 position,
+    int pt_size,
     char* format,
      ...);
 

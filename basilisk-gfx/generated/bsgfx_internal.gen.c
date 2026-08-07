@@ -99,3 +99,41 @@ void _bsgfx_instanceTextF(
     va_end(args);
 }
 
+void _bsgfx_instanceASCIIText(
+    int subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int pt_size, 
+    char* text)
+{
+    _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, strlen(text));
+}
+
+void _bsgfx_instanceASCIITextV(
+    int subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int pt_size, 
+    char* format, 
+    va_list args)
+{
+    int _length = bs_formatStringLength(format, args);
+    char* _formatted = bs_alloca(_length + 1);
+    vsnprintf(_formatted, _length + 1, format, args);
+    _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, _formatted, _length);
+}
+
+void _bsgfx_instanceASCIITextF(
+    int subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int pt_size, 
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    _bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    va_end(args);
+}
+

@@ -114,6 +114,10 @@ typedef void(__stdcall* PFN_bsgfx_instanceText)(int subtype, bsgfx_Font* font, b
 typedef void(__stdcall* PFN_bsgfx_instanceTextN)(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length);
 typedef void(__stdcall* PFN_bsgfx_instanceTextV)(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args);
 typedef void(__stdcall* PFN_bsgfx_instanceTextF)(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, ...);
+typedef void(__stdcall* PFN_bsgfx_instanceASCIIText)(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text);
+typedef void(__stdcall* PFN_bsgfx_instanceASCIITextN)(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length);
+typedef void(__stdcall* PFN_bsgfx_instanceASCIITextV)(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args);
+typedef void(__stdcall* PFN_bsgfx_instanceASCIITextF)(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, ...);
 typedef bs_mat4x3(__stdcall* PFN_bsgfx_matrix)(bs_vec3 position, bs_vec3 scale);
 typedef void(__stdcall* PFN_bsgfx_renderFineShadowVolumes)();
 typedef void(__stdcall* PFN_bsgfx_renderShadowVolumes)();
@@ -254,6 +258,10 @@ typedef struct {
     PFN_bsgfx_instanceTextN bsgfx_instanceTextN;
     PFN_bsgfx_instanceTextV bsgfx_instanceTextV;
     PFN_bsgfx_instanceTextF bsgfx_instanceTextF;
+    PFN_bsgfx_instanceASCIIText bsgfx_instanceASCIIText;
+    PFN_bsgfx_instanceASCIITextN bsgfx_instanceASCIITextN;
+    PFN_bsgfx_instanceASCIITextV bsgfx_instanceASCIITextV;
+    PFN_bsgfx_instanceASCIITextF bsgfx_instanceASCIITextF;
     PFN_bsgfx_matrix bsgfx_matrix;
     PFN_bsgfx_renderFineShadowVolumes bsgfx_renderFineShadowVolumes;
     PFN_bsgfx_renderShadowVolumes bsgfx_renderShadowVolumes;
@@ -394,6 +402,10 @@ BSGFXAPI void _bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* par
 BSGFXAPI void _bsgfx_instanceTextN(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length);
 BSGFXAPI void _bsgfx_instanceTextV(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args);
 BSGFXAPI void _bsgfx_instanceTextF(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format,  ...);
+BSGFXAPI void _bsgfx_instanceASCIIText(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text);
+BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length);
+BSGFXAPI void _bsgfx_instanceASCIITextV(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args);
+BSGFXAPI void _bsgfx_instanceASCIITextF(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format,  ...);
 BSGFXAPI bs_mat4x3 _bsgfx_matrix(bs_vec3 position, bs_vec3 scale);
 BSGFXAPI void _bsgfx_renderFineShadowVolumes();
 BSGFXAPI void _bsgfx_renderShadowVolumes();
@@ -536,6 +548,10 @@ static inline bsgfx_FunctionTable* _bsgfx_getFunctions() {
     functions.bsgfx_instanceTextN = _bsgfx_instanceTextN;
     functions.bsgfx_instanceTextV = _bsgfx_instanceTextV;
     functions.bsgfx_instanceTextF = _bsgfx_instanceTextF;
+    functions.bsgfx_instanceASCIIText = _bsgfx_instanceASCIIText;
+    functions.bsgfx_instanceASCIITextN = _bsgfx_instanceASCIITextN;
+    functions.bsgfx_instanceASCIITextV = _bsgfx_instanceASCIITextV;
+    functions.bsgfx_instanceASCIITextF = _bsgfx_instanceASCIITextF;
     functions.bsgfx_matrix = _bsgfx_matrix;
     functions.bsgfx_renderFineShadowVolumes = _bsgfx_renderFineShadowVolumes;
     functions.bsgfx_renderShadowVolumes = _bsgfx_renderShadowVolumes;

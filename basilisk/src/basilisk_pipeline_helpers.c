@@ -198,24 +198,6 @@ void basilisk_renderTiles() {
     }
 }
 
-void basilisk_renderFontSubtype(int subtype, bsgfx_Id font_id, bs_Shader* fragment_shader) {
-    bs_PipelineHash hash;
-    bs_Pipeline* pipeline;
-
-    // bs_Object* font_object = bs_fetch(BSGFX_FONTS, font_id)->head;
-    bs_Shader* vertex_shader = $vs_bsgfx_quad_instanced();
-
-    hash = bsgfx_defaultPipelineHash();
-    hash.shaders[0] = vertex_shader;
-    hash.shaders[1] = fragment_shader;
-   // bsgfx_requiredForTransparency(&hash);
-
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
-        bsgfx_renderSubtype(subtype, pipeline);
-    }
-}
-
 void basilisk_renderPrefabOutlines() {
     if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
         return;
@@ -327,6 +309,24 @@ void basilisk_renderUI() {
         bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], pipeline);
 
         bs_endComment();
+    }
+}
+
+void basilisk_renderFontSubtype(int subtype, bsgfx_Id font_id, bs_Shader* fragment_shader) {
+    bs_PipelineHash hash;
+    bs_Pipeline* pipeline;
+
+    // bs_Object* font_object = bs_fetch(BSGFX_FONTS, font_id)->head;
+    bs_Shader* vertex_shader = $vs_bsgfx_quad_rounded_instanced();
+
+    hash = bsgfx_defaultPipelineHash();
+    hash.shaders[0] = vertex_shader;
+    hash.shaders[1] = fragment_shader;
+    // bsgfx_requiredForTransparency(&hash);
+
+    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+        bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bsgfx_renderSubtype(subtype, pipeline);
     }
 }
 

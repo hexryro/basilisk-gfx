@@ -3,6 +3,7 @@
 #extension GL_EXT_samplerless_texture_functions : require
 
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
+#include "project/basilisk-gfx/shaders/bsgfx_quad.glsl"
 
 layout (location = BSGFX_LO_SUBPASS_0_OUT_COLOR) out vec4 out_color;
 layout (location = BSGFX_LO_SUBPASS_0_OUT_NORMAL) out vec4 out_normal;
@@ -20,14 +21,19 @@ layout(location = 6) flat in uint in_flags;
 layout(location = 7) flat in uint in_material;
 layout(location = 8) in float in_depth;
 
-layout(set = BSGFX_SET_FONT_SMALL, binding = BSGFX_BINDING_FONT_SMALL) uniform sampler2D font_atlas;
+layout(set = BSGFX_SET_FONTS, binding = BSGFX_BINDING_FONTS) uniform sampler2DArray font_atlas;
 
 void main() {
     out_color = vec4(in_normal, 1.0);
     out_normal.xyz = in_normal;
     out_normal.a = 0.0;
     out_position = vec4(in_world_position, 1.0);
-    out_color = texture(font_atlas, vec2(in_texture.x, 1.0 - in_texture.y)) * in_color;
+
+    int atlas_page = bsgfx_quad_instances[in_instance].header.id;
+
+    float r = texture(font_atlas, vec3(in_texture.x, 1.0 - in_texture.y, float(atlas_page))).r;
+    out_color = vec4(r, r, r, r);
+    //out_color = vec4(in_texture.x, in_texture.y, 0.0, 1.0);
 
     out_normal.xyz = in_normal;
     if (out_normal.x != 0.0 || out_normal.y != 0.0 || out_normal.z != 0.0)

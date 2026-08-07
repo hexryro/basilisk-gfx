@@ -519,38 +519,6 @@ BSAPI bs_Result _bs_loadPng(const char* path, int channels_count, bs_PngData* ou
    * Image Creation
    *============================================================================*/
 
-BSAPI bs_Result _bs_bitmapImage(bs_Object* object, bs_ivec2 dim, bs_Format format, bs_ImageBits flags) {
-    bs_Result result;
-
-    if (!object->image)
-        return BS_RESULT_OK;
-
-    if (object->flags & BS_OBJECT_ALREADY_EXISTS && !(object->flags & BS_OBJECT_FORCE_DESTROY)) 
-        return BS_RESULT_OK;
-
-    bs_Image* image = object->image;
-    _bs_destroyImage(image);
-
-    bs_U32 swaps_count = flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
-
-    image->flags = flags;
-    image->format = format;
-    image->dim = dim;
-
-   /**
-    Create image
-    */
-    _bs_prepareImage(image->head.source_id, object->image->head.id, object->image,
-        (flags & BS_IMAGE_ATTACHMENT_BIT ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0) |
-        (flags & BS_IMAGE_INPUT_ATTACHMENT_BIT ? VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT : 0) |
-        VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
-        VK_IMAGE_USAGE_SAMPLED_BIT,
-        VK_IMAGE_ASPECT_COLOR_BIT);
-
-   // _bs_destroyBuffer(staging_buffer); // queue this or sum shit idk how to deal with this
-
-    return BS_RESULT_OK;
-}
 
 BSAPI void _bs_destroyImage(bs_Image* image) {
     bs_U32 num_swaps = image->flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
@@ -775,6 +743,29 @@ BSAPI void _bs_blit(bs_BlitOperation operation)  {
    * Image File Format
    *============================================================================*/
 
+static inline bs_Format _bs_getFormat(bs_Format base_format, int channels_count) {
+    switch (base_format) {
+    case BS_FORMAT_R8_SRGB: 
+        switch (channels_count) {
+        case 1: return BS_FORMAT_R8_SRGB;
+        case 2: return BS_FORMAT_R8G8_SRGB;
+        case 3: return BS_FORMAT_R8G8B8_SRGB;
+        case 4: return BS_FORMAT_R8G8B8A8_SRGB;
+        }
+        break;
+    case BS_FORMAT_R8_UNORM:
+        switch (channels_count) {
+        case 1: return BS_FORMAT_R8_SRGB;
+        case 2: return BS_FORMAT_R8G8_SRGB;
+        case 3: return BS_FORMAT_R8G8B8_SRGB;
+        case 4: return BS_FORMAT_R8G8B8A8_SRGB;
+        }
+        break;
+    }
+
+    _bs_warnF("Failed to get image format, base format %d has no support for %d channels", bs_serializeFormat(base_format), channels_count);
+}
+
 BSAPI bs_Result _val_bs_loadImage(bs_Object* object, int package_id, bs_ImageBits flags, char* resource_name, char* resource_name_length) {
    // BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_OK);
 
@@ -808,7 +799,8 @@ BSAPI bs_Result _bs_loadImageN(bs_Object* object, int package_id, bs_ImageBits f
         return BS_RESULT_NOT_IMPLEMENTED;
     }
 
-    result = _bs_image(object, (bs_ivec2) { header->width, header->height }, header->images_count, BS_FORMAT_R8G8B8A8_UNORM, flags);
+    bs_Format format = _bs_getFormat(BS_FORMAT_R8_UNORM, header->channels_count);
+    result = _bs_image(object, (bs_ivec2) { header->width, header->height }, header->images_count, format, flags);
     if (result != BS_RESULT_OK) {
        // _bs_destroyResource(resource); // TODO: try uncomment
         return result;
@@ -849,7 +841,7 @@ BSAPI bs_Result _bs_loadImageN(bs_Object* object, int package_id, bs_ImageBits f
         object->image->indices[i].name = strdup(name);
         object->image->indices[i].name_hash = _bs_stringHash(name);
 
-        _bs_stageImage(buffer, BS_FORMAT_R8G8B8A8_UNORM, object->image->dim, bmp);
+        _bs_stageImage(buffer, header->channels_count, object->image->dim, bmp);
         _bs_transition(object->image, i, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         _bs_copyBufferToImage(buffer, object->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         _bs_transition(object->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -988,16 +980,29 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
         return BS_RESULT_NOT_SUPPORTED;
     }
 
-    if (header->channels_count != 4) {
+    if (header->channels_count != 4 && header->channels_count != 1) {
         _bs_warnF("Atlas resource \"%s\" has an unsupported amount of channels (%d)", resource_name, header->channels_count);
         return BS_RESULT_NOT_SUPPORTED;
     }
 
+
+   /**
+    Create image
+    */
     bs_Object* image_object = BS_IMAGE(-1, 0, flags & BS_ATLAS_FORCE_CREATE);
-
+    bs_U32 swaps_count = flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
     atlas->image = image_object->image;
+    atlas->image->num_indices = header->pages_count;
+    atlas->image->flags = flags;
+    atlas->image->format = _bs_getFormat(BS_FORMAT_R8_UNORM, header->channels_count);
+    atlas->image->dim = BS_IV2(header->width, header->height);
 
-    result = _bs_bitmapImage(image_object, (bs_ivec2) { header->width, header->height }, BS_FORMAT_R8G8B8A8_UNORM, 0);
+    result = _bs_prepareImage(atlas->image->head.source_id, atlas->image->head.id, atlas->image,
+        (flags & BS_IMAGE_ATTACHMENT_BIT ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0) |
+        (flags & BS_IMAGE_INPUT_ATTACHMENT_BIT ? VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT : 0) |
+        VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+        VK_IMAGE_USAGE_SAMPLED_BIT,
+        VK_IMAGE_ASPECT_COLOR_BIT);
 
     if (result != BS_RESULT_OK) {
         _bs_destroyAtlas(object->atlas);
@@ -1072,10 +1077,9 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
     }
 
     const size_t page_size = header->width * header->height * header->channels_count;
-    size_t abc = offset - data;
  
     for (int i = 0; i < header->pages_count; i++) {
-        _bs_stageImage(staging_buffer_object->buffer, BS_FORMAT_R8G8B8A8_UNORM, BS_IV2(header->width, header->height), offset);
+        _bs_stageImage(staging_buffer_object->buffer, header->channels_count, BS_IV2(header->width, header->height), offset);
 
         _bs_transition(atlas->image, i, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
         _bs_copyBufferToImage(staging_buffer_object->buffer, atlas->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);

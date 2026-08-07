@@ -1228,11 +1228,11 @@ void bs_stageList(
 
 void bs_stageImage(
     bs_Buffer* buffer, 
-    bs_Format format, 
+    int channels_count, 
     bs_ivec2 dim, 
     const char* data)
 {
-    next.bs_stageImage(buffer, format, dim, data);
+    next.bs_stageImage(buffer, channels_count, dim, data);
 }
 
 void bs_destroyBuffer(

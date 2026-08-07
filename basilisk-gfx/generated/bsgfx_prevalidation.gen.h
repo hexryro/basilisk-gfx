@@ -116,6 +116,7 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     functions.bsgfx_instanceAtlas = (PFN_bsgfx_instanceAtlas)GetProcAddress(module, "_preval_bsgfx_instanceAtlas");
     functions.bsgfx_instanceAtlasFlipped = (PFN_bsgfx_instanceAtlasFlipped)GetProcAddress(module, "_preval_bsgfx_instanceAtlasFlipped");
     functions.bsgfx_instanceText = (PFN_bsgfx_instanceText)GetProcAddress(module, "_preval_bsgfx_instanceText");
+    functions.bsgfx_instanceASCIIText = (PFN_bsgfx_instanceASCIIText)GetProcAddress(module, "_preval_bsgfx_instanceASCIIText");
     functions.bsgfx_matrix = (PFN_bsgfx_matrix)GetProcAddress(module, "_preval_bsgfx_matrix");
     functions.bsgfx_renderFineShadowVolumes = (PFN_bsgfx_renderFineShadowVolumes)GetProcAddress(module, "_preval_bsgfx_renderFineShadowVolumes");
     functions.bsgfx_renderShadowVolumes = (PFN_bsgfx_renderShadowVolumes)GetProcAddress(module, "_preval_bsgfx_renderShadowVolumes");

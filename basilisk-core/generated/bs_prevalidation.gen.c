@@ -444,11 +444,11 @@ BSAPI void _preval_bs_stageList(bs_Buffer* buffer, bs_List* list) {
     next.bs_stageList(buffer, list);
 }
 
-BSAPI void _preval_bs_stageImage(bs_Buffer* buffer, bs_Format format, bs_ivec2 dim, const char* data) {
+BSAPI void _preval_bs_stageImage(bs_Buffer* buffer, int channels_count, bs_ivec2 dim, const char* data) {
     BS_VALIDATE(buffer != NULL, ,);
     BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, ,);
     BS_VALIDATE(data != NULL, ,);
-    next.bs_stageImage(buffer, format, dim, data);
+    next.bs_stageImage(buffer, channels_count, dim, data);
 }
 
 BSAPI void _preval_bs_destroyBuffer(bs_Buffer* buffer) {

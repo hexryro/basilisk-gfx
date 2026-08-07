@@ -413,6 +413,24 @@ BSGFXAPI void _preval_bsgfx_instanceTextV(int subtype, bsgfx_Font* font, bsgfx_T
     next.bsgfx_instanceTextV(subtype, font, params, out_text_size, format, args);
 }
 
+BSGFXAPI void _preval_bsgfx_instanceASCIIText(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text) {
+    BSGFX_VALIDATE(font != NULL, ,);
+    BSGFX_VALIDATE(text != NULL, ,);
+    next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
+}
+
+BSGFXAPI void _preval_bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+    BSGFX_VALIDATE(font != NULL, ,);
+    BSGFX_VALIDATE(text != NULL, ,);
+    next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
+}
+
+BSGFXAPI void _preval_bsgfx_instanceASCIITextV(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args) {
+    BSGFX_VALIDATE(font != NULL, ,);
+    BSGFX_VALIDATE(format != NULL, ,);
+    next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+}
+
 BSGFXAPI bs_mat4x3 _preval_bsgfx_matrix(bs_vec3 position, bs_vec3 scale) {
     return next.bsgfx_matrix(position, scale);
 }
@@ -769,6 +787,9 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_instanceText = _preval_bsgfx_instanceText;
     functions.bsgfx_instanceTextN = _preval_bsgfx_instanceTextN;
     functions.bsgfx_instanceTextV = _preval_bsgfx_instanceTextV;
+    functions.bsgfx_instanceASCIIText = _preval_bsgfx_instanceASCIIText;
+    functions.bsgfx_instanceASCIITextN = _preval_bsgfx_instanceASCIITextN;
+    functions.bsgfx_instanceASCIITextV = _preval_bsgfx_instanceASCIITextV;
     functions.bsgfx_matrix = _preval_bsgfx_matrix;
     functions.bsgfx_renderFineShadowVolumes = _preval_bsgfx_renderFineShadowVolumes;
     functions.bsgfx_renderShadowVolumes = _preval_bsgfx_renderShadowVolumes;

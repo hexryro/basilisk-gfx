@@ -639,6 +639,52 @@ void bsgfx_instanceTextF(
     va_end(args);
 }
 
+void bsgfx_instanceASCIIText(
+    int subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int pt_size, 
+    char* text)
+{
+    next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
+}
+
+void bsgfx_instanceASCIITextN(
+    int subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int pt_size, 
+    char* text, 
+    int text_length)
+{
+    next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
+}
+
+void bsgfx_instanceASCIITextV(
+    int subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int pt_size, 
+    char* format, 
+    va_list args)
+{
+    next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+}
+
+void bsgfx_instanceASCIITextF(
+    int subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int pt_size, 
+    char* format, 
+    ...)
+{
+    va_list args;
+    va_start(args, format);
+    next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    va_end(args);
+}
+
 bs_mat4x3 bsgfx_matrix(
     bs_vec3 position, 
     bs_vec3 scale)

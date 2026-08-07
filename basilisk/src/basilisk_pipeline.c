@@ -105,9 +105,22 @@ static void basilisk_hiResSubpass0() {
     bsgfx_renderColorPickers();
     basilisk_renderUISolid();
     basilisk_renderUI();
+
+    int package = bs_queryPackage("content/basilisk-fonts.bpak");
+
+    if (package >= 0) {
+        bs_Resource* resource = NULL;
+        bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
+        if (resource && resource->model) {
+            bsgfx_Font* font = resource->model;
+            basilisk_renderFontSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
+        }
+    }
     basilisk_renderUIStencil();
     basilisk_renderDither();
-    //basilisk_renderFontSubtype(bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF], BSGFX_FONT_SANS_SERIF_16, $fs_bsgfx_font_arial()); // TODO: text rewrite
+
+
+
   //  bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
     basilisk_renderTiles();
     bsgfx_renderPrimitives(poser()->screen_camera.result);

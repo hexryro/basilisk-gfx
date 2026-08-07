@@ -55,6 +55,7 @@ static void basilisk_loadFontCollection(bs_Object* object) {/*
 }
 
 static void onLoadScene() {
+	bsgfx_test(); // temp testing fonts
 	$vs_bsgfx_mesh_color();
 	$fs_bsgfx_atlas();
 
@@ -150,7 +151,6 @@ int main(int argc, char* argv[]) {
 	bsgfx_enableValidation();
 	bsmod_enableValidation();
 
-	bsgfx_test(); // temp testing fonts
 	//return 0;
 
 	bs_Callbacks* core_callbacks = bs_callbacks();

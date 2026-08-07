@@ -116,6 +116,7 @@ static void _bsgfx_loadResources() {
         _bsgfx_subtypes_[BSGFX_SUBTYPE_TILE_ICON] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instance_batch->batch, 0, range);
         _bsgfx_subtypes_[BSGFX_SUBTYPE_64_HI] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instance_batch->batch, 0, range);
         _bsgfx_subtypes_[BSGFX_SUBTYPE_256_HI] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instance_batch->batch, 0, range);
+        _bsgfx_subtypes_[BSGFX_SUBTYPE_FONT] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instance_batch->batch, 0, range);
 
        // if (_bsgfx_procs_.bsmod_onCreateQuadSubtypes)
        //     _bsgfx_procs_.bsmod_onCreateQuadSubtypes(range);

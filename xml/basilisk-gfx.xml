@@ -92,6 +92,7 @@
 			<line><name>BSGFX_SUBTYPE_LINE</name></line>
 			<line><name>BSGFX_SUBTYPE_LINE_2D</name></line>
 			<line><name>BSGFX_SUBTYPE_LINE_DEPTHLESS</name></line>
+			<line><name>BSGFX_SUBTYPE_FONT</name></line>
 			<line><name>BSGFX_SUBTYPE_COUNT</name></line>
 		</enum>
 
@@ -1772,15 +1773,22 @@
             <field><type>bs_U16</type><name>reserved</name></field>
             <field><type>bs_U32</type><name>glyphs_offset</name></field>
         </structure>
+				
+		<structure name="bsgfx_KerningPair">
+            <field><type>int</type><name>right</name></field>
+            <field><type>float</type><name>value</name></field>
+        </structure>
 		
 		<structure name="bsgfx_Font">
             <field><type>int</type><name>blocks_count</name></field>
             <field><type>int</type><name>pt_sizes_count</name></field>
             <field><type>int</type><name>glyphs_count</name></field>
+            <field><type>int</type><name>kerning_pairs_count</name></field>
             <field><type>bs_Object*</type><name>atlas_object</name></field>
             <field><type>bsgfx_UnicodeBlock2*</type><name>blocks</name></field>
             <field><type>bsgfx_Glyph*</type><name>glyphs</name></field>
             <field><type>int*</type><name>pt_sizes</name></field>
+            <field><type>bsgfx_KerningPair*</type><name>kerning_pairs</name></field>
             <structure instance="_[]">
                 <field><type>void*</type><name>unused</name></field>
             </structure>
@@ -2351,6 +2359,13 @@
 			<param><type>bsgfx_Font*</type><name>font</name></param>
 			<param><type>bsgfx_Text*</type><name>params</name></param>
 			<param><type>bs_vec2*</type><name>out_text_size</name></param>
+		</variadicStringTemplate>
+		<variadicStringTemplate name="bsgfx_instanceASCIIText" string="text">
+			<return>void</return>
+			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_Font*</type><name>font</name></param>
+			<param><type>bs_vec3</type><name>position</name></param>
+			<param><type>int</type><name>pt_size</name></param>
 		</variadicStringTemplate>
 		<function name="bsgfx_matrix">
 			<return>bs_mat4x3</return>

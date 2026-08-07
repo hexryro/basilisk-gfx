@@ -150,6 +150,7 @@
 			<field><type>int</type><name>page</name></field>
 			<field><type>int</type><name>id1</name></field>
 			<field><type>int</type><name>id2</name></field>
+			<field><type>int</type><name>reserved</name></field>
 		</structure>
 
 		<structure name="bsmod_Chunk">

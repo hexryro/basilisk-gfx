@@ -4825,7 +4825,7 @@ bs_stageList(
 
  /**
   @param buffer
-  @param format
+  @param channels_count
   @param dim
   @param data
   @return void
@@ -4833,7 +4833,7 @@ bs_stageList(
 BSAPI void
 bs_stageImage(
     bs_Buffer* buffer,
-    bs_Format format,
+    int channels_count,
     bs_ivec2 dim,
     const char* data);
 

@@ -48,6 +48,8 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 		.param = param,
 		.id1 = id1,
 		.id2 = id2,
+		.page = -1,
+		.reserved = packer->info.count,
 		.category = category,
 	};
 
@@ -99,29 +101,35 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 		total_name_lengths += info->name_length;
 	}
 
-	stbrp_context ctx;
 	stbrp_node* nodes = bs_alloca(header.width * sizeof(stbrp_node));
 
-	stbrp_init_target(&ctx, header.width, header.height, nodes, header.width);
-
+	stbrp_rect* original_rects = packer->rects.data;
 	stbrp_rect* remaining_rects = bs_alloca(header.images_count * sizeof(stbrp_rect));
-	bsmod_TextureInfo* remaining_infos = bs_alloca(header.images_count * sizeof(bsmod_TextureInfo));
+
+	memcpy(remaining_rects, packer->rects.data, header.images_count * sizeof(stbrp_rect));
+
+	packer->rects.count = 0;
 
 	int remaining = header.images_count;
 	while (remaining > 0) {
-		stbrp_pack_rects(&ctx, packer->rects.data, remaining);
+		stbrp_context ctx;
+		stbrp_init_target(&ctx, header.width, header.height, nodes, header.width);
+
+		stbrp_pack_rects(&ctx, remaining_rects, remaining);
 
 		int j = 0;
 		for (int i = 0; i < remaining; i++) {
-			stbrp_rect* rect = bs_fetchUnit(&packer->rects, i);
-			bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, i);
+			stbrp_rect* rect = remaining_rects + i;
 
 			if (rect->was_packed) {
+				bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, rect->id);
+				assert(info->reserved == rect->id);
+
 				info->page = header.pages_count;
+				original_rects[packer->rects.count++] = *rect;
 			}
 			else {
 				remaining_rects[j] = *rect;
-				remaining_infos[j] = *info;
 
 				j++;
 			}
@@ -159,8 +167,9 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 	offset += sizeof(bs_BatlHeader);
 
 	for (int i = 0; i < header.images_count; i++) {
-		bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, i);
 		stbrp_rect* rect = bs_fetchUnit(&packer->rects, i);
+		bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, rect->id);
+		assert(info->reserved == rect->id);
 
 		bs_BatlImage batl_image = {
 			.x = rect->x,
@@ -184,7 +193,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 		int w = width - padding;
 
 		if (info->get_data)
-			info->data = info->get_data(packer, i);
+			info->data = info->get_data(packer, rect->id);
 
 		// lodepng is upside down (:
 		unsigned char* atlas_offset = batl + total_size_excluding_binary;
@@ -200,8 +209,8 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 			memcpy(dst, src, rect->w * header.channels_count);
 		}
 
-	next:
-		free(info->name);
+	next:void;
+		//free(info->name);
 	}
 
 	memcpy(batl, &header, sizeof(bs_BatlHeader));

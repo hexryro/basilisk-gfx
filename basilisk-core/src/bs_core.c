@@ -664,19 +664,8 @@ BSAPI void _bs_stageList(bs_Buffer* buffer, bs_List* list) {
  /**
   Stage image data
   */
-BSAPI void _bs_stageImage(bs_Buffer* buffer, bs_Format format, bs_ivec2 dim, const char* data) {
-    bs_U32 size = dim.x * dim.y;
-
-    switch(format) {
-        case BS_FORMAT_R8_SRGB: size *= 1; break;
-        case BS_FORMAT_R8G8_SRGB: size *= 2; break;
-        case BS_FORMAT_R8G8B8_SRGB: size *= 3; break;
-        case BS_FORMAT_R8G8B8A8_SRGB: size *= 4; break;
-        case BS_FORMAT_R8G8B8A8_UNORM: size *= 4; break;
-        default:
-            _bs_warnF("Failed to stage image data, format %d is not supported", format); // TODO: serialize format
-            return;
-    }
+BSAPI void _bs_stageImage(bs_Buffer* buffer, int channels_count, bs_ivec2 dim, const char* data) {
+    bs_U32 size = dim.x * dim.y * channels_count;
 
     memcpy(_bs_bufferMap(buffer), data, size);
 }

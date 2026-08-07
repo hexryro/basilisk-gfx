@@ -191,8 +191,18 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
     bsgfx_UnicodeBlock2* block = font->blocks;
     assert(block != NULL);
     // assert basic latin
-    assert(block->offset == 0);
-    assert(block->count == 128);
+    //assert(block->offset == 0);
+    //assert(block->count == 127);
+
+    bs_mat4 test_transform = BS_MAT4_IDENTITY;
+    bs_m4Translate(&test_transform, &BS_V3(100.0, 100.0, 0.0), &test_transform);
+    bs_m4Scale(&test_transform, &BS_V3(1024, 1024, 0), &test_transform);
+
+    bsgfx_instanceQuad(subtype, bs_m4x3(&test_transform), BS_V4(0, 0, 1, 1), 0, 0, 0);
+    if (block->offset != 0)
+        return;
+    if (block->count != 127)
+        return;
 
     int glyph_pt_offset = pt_size_id * block->count;
 
@@ -203,10 +213,21 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
 
         bsgfx_Glyph* glyph = _bsgfx_getGlyph(font, block, c, pt_size_id);
 
+        bs_mat4 transform = BS_MAT4_IDENTITY;
+
+        bs_vec2 size = bs_atlasSize(font->atlas_object->atlas, glyph->atlas_index);
+        bs_vec4 coords = bs_atlasCoordinates(font->atlas_object->atlas, glyph->atlas_index);
+
+        bs_m4Translate(&transform, &position, &transform);
+        bs_m4Scale(&transform, &BS_V3(size.x, size.y, 0), &transform);
+
+        bsgfx_instanceQuad(subtype, bs_m4x3(&transform), coords, 0, glyph->atlas_page, 0);
+
         // instanceAtlasTexture(glyph->atlas_page, glyph->atlas_index)
 
         position.x += glyph->advance_x;
     }
+
 }
 
 BSGFXAPI void _bsgfx_instanceUnicodeTextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char32_t* text, int text_length) {
@@ -230,6 +251,7 @@ BSGFXAPI void _bsgfx_instanceUnicodeTextN(int subtype, bsgfx_Font* font, bs_vec3
 // TODO: _bsgfx_instanceShapedTextN()
 
 BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flags, bs_Resource **out) {
+    *out = NULL;
     bs_Result result;
 
     bs_Resource* bfnt;
@@ -238,7 +260,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
         return result;
 
     bs_Object* atlas_object = BS_ATLAS(-1, -1, 0);
-    bs_loadAtlas(atlas_object, bsgfx_package(), 0, name);
+    bs_loadAtlas(atlas_object, package_id, 0, name);
 
     unsigned char* data = bfnt->data->value;
 
@@ -259,28 +281,37 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
     bfnt->model = font;
 
     bs_U16 blocks_count = bs_getLittleEndian16(data + BFNT_BLOCKS_COUNT_OFFSET);
-    bs_U16 pt_sizes_count = bs_getLittleEndian16(data + BFNT_BLOCKS_COUNT_OFFSET);
-    //bs_U32 glyphs_count = bs_getLittleEndian32(data + BFNT_GLYPHS_COUNT_OFFSET);
-    bs_U32 glyphs_count = atlas_object->atlas->count;
+    bs_U16 pt_sizes_count = bs_getLittleEndian16(data + BFNT_PT_SIZES_COUNT_OFFSET);
+    bs_U32 glyphs_count = bs_getLittleEndian32(data + BFNT_GLYPHS_COUNT_OFFSET);
+    bs_U32 kerning_pairs_count = bs_getLittleEndian32(data + BFNT_KERNING_PAIRS_COUNT_OFFSET);
+    //bs_U32 glyphs_count = atlas_object->atlas->count;
 
     font->blocks_count = blocks_count;
     font->pt_sizes_count = pt_sizes_count;
     font->glyphs_count = glyphs_count;
+    font->kerning_pairs_count = kerning_pairs_count;
 
     if (blocks_count > 0) font->blocks = bs_malloc(blocks_count * sizeof(bsgfx_UnicodeBlock2));
     if (pt_sizes_count > 0) font->pt_sizes = bs_malloc(pt_sizes_count * sizeof(int));
     if (glyphs_count > 0) font->glyphs = bs_malloc(glyphs_count * sizeof(bsgfx_Glyph));
+    if (kerning_pairs_count > 0) font->kerning_pairs = bs_malloc(glyphs_count * sizeof(bsgfx_KerningPair));
 
+   /**
+    Pt sizes
+    */
     unsigned char* pt_size_offset = data + BFNT_POINTS_OFFSET;
     for (int i = 0; i < pt_sizes_count; i++) {
         font->pt_sizes[i] = bs_getLittleEndian32(pt_size_offset + BFNT_POINT_SIZE_OFFSET);
         pt_size_offset += BFNT_POINT_SIZE;
     }
 
+   /**
+    Unicode blocks
+    */
     unsigned char* blocks_offset = pt_size_offset;
     for (int i = 0; i < blocks_count; i++) {
         bs_U32 code_start = bs_getLittleEndian32(blocks_offset + BFNT_BLOCK_START_OFFSET);
-        bs_U16 code_count = bs_getLittleEndian16(blocks_offset + BFNT_BLOCKS_COUNT_OFFSET);
+        bs_U16 code_count = bs_getLittleEndian16(blocks_offset + BFNT_BLOCK_LENGTH_OFFSET);
         bs_U32 glyphs_offset = bs_getLittleEndian32(blocks_offset + BFNT_BLOCK_GLYPHS_OFFSET);
 
         font->blocks[i] = (bsgfx_UnicodeBlock2) {
@@ -292,12 +323,34 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
         blocks_offset += BFNT_BLOCK_SIZE;
     }
 
+   /**
+    Kerning pairs
+    unsigned char* kerning_pairs_offset = blocks_offset;
+    for (int i = 0; kerning_pairs_count; i++) {
+        bs_U32 right = bs_getLittleEndian32(kerning_pairs_offset + BFNT_KERNING_PAIR_RIGHT_OFFSET);
+        float value = bs_getLittleEndianF32(kerning_pairs_offset + BFNT_KERNING_PAIR_VALUE_OFFSET);
+
+        font->kerning_pairs[i] = (bsgfx_KerningPair) {
+            .right = right,
+            .value = value,
+        };
+
+        kerning_pairs_offset += BFNT_KERNING_PAIR_SIZE;
+    }
+    */
+
+   /**
+    Glyphs
+    */
     unsigned char* glyphs_offset = blocks_offset;
     for (int i = 0; i < glyphs_count; i++) {
         bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_PAGE_OFFSET);
         bs_U32 atlas_index = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_ATLAS_INDEX);
         bs_U32 glyph_index = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_GLYPH_INDEX);
         bs_U32 codepoint = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_CODEPOINT);
+        int o = glyphs_offset - blocks_offset;
+
+        assert(atlas_index < atlas_object->atlas->count);
 
         font->glyphs[i] = (bsgfx_Glyph) {
             .atlas_page = page,
@@ -310,6 +363,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
         glyphs_offset += BFNT_GLYPH_SIZE;
     }
 
+    *out = bfnt;
     return BS_RESULT_OK;
 }
 
@@ -321,6 +375,8 @@ BSGFXAPI void _bsgfx_test() {
     bs_Resource* resource;
     _bsgfx_loadFont(package_id, "project/fonts/segoeui.ttf", 0, &resource);
 
+    bsgfx_Font* font = resource->model;
+    bs_bindImage(BSGFX_SET_FONTS, BSGFX_BINDING_FONTS, font->atlas_object->atlas->image, bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_LINEAR)->sampler, BS_IMAGE_LAYOUT_GENERAL);
 
     //_bsgfx_loadFont(package_id, "")
 
