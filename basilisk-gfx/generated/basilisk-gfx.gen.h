@@ -1873,6 +1873,9 @@ struct bsgfx_Glyph {
     int glyph_index;
     int advance_x;
     int advance_y;
+    int y_offset;
+    bs_U16 kerning_pair_start;
+    bs_U16 kerning_pair_count;
 };
 
 struct bsgfx_UnicodeBlock2 {
@@ -1883,8 +1886,15 @@ struct bsgfx_UnicodeBlock2 {
 };
 
 struct bsgfx_KerningPair {
-    int right;
-    float value;
+    bs_U16 right;
+    bs_I16 left_x_placement;
+    bs_I16 left_y_placement;
+    bs_I16 left_x_advance;
+    bs_I16 left_y_advance;
+    bs_I16 right_x_placement;
+    bs_I16 right_y_placement;
+    bs_I16 right_x_advance;
+    bs_I16 right_y_advance;
 };
 
 struct bsgfx_Font {
@@ -1892,6 +1902,7 @@ struct bsgfx_Font {
     int pt_sizes_count;
     int glyphs_count;
     int kerning_pairs_count;
+    bs_U16 units_per_em;
     bs_Object* atlas_object;
     bsgfx_UnicodeBlock2* blocks;
     bsgfx_Glyph* glyphs;

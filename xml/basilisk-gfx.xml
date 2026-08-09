@@ -1765,6 +1765,9 @@
             <field><type>int</type><name>glyph_index</name></field>
             <field><type>int</type><name>advance_x</name></field>
             <field><type>int</type><name>advance_y</name></field>
+            <field><type>int</type><name>y_offset</name></field>
+            <field><type>bs_U16</type><name>kerning_pair_start</name></field>
+            <field><type>bs_U16</type><name>kerning_pair_count</name></field>
         </structure>
 		
 		<structure name="bsgfx_UnicodeBlock2">
@@ -1775,8 +1778,17 @@
         </structure>
 				
 		<structure name="bsgfx_KerningPair">
-            <field><type>int</type><name>right</name></field>
-            <field><type>float</type><name>value</name></field>
+			<field><type>bs_U16</type><name>right</name></field>
+
+			<field><type>bs_I16</type><name>left_x_placement</name></field>
+			<field><type>bs_I16</type><name>left_y_placement</name></field>
+			<field><type>bs_I16</type><name>left_x_advance</name></field>
+			<field><type>bs_I16</type><name>left_y_advance</name></field>
+
+			<field><type>bs_I16</type><name>right_x_placement</name></field>
+			<field><type>bs_I16</type><name>right_y_placement</name></field>
+			<field><type>bs_I16</type><name>right_x_advance</name></field>
+			<field><type>bs_I16</type><name>right_y_advance</name></field>
         </structure>
 		
 		<structure name="bsgfx_Font">
@@ -1784,6 +1796,7 @@
             <field><type>int</type><name>pt_sizes_count</name></field>
             <field><type>int</type><name>glyphs_count</name></field>
             <field><type>int</type><name>kerning_pairs_count</name></field>
+            <field><type>bs_U16</type><name>units_per_em</name></field>
             <field><type>bs_Object*</type><name>atlas_object</name></field>
             <field><type>bsgfx_UnicodeBlock2*</type><name>blocks</name></field>
             <field><type>bsgfx_Glyph*</type><name>glyphs</name></field>

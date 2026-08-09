@@ -164,11 +164,11 @@
   */
 #define BFNT_MAGIC_OFFSET                    0 // U32
 #define BFNT_VERSION_OFFSET                  4 // U32
-#define BFNT_BLOCKS_COUNT_OFFSET             8 // U16
-#define BFNT_PT_SIZES_COUNT_OFFSET          10 // U16
-#define BFNT_GLYPHS_COUNT_OFFSET            12 // U32
-#define BFNT_KERNING_PAIRS_COUNT_OFFSET     16 // U32
-#define BFNT_RESERVED_0                     20 // U32
+#define BFNT_GLYPHS_COUNT_OFFSET             8 // U32
+#define BFNT_BLOCKS_COUNT_OFFSET            12 // U16
+#define BFNT_PT_SIZES_COUNT_OFFSET          14 // U16
+#define BFNT_KERNING_PAIRS_COUNT_OFFSET     16 // U16
+#define BFNT_UNITS_PER_EM                   18 // U16
 
  /**
   Mapping all 355 codepoint blocks found in Unicode 18.0.0 to an 
@@ -179,7 +179,7 @@
 //
 //#define BFNT_HEADER_SIZE (BFNT_BLOCK_LOOKUP_OFFSET + BFNT_BLOCK_LOOKUP_LENGTH)
 
-#define BFNT_HEADER_SIZE                24
+#define BFNT_HEADER_SIZE                20
 
  /**
   Rasterized pt sizes
@@ -204,28 +204,28 @@
 #define BFNT_GLYPH_PAGE_OFFSET          0 // U16
 #define BFNT_GLYPH_KERNING_START_OFFSET 2 // U16
 #define BFNT_GLYPH_KERNING_COUNT_OFFSET 4 // U16
-#define BFNT_GLYPH_KERNING_START_OFFSET 6 // U16
-#define BFNT_GLYPH_KERNING_COUNT_OFFSET 8 // U16
-#define BFNT_GLYPH_GLYPH_INDEX         10 // U16
-#define BFNT_GLYPH_ATLAS_INDEX         12 // U16
-#define BFNT_GLYPH_CODEPOINT           14 // U32
+#define BFNT_GLYPH_GLYPH_INDEX          6 // U16
+#define BFNT_GLYPH_ATLAS_INDEX          8 // U16
+#define BFNT_GLYPH_RESERVED_0          10 // U16
+#define BFNT_GLYPH_CODEPOINT           12 // U32
+#define BFNT_GLYPH_Y_OFFSET            16 // I32
 
-#define BFNT_GLYPH_SIZE                18
+#define BFNT_GLYPH_SIZE                24
 
  /**
   Kerning pairs
   */
-#define BFNT_KERNING_PAIR_RIGHT_OFFSET      0 // U16
-#define BFNT_KERN_LEFT_X_PLACEMENT_OFFSET   2 // I16
-#define BFNT_KERN_LEFT_Y_PLACEMENT_OFFSET   4 // I16
-#define BFNT_KERN_LEFT_X_ADVANCE_OFFSET     6 // I16
-#define BFNT_KERN_LEFT_Y_ADVANCE_OFFSET     8 // I16
-#define BFNT_KERN_RIGHT_X_PLACEMENT_OFFSET 10 // I16
-#define BFNT_KERN_RIGHT_Y_PLACEMENT_OFFSET 12 // I16
-#define BFNT_KERN_RIGHT_X_ADVANCE_OFFSET   14 // I16
-#define BFNT_KERN_RIGHT_Y_ADVANCE_OFFSET   16 // I16
+#define BFNT_KERNING_PAIR_RIGHT_OFFSET      0 // U32
+#define BFNT_KERN_LEFT_X_PLACEMENT_OFFSET   4 // I16
+#define BFNT_KERN_LEFT_Y_PLACEMENT_OFFSET   6 // I16
+#define BFNT_KERN_LEFT_X_ADVANCE_OFFSET     8 // I16
+#define BFNT_KERN_LEFT_Y_ADVANCE_OFFSET    10 // I16
+#define BFNT_KERN_RIGHT_X_PLACEMENT_OFFSET 12 // I16
+#define BFNT_KERN_RIGHT_Y_PLACEMENT_OFFSET 14 // I16
+#define BFNT_KERN_RIGHT_X_ADVANCE_OFFSET   16 // I16
+#define BFNT_KERN_RIGHT_Y_ADVANCE_OFFSET   18 // I16
 
-#define BFNT_KERNING_PAIR_SIZE         18
+#define BFNT_KERNING_PAIR_SIZE             20
 
 
 

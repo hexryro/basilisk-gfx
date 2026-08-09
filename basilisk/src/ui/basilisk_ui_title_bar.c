@@ -133,7 +133,7 @@ void basilisk_instanceTitleBarUI() {
         bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
         if (resource && resource->model) {
             bsgfx_Font* font = resource->model;
-            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(0, 0, 0), 44, BS_CONSTANT_STRING("abc123AV"));
+            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(0, 0, 0), 44, BS_CONSTANT_STRING("Hamburgevons"));
         }
     }
 

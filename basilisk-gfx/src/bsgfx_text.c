@@ -179,8 +179,12 @@ static bsgfx_UnicodeBlock2* _bsgfx_queryUnicodeBlock(bsgfx_Font* font, char32_t 
 static inline bsgfx_Glyph* _bsgfx_getGlyph(const bsgfx_Font* font, const bsgfx_UnicodeBlock2* block, char32_t c, int pt_size_id) {
     const int pt_offset = pt_size_id * block->count;
     int glyph_offset = block->glyphs_offset + pt_offset + (c - block->offset);
-
+    assert(glyph_offset < font->glyphs_count);
     return font->glyphs + glyph_offset;
+}
+
+static inline float _bsgfx_convertDesignUnits(bsgfx_Font* font, float pt_size, float units) {
+    return (units / (float)font->units_per_em) * pt_size;
 }
 
 BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
@@ -206,6 +210,9 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
 
     int glyph_pt_offset = pt_size_id * block->count;
 
+    bs_vec2 next_glyph_placement = { 0 };
+    bs_vec2 next_glyph_advance = { 0 };
+
     for (int i = 0; i < text_length; i++) {
         char c = text[i];
         if (c < 0)
@@ -213,12 +220,52 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
 
         bsgfx_Glyph* glyph = _bsgfx_getGlyph(font, block, c, pt_size_id);
 
-        bs_mat4 transform = BS_MAT4_IDENTITY;
-
         bs_vec2 size = bs_atlasSize(font->atlas_object->atlas, glyph->atlas_index);
         bs_vec4 coords = bs_atlasCoordinates(font->atlas_object->atlas, glyph->atlas_index);
 
-        bs_m4Translate(&transform, &position, &transform);
+        bs_vec2 placement = next_glyph_placement;
+        bs_vec2 advance = next_glyph_advance;
+
+        next_glyph_placement = BS_V2(0, 0);
+        next_glyph_advance = BS_V2(0, 0);
+
+        bs_vec3 p = position;
+        p.x += placement.x;
+        p.y += placement.y;
+
+        if (i < (text_length - 1)) {
+            char next = text[i + 1];
+            //bsgfx_Glyph* next_glyph = _bsgfx_getGlyph(font, block, c, pt_size_id);
+
+            //int next_index = font->table[next];
+
+            int start = glyph->kerning_pair_start;
+            int end = start + glyph->kerning_pair_count;
+
+            for (int j = start; j < end; j++) {
+                bsgfx_KerningPair* pair = font->kerning_pairs + j;
+
+                if (next == pair->right) {
+                    p.x += _bsgfx_convertDesignUnits(font, pt_size, pair->left_x_placement);
+                    p.y += _bsgfx_convertDesignUnits(font, pt_size, pair->left_y_placement);
+
+                    advance.x += _bsgfx_convertDesignUnits(font, pt_size, pair->left_x_advance);
+                    advance.y += _bsgfx_convertDesignUnits(font, pt_size, pair->left_y_advance);
+
+                    next_glyph_placement.x = _bsgfx_convertDesignUnits(font, pt_size, pair->right_x_placement);
+                    next_glyph_placement.y = _bsgfx_convertDesignUnits(font, pt_size, pair->right_y_placement);
+
+                    next_glyph_advance.x = _bsgfx_convertDesignUnits(font, pt_size, pair->right_x_advance);
+                    next_glyph_advance.y = _bsgfx_convertDesignUnits(font, pt_size, pair->right_y_advance);
+
+                    break;
+                }
+            }
+        }
+
+        bs_mat4 transform = BS_MAT4_IDENTITY;
+
+        bs_m4Translate(&transform, &p, &transform);
         bs_m4Scale(&transform, &BS_V3(size.x, size.y, 0), &transform);
 
         bsgfx_instanceQuad(subtype, bs_m4x3(&transform), coords, 0, glyph->atlas_page, 0);
@@ -226,6 +273,9 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
         // instanceAtlasTexture(glyph->atlas_page, glyph->atlas_index)
 
         position.x += glyph->advance_x;
+
+        position.x += advance.x;
+        position.y += advance.y;
     }
 
 }
@@ -283,18 +333,20 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
     bs_U16 blocks_count = bs_getLittleEndian16(data + BFNT_BLOCKS_COUNT_OFFSET);
     bs_U16 pt_sizes_count = bs_getLittleEndian16(data + BFNT_PT_SIZES_COUNT_OFFSET);
     bs_U32 glyphs_count = bs_getLittleEndian32(data + BFNT_GLYPHS_COUNT_OFFSET);
-    bs_U32 kerning_pairs_count = bs_getLittleEndian32(data + BFNT_KERNING_PAIRS_COUNT_OFFSET);
+    bs_U16 kerning_pairs_count = bs_getLittleEndian16(data + BFNT_KERNING_PAIRS_COUNT_OFFSET);
+    bs_U16 units_per_em = bs_getLittleEndian16(data + BFNT_UNITS_PER_EM);
     //bs_U32 glyphs_count = atlas_object->atlas->count;
 
     font->blocks_count = blocks_count;
     font->pt_sizes_count = pt_sizes_count;
     font->glyphs_count = glyphs_count;
     font->kerning_pairs_count = kerning_pairs_count;
+    font->units_per_em = units_per_em;
 
     if (blocks_count > 0) font->blocks = bs_malloc(blocks_count * sizeof(bsgfx_UnicodeBlock2));
     if (pt_sizes_count > 0) font->pt_sizes = bs_malloc(pt_sizes_count * sizeof(int));
     if (glyphs_count > 0) font->glyphs = bs_malloc(glyphs_count * sizeof(bsgfx_Glyph));
-    if (kerning_pairs_count > 0) font->kerning_pairs = bs_malloc(glyphs_count * sizeof(bsgfx_KerningPair));
+    if (kerning_pairs_count > 0) font->kerning_pairs = bs_malloc(kerning_pairs_count * sizeof(bsgfx_KerningPair));
 
    /**
     Pt sizes
@@ -345,10 +397,13 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
     unsigned char* glyphs_offset = blocks_offset;
     for (int i = 0; i < glyphs_count; i++) {
         bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_PAGE_OFFSET);
-        bs_U32 atlas_index = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_ATLAS_INDEX);
-        bs_U32 glyph_index = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_GLYPH_INDEX);
+        bs_U16 atlas_index = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_ATLAS_INDEX);
+        bs_U16 glyph_index = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_GLYPH_INDEX);
         bs_U32 codepoint = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_CODEPOINT);
-        int o = glyphs_offset - blocks_offset;
+        bs_I32 y_offset = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_Y_OFFSET);
+        
+        bs_U16 kern_start_pair = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_KERNING_START_OFFSET);
+        bs_U16 kern_count_pair = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_KERNING_COUNT_OFFSET);
 
         assert(atlas_index < atlas_object->atlas->count);
 
@@ -358,9 +413,46 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
             .glyph_index = glyph_index,
             .advance_x = atlas_object->atlas->mapped[atlas_index].w, // temp
             .advance_y = 16.0, // temp
+            .kerning_pair_start = kern_start_pair,
+            .kerning_pair_count = kern_count_pair,
+            .y_offset = y_offset,
         };
 
         glyphs_offset += BFNT_GLYPH_SIZE;
+    }
+
+   /**
+    Kerning pairs
+    */
+    unsigned char* kerning_pairs_offset = glyphs_offset;
+    for (int i = 0; i < kerning_pairs_count; i++) {
+        bs_U32 right = bs_getLittleEndian32(kerning_pairs_offset + BFNT_KERNING_PAIR_RIGHT_OFFSET);
+
+        bs_I16 left_x_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_X_PLACEMENT_OFFSET);
+        bs_I16 left_y_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_Y_PLACEMENT_OFFSET);
+        bs_I16 left_x_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_X_ADVANCE_OFFSET);
+        bs_I16 left_y_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_Y_ADVANCE_OFFSET);
+
+        bs_I16 right_x_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_X_PLACEMENT_OFFSET);
+        bs_I16 right_y_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_Y_PLACEMENT_OFFSET);
+        bs_I16 right_x_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_X_ADVANCE_OFFSET);
+        bs_I16 right_y_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_Y_ADVANCE_OFFSET);
+
+        font->kerning_pairs[i] = (bsgfx_KerningPair) {
+            .right = right,
+
+            .left_x_placement = left_x_placement,
+            .left_y_placement = left_y_placement,
+            .left_x_advance = left_x_advance,
+            .left_y_advance = left_y_advance,
+
+            .right_x_placement = right_x_placement,
+            .right_y_placement = right_y_placement,
+            .right_x_advance = right_x_advance,
+            .right_y_advance = right_y_advance,
+        };
+
+        kerning_pairs_offset += BFNT_KERNING_PAIR_SIZE;
     }
 
     *out = bfnt;

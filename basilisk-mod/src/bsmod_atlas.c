@@ -35,7 +35,6 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 	int width, 
 	int height, 
 	int category, 
-	char user_data[12],
 	char* name, 
 	int name_length) 
 {
@@ -48,9 +47,6 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 		.page = -1,
 		.category = category,
 	};
-
-	if (user_data)
-		memcpy(info.user_data, user_data, sizeof(info.user_data));
 
 	stbrp_rect rect = {
 		.w = width,
@@ -187,7 +183,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 		memcpy(offset, "\0\n", 2);
 		offset += 2;
 
-		int w = width - padding;
+		int w = width;
 
 		if (info->get_data)
 			info->data = info->get_data(packer, rect->id);
@@ -197,8 +193,8 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 		atlas_offset += info->page * width * height * header.channels_count;
 		for (int y = 0; y < rect->h; y++) {
 			unsigned char* dst = atlas_offset;
-			dst += (rect->x + padding) * header.channels_count;
-			dst += (rect->y + padding + y) * w * header.channels_count;
+			dst += (rect->x) * header.channels_count;
+			dst += (rect->y + y) * w * header.channels_count;
 
 			unsigned char* src = info->data;
 			src += y * rect->w * header.channels_count;
@@ -212,7 +208,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 
 	memcpy(batl, &header, sizeof(bs_BatlHeader));
 
-	//result = bs_savePng(batl + header.binary_offset, BS_IV2(width, height), BS_PNG_RGBA, BS_CONSTANT_STRING("test.png"));
+	//result = bs_savePngN(batl + total_size_excluding_binary, BS_IV2(width, height), BS_PNG_GREY, BS_CONSTANT_STRING("test.png"));
 
 	result = _bsmod_packResource(BS_RESOURCE_ATLAS, batl, total_size, package_name, resource_name);
 	bs_free(batl);

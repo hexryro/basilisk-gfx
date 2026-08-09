@@ -254,7 +254,7 @@
         "package": "content/basilisk-fonts.bpak",
         "prefix": "fonts/",
         "callOnce": false,
-        "lastModified": "2026-08-07 12:18:50",
+        "lastModified": "2026-08-09 14:21:15",
         "entries": [
             "project/fonts/notonaskharabic.ttf",
             "project/fonts/segoeui.ttf"
