@@ -35,8 +35,7 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 	int width, 
 	int height, 
 	int category, 
-	int id1,
-	int id2,
+	char user_data[12],
 	char* name, 
 	int name_length) 
 {
@@ -46,12 +45,12 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 		.data = data,
 		.get_data = get_data,
 		.param = param,
-		.id1 = id1,
-		.id2 = id2,
 		.page = -1,
-		.reserved = packer->info.count,
 		.category = category,
 	};
+
+	if (user_data)
+		memcpy(info.user_data, user_data, sizeof(info.user_data));
 
 	stbrp_rect rect = {
 		.w = width,
@@ -123,7 +122,6 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 
 			if (rect->was_packed) {
 				bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, rect->id);
-				assert(info->reserved == rect->id);
 
 				info->page = header.pages_count;
 				original_rects[packer->rects.count++] = *rect;
@@ -169,7 +167,6 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 	for (int i = 0; i < header.images_count; i++) {
 		stbrp_rect* rect = bs_fetchUnit(&packer->rects, i);
 		bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, rect->id);
-		assert(info->reserved == rect->id);
 
 		bs_BatlImage batl_image = {
 			.x = rect->x,

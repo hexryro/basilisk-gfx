@@ -148,9 +148,6 @@
 			<field><type>int</type><name>name_length</name></field>
 			<field><type>int</type><name>category</name></field>
 			<field><type>int</type><name>page</name></field>
-			<field><type>int</type><name>id1</name></field>
-			<field><type>int</type><name>id2</name></field>
-			<field><type>int</type><name>reserved</name></field>
 		</structure>
 
 		<structure name="bsmod_Chunk">
@@ -298,8 +295,6 @@
 			<param><type>int</type><name>width</name></param>
 			<param><type>int</type><name>height</name></param>
 			<param><type>int</type><name>category</name></param>
-			<param><type>int</type><name>id1</name></param>
-			<param><type>int</type><name>id2</name></param>
 		</variadicStringTemplate>
 		<function name="bsmod_destroyAtlasPacker">
 			<return>void</return>

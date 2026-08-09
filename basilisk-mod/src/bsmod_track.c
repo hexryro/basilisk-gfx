@@ -277,8 +277,6 @@ static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* 
 			png_data.width, 
 			png_data.height, 
 			0,
-			0,
-			0,
 			name
 		);
 
