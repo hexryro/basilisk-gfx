@@ -186,63 +186,63 @@ BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 
 	bsmod_UnicodeBlockRange ranges[] = {
 		{
-			.block = BSGFX_UNICODE_BLOCK_BASIC_LATIN,
+			.block = BSMOD_UNICODE_BLOCK_BASIC_LATIN,
 			.offset = 0,
 			.count = 0x007F - 0,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_LATIN_1_SUPPLEMENT,
+			.block = BSMOD_UNICODE_BLOCK_LATIN_1_SUPPLEMENT,
 			.offset = 0x00A0,
 			.count = 0x00FF - 0x00A0,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_A,
+			.block = BSMOD_UNICODE_BLOCK_LATIN_EXTENDED_A,
 			.offset = 0x0100,
 			.count = 0x017F - 0x0100,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_LATIN_EXTENDED_B,
+			.block = BSMOD_UNICODE_BLOCK_LATIN_EXTENDED_B,
 			.offset = 0x0180,
 			.count = 0x024F - 0x0180,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_IPA_EXTENSIONS,
+			.block = BSMOD_UNICODE_BLOCK_IPA_EXTENSIONS,
 			.offset = 0x0250,
 			.count = 0x02AF - 0x0250,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_SPACING_MODIFIER_LETTERS,
+			.block = BSMOD_UNICODE_BLOCK_SPACING_MODIFIER_LETTERS,
 			.offset = 0x02B0,
 			.count = 0x02FF - 0x02B0,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_GREEK,
+			.block = BSMOD_UNICODE_BLOCK_GREEK,
 			.offset = 0x0370,
 			.count = 0x03FF - 0x0370,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_CYRILLIC,
+			.block = BSMOD_UNICODE_BLOCK_CYRILLIC,
 			.offset = 0x0400,
 			.count = 0x04FF - 0x0400,
 			.size = 1,
 			.rasterize = true,
 		},
 		{
-			.block = BSGFX_UNICODE_BLOCK_ARMENIAN,
+			.block = BSMOD_UNICODE_BLOCK_ARMENIAN,
 			.offset = 0x0530,
 			.count = 0x058F - 0x0530,
 			.size = 1,
@@ -252,7 +252,8 @@ BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 
 	int ranges_count = sizeof(ranges) / sizeof(*ranges);
 
-	int pt_sizes[] = { 44 };
+	//int pt_sizes[] = { 4, 6, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 56, 64, 72, 144 };
+	int pt_sizes[] = { 16 };
 
 	int pt_sizes_count = sizeof(pt_sizes) / sizeof(*pt_sizes);
 

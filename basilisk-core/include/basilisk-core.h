@@ -191,39 +191,41 @@
  /**
   Font specific codepoint ranges
   */
-#define BFNT_BLOCK_START_OFFSET         0 // U32
-#define BFNT_BLOCK_LENGTH_OFFSET        4 // U16
-#define BFNT_BLOCK_SIZE_OFFSET          6 // U16
-#define BFNT_BLOCK_GLYPHS_OFFSET        8 // U32 - Value is 0 if no atlas is available
+#define BFNT_BLOCK_START                0 // U32
+#define BFNT_BLOCK_LENGTH               4 // U16
+#define BFNT_BLOCK_SIZE                 6 // U16
+#define BFNT_BLOCK_GLYPHS               8 // U32 - Value is 0 if no atlas is available
 
 #define BFNT_BLOCK_SIZE                12
 
  /**
   Rasterized glyphs 
   */
-#define BFNT_GLYPH_PAGE_OFFSET          0 // U16
-#define BFNT_GLYPH_KERNING_START_OFFSET 2 // U16
-#define BFNT_GLYPH_KERNING_COUNT_OFFSET 4 // U16
+#define BFNT_GLYPH_PAGE                 0 // U16
+#define BFNT_GLYPH_KERNING_START        2 // U16
+#define BFNT_GLYPH_KERNING_COUNT        4 // U16
 #define BFNT_GLYPH_GLYPH_INDEX          6 // U16
 #define BFNT_GLYPH_ATLAS_INDEX          8 // U16
 #define BFNT_GLYPH_RESERVED_0          10 // U16
 #define BFNT_GLYPH_CODEPOINT           12 // U32
 #define BFNT_GLYPH_Y_OFFSET            16 // I32
+#define BFNT_GLYPH_X_ADVANCE           20 // I32
+#define BFNT_GLYPH_Y_ADVANCE           24 // I32
 
-#define BFNT_GLYPH_SIZE                24
+#define BFNT_GLYPH_SIZE                28
 
  /**
   Kerning pairs
   */
-#define BFNT_KERNING_PAIR_RIGHT_OFFSET      0 // U32
-#define BFNT_KERN_LEFT_X_PLACEMENT_OFFSET   4 // I16
-#define BFNT_KERN_LEFT_Y_PLACEMENT_OFFSET   6 // I16
-#define BFNT_KERN_LEFT_X_ADVANCE_OFFSET     8 // I16
-#define BFNT_KERN_LEFT_Y_ADVANCE_OFFSET    10 // I16
-#define BFNT_KERN_RIGHT_X_PLACEMENT_OFFSET 12 // I16
-#define BFNT_KERN_RIGHT_Y_PLACEMENT_OFFSET 14 // I16
-#define BFNT_KERN_RIGHT_X_ADVANCE_OFFSET   16 // I16
-#define BFNT_KERN_RIGHT_Y_ADVANCE_OFFSET   18 // I16
+#define BFNT_KERNING_PAIR_RIGHT         0 // U32
+#define BFNT_KERN_LEFT_X_PLACEMENT      4 // I16
+#define BFNT_KERN_LEFT_Y_PLACEMENT      6 // I16
+#define BFNT_KERN_LEFT_X_ADVANCE        8 // I16
+#define BFNT_KERN_LEFT_Y_ADVANCE       10 // I16
+#define BFNT_KERN_RIGHT_X_PLACEMENT    12 // I16
+#define BFNT_KERN_RIGHT_Y_PLACEMENT    14 // I16
+#define BFNT_KERN_RIGHT_X_ADVANCE      16 // I16
+#define BFNT_KERN_RIGHT_Y_ADVANCE      18 // I16
 
 #define BFNT_KERNING_PAIR_SIZE             20
 

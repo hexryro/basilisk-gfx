@@ -106,11 +106,11 @@ BSGFXAPI void _bsgfx_requiredForStencilShadows(bs_PipelineHash* inout) {
 }
 
 BSGFXAPI void _bsgfx_requiredForTransparency(bs_PipelineHash* inout) {
-    inout->src_alpha_factor = BS_BLEND_FACTOR_SRC_ALPHA;
-    inout->dst_alpha_factor = BS_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
     inout->src_color_factor = BS_BLEND_FACTOR_SRC_ALPHA;
     inout->dst_color_factor = BS_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
     inout->color_op = BS_BLEND_OP_ADD;
+    inout->src_alpha_factor = BS_BLEND_FACTOR_ONE;
+    inout->dst_alpha_factor = BS_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
     inout->alpha_op = BS_BLEND_OP_ADD;
 }
 

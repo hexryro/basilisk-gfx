@@ -322,7 +322,7 @@ void basilisk_renderFontSubtype(int subtype, bsgfx_Id font_id, bs_Shader* fragme
     hash = bsgfx_defaultPipelineHash();
     hash.shaders[0] = vertex_shader;
     hash.shaders[1] = fragment_shader;
-    // bsgfx_requiredForTransparency(&hash);
+    bsgfx_requiredForTransparency(&hash);
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
         bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
