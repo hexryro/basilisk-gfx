@@ -32,9 +32,7 @@
 #define STB_RECT_PACK_IMPLEMENTATION
 #include <stb_rect_pack/stb_rect_pack.h>
 
-static bs_List _bsmod_string_pool = { .unit_size = sizeof(bs_StringPoolEntry), .increment = 64 };
-
-struct bsmod_Hook {
+typedef struct {
 	char* path;
 	char* function;
 	char* package;
@@ -42,13 +40,17 @@ struct bsmod_Hook {
 	bool call_once;
 	bs_DateTime last_modified;
 	bs_List entries;
-};
+} bsmod_Hook;
+
+volatile long _bsmod_has_performed_tracked_changes_ = 0;
+
+static bs_List _bsmod_string_pool = { .unit_size = sizeof(bs_StringPoolEntry), .increment = 64 };
 
 // todo make this reloadable
 static bs_List* _bsmod_loadHooks() {
 	bs_Result result;
 
-	static bs_List hooks = { .unit_size = sizeof(struct bsmod_Hook), .increment = 16 };
+	static bs_List hooks = { .unit_size = sizeof(bsmod_Hook), .increment = 16 };
 	if (hooks.capacity)
 		return &hooks;
 
@@ -67,7 +69,7 @@ static bs_List* _bsmod_loadHooks() {
 		//last_modified = bs_stringF(last_modified, "%02d-%02d-%02d %02d:%02d:%02d", m.years, m.months, m.days, m.hours, m.minutes, m.seconds);
 
 		char* prefix = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("prefix")).as_string;
-		struct bsmod_Hook dir = {
+		bsmod_Hook dir = {
 			.path = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("path")).as_string),
 			.function = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("function")).as_string),
 			.package = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("package")).as_string),
@@ -105,7 +107,7 @@ static void _bsmod_saveHooks(bs_List* hooks) {
 	bs_ensureJsonMutable(&json);
 
 	for (int i = 0; i < hooks->count; i++) {
-		struct bsmod_Hook* dir = bs_fetchUnit(hooks, i);
+		bsmod_Hook* dir = bs_fetchUnit(hooks, i);
 		bs_ensureJsonF(&json, bs_jsonValue(dir->path), "$[%d].path", i);
 		bs_ensureJsonF(&json, bs_jsonValue(dir->function), "$[%d].function", i);
 		bs_ensureJsonF(&json, bs_jsonValue(dir->package), "$[%d].package", i);
@@ -519,7 +521,7 @@ BSMODAPI void _bsmod_onTrack() {
 
 	static bool reload_all = false; // temp
 	for (int i = 0; i < hooks->count; i++) {
-		struct bsmod_Hook* dir = bs_fetchUnit(hooks, i);
+		bsmod_Hook* dir = bs_fetchUnit(hooks, i);
 
 		if (reload_all)
 			bs_logSectionF("Directory \"%s\"", dir->path);
@@ -547,12 +549,12 @@ BSMODAPI void _bsmod_onTrack() {
 			}
 		}
 		else {
-			static bs_List changed_entries = { .unit_size = sizeof(char*), .increment = 16 };
-			static bs_List entries = { .unit_size = sizeof(char*), .increment = 16 };
-			static bs_List added_entries = { .unit_size = sizeof(char*), .increment = 4 };
-			static bs_List removed_entries = { .unit_size = sizeof(char*), .increment = 4 };
+			static bs_List _bsmod_changed_entries = { .unit_size = sizeof(char*), .increment = 16 };
+			static bs_List _bsmod_entries = { .unit_size = sizeof(char*), .increment = 16 };
+			static bs_List _bsmod_added_entries = { .unit_size = sizeof(char*), .increment = 4 };
+			static bs_List _bsmod_removed_entries = { .unit_size = sizeof(char*), .increment = 4 };
 
-			changed_entries.count = entries.count = added_entries.count = removed_entries.count = 0;
+			_bsmod_changed_entries.count = _bsmod_entries.count = _bsmod_added_entries.count = _bsmod_removed_entries.count = 0;
 			struct {
 				bs_DateTime original_date;
 				bs_DateTime date;
@@ -562,18 +564,18 @@ BSMODAPI void _bsmod_onTrack() {
 			} result = {
 				.original_date = dir->last_modified,
 				.date = dir->last_modified,
-				.added_entries = &added_entries,
-				.changed_entries = &changed_entries,
-				.entries = &entries,
+				.added_entries = &_bsmod_added_entries,
+				.changed_entries = &_bsmod_changed_entries,
+				.entries = &_bsmod_entries,
 			};
 
 			bs_foreachFile(_bsmod_findLastModifiedFile, &result, dir->path);
 			bs_foreachDirectory(_bsmod_findLastModifiedDirectory, &result, dir->path); // TODO: this blows up the stack
-			_bsmod_trackDirectoryDifferences(&changed_entries, result.entries, &dir->entries, &added_entries);
-			_bsmod_trackDirectoryDifferences(&changed_entries, &dir->entries, result.entries, &removed_entries);
+			_bsmod_trackDirectoryDifferences(&_bsmod_changed_entries, result.entries, &dir->entries, &_bsmod_added_entries);
+			_bsmod_trackDirectoryDifferences(&_bsmod_changed_entries, &dir->entries, result.entries, &_bsmod_removed_entries);
 
 			bool later = bs_isLaterThan(&result.date, &dir->last_modified);
-			bool changed = added_entries.count > 0 || removed_entries.count > 0;
+			bool changed = _bsmod_added_entries.count > 0 || _bsmod_removed_entries.count > 0;
 
 			// TODO: this code is getting pretty ugly
 
@@ -624,19 +626,19 @@ BSMODAPI void _bsmod_onTrack() {
 						.compile_references = true,
 					};
 
-					int added_count = added_entries.count, removed_count = removed_entries.count;
+					int added_count = _bsmod_added_entries.count, removed_count = _bsmod_removed_entries.count;
 					if (dir->call_once) {
 						added_count = bs_clamp(added_count, 0, 1);
 						removed_count = added_count > 0 ? 0 : bs_clamp(removed_count, 0, 1);
 					}
 
 					for (int j = 0; j < added_count; j++) {
-						params.path = *(char**)bs_fetchUnit(&added_entries, j);
+						params.path = *(char**)bs_fetchUnit(&_bsmod_added_entries, j);
 						function(params);
 					}
 
 					for (int j = 0; j < removed_count; j++) {
-						params.path = *(char**)bs_fetchUnit(&removed_entries, j);
+						params.path = *(char**)bs_fetchUnit(&_bsmod_removed_entries, j);
 						function(params);
 					}
 				}
@@ -654,9 +656,56 @@ BSMODAPI void _bsmod_onTrack() {
 	}
 
 	reload_all = false;
+}
 
-	for (int i = 0; i < _bsmod_packages()->count; i++) {
-		bsmod_Package* package = bs_fetchUnit(_bsmod_packages(), i);
-		bsmod_savePackageF("%s/%s.bpak", package->directory, package->name);
+
+
+  /*==============================================================================
+   * Auto Track
+   *============================================================================*/
+
+static DWORD WINAPI _bsmod_tickAsync(void* param) {
+	while (1) {
+		_bsmod_onTrack();
+		InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 1);
+		Sleep(1000);
+	}
+}
+
+BSMODAPI void _bsmod_beginTrackChanges() {
+	if (bs_args()->track_changes)
+		CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
+}
+
+BSMODAPI void _bsmod_tickTracker() {
+	if (InterlockedCompareExchange(&_bsmod_has_performed_tracked_changes_, 1, 1) == 1) {
+
+		for (int i = 0; i < _bsmod_packages()->count; i++) {
+			bsmod_Package* package = bs_fetchUnit(_bsmod_packages(), i);
+			bsmod_savePackageF("%s/%s.bpak", package->directory, package->name);
+		}
+
+		bool has_changes = false;
+
+		for (int i = 0; i < bsmod_packages()->count; i++) {
+			bsmod_Package* package = bs_fetchUnit(bsmod_packages(), i);
+			int package_id = bs_queryPackage(package->path); // this is shit
+			if (package_id < 0)
+				continue;
+
+			for (int j = 0; j < package->resources.count; j++) {
+				bsmod_Resource* resource = bs_fetchUnit(&package->resources, j);
+				if (resource->has_changes) {
+					_bsmod_loadResource(resource->type, package_id, resource->name);
+					resource->has_changes = false;
+					has_changes = true;
+				}
+			}
+		}
+
+		if (has_changes)
+			bs_pushDescriptors();
+
+		InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 0);
 	}
 }

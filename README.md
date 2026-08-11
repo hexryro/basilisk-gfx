@@ -16,12 +16,12 @@ After that, engine should be working again
 - cglm: https://github.com/recp/cglm
 - FreeType: https://github.com/freetype/freetype
 - glslang: https://github.com/khronosGroup/glslang
-- kb: https://github.com/JimmyLefevre/kb
 - lodepng: https://github.com/lvandeve/lodepng
 - SPIRV-Cross: https://github.com/khronosgroup/spirv-cross
 - stb (stb_rect_pack.h): https://github.com/nothings/stb
 - Vulkan: https://github.com/khronosGroup/Vulkan-Docs
 - yyjson: https://github.com/ibireme/yyjson
+- msdfgl (modified): https://github.com/nyyManni/msdfgl
 
 ## Icons/Artwork
 

@@ -93,6 +93,14 @@ BSMODAPI void _preval_bsmod_onMap(bsgfx_TypeId type_id, int id) {
     next.bsmod_onMap(type_id, id);
 }
 
+BSMODAPI void _preval_bsmod_beginTrackChanges() {
+    next.bsmod_beginTrackChanges();
+}
+
+BSMODAPI void _preval_bsmod_tickTracker() {
+    next.bsmod_tickTracker();
+}
+
 BSMODAPI void _preval_bsmod_onTrack() {
     next.bsmod_onTrack();
 }
@@ -555,6 +563,8 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_onGfxRender = _preval_bsmod_onGfxRender;
     functions.bsmod_onTick = _preval_bsmod_onTick;
     functions.bsmod_onMap = _preval_bsmod_onMap;
+    functions.bsmod_beginTrackChanges = _preval_bsmod_beginTrackChanges;
+    functions.bsmod_tickTracker = _preval_bsmod_tickTracker;
     functions.bsmod_onTrack = _preval_bsmod_onTrack;
     functions.bsmod_onPackBindings = _preval_bsmod_onPackBindings;
     functions.bsmod_onCompileShader = _preval_bsmod_onCompileShader;

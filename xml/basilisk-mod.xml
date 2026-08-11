@@ -573,7 +573,7 @@
 		<function name="bsmod_callbacks">
 			<return>bsmod_Callbacks*</return>
 		</function>
-
+		
 		<function name="bsmod_copyHoveringDataToBuffer">
 			<return>void</return>
 		</function>
@@ -604,6 +604,15 @@
 			<param><type>bsgfx_TypeId</type><name>type_id</name></param>
 			<param><type>int</type><name>id</name></param>
 		</function>
+
+		<function name="bsmod_beginTrackChanges">
+			<return>void</return>
+		</function>
+
+		<function name="bsmod_tickTracker">
+			<return>void</return>
+		</function>
+		
 		<function name="bsmod_onTrack">
 			<return>void</return>
 		</function>

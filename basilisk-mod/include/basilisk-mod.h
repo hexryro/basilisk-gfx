@@ -48,16 +48,19 @@
 
 #define BSMOD_BATCH_IDS(X)									\
     X(BSMOD_BATCH_TILE)                                     \
+    X(BSMOD_BATCH_MSDF_GLYPHS)                              \
     X(BSMOD_BATCHES_COUNT)
 
 #define BSMOD_RENDERER_IDS(X)								\
     X(BSMOD_RENDERER)                                       \
     X(BSMOD_RENDERER_3D)                                    \
+    X(BSMOD_RENDERER_MSDF)                                  \
     X(BSMOD_RENDERERS_COUNT)
 
 #define BSMOD_QUEUE_IDS(X)									\
     X(BSMOD_QUEUE_GRAPHICS)                                 \
     X(BSMOD_QUEUE_GRAPHICS_RASTERIZATION)                   \
+    X(BSMOD_QUEUE_MSDF)                                     \
     X(BSMOD_QUEUES_COUNT)
 
 #define BSMOD_RAY_TRACER_IDS(X) \

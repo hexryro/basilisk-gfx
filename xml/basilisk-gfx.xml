@@ -2005,13 +2005,6 @@
 			<param><type>int</type><name>id</name></param>
 			<param><type>int</type><name>material</name></param>
 		</function>
-		<variadicStringTemplate name="bsgfx_instanceText">
-			<return>void</return>
-			<param><type>int</type><name>subtype</name></param>
-			<param><type>bsgfx_Font*</type><name>font</name></param>
-			<param><type>bsgfx_Text*</type><name>params</name></param>
-			<param><type>bs_vec2*</type><name>out_text_size</name></param>
-		</variadicStringTemplate>
 		<variadicStringTemplate name="bsgfx_instanceASCIIText" string="text">
 			<return>void</return>
 			<param><type>int</type><name>subtype</name></param>

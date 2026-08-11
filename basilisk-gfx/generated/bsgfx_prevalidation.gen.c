@@ -389,30 +389,6 @@ BSGFXAPI int _preval_bsgfx_instanceAtlasFlipped(int subtype, bs_mat4x3 transform
     return next.bsgfx_instanceAtlasFlipped(subtype, transform, texture, flags, id, material);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceText(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value) {
-    BSGFX_VALIDATE(font != NULL, ,);
-    BSGFX_VALIDATE(params != NULL, ,);
-    BSGFX_VALIDATE(out_text_size != NULL, ,);
-    BSGFX_VALIDATE(value != NULL, ,);
-    next.bsgfx_instanceText(subtype, font, params, out_text_size, value);
-}
-
-BSGFXAPI void _preval_bsgfx_instanceTextN(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* value, int value_length) {
-    BSGFX_VALIDATE(font != NULL, ,);
-    BSGFX_VALIDATE(params != NULL, ,);
-    BSGFX_VALIDATE(out_text_size != NULL, ,);
-    BSGFX_VALIDATE(value != NULL, ,);
-    next.bsgfx_instanceTextN(subtype, font, params, out_text_size, value, value_length);
-}
-
-BSGFXAPI void _preval_bsgfx_instanceTextV(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* format, va_list args) {
-    BSGFX_VALIDATE(font != NULL, ,);
-    BSGFX_VALIDATE(params != NULL, ,);
-    BSGFX_VALIDATE(out_text_size != NULL, ,);
-    BSGFX_VALIDATE(format != NULL, ,);
-    next.bsgfx_instanceTextV(subtype, font, params, out_text_size, format, args);
-}
-
 BSGFXAPI void _preval_bsgfx_instanceASCIIText(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text) {
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(text != NULL, ,);
@@ -784,9 +760,6 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_instanceDepthlessCircle = _preval_bsgfx_instanceDepthlessCircle;
     functions.bsgfx_instanceAtlas = _preval_bsgfx_instanceAtlas;
     functions.bsgfx_instanceAtlasFlipped = _preval_bsgfx_instanceAtlasFlipped;
-    functions.bsgfx_instanceText = _preval_bsgfx_instanceText;
-    functions.bsgfx_instanceTextN = _preval_bsgfx_instanceTextN;
-    functions.bsgfx_instanceTextV = _preval_bsgfx_instanceTextV;
     functions.bsgfx_instanceASCIIText = _preval_bsgfx_instanceASCIIText;
     functions.bsgfx_instanceASCIITextN = _preval_bsgfx_instanceASCIITextN;
     functions.bsgfx_instanceASCIITextV = _preval_bsgfx_instanceASCIITextV;

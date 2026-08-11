@@ -304,7 +304,7 @@ static bool _bsgfx_instanceRange(bsgfx_Menu* menu, bsgfx_Widget* widget, bool al
 	};
 
 	bs_vec2 text_size;
-	_bsgfx_instanceTextF(font, &text, "%d/%d", &text_size, *widget->range.value, widget->range.max);
+	//_bsgfx_instanceTextF(font, &text, "%d/%d", &text_size, *widget->range.value, widget->range.max);
 	copy_position.x += text_size.x;
 
 	if (bs_rectangleVsPoint(&copy_position.xy, &copy_dimensions, &cursor) && bs_leftClickOnce()) {
@@ -626,7 +626,7 @@ static bool _bsgfx_instanceString(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	};
 
 	bs_vec2 text_size;
-	_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, widget->string.value, len);
+	//_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, widget->string.value, len);
 	bool hovering = bs_rectangleVsPoint(&text.position.xy, &text_dimensions, &cursor);
 	if (widget->string.on_hover && hovering)
 		widget->string.on_hover(widget);
@@ -675,7 +675,7 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 		};
 
 		bs_vec2 text_size;
-		_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->button.name);
+		//_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->button.name);
 
 	}
 	
@@ -1369,7 +1369,7 @@ static bool _bsgfx_instanceInput(
 			};
 
 			bs_vec2 text_size;
-			_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, c, 1);
+		//_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, c, 1);
 		}
 	}
 
@@ -1392,12 +1392,12 @@ static bool _bsgfx_instanceInput(
 	if (string->len == 0 && widget->input.placeholder_text) {
 		text.material_id = widget->input.placeholder_text_material_id;
 		bs_vec2 text_size;
-		_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->input.placeholder_text);
+		//_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->input.placeholder_text);
 	}
 	else {
 		text.material_id = widget->material_id;
 		bs_vec2 text_size;
-		_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, string->value, BS_MIN(string->len, 1024));
+		//_bsgfx_instanceTextN(menu->text_subtype, font, &text, &text_size, string->value, BS_MIN(string->len, 1024));
 	}
 
 	const float z_offset = 3;
@@ -1836,10 +1836,10 @@ static void _bsgfx_instanceTitleBar(bsgfx_Menu* menu, bsgfx_TitleBar* title_bar,
 	  */
 	if (title_bar->name) {
 		bs_vec2 text_size;
-		_bsgfx_instanceText(menu->text_subtype, font, &(bsgfx_Text) {
-			.position = BS_V4(position.x + bar_padding, position.y + bar_padding, position.z + 1, 1),
-			.scale = 16.0,
-		}, &text_size, title_bar->name);
+	//	_bsgfx_instanceText(menu->text_subtype, font, &(bsgfx_Text) {
+	//		.position = BS_V4(position.x + bar_padding, position.y + bar_padding, position.z + 1, 1),
+	//		.scale = 16.0,
+	//	}, &text_size, title_bar->name);
 	}
 
 	 /**

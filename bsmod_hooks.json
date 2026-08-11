@@ -5,7 +5,7 @@
         "package": "content/bsgfx.bpak",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-08-10 19:48:22",
+        "lastModified": "2026-08-11 22:01:00",
         "entries": [
             "project/basilisk-gfx/shaders/bsgfx.glsl",
             "project/basilisk-gfx/shaders/bsgfx_atlas.glsl",
@@ -46,6 +46,7 @@
             "project/basilisk-gfx/shaders/frag/fs_bsgfx_material_texture.frag",
             "project/basilisk-gfx/shaders/frag/fs_bsgfx_minimap.frag",
             "project/basilisk-gfx/shaders/frag/fs_bsgfx_model.frag",
+            "project/basilisk-gfx/shaders/frag/fs_bsgfx_msdf_glyph.frag",
             "project/basilisk-gfx/shaders/frag/fs_bsgfx_pixelation.frag",
             "project/basilisk-gfx/shaders/frag/fs_bsgfx_sprite.frag",
             "project/basilisk-gfx/shaders/frag/fs_bsgfx_tile.frag",
@@ -74,6 +75,7 @@
             "project/basilisk-gfx/shaders/vert/vs_bsgfx_mesh_instanced.vert",
             "project/basilisk-gfx/shaders/vert/vs_bsgfx_mesh_instanced_2d.vert",
             "project/basilisk-gfx/shaders/vert/vs_bsgfx_mesh_static_instanced.vert",
+            "project/basilisk-gfx/shaders/vert/vs_bsgfx_msdf_glyph.vert",
             "project/basilisk-gfx/shaders/vert/vs_bsgfx_point_instanced.vert",
             "project/basilisk-gfx/shaders/vert/vs_bsgfx_primitive_instanced.vert",
             "project/basilisk-gfx/shaders/vert/vs_bsgfx_quad_instanced.vert",
@@ -254,7 +256,7 @@
         "package": "content/basilisk-fonts.bpak",
         "prefix": "fonts/",
         "callOnce": false,
-        "lastModified": "2026-08-10 19:32:45",
+        "lastModified": "2026-08-11 22:34:17",
         "entries": [
             "project/fonts/notonaskharabic.ttf",
             "project/fonts/segoeui.ttf"

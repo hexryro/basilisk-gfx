@@ -47,11 +47,10 @@ Bsmod _bsmod_ = {
 bs_Json _bsmod_config_ = { 0 };
 
 static int _bsmod_sources_[BS_OBJECT_TYPE_COUNT] = { -1 };
+
 int bsmod_fetchSource(bs_ObjectType type) {
     return _bsmod_sources_[type];
 }
-
-volatile long _bsmod_has_performed_tracked_changes_ = 0;
 
 int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT] = { 0 };
 
@@ -101,43 +100,9 @@ static void _bsmod_instanceAxisFace(
 }
 
 bs_Result _bsmod_loadResource(int type, int package_id, char* name);
+
 BSMODAPI void _bsmod_onTick() {
-    if (InterlockedCompareExchange(&_bsmod_has_performed_tracked_changes_, 1, 1) == 1) {
-
-        bool has_changes = false;
-
-        for (int i = 0; i < bsmod_packages()->count; i++) {
-            bsmod_Package* package = bs_fetchUnit(bsmod_packages(), i);
-            int package_id = bs_queryPackage(package->path); // this is shit
-            if (package_id < 0)
-                continue;
-
-            for (int j = 0; j < package->resources.count; j++) {
-                bsmod_Resource* resource = bs_fetchUnit(&package->resources, j);
-                if (resource->has_changes) {
-                    _bsmod_loadResource(resource->type, package_id, resource->name);
-                    resource->has_changes = false;
-                    has_changes = true;
-                }
-            }
-        }
-
-        if (has_changes)
-            bs_pushDescriptors();
-
-        InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 0);
-    }
-    
-
-   // memset(&_bsmod_.queue, 0, sizeof(_bsmod_.queue));
-
-  //  static float lisk_time = 0.0;
-  //  lisk_time += bs_elapsedTime();
-  //  if (lisk_time > 0.1) {
-  //      if (bs_arguments()->use_lisk)
-  //          _bsmod_tickLisk();
-  //      lisk_time = 0.0;
-  //  }
+    _bsmod_tickTracker();
 
     return;
     if (bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_CURSOR_READS) && bs_bufferIsMapped(bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_CURSOR_READS)->buffer)) {
@@ -184,8 +149,6 @@ BSMODAPI void _bsmod_onTick() {
 
             bs_pushBatch(batch, BS_U32_MAX, BS_U32_MAX);
             bs_setScope(&last);
-
-
 
             /**
 
@@ -247,7 +210,7 @@ BSMODAPI void _bsmod_onTick() {
     } break;
     }
 
-    end:
+end:
     last_selected_count = _bsmod_.selected_ids.count;
     last_selected_type = _bsmod_.selected_type;
 
@@ -386,14 +349,6 @@ BSMODAPI void _bsmod_onGfxRender() {
     }
 }
 
-static DWORD WINAPI _bsmod_tickAsync(void* param) {
-    while (1) {
-        _bsmod_onTrack();
-        InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 1);
-        Sleep(1000);
-    }
-}
-
 static void _bsmod_onLoadVariables() {
     if (_bsmod_config_.doc)
         bs_destroyJson(&_bsmod_config_);
@@ -455,9 +410,6 @@ BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track
 
     result = bs_loadPackageN(&_bsmod_.package, BS_CONSTANT_STRING(BSMOD_CONTENT_PATH));
     bsmod_iniPackage(_bsmod_.package);
-
-    if (bs_args()->track_changes)
-        CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
 }
 
 BSMODAPI void _bsmod_onCreateQuadSubtypes(bs_Range range) {
@@ -509,8 +461,11 @@ BSMODAPI void _bsmod_bindAtlases() {
         bs_bindImages(BSMOD_SET_IMAGE_ATLAS_ICONS, BSMOD_BINDING_IMAGE_ATLAS_ICONS, icon_atlases, BSMOD_ATLAS_ICONS_COUNT);
 }
 
+void _bsmod_loadMsdfResources();
 BSMODAPI void _bsmod_onLoad() {
     bs_Result result;
+
+    _bsmod_loadMsdfResources();
 
     bs_Object* tile_batch_object = BS_BATCH(BSMOD_BATCHES, BSMOD_BATCH_TILE, 0);
     result = bs_batch(tile_batch_object, sizeof(int), $vs_bsgfx_tile_static(), BS_BATCH_KEEP_DATA);
@@ -621,4 +576,6 @@ BSMODAPI void _bsmod_onLoad() {
     bs_loadAtlasN(prefab_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("prefab_icons"));
 
     _bsmod_bindAtlases();
+
+    _bsmod_beginTrackChanges();
 }

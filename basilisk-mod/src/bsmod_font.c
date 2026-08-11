@@ -25,12 +25,13 @@
 
 #include <bsmod_internal.h>
 
-#include <ft2build.h>
 #include <stb_rect_pack/stb_rect_pack.h>
+
+#include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype/tttables.h>
 #include <freetype/ftoutln.h>
-
+ 
 FT_Library _freetype_library = NULL;
 
 bs_Result _bsmod_convertFreetypeError(FT_Error error) {
@@ -532,6 +533,7 @@ static inline void _bsmod_setKerningPairs(unsigned char* kerning_pairs_offset, i
 	*kern_id += count;
 }
 
+void _bsmod_generateGlyphsMSDF();
 BSMODAPI bs_Result _bsmod_packFont(
 	char* package_path, 
 	char* ttf_path, 
@@ -542,6 +544,10 @@ BSMODAPI bs_Result _bsmod_packFont(
 	const char* resource_name,
 	int resource_name_length)
 {
+	_bsmod_generateGlyphsMSDF();
+
+	return BS_RESULT_OK;
+
 	const int channels_count = 1;
 	const int padding = 0;
 

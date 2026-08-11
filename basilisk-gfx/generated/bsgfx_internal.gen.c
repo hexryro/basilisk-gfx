@@ -61,44 +61,6 @@ bsgfx_Material* _bsgfx_materialF(
     return _return;
 }
 
-void _bsgfx_instanceText(
-    int subtype, 
-    bsgfx_Font* font, 
-    bsgfx_Text* params, 
-    bs_vec2* out_text_size, 
-    char* value)
-{
-    _bsgfx_instanceTextN(subtype, font, params, out_text_size, value, strlen(value));
-}
-
-void _bsgfx_instanceTextV(
-    int subtype, 
-    bsgfx_Font* font, 
-    bsgfx_Text* params, 
-    bs_vec2* out_text_size, 
-    char* format, 
-    va_list args)
-{
-    int _length = bs_formatStringLength(format, args);
-    char* _formatted = bs_alloca(_length + 1);
-    vsnprintf(_formatted, _length + 1, format, args);
-    _bsgfx_instanceTextN(subtype, font, params, out_text_size, _formatted, _length);
-}
-
-void _bsgfx_instanceTextF(
-    int subtype, 
-    bsgfx_Font* font, 
-    bsgfx_Text* params, 
-    bs_vec2* out_text_size, 
-    char* format, 
-    ...)
-{
-    va_list args;
-    va_start(args, format);
-    _bsgfx_instanceTextV(subtype, font, params, out_text_size, format, args);
-    va_end(args);
-}
-
 void _bsgfx_instanceASCIIText(
     int subtype, 
     bsgfx_Font* font, 

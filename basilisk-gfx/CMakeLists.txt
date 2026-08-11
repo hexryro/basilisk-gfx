@@ -4,7 +4,6 @@ project(basilisk-gfx)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-file(GLOB_RECURSE KB_FILES "${CMAKE_SOURCE_DIR}/external/kb/*.*")
 file(GLOB_RECURSE GENERATED_FILES "generated/*.*")
 file(GLOB SOURCE_FILES "src/*.c")
 file(GLOB TYPE_FILES "src/types/*.*")
@@ -22,7 +21,6 @@ file(GLOB PROJECT_FILES "./*" LIST_DIRECTORIES false)
 add_library(${PROJECT_NAME} SHARED
     bsgfx_contracts.h
 
-    ${KB_FILES}
     ${SOURCE_FILES}
     ${HEADER_FILES}
     ${GENERATED_FILES}
@@ -37,7 +35,6 @@ add_library(${PROJECT_NAME} SHARED
     ${TYPE_FILES}
 )
 
-source_group("External Files" FILES ${KB_FILES})
 source_group("Source Files" FILES ${SOURCE_FILES})
 source_group("Generated Files" FILES ${GENERATED_FILES})
 

@@ -10,8 +10,6 @@ file(GLOB TYPE_FILES "src/types/*.*")
 
 file(GLOB UI_FILES "src/ui/*.*")
 
-file(GLOB_RECURSE KB_FILES "${CMAKE_SOURCE_DIR}/external/kb/*.*")
-
 file(GLOB VS_SHADER_FILES "resources/shaders/vert/*.*")
 file(GLOB FS_SHADER_FILES "resources/shaders/frag/*.*")
 

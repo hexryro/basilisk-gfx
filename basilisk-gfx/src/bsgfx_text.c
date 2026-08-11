@@ -32,10 +32,6 @@
 #include <string.h>
 #include <uchar.h>
 
-#define KB_TEXT_SHAPE_IMPLEMENTATION
-#define KB_TEXT_SHAPE_STATIC
-#include <kb/kb_text_shape.h>
-
 #define WIDTH   640
 #define HEIGHT  480
 
@@ -60,95 +56,6 @@ BSAPI bs_vec2 _bsgfx_textDimensions(bsgfx_Font* font, char* name, int length) {
     return BS_V2(width, font->height);
     */
     return BS_V2(16, 16); // temp ofc
-}
-
-BSGFXAPI void _bsgfx_instanceTextN(int subtype, bsgfx_Font* font, bsgfx_Text* params, bs_vec2* out_text_size, char* text, int text_length) {
-	/*
-	if (!text)
-		text = "(null)";
-
-	bs_RGBA color = BS_WHITE;
-
-	bs_vec2 offset = { 0 };
-
-	bs_vec3 scale;
-	bs_v2MulS(&BS_V2(font->spacing, font->atlas->mapped[0].h), params->scale, &scale.xy);
-	scale.z = 0.0;
-
-	bs_mat4 transform = BS_MAT4_IDENTITY;
-	bs_m4Translate(&transform, &params->position.xyz, &transform);
-	bs_m4Rotate(&transform, &BS_QUAT_IDENTITY, &transform);
-	bs_m4Scale(&transform, &scale, &transform);
-
-	bs_U32 flags;
-	float layout_scale = (params->scale / (float)font->units_per_em);
-
-	for (int i = 0; i < text_length; i++) {
-		char c = text[i];
-		int index = font->table[c];
-		if (index >= font->atlas->count)
-			index = 0;
-
-		flags = params->flags;
-		if ((params->select_end || params->select_start) && (
-			(i >= params->select_start && i < params->select_end) ||
-			(i > params->select_end && i <= params->select_start))) {
-			flags |= BSGFX_ID_FONT_IS_SELECTED;
-		}
-
-		float spacing = font->glyphs[index].advance_width * layout_scale;
-		if (c == ' ') {
-			float new_offset = offset.x + spacing * layout_scale;
-			if (params->max_length > 0.0 && new_offset > params->max_length)
-				break;
-
-			transform.v[3].x = params->position.x + offset.x;
-			transform.v[3].y = params->position.y + offset.y;
-			transform.v[0].x = spacing * layout_scale;
-			transform.v[1].y = font->height * layout_scale;
-			//bsgfx_instanceQuad(subtype, bs_m4x3(transform), bs_v4(0, 0, 0, 0), flags, 0, 0);
-
-			offset.x = new_offset;
-			continue;
-		}
-		else if (c == '\n') {
-			offset.x = 0.0;
-			offset.y -= font->height * layout_scale;
-			continue;
-		}
-
-		bs_vec4 coords = bs_atlasCoordinates(font->atlas, index);
-		bs_vec2 size = bs_atlasSize(font->atlas, index);
-
-		float new_offset = offset.x + size.x * layout_scale;
-		if (params->max_length > 0.0 && new_offset > params->max_length)
-			break;
-
-		transform.v[3].x = params->position.x + offset.x;
-		transform.v[3].y = params->position.y + offset.y + ((float)font->glyphs[index].y_offset) * layout_scale;
-		transform.v[0].x = (size.x + font->glyphs[index].left_side_bearing) * layout_scale;
-		transform.v[1].y = size.y * layout_scale;
-
-		_bsgfx_instanceQuad(subtype, bs_m4x3(&transform), coords, flags, 0, params->material_id);
-		offset.x += spacing;
-
-		if (i <= (text_length - 1)) {
-			char next = text[i + 1];
-			int next_index = font->table[next];
-
-			for (int j = font->glyphs[index].kerning_pair_offset; j < (font->glyphs[index].kerning_pair_offset + font->glyphs[index].kerning_pair_count); j++) {
-				if (next_index == font->pairs[j].right) {
-					offset.x += font->pairs[j].value;
-					break;
-				}
-			}
-		}
-
-	}
-
-	*out_text_size = offset;
-	*/
-
 }
 
 static int _bsgfx_queryPtSize(bsgfx_Font* font, int pt_size) {
@@ -214,7 +121,7 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
     bs_vec2 next_glyph_advance = { 0 };
 
     const float spacing = 8.0;
-    const float temp_scale = 1.0;
+    const float temp_scale = 8.0;
 
     for (int i = 0; i < text_length; i++) {
         char c = text[i];
@@ -281,9 +188,9 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
 
         // instanceAtlasTexture(glyph->atlas_page, glyph->atlas_index)
 
-        position.x += (float)glyph->x_advance / 64.0;
+        position.x += ((float)glyph->x_advance / 64.0) * temp_scale;
 
-        position.x += advance.x;
+        position.x += advance.x * temp_scale;
         position.y += advance.y;
         position.z += 0.01;
     }
@@ -385,22 +292,6 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
     }
 
    /**
-    Kerning pairs
-    unsigned char* kerning_pairs_offset = blocks_offset;
-    for (int i = 0; kerning_pairs_count; i++) {
-        bs_U32 right = bs_getLittleEndian32(kerning_pairs_offset + BFNT_KERNING_PAIR_RIGHT_OFFSET);
-        float value = bs_getLittleEndianF32(kerning_pairs_offset + BFNT_KERNING_PAIR_VALUE_OFFSET);
-
-        font->kerning_pairs[i] = (bsgfx_KerningPair) {
-            .right = right,
-            .value = value,
-        };
-
-        kerning_pairs_offset += BFNT_KERNING_PAIR_SIZE;
-    }
-    */
-
-   /**
     Glyphs
     */
     unsigned char* glyphs_offset = blocks_offset;
@@ -478,7 +369,7 @@ BSGFXAPI void _bsgfx_test() {
     _bsgfx_loadFont(package_id, "project/fonts/segoeui.ttf", 0, &resource);
 
     bsgfx_Font* font = resource->model;
-    bs_bindImage(BSGFX_SET_FONTS, BSGFX_BINDING_FONTS, font->atlas_object->atlas->image, bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_LINEAR)->sampler, BS_IMAGE_LAYOUT_GENERAL);
+    bs_bindImage(BSGFX_SET_FONTS, BSGFX_BINDING_FONTS, font->atlas_object->atlas->image, bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler, BS_IMAGE_LAYOUT_GENERAL);
 
     //_bsgfx_loadFont(package_id, "")
 

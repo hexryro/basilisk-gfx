@@ -36,8 +36,6 @@ Basilisk basilisk = {
 	.package_id = -1,
 };
 
-volatile long has_performed_tracked_changes = 1;
-
 static void basilisk_loadFontCollection(bs_Object* object) {/*
 	bs_Sampler* nearest_sampler = bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler;
 
@@ -94,8 +92,6 @@ static void onModTick() {
 
 static void onIni() {
 	bsmod_onIni();
-
-	bsmod_onTrack();
 }
 
 static void onLateIni() {

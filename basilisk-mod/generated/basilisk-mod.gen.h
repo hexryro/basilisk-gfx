@@ -682,6 +682,18 @@ bsmod_onMap(
   @return void
   */
 BSMODAPI void
+bsmod_beginTrackChanges();
+
+ /**
+  @return void
+  */
+BSMODAPI void
+bsmod_tickTracker();
+
+ /**
+  @return void
+  */
+BSMODAPI void
 bsmod_onTrack();
 
  /**

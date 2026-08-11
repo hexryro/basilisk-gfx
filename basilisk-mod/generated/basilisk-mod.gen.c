@@ -127,6 +127,16 @@ void bsmod_onMap(
     next.bsmod_onMap(type_id, id);
 }
 
+void bsmod_beginTrackChanges()
+{
+    next.bsmod_beginTrackChanges();
+}
+
+void bsmod_tickTracker()
+{
+    next.bsmod_tickTracker();
+}
+
 void bsmod_onTrack()
 {
     next.bsmod_onTrack();

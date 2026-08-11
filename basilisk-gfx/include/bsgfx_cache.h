@@ -157,6 +157,9 @@ BSGFX_CACHE_CS(cs_bsgfx_mesh_type_volume)
 BSGFX_CACHE_CS(cs_bsgfx_bone_volume)
 BSGFX_CACHE_CS(cs_bsgfx_textured_volume)
 
+BSGFX_CACHE_FS(fs_bsgfx_msdf_glyph)
+BSGFX_CACHE_VS(vs_bsgfx_msdf_glyph)
+
 //BSGFX_CACHE_RMISS(main)
 //BSGFX_CACHE_RGEN(main)
 

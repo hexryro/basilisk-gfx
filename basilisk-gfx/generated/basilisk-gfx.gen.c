@@ -593,52 +593,6 @@ int bsgfx_instanceAtlasFlipped(
     return next.bsgfx_instanceAtlasFlipped(subtype, transform, texture, flags, id, material);
 }
 
-void bsgfx_instanceText(
-    int subtype, 
-    bsgfx_Font* font, 
-    bsgfx_Text* params, 
-    bs_vec2* out_text_size, 
-    char* value)
-{
-    next.bsgfx_instanceText(subtype, font, params, out_text_size, value);
-}
-
-void bsgfx_instanceTextN(
-    int subtype, 
-    bsgfx_Font* font, 
-    bsgfx_Text* params, 
-    bs_vec2* out_text_size, 
-    char* value, 
-    int value_length)
-{
-    next.bsgfx_instanceTextN(subtype, font, params, out_text_size, value, value_length);
-}
-
-void bsgfx_instanceTextV(
-    int subtype, 
-    bsgfx_Font* font, 
-    bsgfx_Text* params, 
-    bs_vec2* out_text_size, 
-    char* format, 
-    va_list args)
-{
-    next.bsgfx_instanceTextV(subtype, font, params, out_text_size, format, args);
-}
-
-void bsgfx_instanceTextF(
-    int subtype, 
-    bsgfx_Font* font, 
-    bsgfx_Text* params, 
-    bs_vec2* out_text_size, 
-    char* format, 
-    ...)
-{
-    va_list args;
-    va_start(args, format);
-    next.bsgfx_instanceTextV(subtype, font, params, out_text_size, format, args);
-    va_end(args);
-}
-
 void bsgfx_instanceASCIIText(
     int subtype, 
     bsgfx_Font* font, 
