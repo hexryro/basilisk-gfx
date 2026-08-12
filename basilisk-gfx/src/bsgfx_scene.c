@@ -35,6 +35,10 @@ void _bsgfx_allocateMaterials();
 static void _bsgfx_loadResources() {
     bs_Result result;
 
+    bs_Object* queue_obj = BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES, 0);
+    bs_Queue* queue = queue_obj->queue;
+    bs_queue(queue_obj, BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_SINGLE_TIMES_BIT);
+
     bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_GRAPHICS_BIT);
     bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_COMPUTE, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_COMPUTE_BIT);
 
@@ -121,7 +125,7 @@ static void _bsgfx_loadResources() {
        // if (_bsgfx_procs_.bsmod_onCreateQuadSubtypes)
        //     _bsgfx_procs_.bsmod_onCreateQuadSubtypes(range);
 
-        bs_pushBatch(quad_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
+        bs_pushBatch(queue, quad_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
     }
 
     if (bs_canPushBatch(volume_batch->batch)) {
@@ -129,7 +133,7 @@ static void _bsgfx_loadResources() {
 
         bs_pushQuad(volume_screen_batch->batch, &quad, BSGFX_SHADOW_COLOR);
 
-        bs_pushBatch(volume_batch->batch, 0, BSGFX_NUM_SHADOW_VERTICES);
+        bs_pushBatch(queue, volume_batch->batch, 0, BSGFX_NUM_SHADOW_VERTICES);
         bs_bindBuffer(BSGFX_SET_VOLUME_OUT_VERTICES, BSGFX_BINDING_VOLUME_OUT_VERTICES, volume_batch->batch->vertex_buffer->buffer);
     }
 
@@ -138,14 +142,14 @@ static void _bsgfx_loadResources() {
         bs_pushQuad(screen_batch->batch, &quad, BS_WHITE);
        // const float offset = 0.75;
        // bs_pushQuad(screen_batch, bs_quad(BS_V3(0.125, 0.125, 0.0), bs_v2V1(offset)), BS_WHITE);
-        bs_pushBatch(screen_batch->batch, BS_U32_MAX, BS_U32_MAX);
+        bs_pushBatch(queue,screen_batch->batch, BS_U32_MAX, BS_U32_MAX);
     }
 
     bs_Object* mesh_volume_batch = BS_BATCH(BSGFX_BATCHES, BSGFX_BATCH_MESH_TYPE_VOLUME_COMPUTED, true);
     result = bs_batch(mesh_volume_batch, 0, $vs_bsgfx_volume(), 0);
 
     if (result == BS_RESULT_OK && bs_canPushBatch(mesh_volume_batch->batch)) {
-        bs_pushBatch(mesh_volume_batch->batch, 0, BSGFX_PRE_COMPUTED_VOLUME_SIZE);
+        bs_pushBatch(queue, mesh_volume_batch->batch, 0, BSGFX_PRE_COMPUTED_VOLUME_SIZE);
       //  bs_bindBuffer(BSGFX_SET_VOLUME_OUT_VERTICES, BSGFX_BINDING_VOLUME_OUT_VERTICES_MESH_TYPE, mesh_volume_batch->batch->vertex_buffer->buffer);
     }
 
@@ -217,7 +221,7 @@ static void _bsgfx_loadResources() {
     if (_bsgfx_prefab_model_ && bs_exists(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED)) { // _bsgfx_prefab_model_ is temp
         mesh_instance_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED);
         if (bs_canPushBatch(mesh_instance_batch->batch)) {
-            bs_pushBatch(mesh_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
+            bs_pushBatch(queue, mesh_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
             bs_bindBuffer(BSGFX_SET_VOLUME_IN_VERTICES, BSGFX_BINDING_VOLUME_IN_VERTICES_MESH, mesh_instance_batch->batch->vertex_buffer->buffer);
             bs_bindBuffer(BSGFX_SET_VOLUME_IN_INDICES, BSGFX_BINDING_VOLUME_IN_INDICES_MESH, mesh_instance_batch->batch->index_buffer->buffer);
             //bs_bindBuffer(BSGFX_SET_VOLUME_IN_VERTICES, BSGFX_BINDING_VOLUME_IN_VERTICES_MESH_TYPE, mesh_instance_batch->batch->vertex_buffer->buffer);
@@ -227,15 +231,15 @@ static void _bsgfx_loadResources() {
     }
 
     if (point_batch && bs_canPushBatch(point_batch->batch)) {
-        bs_pushBatch(point_batch->batch, BS_U32_MAX, BS_U32_MAX);
+        bs_pushBatch(queue, point_batch->batch, BS_U32_MAX, BS_U32_MAX);
     }
 
     if (line_batch && bs_canPushBatch(line_batch->batch)) {
-        bs_pushBatch(line_batch->batch, BS_U32_MAX, BS_U32_MAX);
+        bs_pushBatch(queue, line_batch->batch, BS_U32_MAX, BS_U32_MAX);
     }
 
     if (bone_instance_batch && bs_canPushBatch(bone_instance_batch->batch)) {
-        bs_pushBatch(bone_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
+        bs_pushBatch(queue, bone_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
        // bs_bindBuffer(BSGFX_SET_VOLUME_IN_VERTICES, BSGFX_BINDING_VOLUME_IN_VERTICES_BONE, bone_instance_batch->batch->vertex_buffer->buffer);
        // bs_bindBuffer(BSGFX_SET_VOLUME_IN_INDICES, BSGFX_BINDING_VOLUME_IN_INDICES_BONE, bone_instance_batch->batch->index_buffer->buffer);
     }
@@ -253,10 +257,7 @@ BSGFXAPI void _bsgfx_loadScene(const char* name) {
         .name_hash = bs_stringHash(name),
     };
 
-    bs_Scope scope = *bs_getScope();
-    bs_setScope(&(bs_Scope) { 0 });
-
-	bs_load(_bsgfx_loadResources);
+	_bsgfx_loadResources();
 
    // if (_bsgfx_procs_.bsmod_onLoad)
    //     bs_runSingle(_bsgfx_procs_.bsmod_onLoad);
@@ -277,9 +278,6 @@ BSGFXAPI void _bsgfx_loadScene(const char* name) {
         //bsgfx_computePrefabShadows();
 
     }
-
-   // _bsgfx_despawnAllItems();
-    bs_setScope(&scope);
 
     bs_logEndOfSection();
 

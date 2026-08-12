@@ -718,8 +718,8 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 /**
  Color Picker
  */
-BSGFXAPI void _bsgfx_renderColorPickers() {
-	bs_beginCommentN(BS_CONSTANT_STRING("Color picker"));
+BSGFXAPI void _bsgfx_renderColorPickers(bs_RendererScope* scope, bs_Queue* queue) {
+	bs_beginCommentN(queue, BS_CONSTANT_STRING("Color picker"));
 	bs_Pipeline* pipeline;
 	bs_PipelineHash hash;
 
@@ -749,10 +749,10 @@ BSGFXAPI void _bsgfx_renderColorPickers() {
 		.write_mask = 0xFF,
 	};
 
-	if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+	if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-		bs_pushConstant(pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
-		_bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER], pipeline);
+		bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+		_bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER], pipeline);
 	}
 
 	 /**
@@ -763,10 +763,10 @@ BSGFXAPI void _bsgfx_renderColorPickers() {
 	hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
 	hash.shaders[1] = $fs_bsgfx_hue();
 
-	if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+	if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-		bs_pushConstant(pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
-		_bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER_HUE], pipeline);
+		bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+		_bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER_HUE], pipeline);
 	}
 
 	 /**
@@ -777,12 +777,12 @@ BSGFXAPI void _bsgfx_renderColorPickers() {
 	hash.shaders[0] = $vs_bsgfx_quad_rounded_instanced();
 	hash.shaders[1] = $fs_bsgfx_alpha();
 
-	if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-		bs_pushConstant(pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
-		_bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER_ALPHA], pipeline);
+	if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
+		bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+		_bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER_ALPHA], pipeline);
 	}
 
-	bs_endComment();
+	bs_endComment(queue);
 }
 
 typedef enum {

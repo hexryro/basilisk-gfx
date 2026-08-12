@@ -88,45 +88,59 @@ bs_PipelineHash bsgfx_defaultPipelineHash()
     return next.bsgfx_defaultPipelineHash();
 }
 
-void bsgfx_renderTileIcons()
+void bsgfx_renderTileIcons(
+    bs_RendererScope* scope, 
+    bs_Queue* queue)
 {
-    next.bsgfx_renderTileIcons();
+    next.bsgfx_renderTileIcons(scope, queue);
 }
 
-void bsgfx_renderAtlasIcons()
+void bsgfx_renderAtlasIcons(
+    bs_RendererScope* scope, 
+    bs_Queue* queue)
 {
-    next.bsgfx_renderAtlasIcons();
+    next.bsgfx_renderAtlasIcons(scope, queue);
 }
 
 void bsgfx_renderLineModel(
+    bs_RendererScope* scope, 
+    bs_Queue* queue, 
     const bs_mat4* camera, 
     int subtype, 
     bool skip_depth_test)
 {
-    next.bsgfx_renderLineModel(camera, subtype, skip_depth_test);
+    next.bsgfx_renderLineModel(scope, queue, camera, subtype, skip_depth_test);
 }
 
 void bsgfx_renderLines(
+    bs_RendererScope* scope, 
+    bs_Queue* queue, 
     const bs_mat4* camera, 
     int subtype, 
     bool skip_depth_test)
 {
-    next.bsgfx_renderLines(camera, subtype, skip_depth_test);
+    next.bsgfx_renderLines(scope, queue, camera, subtype, skip_depth_test);
 }
 
-void bsgfx_renderPoints()
+void bsgfx_renderPoints(
+    bs_RendererScope* scope, 
+    bs_Queue* queue)
 {
-    next.bsgfx_renderPoints();
+    next.bsgfx_renderPoints(scope, queue);
 }
 
-void bsgfx_renderAtlas()
+void bsgfx_renderAtlas(
+    bs_RendererScope* scope, 
+    bs_Queue* queue)
 {
-    next.bsgfx_renderAtlas();
+    next.bsgfx_renderAtlas(scope, queue);
 }
 
-void bsgfx_renderPrimitiveTiles()
+void bsgfx_renderPrimitiveTiles(
+    bs_RendererScope* scope, 
+    bs_Queue* queue)
 {
-    next.bsgfx_renderPrimitiveTiles();
+    next.bsgfx_renderPrimitiveTiles(scope, queue);
 }
 
 void bsgfx_swapBufferBindings()
@@ -446,10 +460,11 @@ bool bsgfx_subtypeHasFlag(
 }
 
 void bsgfx_renderSubtype(
+    bs_Queue* queue, 
     int subtype, 
     bs_Pipeline* pipeline)
 {
-    next.bsgfx_renderSubtype(subtype, pipeline);
+    next.bsgfx_renderSubtype(queue, subtype, pipeline);
 }
 
 void bsgfx_resetInstances()
@@ -791,14 +806,17 @@ void bsgfx_loadLights(
     next.bsgfx_loadLights(package_id);
 }
 
-void bsgfx_computePrefabShadows()
+void bsgfx_computePrefabShadows(
+    bs_Queue* queue)
 {
-    next.bsgfx_computePrefabShadows();
+    next.bsgfx_computePrefabShadows(queue);
 }
 
-void bsgfx_renderPrefabShadowVolumes()
+void bsgfx_renderPrefabShadowVolumes(
+    bs_RendererScope* scope, 
+    bs_Queue* queue)
 {
-    next.bsgfx_renderPrefabShadowVolumes();
+    next.bsgfx_renderPrefabShadowVolumes(scope, queue);
 }
 
 bsgfx_PrefabMetadata* bsgfx_prefabMetadata(
@@ -843,15 +861,11 @@ void bsgfx_instancePrefabs()
 }
 
 void bsgfx_renderPrefabs(
+    bs_Queue* queue, 
     bs_Pipeline* pipeline, 
     int key_start)
 {
-    next.bsgfx_renderPrefabs(pipeline, key_start);
-}
-
-void bsgfx_renderScenePrefabs()
-{
-    next.bsgfx_renderScenePrefabs();
+    next.bsgfx_renderPrefabs(queue, pipeline, key_start);
 }
 
 void bsgfx_renderPrefabPrimitives(
@@ -916,9 +930,11 @@ void bsgfx_instancePrimitives()
 }
 
 void bsgfx_renderPrimitives(
+    bs_RendererScope* scope, 
+    bs_Queue* queue, 
     bs_mat4 camera)
 {
-    next.bsgfx_renderPrimitives(camera);
+    next.bsgfx_renderPrimitives(scope, queue, camera);
 }
 
 int bsgfx_queryPrimitive(
@@ -1050,8 +1066,10 @@ bool bsgfx_instanceWidgets(
     return next.bsgfx_instanceWidgets(menu, title_bar, tab_bar);
 }
 
-void bsgfx_renderColorPickers()
+void bsgfx_renderColorPickers(
+    bs_RendererScope* scope, 
+    bs_Queue* queue)
 {
-    next.bsgfx_renderColorPickers();
+    next.bsgfx_renderColorPickers(scope, queue);
 }
 

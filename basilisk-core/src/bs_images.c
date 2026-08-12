@@ -71,15 +71,15 @@ BSAPI int _bs_imageSwapsCount(bs_Image* image) {
     return image->flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
 }
 
-BSAPI void _val_bs_transition(bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout) {
+BSAPI void _val_bs_transition(bs_Queue* queue, bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout) {
     BS_VALIDATE(old_layout != new_layout,,);
     BS_VALIDATE(index == 0 || index < image->num_indices,,);
-    _bs_transition(image, index, old_layout, new_layout);
+    _bs_transition(queue, image, index, old_layout, new_layout);
 }
 
-BSAPI void _bs_transition(bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout) {
+BSAPI void _bs_transition(bs_Queue* queue, bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout) {
     VkResult result;
-    VkCommandBuffer commands = bsi_fetchCommands();
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
 
     VkPipelineStageFlags src_stage;
     VkPipelineStageFlags dst_stage;
@@ -219,9 +219,9 @@ BSAPI void _bs_transition(bs_Image* image, int index, bs_ImageLayout old_layout,
         0, NULL,
         1, &barrier);
 
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
-        _bs_pushQueue(_bs_scope_.queue);
-        result = vkQueueWaitIdle(_bs_scope_.queue->queue);
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
+        _bs_pushQueue(queue, 0, NULL);
+        _bs_stallQueue(queue);
     }
 }
 
@@ -623,15 +623,15 @@ BSAPI bs_Result _bs_sampler(bs_Object* object, bs_ImageFilter filter, bs_Sampler
     return BS_RESULT_OK;
 }
 
-BSAPI void _val_bs_copyImageToBufferAsync(bs_Image* image, bs_Buffer* buffer, int image_index, bs_ImageLayout layout, bs_U64 buffer_offset, bs_ivec2 offset, bs_ivec2 dim) {
+BSAPI void _val_bs_copyImageToBufferAsync(bs_Queue* queue, bs_Image* image, bs_Buffer* buffer, int image_index, bs_ImageLayout layout, bs_U64 buffer_offset, bs_ivec2 offset, bs_ivec2 dim) {
     int channels_count = _bs_hasAlpha(image->format) ? 4 : 3;
     BS_VALIDATE((dim.x * dim.y * channels_count) <= (buffer->num_bytes - buffer_offset),,);
 
-    _bs_copyImageToBufferAsync(image, buffer, image_index, layout, buffer_offset, offset, dim);
+    _bs_copyImageToBufferAsync(queue, image, buffer, image_index, layout, buffer_offset, offset, dim);
 }
 
-BSAPI void _bs_copyImageToBufferAsync(bs_Image* image, bs_Buffer* buffer, int image_index, bs_ImageLayout layout, bs_U64 buffer_offset, bs_ivec2 offset, bs_ivec2 dim) {
-    VkCommandBuffer commands = bsi_fetchCommands();
+BSAPI void _bs_copyImageToBufferAsync(bs_Queue* queue, bs_Image* image, bs_Buffer* buffer, int image_index, bs_ImageLayout layout, bs_U64 buffer_offset, bs_ivec2 offset, bs_ivec2 dim) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
     int image_swap = (image->flags & BS_IMAGE_SWAPS_BIT) ? _bs_context_->frame : 0;
     int buffer_swap = (buffer->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
 
@@ -663,8 +663,8 @@ BSAPI void _bs_copyImageToBufferAsync(bs_Image* image, bs_Buffer* buffer, int im
     vkCmdCopyImageToBuffer(commands, image->_[image_swap].vk_image, layout, buffer->_[buffer_swap].vk_buffer, 1, &copy);
 }
 
-BSAPI void _bs_copyBufferToImage(bs_Buffer* buffer, bs_Image* image, int index, bs_ImageLayout layout) {
-    VkCommandBuffer commands = bsi_fetchCommands();
+BSAPI void _bs_copyBufferToImage(bs_Queue* queue, bs_Buffer* buffer, bs_Image* image, int index, bs_ImageLayout layout) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
 
     VkBufferImageCopy region = {
         .imageSubresource = {
@@ -686,9 +686,9 @@ BSAPI void _bs_copyBufferToImage(bs_Buffer* buffer, bs_Image* image, int index, 
         1,
         &region);
 
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
-        _bs_pushQueue(_bs_scope_.queue);
-        vkQueueWaitIdle(_bs_scope_.queue->queue);
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
+        _bs_pushQueue(queue, 0, NULL);
+        _bs_stallQueue(queue);
     }
 }
 
@@ -703,8 +703,8 @@ static VkImageAspectFlags _bs_imageAspectFlags(bs_Image* image) {
     return VK_IMAGE_ASPECT_COLOR_BIT;
 }
 
-BSAPI void _bs_blit(bs_BlitOperation operation)  {
-    VkCommandBuffer commands = bsi_fetchCommands();
+BSAPI void _bs_blit(bs_Queue* queue, bs_BlitOperation operation)  {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
 
     VkImageBlit region = {
         .srcSubresource = {
@@ -766,20 +766,22 @@ static inline bs_Format _bs_getFormat(bs_Format base_format, int channels_count)
     _bs_warnF("Failed to get image format, base format %d has no support for %d channels", bs_serializeFormat(base_format), channels_count);
 }
 
-BSAPI bs_Result _val_bs_loadImage(bs_Object* object, int package_id, bs_ImageBits flags, char* resource_name, char* resource_name_length) {
+BSAPI bs_Result _val_bs_loadImage(bs_Queue* queue, bs_Object* object, int package_id, bs_ImageBits flags, char* resource_name, char* resource_name_length) {
    // BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_OK);
 
-    return _bs_loadImageN(object, package_id, flags, resource_name, resource_name_length);
+    BS_VALIDATE(queue->flags & BS_QUEUE_SINGLE_TIMES_BIT,,); // TODO: document this
+
+    return _bs_loadImageN(queue, object, package_id, flags, resource_name, resource_name_length);
 }
 
-BSAPI bs_Result _bs_loadImageN(bs_Object* object, int package_id, bs_ImageBits flags, char* path, int path_length) {
+BSAPI bs_Result _bs_loadImageN(bs_Queue* queue, bs_Object* object, int package_id, bs_ImageBits flags, char* resource_name, int resource_name_length) {
     bs_Result result;
 
     if (!object->image)
         return BS_RESULT_OK;
 
     bs_Resource* resource;
-    result = _bs_loadResourceN(package_id, 0, BS_RESOURCE_IMAGE, &resource, path, path_length);
+    result = _bs_loadResourceN(package_id, 0, BS_RESOURCE_IMAGE, &resource, resource_name, resource_name_length);
     if (result != BS_RESULT_OK)
         return result;
 
@@ -842,9 +844,9 @@ BSAPI bs_Result _bs_loadImageN(bs_Object* object, int package_id, bs_ImageBits f
         object->image->indices[i].name_hash = _bs_stringHash(name);
 
         _bs_stageImage(buffer, header->channels_count, object->image->dim, bmp);
-        _bs_transition(object->image, i, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        _bs_copyBufferToImage(buffer, object->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        _bs_transition(object->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        _bs_transition(queue, object->image, i, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _bs_copyBufferToImage(queue, buffer, object->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _bs_transition(queue, object->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         data += pointer->name_length;
     }
@@ -946,13 +948,13 @@ BSAPI void _bs_destroyAtlas(bs_Atlas* atlas) {
     //	_bs_destroyBuffer(atlas->buffer);
 }
 
-BSAPI bs_Result _val_bs_loadAtlasMemory(bs_Object* object, int package_id, char* resource_name, char* data, bs_U32 flags) {
+BSAPI bs_Result _val_bs_loadAtlasMemory(bs_Queue* queue, bs_Object* object, int package_id, char* resource_name, char* data, bs_U32 flags) {
  //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_ATLAS, BS_RESULT_VALIDATION_ERROR);
 
-    return _bs_loadAtlasMemory(object, package_id, resource_name, data, flags);
+    return _bs_loadAtlasMemory(queue, object, package_id, resource_name, data, flags);
 }
 
-BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* resource_name, char* data, bs_U32 flags) {
+BSAPI bs_Result _bs_loadAtlasMemory(bs_Queue* queue, bs_Object* object, int package_id, char* resource_name, char* data, bs_U32 flags) {
     bs_Result result;
 
     if (!object->atlas) 
@@ -1081,9 +1083,9 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
     for (int i = 0; i < header->pages_count; i++) {
         _bs_stageImage(staging_buffer_object->buffer, header->channels_count, BS_IV2(header->width, header->height), offset);
 
-        _bs_transition(atlas->image, i, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        _bs_copyBufferToImage(staging_buffer_object->buffer, atlas->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        _bs_transition(atlas->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        _bs_transition(queue, atlas->image, i, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _bs_copyBufferToImage(queue, staging_buffer_object->buffer, atlas->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        _bs_transition(queue, atlas->image, i, BS_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         offset += page_size;
     }
@@ -1092,7 +1094,7 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Object* object, int package_id, char* res
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_loadAtlasN(bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length) {
+BSAPI bs_Result _bs_loadAtlasN(bs_Queue* queue, bs_Object* object, int package_id, bs_U32 flags, char* path, int path_length) {
     bs_Result result;
 
     bs_Resource* resource;
@@ -1100,7 +1102,7 @@ BSAPI bs_Result _bs_loadAtlasN(bs_Object* object, int package_id, bs_U32 flags, 
     if (result != BS_RESULT_OK)
         return result;
 
-    result = _bs_loadAtlasMemory(object, package_id, path, resource->data->value, flags);
+    result = _bs_loadAtlasMemory(queue, object, package_id, path, resource->data->value, flags);
     if (result != BS_RESULT_OK)
         return result;
 

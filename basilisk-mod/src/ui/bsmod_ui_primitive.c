@@ -98,6 +98,9 @@ BSMODAPI void _bsmod_onDragPrimitive(bsmod_DraggingParams params) {
 #include <float.h>
 
 BSMODAPI void _bsmod_rasterizePrimitiveIcons() {
+  //  bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_SINGLE_TIMES)->queue;
+    bs_Queue* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS)->queue;
+
     bs_Pipeline* pipeline;
     bs_PipelineHash hash;
 
@@ -105,7 +108,7 @@ BSMODAPI void _bsmod_rasterizePrimitiveIcons() {
     hash.shaders[0] = $vs_bsmod_mesh_instanced();
     hash.shaders[1] = $fs_bsmod_rasterize();
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(NULL, queue, &hash, &pipeline) == BS_RESULT_OK) {
         const width = 70;
 
         const bs_ivec2 render_size = { width * 2, width * 2 };

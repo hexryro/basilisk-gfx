@@ -48,7 +48,6 @@ bs_Config _bs_config_ = {
     .attributes.unit_size = sizeof(bs_AttributeType),
 };
 
-bs_Scope _bs_scope_ = { 0 };
 bs_Instance* _bs_instance_ = NULL;
 bs_IO _bs_io_ = { 0 };
 bs_Context* _bs_context_ = { 0 };
@@ -62,7 +61,6 @@ BSAPI bs_Args* _bs_args() { return &_bs_args_; }
 BSAPI bs_Features* _bs_features() { return &_bs_features_; }
 BSAPI bs_Props* _bs_props() { return &_bs_props_; }
 BSAPI bs_Config* _bs_config() { return &_bs_config_; }
-BSAPI bs_Scope* _bs_scope() { return &_bs_scope_; }
 BSAPI bs_IO* _bs_io() { return &_bs_io_; }
 BSAPI bs_Context* _bs_context() { return _bs_context_; }
 BSAPI bs_Callbacks* _bs_callbacks() { return &_bs_callbacks_; }
@@ -82,12 +80,12 @@ BSAPI void _bsi_nameHandleN(bs_U64 handle, bs_U32 type, char* name, int name_len
     pfn_vkSetDebugUtilsObjectNameEXT(_bs_instance_->device, &name_i);
 }
 
-BSAPI struct VkCommandBuffer_T* _bsi_fetchCommands() {
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT)
-        _bs_resetQueue(_bs_scope_.queue);
+BSAPI struct VkCommandBuffer_T* _bsi_fetchCommands(bs_Queue* queue) {
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT)
+        _bs_resetQueue(queue);
 
-    int swap = _bs_queueSwap(_bs_scope_.queue);
-    return _bs_scope_.queue->_[swap].command_buffer;
+    int swap = _bs_queueSwap(queue);
+    return queue->_[swap].command_buffer;
 }
 
 BSAPI struct VkDevice_T* _bsi_fetchDevice() {
@@ -101,19 +99,19 @@ BSAPI bs_Procedure* _bs_procedures() {
  /**
   Begin Comment
   */
-BSAPI void _val_bs_beginComment(char* message, int message_len) {
+BSAPI void _val_bs_beginComment(bs_Queue* queue, char* message, int message_len) {
     BS_VALIDATE(_bs_procs_.vkCmdBeginDebugUtilsLabelEXT != NULL, , );
-    _bs_beginCommentN(message, message_len);
+    _bs_beginCommentN(queue, message, message_len);
 }
 
-BSAPI void _bs_beginCommentN(char* message, int message_len) {
+BSAPI void _bs_beginCommentN(bs_Queue* queue, char* message, int message_len) {
     VkDebugUtilsLabelEXT label = {
         .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT,
         .pLabelName = message,
         .color = { 0.3f, 0.3f, 0.9f, 1.0f }, // todo param
     };
 
-    VkCommandBuffer commands = bsi_fetchCommands();
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
 //    _bs_procs.vkCmdInsertDebugUtilsLabelEXT(commands, &label);
     _bs_procs_.vkCmdBeginDebugUtilsLabelEXT(commands, &label);
 }
@@ -121,13 +119,14 @@ BSAPI void _bs_beginCommentN(char* message, int message_len) {
  /**
   End Comment
   */
-BSAPI void _val_bs_endComment() {
+BSAPI void _val_bs_endComment(bs_Queue* queue) {
     BS_VALIDATE(_bs_procs_.vkCmdEndDebugUtilsLabelEXT != NULL, , );
-    _bs_endComment();
+    _bs_endComment(queue);
 }
 
-BSAPI void _bs_endComment() {
-    _bs_procs_.vkCmdEndDebugUtilsLabelEXT(bsi_fetchCommands());
+BSAPI void _bs_endComment(bs_Queue* queue) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
+    _bs_procs_.vkCmdEndDebugUtilsLabelEXT(commands);
 }
 
 BSAPI void _bs_parseArgs(int argc, char* argv[]) {
@@ -363,33 +362,6 @@ BSAPI void _bs_ini() {
     _bs_prepareInstance();
 }
 
-static int _bs_compareInt(const int* a, const int* b) {
-    if (*a == *b) return 0;
-    else if (*a < *b) return -1;
-    else return 1;
-}
-
-BSAPI void _bs_load(
-    bs_Callback load_resources)
-{
-    if (!_bs_instance_->single_times_queue) {
-        bs_Object* object = BS_QUEUE(-1, 0, 0);
-        if (_bs_queue(object, BS_QUEUE_TRANSFER_BIT | BS_QUEUE_COMPUTE_BIT | BS_QUEUE_SINGLE_TIMES_BIT) != BS_RESULT_OK) {
-            _bs_criticalN(BS_CONSTANT_STRING("Failed to create single times queue"));
-            return;
-        }
-
-        _bs_instance_->single_times_queue = object->queue;
-    }
-    _bs_scope_.queue = _bs_instance_->single_times_queue;
-
-    if (load_resources)
-        load_resources();
-
-    _bs_scope_.queue = NULL;
-}
-
-
 
 
   /*==============================================================================
@@ -409,8 +381,8 @@ static inline bs_U32 _bs_queryMemoryType(bs_U32 filter, VkMemoryPropertyFlags pr
     return 0;
 }
 
-static void _bs_clearAttachment(bs_U32 index, bs_ivec2 dim, VkImageAspectFlags aspect_flags, VkClearValue value) {
-    VkCommandBuffer commands = bsi_fetchCommands();
+static void _bs_clearAttachment(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, VkImageAspectFlags aspect_flags, VkClearValue value) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
 
     VkClearAttachment clear_attachment = {
         .aspectMask = aspect_flags,
@@ -431,16 +403,16 @@ static void _bs_clearAttachment(bs_U32 index, bs_ivec2 dim, VkImageAspectFlags a
     vkCmdClearAttachments(commands, 1, &clear_attachment, 1, &rectangle);
 }
 
-BSAPI void _bs_clearStencil(bs_U32 index, bs_ivec2 dim, bs_U32 value) {
-    _bs_clearAttachment(index, dim, VK_IMAGE_ASPECT_STENCIL_BIT, (VkClearValue) {.depthStencil.stencil = value });
+BSAPI void _bs_clearStencil(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, bs_U32 value) {
+    _bs_clearAttachment(queue, index, dim, VK_IMAGE_ASPECT_STENCIL_BIT, (VkClearValue) {.depthStencil.stencil = value });
 }
 
-BSAPI void _bs_clearDepth(bs_U32 index, bs_ivec2 dim, float value) {
-    _bs_clearAttachment(index, dim, VK_IMAGE_ASPECT_DEPTH_BIT, (VkClearValue) { .depthStencil.depth = value });
+BSAPI void _bs_clearDepth(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, float value) {
+    _bs_clearAttachment(queue, index, dim, VK_IMAGE_ASPECT_DEPTH_BIT, (VkClearValue) { .depthStencil.depth = value });
 }
 
-BSAPI void _bs_clearDepthStencil(bs_U32 index, bs_ivec2 dim, float depth_value, bs_U32 stencil_value) {
-    _bs_clearAttachment(index, dim, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, (VkClearValue) {
+BSAPI void _bs_clearDepthStencil(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, float depth_value, bs_U32 stencil_value) {
+    _bs_clearAttachment(queue, index, dim, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, (VkClearValue) {
         .depthStencil = {
             .depth = depth_value,
             .stencil = stencil_value,
@@ -448,27 +420,27 @@ BSAPI void _bs_clearDepthStencil(bs_U32 index, bs_ivec2 dim, float depth_value, 
     });
 }
 
-BSAPI void _bs_clearColor(bs_U32 index, bs_ivec2 dim, bs_RGBA color) {
+BSAPI void _bs_clearColor(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, bs_RGBA color) {
     // TODO: union needs to match the attachment format
-    _bs_clearAttachment(index, dim, VK_IMAGE_ASPECT_COLOR_BIT, (VkClearValue) { 
+    _bs_clearAttachment(queue, index, dim, VK_IMAGE_ASPECT_COLOR_BIT, (VkClearValue) {
         .color.float32 = { 
             [0] = color.r / 255.0, [1] = color.g / 255.0, [2] = color.b / 255.0, [3] = color.a / 255.0,
         } 
     });
 }
 
-BSAPI void _bs_stencilReference(bs_StencilFaceFlag face, bs_U32 reference) {
-    VkCommandBuffer commands = bsi_fetchCommands();
+BSAPI void _bs_stencilReference(bs_Queue* queue, bs_StencilFaceFlag face, bs_U32 reference) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
     vkCmdSetStencilReference(commands, (VkStencilFaceFlags)face, reference);
 }
 
-BSAPI void _bs_cull(bs_CullFlags flags) {
-    VkCommandBuffer commands = bsi_fetchCommands();
+BSAPI void _bs_cull(bs_Queue* queue, bs_CullFlags flags) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
     vkCmdSetCullMode(commands, flags);
 }
 
-BSAPI void _bs_setLineWidth(float width) {
-    VkCommandBuffer commands = bsi_fetchCommands();
+BSAPI void _bs_setLineWidth(bs_Queue* queue, float width) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
     vkCmdSetLineWidth(commands, width);
 }
 
@@ -690,7 +662,10 @@ BSAPI void _bs_destroyBuffer(bs_Buffer* buffer) {
     _bs_resetObject(&buffer->head, sizeof(bs_Buffer));
 }
 
-BSAPI void _val_bs_copyAsync(bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, bs_U32 src_offset, bs_U32 num_bytes) {
+ /**
+  Buffer to buffer copy
+  */
+BSAPI void _val_bs_copyAsync(bs_Queue* queue, bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, bs_U32 src_offset, bs_U32 num_bytes) {
     int src_swap = (src->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
     int dst_swap = (dst->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
 
@@ -703,10 +678,10 @@ BSAPI void _val_bs_copyAsync(bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, 
     BS_VALIDATE(num_bytes > 0,,);
     BS_VALIDATE(num_bytes < src->num_bytes, , );
 
-    _bs_copyAsync(src, dst, dst_offset, src_offset, num_bytes);
+    _bs_copyAsync(queue, src, dst, dst_offset, src_offset, num_bytes);
 }
 
-BSAPI void _bs_copyAsync(bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, bs_U32 src_offset, bs_U32 num_bytes) {
+BSAPI void _bs_copyAsync(bs_Queue* queue, bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, bs_U32 src_offset, bs_U32 num_bytes) {
     if (num_bytes == BS_U32_MAX)
         num_bytes = BS_MIN(dst->num_bytes, src->num_bytes);
 
@@ -719,22 +694,25 @@ BSAPI void _bs_copyAsync(bs_Buffer* src, bs_Buffer* dst, bs_U32 dst_offset, bs_U
     int src_swap = (src->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
     int dst_swap = (dst->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
 
-    VkCommandBuffer commands = bsi_fetchCommands();
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
     vkCmdCopyBuffer(commands, src->_[src_swap].vk_buffer, dst->_[dst_swap].vk_buffer, 1, &copy_region);
 
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
-        _bs_pushQueue(_bs_scope_.queue);
-        vkQueueWaitIdle(_bs_scope_.queue->queue);
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
+        _bs_pushQueue(queue, 0, NULL);
+        _bs_stallQueue(queue);
     }
 }
 
-BSAPI void _bs_setBufferAsync(bs_Buffer* buffer, bs_U32 offset, bs_U32 num_bytes, bs_U32 value) {
-    VkCommandBuffer commands = bsi_fetchCommands();
+ /**
+  Buffer memset
+  */
+BSAPI void _bs_setBufferAsync(bs_Queue* queue, bs_Buffer* buffer, bs_U32 offset, bs_U32 num_bytes, bs_U32 value) {
+    VkCommandBuffer commands = _bsi_fetchCommands(queue);
     int swap = buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frame : 0;
     vkCmdFillBuffer(commands, buffer->_[swap].vk_buffer, offset, num_bytes, value);
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
-        _bs_pushQueue(_bs_scope_.queue);
-        vkQueueWaitIdle(_bs_scope_.queue->queue);
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
+        _bs_pushQueue(queue, 0, NULL);
+        vkQueueWaitIdle(queue->queue);
     }
 }
 
@@ -1501,7 +1479,7 @@ static struct bs_BatchBindings {
     return bindings;
 };
 
-BSAPI bs_Result _bs_pushBatch(bs_Batch* batch, bs_U32 num_indices, bs_U32 num_vertices) {
+BSAPI bs_Result _bs_pushBatch(bs_Queue* queue, bs_Batch* batch, bs_U32 num_indices, bs_U32 num_vertices) {
     bs_Result result;
 
     if (num_indices == BS_U32_MAX) 
@@ -1559,7 +1537,7 @@ BSAPI bs_Result _bs_pushBatch(bs_Batch* batch, bs_U32 num_indices, bs_U32 num_ve
     }
 
     _bs_stageList(batch->staging_buffer->buffer, &batch->vertices);
-    _bs_copyAsync(batch->staging_buffer->buffer, batch->vertex_buffer->buffer, 0, 0, BS_U32_MAX);
+    _bs_copyAsync(queue, batch->staging_buffer->buffer, batch->vertex_buffer->buffer, 0, 0, BS_U32_MAX);
 
     if (bindings.vertex_was_bound)
         _bs_bindBuffer(bindings.vertex_bind_set, bindings.vertex_binding, batch->vertex_buffer->buffer);
@@ -1581,7 +1559,7 @@ BSAPI bs_Result _bs_pushBatch(bs_Batch* batch, bs_U32 num_indices, bs_U32 num_ve
             return result;
         }
 
-        _bs_copyAsync(batch->staging_buffer->buffer, batch->index_buffer->buffer, 0, 0, BS_U32_MAX);
+        _bs_copyAsync(queue, batch->staging_buffer->buffer, batch->index_buffer->buffer, 0, 0, BS_U32_MAX);
     }
 
     if (bindings.index_was_bound)
@@ -1617,9 +1595,9 @@ BSAPI int _bs_batchSize(bs_Batch* batch) {
     return (batch->indices.unit_size == 0) ? batch->vertices.count : batch->indices.count;
 }
 
-BSAPI void _bs_render(bs_Batch* batch, bs_Pipeline* pipeline, bs_U32 vertex_offset, bs_U32 vertex_count, bs_U32 instance_offset, bs_U32 instance_count) {
+BSAPI void _bs_render(bs_Queue* queue, bs_Batch* batch, bs_Pipeline* pipeline, bs_U32 vertex_offset, bs_U32 vertex_count, bs_U32 instance_offset, bs_U32 instance_count) {
     VkDeviceSize offsets[] = { 0 };
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+    VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     int batch_size = _bs_batchSize(batch);
     vertex_count = vertex_count == BS_U32_MAX ? batch_size : vertex_count;
@@ -1923,21 +1901,19 @@ BSAPI bool _bs_rendererIsDynamic(bs_Renderer* renderer) {
     return renderer->render_pass == NULL;
 }
 
-BSAPI void _val_bs_beginRender(bs_Renderer* renderer) {
-    BS_VALIDATE(_bs_scope_.renderer != NULL,,);
-
+BSAPI void _val_bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
     if (renderer->render_pass) {
         BS_VALIDATE(_bs_procs_.vkCmdBeginRenderingKHR != NULL, , );
         BS_VALIDATE(_bs_procs_.vkCmdEndRenderingKHR != NULL, , );
     }
 
-    _bs_beginRender(renderer);
+    _bs_beginRender(queue, renderer);
 }
 
-BSAPI void _bs_beginRender(bs_Renderer* renderer) {
-    _bs_scope_.renderer = renderer;
+BSAPI void _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
+    //_bs_scope_.renderer = renderer;
 
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+    VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     VkClearValue clear_values[BS_MAX_ATTACHMENTS_COUNT] = { 0 };
 
@@ -1951,8 +1927,6 @@ BSAPI void _bs_beginRender(bs_Renderer* renderer) {
     }
 
     if (renderer->render_pass) {
-        _bs_scope_.renderer = renderer;
-
         VkRenderPassBeginInfo render_pass_i = {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
             .renderPass = renderer->render_pass,
@@ -2029,51 +2003,57 @@ BSAPI void _bs_beginRender(bs_Renderer* renderer) {
 
 }
 
-BSAPI void _bs_endRender(bs_Renderer* renderer) {
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+BSAPI void _bs_endRender(bs_Queue* queue, bs_Renderer* renderer) {
+    VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
     if (renderer->render_pass) {
-        _bs_scope_.renderer = renderer;
+        //_bs_scope_.renderer = renderer;
         vkCmdEndRenderPass(command_buffer);
     }
     else {
         _bs_procs_.vkCmdEndRenderingKHR(command_buffer);
     }
 
-    _bs_scope_.renderer = NULL;
-    _bs_scope_.subpass = 0;
+    //_bs_scope_.renderer = NULL;
+    //_bs_scope_.subpass = 0;
 }
 
-BSAPI void _val_bs_runPass(bs_Renderer* renderer, bs_Callback subpasses[], int subpasses_count) {
+BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_Callback subpasses[], int subpasses_count) {
     BS_VALIDATE(subpasses_count <= renderer->num_subpasses,,);
 
     for (int i = 0; i < subpasses_count; i++) {
         BS_VALIDATE(subpasses[i] != NULL,,);
     }
 
-    _bs_runPass(renderer, subpasses, subpasses_count);
+    _bs_runPass(queue, renderer, subpasses, subpasses_count);
 }
 
-BSAPI void _bs_runPass(bs_Renderer* renderer, bs_Callback callbacks[], int callbacks_count) {
-    _bs_beginRender(renderer);
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+BSAPI void _bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_Callback callbacks[], int callbacks_count) {
+    _bs_beginRender(queue, renderer);
+    VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     if (renderer->render_pass) {
         for (int i = 0; i < renderer->num_subpasses; i++) {
             bs_Callback callback = callbacks[i];
 
             if (i != 0) {
-                _bs_scope_.subpass = i;
+                //_bs_scope_.subpass = i;
                 vkCmdNextSubpass(command_buffer, VK_SUBPASS_CONTENTS_INLINE);
             }
 
-            callback();
+            bs_RendererScope scope = {
+                .queue = queue,
+                .renderer = renderer,
+                .subpass = i,
+            };
+
+            callback(scope);
         }
     }
     else {
         for (int i = 0; i < callbacks_count; i++)
             callbacks[i]();
     }
-    _bs_endRender(renderer);
+    _bs_endRender(queue, renderer);
 }
 
 BSAPI int _bs_rendererSwapsCount(bs_Renderer* renderer) {
@@ -2114,8 +2094,8 @@ BSAPI void _bs_resizeRenderer(bs_Renderer* renderer, bs_ivec2 dim) {
    * Computation
    *============================================================================*/
 
-BSAPI void _bs_dispatchAsync(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z) {
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+BSAPI void _bs_dispatchAsync(bs_Queue* queue, bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z) {
+    VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline->vk_pipeline);
     vkCmdBindDescriptorSets(
@@ -2126,9 +2106,9 @@ BSAPI void _bs_dispatchAsync(bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z
 
     vkCmdDispatch(command_buffer, x, y, z);
 
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
-        _bs_pushQueue(_bs_scope_.queue);
-        vkQueueWaitIdle(_bs_scope_.queue->queue);
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
+        _bs_pushQueue(queue, 0, NULL);
+        _bs_stallQueue(queue);
     }
 }
 
@@ -2148,7 +2128,7 @@ static void _bs_nameRayTracer(bs_Object* object, const char* name) {
 BSAPI void _bs_rayTrace(bs_RayTracer* ray_tracer, bs_Pipeline* pipeline, bs_U32 width, bs_U32 height, bs_U32 depth) {
     _bs_warnF("_bs_rayTrace has not been implemented yet");
     /*
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+    VkCommandBuffer command_buffer = _bsi_fetchCommands();
 
     vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipeline->vk_pipeline);
     if (pipeline->num_bind_sets != 0) {
@@ -2239,7 +2219,7 @@ BSAPI void _bs_destroyRayTracer(bs_RayTracer* tracer) { // i'm already tracer
     memset(tracer, 0, sizeof(bs_RayTracer));
 }
 
-static bs_Result _bs_buildBLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) {
+static bs_Result _bs_buildBLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer* staging_buffer) {
     VkResult vk_result;
     bs_Result result;
 
@@ -2254,11 +2234,11 @@ static bs_Result _bs_buildBLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
         return result;
     }
 
-    _bs_copyAsync(staging_buffer, aabb_buffer->buffer, 0, 0, BS_U32_MAX);
+    _bs_copyAsync(queue, staging_buffer, aabb_buffer->buffer, 0, 0, BS_U32_MAX);
 
-    bsi_fetchCommands();
+    _bsi_fetchCommands(queue);
 
-    _bs_scope_.queue->flags &= ~BS_QUEUE_SINGLE_TIMES_BIT;
+    queue->flags &= ~BS_QUEUE_SINGLE_TIMES_BIT;
 
     bs_Batch* batch = *(bs_Batch**)_bs_fetchUnit(&tracer->batches, 0);
 
@@ -2356,20 +2336,20 @@ static bs_Result _bs_buildBLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
 
     VkAccelerationStructureBuildRangeInfoKHR* pRangeInfo = &aabb_range_info;
 
-    _bs_procs_.vkCmdBuildAccelerationStructuresKHR(bsi_fetchCommands(), 1, &build_info, &pRangeInfo);
-    _bs_scope_.queue->flags |= BS_QUEUE_SINGLE_TIMES_BIT;
+    _bs_procs_.vkCmdBuildAccelerationStructuresKHR(_bsi_fetchCommands(queue), 1, &build_info, &pRangeInfo);
+    queue->flags |= BS_QUEUE_SINGLE_TIMES_BIT;
 
-    _bs_pushQueue(_bs_scope_.queue);
-    vkQueueWaitIdle(_bs_scope_.queue->queue);
+    _bs_pushQueue(queue, 0, NULL);
+    _bs_stallQueue(queue);
 
     return BS_RESULT_OK;
 }
 
-static bs_Result _bs_buildTLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) {
+static bs_Result _bs_buildTLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer* staging_buffer) {
     bs_Result result;
 
-    VkCommandBuffer cmds = bsi_fetchCommands();
-    _bs_scope_.queue->flags &= ~BS_QUEUE_SINGLE_TIMES_BIT;
+    VkCommandBuffer cmds = _bsi_fetchCommands(queue);
+    queue->flags &= ~BS_QUEUE_SINGLE_TIMES_BIT;
 
     VkAccelerationStructureDeviceAddressInfoKHR address_info = { VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR };
     address_info.accelerationStructure = tracer->BLAS;
@@ -2404,7 +2384,7 @@ static bs_Result _bs_buildTLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
     }
 
     memcpy(staging_buffer->_->data, &instance, sizeof(instance));
-    _bs_copyAsync(staging_buffer, instance_buffer, 0, 0, sizeof(instance));
+    _bs_copyAsync(queue, staging_buffer, instance_buffer, 0, 0, sizeof(instance));
 
     VkBufferMemoryBarrier barrier = {
         .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
@@ -2418,7 +2398,7 @@ static bs_Result _bs_buildTLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
     };
 
     vkCmdPipelineBarrier(
-        bsi_fetchCommands(),
+        _bsi_fetchCommands(queue),
         VK_PIPELINE_STAGE_TRANSFER_BIT,
         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
         0,
@@ -2495,16 +2475,16 @@ static bs_Result _bs_buildTLAS(bs_RayTracer* tracer, bs_Buffer* staging_buffer) 
 
     VkAccelerationStructureBuildRangeInfoKHR* p_range_info = &range_info;
 
-    _bs_procs_.vkCmdBuildAccelerationStructuresKHR(bsi_fetchCommands(), 1, &build_info, &p_range_info);
-    _bs_scope_.queue->flags |= BS_QUEUE_SINGLE_TIMES_BIT;
+    _bs_procs_.vkCmdBuildAccelerationStructuresKHR(_bsi_fetchCommands(queue), 1, &build_info, &p_range_info);
+    queue->flags |= BS_QUEUE_SINGLE_TIMES_BIT;
 
-    _bs_pushQueue(_bs_scope_.queue);
-    vkQueueWaitIdle(_bs_scope_.queue->queue);
+    _bs_pushQueue(queue, 0, NULL);
+    _bs_stallQueue(queue);
 
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_build(bs_RayTracer* tracer) {
+BSAPI bs_Result _bs_build(bs_Queue* queue, bs_RayTracer* tracer) {
     bs_Buffer* staging_buffer = BS_BUFFER(-1, 0, 0)->buffer;
     bs_Result result = _bs_buffer(staging_buffer, BS_MAX(sizeof(VkAccelerationStructureInstanceKHR), tracer->aabbs.count * sizeof(VkAabbPositionsKHR)),
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -2518,13 +2498,13 @@ BSAPI bs_Result _bs_build(bs_RayTracer* tracer) {
 
     _bs_mapBuffer(staging_buffer, BS_U32_MAX);
 
-    result = _bs_buildBLAS(tracer, staging_buffer);
+    result = _bs_buildBLAS(queue, tracer, staging_buffer);
     if (result != BS_RESULT_OK) {
         _bs_destroyRayTracer(tracer);
         return result;
     }
 
-    result = _bs_buildTLAS(tracer, staging_buffer);
+    result = _bs_buildTLAS(queue, tracer, staging_buffer);
     if (result != BS_RESULT_OK) {
         _bs_destroyRayTracer(tracer);
         return result;
@@ -2539,8 +2519,8 @@ BSAPI bs_Result _bs_build(bs_RayTracer* tracer) {
    * Synchronization
    *============================================================================*/
 
-BSAPI void _bs_barrier(bs_U32 dependency_flags, bs_U32 src_stage, bs_U32 dst_stage, bs_U32 src_access, bs_U32 dst_access) {
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+BSAPI void _bs_barrier(bs_Queue* queue, bs_U32 dependency_flags, bs_U32 src_stage, bs_U32 dst_stage, bs_U32 src_access, bs_U32 dst_access) {
+    VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     vkCmdPipelineBarrier(
         command_buffer,
@@ -2553,9 +2533,9 @@ BSAPI void _bs_barrier(bs_U32 dependency_flags, bs_U32 src_stage, bs_U32 dst_sta
         },
         0, NULL, 0, NULL);
 
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
-        _bs_pushQueue(_bs_scope_.queue);
-        vkQueueWaitIdle(_bs_scope_.queue->queue);
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
+        _bs_pushQueue(queue, 0, NULL);
+        _bs_stallQueue(queue);
     }
 }
 
@@ -2564,10 +2544,6 @@ BSAPI void _bs_barrier(bs_U32 dependency_flags, bs_U32 src_stage, bs_U32 dst_sta
   /*==============================================================================
    * Queues
    *============================================================================*/
-
-BSAPI bs_Queue* _bs_singleTimesQueue() {
-    return _bs_instance_->single_times_queue;
-}
 
 static inline VkQueueFlags _bs_convertQueueFlags(bs_QueueBits flags) {
     return
@@ -2749,17 +2725,19 @@ BSAPI void _bs_destroyQueue(bs_Queue* queue) {
     _bs_resetObject(&queue->head, sizeof(bs_Queue));
 }
 
-BSAPI void _bs_awaitQueue(bs_Queue* queue, bs_PipelineStage stage) {
+bs_WaitSemaphore _bs_queueSemaphore(bs_Queue* queue, bs_PipelineStage stage) {
     int swap = _bs_queueSwap(queue);
-    _bs_scope_.wait_semaphores[_bs_scope_.wait_num] = queue->_[swap].semaphore;
-    _bs_scope_.wait_stages[_bs_scope_.wait_num] = (VkPipelineStageFlags)stage;
-    _bs_scope_.wait_num++;
+    return (bs_WaitSemaphore) {
+        .semaphore = queue->_[swap].semaphore,
+        .stage = stage,
+    };
 }
 
-BSAPI void _bs_awaitAcquisition() {
-    _bs_scope_.wait_semaphores[_bs_scope_.wait_num] = _bs_context_->_[_bs_context_->frame].semaphore;
-    _bs_scope_.wait_stages[_bs_scope_.wait_num] = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    _bs_scope_.wait_num++;
+bs_WaitSemaphore _bs_acquisitionSemaphore() {
+    return (bs_WaitSemaphore) {
+        .semaphore = _bs_context_->_[_bs_context_->frame].semaphore,
+        .stage = BS_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+    };
 }
 
 BSAPI void _bs_stallQueue(bs_Queue* queue) {
@@ -2811,15 +2789,11 @@ BSAPI bs_Result _bs_poll(bs_Queue* queue) {
 }
 
 BSAPI bs_Result _val_bs_resetQueue(bs_Queue* queue) {
-    BS_VALIDATE(!_bs_scope_.has_begun, BS_RESULT_VALIDATION_ERROR,);
-
     return _bs_resetQueue(queue);
 }
 
 BSAPI bs_Result _bs_resetQueue(bs_Queue* queue) {
     VkResult result;
-
-    _bs_scope_.queue = queue;
 
     int swap = _bs_queueSwap(queue);
     VkCommandBuffer command_buffer = queue->_[swap].command_buffer;
@@ -2838,17 +2812,14 @@ BSAPI bs_Result _bs_resetQueue(bs_Queue* queue) {
         return _bs_convertVulkanResult(result);
     }
 
-    _bs_scope_.has_begun = true;
-
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _val_bs_pushQueue(bs_Queue* queue) {
-    BS_VALIDATE(!_bs_scope_.has_begun, BS_RESULT_VALIDATION_ERROR,);
-    return _bs_pushQueue(queue);
+BSAPI bs_Result _val_bs_pushQueue(bs_Queue* queue, int wait_semaphore_count, bs_WaitSemaphore wait_stages[]) {
+    return _bs_pushQueue(queue, wait_semaphore_count, wait_stages);
 }
 
-BSAPI bs_Result _bs_pushQueue(bs_Queue* queue) {
+BSAPI bs_Result _bs_pushQueue(bs_Queue* queue, int wait_semaphores_count, bs_WaitSemaphore wait_semaphores[]) {
     VkResult result;
 
     int swap = _bs_queueSwap(queue);
@@ -2858,22 +2829,33 @@ BSAPI bs_Result _bs_pushQueue(bs_Queue* queue) {
     if (result != VK_SUCCESS)
         return _bs_convertVulkanResult(result);
 
+    VkPipelineStageFlags* stages = NULL;
+    VkSemaphore* semaphores = NULL;
+
+    if (wait_semaphores_count > 0) {
+        stages = _alloca(wait_semaphores_count * sizeof(VkPipelineStageFlags));
+        semaphores = _alloca(wait_semaphores_count * sizeof(VkSemaphore));
+
+        for (int i = 0; i < wait_semaphores_count; i++) {
+            semaphores[i] = wait_semaphores[i].semaphore;
+            stages[i] = wait_semaphores[i].stage;
+        }
+    }
+
     VkSubmitInfo submit_i = {
         .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
         .signalSemaphoreCount = queue->_[swap].semaphore ? 1 : 0,
         .pSignalSemaphores = &queue->_[swap].semaphore,
         .commandBufferCount = 1,
         .pCommandBuffers = &command_buffer,
-        .waitSemaphoreCount = _bs_scope_.wait_num,
-        .pWaitDstStageMask = _bs_scope_.wait_stages,
-        .pWaitSemaphores = _bs_scope_.wait_semaphores
+        .waitSemaphoreCount = wait_semaphores_count,
+        .pWaitDstStageMask = stages,
+        .pWaitSemaphores = semaphores
     };
 
     result = vkQueueSubmit(queue->queue, 1, &submit_i, queue->_->fence ? queue->_[swap].fence : NULL);
     if (result != VK_SUCCESS)
         return _bs_convertVulkanResult(result);
-
-    _bs_scope_.has_begun = false;
 
     return BS_RESULT_OK;
 }
@@ -2882,39 +2864,8 @@ BSAPI void _bs_enqueue(bs_Queue* queue, bs_Callback function) {
     if (_bs_resetQueue(queue) == BS_RESULT_OK) {
         if (function)
             function();
-        _bs_pushQueue(queue);
+        _bs_pushQueue(queue, 0, NULL);
     }
-
-    _bs_setScope(&(bs_Scope) { 0 });
-}
-
-BSAPI bs_Scope _bs_enterSingle() {
-    bs_Scope backup = _bs_scope_;
-    _bs_scope_ = (bs_Scope){
-        .queue = _bs_instance_->single_times_queue
-    };
-    return backup;
-}
-
-BSAPI bs_Scope* _bs_getScope() {
-    return &_bs_scope_;
-}
-
-BSAPI void _bs_setScope(bs_Scope* scope) {
-    if (scope)
-        _bs_scope_ = *scope;
-    else
-        memset(&_bs_scope_, 0, sizeof(bs_Scope));
-}
-
-BSAPI void _bs_leaveSingle(bs_Scope* backup) {
-    _bs_scope_ = *backup;
-}
-
-BSAPI void _bs_runSingle(bs_Callback f) {
-    bs_Scope backup = _bs_enterSingle();
-    if (f) f();
-    _bs_leaveSingle(&backup);
 }
 
 
@@ -3037,19 +2988,22 @@ BSAPI void _val_bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_qu
 }
 
 BSAPI void _bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues_count) {
-    VkSemaphore wait_semaphores[BS_MAX_NUM_WAITS];
-    bs_U32 num_wait_semaphores = 0;
+    VkSemaphore* wait_semaphores = NULL;
 
-    for (int i = 0; i < wait_queues_count; i++) {
-        bs_Queue* wait_queue = wait_queues[i];
+    if (wait_queues_count > 0) {
+        wait_semaphores = _alloca(wait_queues_count * sizeof(VkSemaphore));
 
-        int swap = _bs_queueSwap(wait_queue);
-        wait_semaphores[num_wait_semaphores++] = wait_queue->_[swap].semaphore;
+        for (int i = 0; i < wait_queues_count; i++) {
+            bs_Queue* wait_queue = wait_queues[i];
+
+            int swap = _bs_queueSwap(wait_queue);
+            wait_semaphores[i] = wait_queue->_[swap].semaphore;
+        }
     }
 
     VkPresentInfoKHR present_i = {
         .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-        .waitSemaphoreCount = num_wait_semaphores,
+        .waitSemaphoreCount = wait_queues_count,
         .pWaitSemaphores = wait_semaphores,
         .swapchainCount = 1,
         .pSwapchains = &_bs_context_->swapchain,

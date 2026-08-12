@@ -41,70 +41,29 @@
 static void _bsgfx_loResSubpass0() {
 }
 
-/**
- Low Resolution Subpass 1
- Used for post processing
- Writes to BSGFX_IMAGE_LO_RES_RESULT
- */
-static void _bsgfx_loResSubpass1() {
-    bs_beginCommentN(BS_CONSTANT_STRING("Low Resolution Subpass 1"));
-
-    if (bs_exists(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)) {
-        bs_barrier(0,
-            BS_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-            BS_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-            BS_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-            BS_ACCESS_SHADER_READ_BIT);
-
-        bs_PipelineHash hash = bsgfx_defaultPipelineHash();
-        hash.shaders[0] = $vs_bsgfx_color_percentage();
-        hash.shaders[1] = $fs_bsgfx_hilight();
-
-        bs_Pipeline* pipeline;
-        if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-            struct {
-                float offset_x;
-                float offset_y;
-                float elapsed;
-                //   int noise;
-            } push_const = {
-                .offset_x = poser()->world_camera.position.x / (bs_resolution().x / BSGFX_PIXEL_SCALE),
-                .offset_y = poser()->world_camera.position.y / (bs_resolution().y / BSGFX_PIXEL_SCALE),
-                .elapsed = bs_elapsedTime(),
-                //   .noise = _bsgfx_queryTexture(512, "noise_00"),
-            };
-
-            bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-            bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)->batch, pipeline, 0, 6, 0, 1);
-        }
-    }
-
-    bs_endComment();
-
-
-}
-
  /**
   High Resolution Subpass 0
   Writes to the swapchain (or whatever)
   */
-static void basilisk_hiResSubpass0() {
+static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
+    bs_Queue* queue = scope->queue;
+
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
-    bs_beginCommentN(BS_CONSTANT_STRING("High Resolution Subpass 0"));
+    bs_beginCommentN(queue, BS_CONSTANT_STRING("High Resolution Subpass 0"));
 
     bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
-    bs_clearColor(0, bs_resolution(), BS_RGBA(75, 75, 75, 255));
+    bs_clearColor(queue, 0, bs_resolution(), BS_RGBA(75, 75, 75, 255));
 
-    basilisk_renderDepthlessLines();
-    basilisk_renderPoints();
-    basilisk_renderCones();
-    basilisk_renderSelectedTile();
-    basilisk_renderRoundedQuads();
-    bsgfx_renderColorPickers();
-    basilisk_renderUISolid();
-    basilisk_renderUI();
+    basilisk_renderDepthlessLines(scope, queue);
+    basilisk_renderPoints(scope, queue);
+    basilisk_renderCones(scope, queue);
+    basilisk_renderSelectedTile(scope, queue);
+    basilisk_renderRoundedQuads(scope, queue);
+    bsgfx_renderColorPickers(scope, queue);
+    basilisk_renderUISolid(scope, queue);
+    basilisk_renderUI(scope, queue);
 
     int package = bs_queryPackage("content/basilisk-fonts.bpak");
 
@@ -113,17 +72,17 @@ static void basilisk_hiResSubpass0() {
         bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
         if (resource && resource->model) {
             bsgfx_Font* font = resource->model;
-            basilisk_renderFontSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
+            basilisk_renderFontSubtype(scope, queue, bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
         }
     }
-    basilisk_renderUIStencil();
-    basilisk_renderDither();
+    basilisk_renderUIStencil(scope, queue);
+    basilisk_renderDither(scope, queue);
 
 
 
   //  bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
-    basilisk_renderTiles();
-    bsgfx_renderPrimitives(poser()->screen_camera.result);
+    basilisk_renderTiles(scope, queue);
+    bsgfx_renderPrimitives(scope, queue, poser()->screen_camera.result);
 
     /*
    // Final post processing step on the BSGFX_IMAGE_LO_RES_RESULT
@@ -160,7 +119,7 @@ static void basilisk_hiResSubpass0() {
     }
     */
 
-    bsgfx_renderColorPickers();
+    bsgfx_renderColorPickers(scope, queue);
 
     /**
      Textures
@@ -170,26 +129,16 @@ static void basilisk_hiResSubpass0() {
     hash.shaders[0] = $vs_bsgfx_quad_instanced();
     hash.shaders[1] = $fs_bsgfx_256_hi_res();
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_256_HI], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_256_HI], pipeline);
     }
 
-    bsgfx_renderAtlasIcons();
-    bsgfx_renderTileIcons();
+    bsgfx_renderAtlasIcons(scope, queue);
+    bsgfx_renderTileIcons(scope, queue);
 
-    bs_endComment();
-}
-
-static void basilisk_graphicsPipe() {
-    if (bs_exists(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)) {
-        bs_Renderer* hi_res_renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
-        bs_Callback callbacks[] = {
-            basilisk_hiResSubpass0,
-        };
-        bs_runPass(hi_res_renderer, callbacks, sizeof(callbacks) / sizeof(*callbacks));
-    }
+    bs_endComment(queue);
 }
 
 void basilisk_pipeline() {
@@ -197,12 +146,25 @@ void basilisk_pipeline() {
         return;
 
     bs_Queue* graphics_queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
-    bs_setScope(&(bs_Scope) { 0 });
 
     bs_acquire();
 
-    bs_awaitAcquisition();
-    bs_enqueue(graphics_queue, basilisk_graphicsPipe);
+    if (bs_resetQueue(graphics_queue) == BS_RESULT_OK) {
+
+        if (bs_exists(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)) {
+            bs_Renderer* hi_res_renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
+            bs_SubpassCallbackFunction callbacks[] = {
+                basilisk_hiResSubpass0,
+            };
+            bs_runPass(graphics_queue, hi_res_renderer, callbacks, sizeof(callbacks) / sizeof(*callbacks));
+        }
+
+        bs_WaitSemaphore wait_semaphores[] = {
+            bs_acquisitionSemaphore(),
+        };
+        int wait_semaphores_count = sizeof(wait_semaphores) / sizeof(*wait_semaphores);
+        bs_pushQueue(graphics_queue, wait_semaphores_count, wait_semaphores);
+    }
 
     bs_stall(graphics_queue);
 

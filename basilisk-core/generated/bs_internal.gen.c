@@ -61,28 +61,31 @@ void _bs_writeLogFileF(
 }
 
 void _bs_beginComment(
+    bs_Queue* queue, 
     char* value)
 {
-    _bs_beginCommentN(value, strlen(value));
+    _bs_beginCommentN(queue, value, strlen(value));
 }
 
 void _bs_beginCommentV(
+    bs_Queue* queue, 
     char* format, 
     va_list args)
 {
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    _bs_beginCommentN(_formatted, _length);
+    _bs_beginCommentN(queue, _formatted, _length);
 }
 
 void _bs_beginCommentF(
+    bs_Queue* queue, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    _bs_beginCommentV(format, args);
+    _bs_beginCommentV(queue, format, args);
     va_end(args);
 }
 
@@ -183,15 +186,17 @@ bs_Result _bs_savePngF(
 }
 
 bs_Result _bs_loadImage(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
     char* path)
 {
-    return _bs_loadImageN(object, package_id, flags, path, strlen(path));
+    return _bs_loadImageN(queue, object, package_id, flags, path, strlen(path));
 }
 
 bs_Result _bs_loadImageV(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
@@ -201,10 +206,11 @@ bs_Result _bs_loadImageV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bs_loadImageN(object, package_id, flags, _formatted, _length);
+    return _bs_loadImageN(queue, object, package_id, flags, _formatted, _length);
 }
 
 bs_Result _bs_loadImageF(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
@@ -213,21 +219,23 @@ bs_Result _bs_loadImageF(
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = _bs_loadImageV(object, package_id, flags, format, args);
+    bs_Result _return = _bs_loadImageV(queue, object, package_id, flags, format, args);
     va_end(args);
     return _return;
 }
 
 bs_Result _bs_loadAtlas(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
     char* path)
 {
-    return _bs_loadAtlasN(object, package_id, flags, path, strlen(path));
+    return _bs_loadAtlasN(queue, object, package_id, flags, path, strlen(path));
 }
 
 bs_Result _bs_loadAtlasV(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
@@ -237,10 +245,11 @@ bs_Result _bs_loadAtlasV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bs_loadAtlasN(object, package_id, flags, _formatted, _length);
+    return _bs_loadAtlasN(queue, object, package_id, flags, _formatted, _length);
 }
 
 bs_Result _bs_loadAtlasF(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
@@ -249,7 +258,7 @@ bs_Result _bs_loadAtlasF(
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = _bs_loadAtlasV(object, package_id, flags, format, args);
+    bs_Result _return = _bs_loadAtlasV(queue, object, package_id, flags, format, args);
     va_end(args);
     return _return;
 }

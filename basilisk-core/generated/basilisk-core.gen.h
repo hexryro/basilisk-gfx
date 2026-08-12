@@ -108,9 +108,11 @@ typedef struct bs_BufferSwap bs_BufferSwap;
 typedef struct bs_Buffer bs_Buffer;
 typedef struct bs_Output bs_Output;
 typedef struct bs_Input bs_Input;
+typedef struct bs_RendererScope bs_RendererScope;
 typedef struct bs_RendererSwaps bs_RendererSwaps;
 typedef struct bs_Renderer bs_Renderer;
 typedef struct bs_Batch bs_Batch;
+typedef struct bs_WaitSemaphore bs_WaitSemaphore;
 typedef struct bs_QueueSwaps bs_QueueSwaps;
 typedef struct bs_Queue bs_Queue;
 typedef struct bs_ShaderGroup bs_ShaderGroup;
@@ -138,7 +140,6 @@ typedef struct bs_IO bs_IO;
 typedef struct bs_Instance bs_Instance;
 typedef struct bs_Bindings bs_Bindings;
 typedef struct bs_Config bs_Config;
-typedef struct bs_Scope bs_Scope;
 typedef struct bs_QueueFamily bs_QueueFamily;
 typedef struct bs_SurfaceFormat bs_SurfaceFormat;
 typedef struct bs_PhysicalDevice bs_PhysicalDevice;
@@ -407,12 +408,6 @@ typedef enum bs_VkObjectType bs_VkObjectType;
     32
 
 #define BS_MAX_NUM_QUEUES                                            \
-    8
-
-#define BS_MAX_NUM_SIGNALS                                           \
-    8
-
-#define BS_MAX_NUM_WAITS                                             \
     8
 
 #define BS_MAX_NUM_SUBPASSES                                         \
@@ -1319,6 +1314,7 @@ typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
 typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
 typedef void (__stdcall* bs_ValidationErrorCallbackFunction)();
 typedef void (__stdcall* bs_WindowConfigurationCallbackFunction)();
+typedef void (__stdcall* bs_SubpassCallbackFunction)(bs_RendererScope);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -2676,6 +2672,12 @@ struct bs_Input {
     bs_U32 attachment;
 };
 
+struct bs_RendererScope {
+    bs_Queue* queue;
+    bs_Renderer* renderer;
+    int subpass;
+};
+
 struct bs_RendererSwaps {
     struct VkFramebuffer_T* framebuffer;
 };
@@ -2691,6 +2693,7 @@ struct bs_Renderer {
     int num_subpasses;
     int num_dependencies;
     bs_ivec2 dim;
+    bs_Queue* queue;
     struct VkRenderPass_T* render_pass;
     bs_RendererSwaps _[];
 };
@@ -2709,6 +2712,11 @@ struct bs_Batch {
     struct {
         void* unused;
     }_[];
+};
+
+struct bs_WaitSemaphore {
+    struct VkSemaphore_T* semaphore;
+    bs_PipelineStage stage;
 };
 
 struct bs_QueueSwaps {
@@ -3004,7 +3012,6 @@ struct bs_IO {
 };
 
 struct bs_Instance {
-    bs_Queue* single_times_queue;
     int bind_sets_count;
     int bindings_count;
     int descriptors_count;
@@ -3036,16 +3043,6 @@ struct bs_Bindings {
 
 struct bs_Config {
     bs_List attributes;
-};
-
-struct bs_Scope {
-    bool has_begun;
-    bs_Renderer* renderer;
-    int subpass;
-    bs_Queue* queue;
-    bs_U32 wait_num;
-    bs_U32 wait_stages[BS_MAX_NUM_WAITS];
-    struct VkSemaphore_T* wait_semaphores[BS_MAX_NUM_WAITS];
 };
 
 struct bs_QueueFamily {
@@ -4508,48 +4505,58 @@ bs_populateVertexDeclaration(
     int attributes_count);
 
  /**
+  @param queue
   @param value
   @return void
   */
 BSAPI void
 bs_beginComment(
+    bs_Queue* queue,
     char* value);
 
  /**
+  @param queue
   @param value
   @param value_length
   @return void
   */
 BSAPI void
 bs_beginCommentN(
+    bs_Queue* queue,
     char* value,
     int value_length);
 
  /**
+  @param queue
   @param format
   @param args
   @return void
   */
 BSAPI void
 bs_beginCommentV(
+    bs_Queue* queue,
     char* format,
     va_list args);
 
  /**
+  @param queue
   @param format
   @param ...
   @return void
   */
 BSAPI void
 bs_beginCommentF(
+    bs_Queue* queue,
     char* format,
      ...);
 
  /**
+  @param queue
   @return void
   */
 BSAPI void
-bs_endComment();
+bs_endComment(
+    bs_Queue* queue);
 
  /**
   @return bs_Image*
@@ -4558,6 +4565,7 @@ BSAPI bs_Image*
 bs_swapchainImage();
 
  /**
+  @param queue
   @param index
   @param resolution
   @param value
@@ -4565,11 +4573,13 @@ bs_swapchainImage();
   */
 BSAPI void
 bs_clearStencil(
+    bs_Queue* queue,
     bs_U32 index,
     bs_ivec2 resolution,
     bs_U32 value);
 
  /**
+  @param queue
   @param index
   @param dim
   @param value
@@ -4577,11 +4587,13 @@ bs_clearStencil(
   */
 BSAPI void
 bs_clearDepth(
+    bs_Queue* queue,
     bs_U32 index,
     bs_ivec2 dim,
     float value);
 
  /**
+  @param queue
   @param index
   @param dim
   @param depth_value
@@ -4590,12 +4602,14 @@ bs_clearDepth(
   */
 BSAPI void
 bs_clearDepthStencil(
+    bs_Queue* queue,
     bs_U32 index,
     bs_ivec2 dim,
     float depth_value,
     bs_U32 stencil_value);
 
  /**
+  @param queue
   @param index
   @param dim
   @param color
@@ -4603,34 +4617,41 @@ bs_clearDepthStencil(
   */
 BSAPI void
 bs_clearColor(
+    bs_Queue* queue,
     bs_U32 index,
     bs_ivec2 dim,
     bs_RGBA color);
 
  /**
+  @param queue
   @param face
   @param reference
   @return void
   */
 BSAPI void
 bs_stencilReference(
+    bs_Queue* queue,
     bs_StencilFaceFlag face,
     bs_U32 reference);
 
  /**
+  @param queue
   @param flags
   @return void
   */
 BSAPI void
 bs_cull(
+    bs_Queue* queue,
     bs_CullFlags flags);
 
  /**
+  @param queue
   @param width
   @return void
   */
 BSAPI void
 bs_setLineWidth(
+    bs_Queue* queue,
     float width);
 
  /**
@@ -4642,6 +4663,7 @@ bs_batchSize(
     bs_Batch* batch);
 
  /**
+  @param queue
   @param batch
   @param pipeline
   @param vertex_offset
@@ -4652,6 +4674,7 @@ bs_batchSize(
   */
 BSAPI void
 bs_render(
+    bs_Queue* queue,
     bs_Batch* batch,
     bs_Pipeline* pipeline,
     bs_U32 vertex_offset,
@@ -4660,6 +4683,7 @@ bs_render(
     bs_U32 num_instances);
 
  /**
+  @param queue
   @param dependency_flags
   @param src
   @param dst
@@ -4669,6 +4693,7 @@ bs_render(
   */
 BSAPI void
 bs_barrier(
+    bs_Queue* queue,
     bs_U32 dependency_flags,
     bs_U32 src,
     bs_U32 dst,
@@ -4726,11 +4751,13 @@ bs_accelerateBatch(
     bs_Batch* batch);
 
  /**
+  @param queue
   @param ray_tracer
   @return bs_Result
   */
 BSAPI bs_Result
 bs_build(
+    bs_Queue* queue,
     bs_RayTracer* ray_tracer);
 
  /**
@@ -4742,6 +4769,7 @@ bs_destroyRayTracer(
     bs_RayTracer* ray_tracer);
 
  /**
+  @param queue
   @param pipeline
   @param x
   @param y
@@ -4750,6 +4778,7 @@ bs_destroyRayTracer(
   */
 BSAPI void
 bs_dispatchAsync(
+    bs_Queue* queue,
     bs_Pipeline* pipeline,
     bs_U32 x,
     bs_U32 y,
@@ -4846,6 +4875,7 @@ bs_destroyBuffer(
     bs_Buffer* buffer);
 
  /**
+  @param queue
   @param src
   @param dst
   @param src_offset
@@ -4855,6 +4885,7 @@ bs_destroyBuffer(
   */
 BSAPI void
 bs_copyAsync(
+    bs_Queue* queue,
     bs_Buffer* src,
     bs_Buffer* dst,
     bs_U32 src_offset,
@@ -4862,6 +4893,7 @@ bs_copyAsync(
     bs_U32 num_bytes);
 
  /**
+  @param queue
   @param buffer
   @param offset
   @param num_bytes
@@ -4870,6 +4902,7 @@ bs_copyAsync(
   */
 BSAPI void
 bs_setBufferAsync(
+    bs_Queue* queue,
     bs_Buffer* buffer,
     bs_U32 offset,
     bs_U32 num_bytes,
@@ -4960,6 +4993,7 @@ bs_minimizeBatch(
     bs_Batch* batch);
 
  /**
+  @param queue
   @param batch
   @param num_index_bytes
   @param num_vertex_bytes
@@ -4967,6 +5001,7 @@ bs_minimizeBatch(
   */
 BSAPI bs_Result
 bs_pushBatch(
+    bs_Queue* queue,
     bs_Batch* batch,
     bs_U32 num_index_bytes,
     bs_U32 num_vertex_bytes);
@@ -5482,6 +5517,7 @@ bs_framebuffer(
     bs_ivec2 resolution);
 
  /**
+  @param queue
   @param renderer
   @param callbacks
   @param callbacks_count
@@ -5489,8 +5525,9 @@ bs_framebuffer(
   */
 BSAPI void
 bs_runPass(
+    bs_Queue* queue,
     bs_Renderer* renderer,
-    bs_Callback callbacks[],
+    bs_SubpassCallbackFunction callbacks[],
     int callbacks_count);
 
  /**
@@ -5502,19 +5539,23 @@ bs_rendererIsDynamic(
     bs_Renderer* renderer);
 
  /**
+  @param queue
   @param renderer
   @return void
   */
 BSAPI void
 bs_beginRender(
+    bs_Queue* queue,
     bs_Renderer* renderer);
 
  /**
+  @param queue
   @param renderer
   @return void
   */
 BSAPI void
 bs_endRender(
+    bs_Queue* queue,
     bs_Renderer* renderer);
 
  /**
@@ -5534,12 +5575,6 @@ BSAPI void
 bs_resizeRenderer(
     bs_Renderer* renderer,
     bs_ivec2 resolution);
-
- /**
-  @return bs_Queue*
-  */
-BSAPI bs_Queue*
-bs_singleTimesQueue();
 
  /**
   @param flags
@@ -5574,22 +5609,6 @@ bs_acquire();
 BSAPI int
 bs_queueSwap(
     bs_Queue* queue);
-
- /**
-  @param queue
-  @param stage
-  @return void
-  */
-BSAPI void
-bs_awaitQueue(
-    bs_Queue* queue,
-    bs_PipelineStage stage);
-
- /**
-  @return void
-  */
-BSAPI void
-bs_awaitAcquisition();
 
  /**
   @param queue
@@ -5656,42 +5675,6 @@ bs_poll(
     bs_Queue* queue);
 
  /**
-  @return bs_Scope
-  */
-BSAPI bs_Scope
-bs_enterSingle();
-
- /**
-  @param backup
-  @return void
-  */
-BSAPI void
-bs_leaveSingle(
-    bs_Scope* backup);
-
- /**
-  @return bs_Scope*
-  */
-BSAPI bs_Scope*
-bs_getScope();
-
- /**
-  @param scope
-  @return void
-  */
-BSAPI void
-bs_setScope(
-    bs_Scope* scope);
-
- /**
-  @param function
-  @return void
-  */
-BSAPI void
-bs_runSingle(
-    bs_Callback function);
-
- /**
   @param object
   @param dim
   @param num_indices
@@ -5708,6 +5691,7 @@ bs_image(
     bs_U32 flags);
 
  /**
+  @param queue
   @param image
   @param index
   @param old_layout
@@ -5716,6 +5700,7 @@ bs_image(
   */
 BSAPI void
 bs_transition(
+    bs_Queue* queue,
     bs_Image* image,
     int index,
     bs_ImageLayout old_layout,
@@ -5928,6 +5913,7 @@ bs_queryImageIndex(
     int* out);
 
  /**
+  @param queue
   @param image
   @param buffer
   @param image_index
@@ -5939,6 +5925,7 @@ bs_queryImageIndex(
   */
 BSAPI void
 bs_copyImageToBufferAsync(
+    bs_Queue* queue,
     bs_Image* image,
     bs_Buffer* buffer,
     int image_index,
@@ -5962,14 +5949,17 @@ bs_copyBufferToImage(
     bs_ImageLayout layout);
 
  /**
+  @param queue
   @param operation
   @return void
   */
 BSAPI void
 bs_blit(
+    bs_Queue* queue,
     bs_BlitOperation operation);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -5978,12 +5968,14 @@ bs_blit(
   */
 BSAPI bs_Result
 bs_loadImage(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_ImageBits flags,
     char* path);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -5993,6 +5985,7 @@ bs_loadImage(
   */
 BSAPI bs_Result
 bs_loadImageN(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_ImageBits flags,
@@ -6000,6 +5993,7 @@ bs_loadImageN(
     int path_length);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -6009,6 +6003,7 @@ bs_loadImageN(
   */
 BSAPI bs_Result
 bs_loadImageV(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_ImageBits flags,
@@ -6016,6 +6011,7 @@ bs_loadImageV(
     va_list args);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -6025,6 +6021,7 @@ bs_loadImageV(
   */
 BSAPI bs_Result
 bs_loadImageF(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_ImageBits flags,
@@ -6076,6 +6073,7 @@ bs_sampler(
     bs_SamplerBits flags);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -6084,12 +6082,14 @@ bs_sampler(
   */
 BSAPI bs_Result
 bs_loadAtlas(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_U32 flags,
     char* path);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -6099,6 +6099,7 @@ bs_loadAtlas(
   */
 BSAPI bs_Result
 bs_loadAtlasN(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_U32 flags,
@@ -6106,6 +6107,7 @@ bs_loadAtlasN(
     int path_length);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -6115,6 +6117,7 @@ bs_loadAtlasN(
   */
 BSAPI bs_Result
 bs_loadAtlasV(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_U32 flags,
@@ -6122,6 +6125,7 @@ bs_loadAtlasV(
     va_list args);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param flags
@@ -6131,6 +6135,7 @@ bs_loadAtlasV(
   */
 BSAPI bs_Result
 bs_loadAtlasF(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     bs_U32 flags,
@@ -6202,6 +6207,7 @@ bs_destroyAtlas(
     bs_Atlas* atlas);
 
  /**
+  @param queue
   @param object
   @param package_id
   @param resource_name
@@ -6211,6 +6217,7 @@ bs_destroyAtlas(
   */
 BSAPI bs_Result
 bs_loadAtlasMemory(
+    bs_Queue* queue,
     bs_Object* object,
     int package_id,
     char* resource_name,
@@ -6234,14 +6241,6 @@ BSAPI void
 bs_ini();
 
  /**
-  @param load_resources
-  @return void
-  */
-BSAPI void
-bs_load(
-    bs_Callback load_resources);
-
- /**
   @param procedures
   @param count
   @param dll_handle
@@ -6256,16 +6255,20 @@ bs_queryProcedures(
     unsigned char* destination);
 
  /**
-  @return struct VkCommandBuffer_T*
+  @param queue
+  @param stage
+  @return bs_WaitSemaphore
   */
-BSAPI struct VkCommandBuffer_T*
-bsi_fetchCommands();
+BSAPI bs_WaitSemaphore
+bs_queueSemaphore(
+    bs_Queue* queue,
+    bs_PipelineStage stage);
 
  /**
-  @return struct VkDevice_T*
+  @return bs_WaitSemaphore
   */
-BSAPI struct VkDevice_T*
-bsi_fetchDevice();
+BSAPI bs_WaitSemaphore
+bs_acquisitionSemaphore();
 
  /**
   @param queue
@@ -6277,11 +6280,15 @@ bs_resetQueue(
 
  /**
   @param queue
+  @param wait_semaphores_count
+  @param wait_semaphores
   @return bs_Result
   */
 BSAPI bs_Result
 bs_pushQueue(
-    bs_Queue* queue);
+    bs_Queue* queue,
+    int wait_semaphores_count,
+    bs_WaitSemaphore wait_semaphores[]);
 
  /**
   @param handle
@@ -7020,12 +7027,6 @@ bs_props();
   */
 BSAPI bs_Config*
 bs_config();
-
- /**
-  @return bs_Scope*
-  */
-BSAPI bs_Scope*
-bs_scope();
 
  /**
   @return bs_Context*
@@ -8628,12 +8629,16 @@ bs_pipelineHash(
     bs_PipelineHash* descriptor);
 
  /**
+  @param scope
+  @param queue
   @param descriptor
   @param out
   @return bs_Result
   */
 BSAPI bs_Result
 bs_pipeline(
+    bs_RendererScope* scope,
+    bs_Queue* queue,
     bs_PipelineHash* descriptor,
     bs_Pipeline** out);
 
@@ -8646,6 +8651,7 @@ bs_destroyPipeline(
     bs_Pipeline* pipeline);
 
  /**
+  @param queue
   @param pipeline
   @param offset
   @param size
@@ -8654,18 +8660,21 @@ bs_destroyPipeline(
   */
 BSAPI void
 bs_pushConstant(
+    bs_Queue* queue,
     bs_Pipeline* pipeline,
     bs_U32 offset,
     bs_U32 size,
     void* data);
 
  /**
+  @param queue
   @param pipeline_hash
   @param out
   @return bs_Result
   */
 BSAPI bs_Result
 bs_rayTracingPipeline(
+    bs_Queue* queue,
     bs_RayTracePipelineHash* pipeline_hash,
     bs_Pipeline** out);
 
@@ -9812,7 +9821,6 @@ BSAPI extern bs_Config _bs_config_;
 BSAPI extern bs_Args _bs_args_;
 BSAPI extern bs_Features _bs_features_;
 BSAPI extern bs_Props _bs_props_;
-BSAPI extern bs_Scope _bs_scope_;
 BSAPI extern bs_Context* _bs_context_;
 BSAPI extern int _bs_image_index_;
 BSAPI extern bs_List _bs_physical_devices_;

@@ -88,4 +88,6 @@ BSAPI void _bs_writeLogger(
     _bs_criticalF(format __VA_OPT__(, ) __VA_ARGS__)
    // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, _bs_convertYyjsonError(code), code, __func__, __FILE__, __LINE__, format __VA_OPT__(, ) __VA_ARGS__)
 
+BSAPI struct VkCommandBuffer_T* _bsi_fetchCommands(bs_Queue* queue);
+
 #endif

@@ -64,8 +64,10 @@ static void onLoadScene() {
 	bs_loadPackage(&basilisk.package_id, "content/basilisk.bpak");
 	bsmod_iniPackage(basilisk.package_id);
 
+	bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
 	bs_Object* atlas = BS_ATLAS(-1, -1, 0);
-	bs_loadAtlasN(atlas, basilisk.package_id, 0, BS_CONSTANT_STRING("temp"));
+	bs_loadAtlasN(queue, atlas, basilisk.package_id, 0, BS_CONSTANT_STRING("temp"));
 
 	bsmod_onLoad();
 	bsmod_bindAtlases();

@@ -119,6 +119,8 @@ BSMODAPI void _bsmod_onDragPrefab(bsmod_DraggingParams params) {
    *============================================================================*/
 
 BSMODAPI void _bsmod_rasterizePrefabIcons() {
+    bs_Queue* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS)->queue;
+
     bs_Pipeline* pipeline;
     bs_PipelineHash hash;
 
@@ -131,7 +133,7 @@ BSMODAPI void _bsmod_rasterizePrefabIcons() {
     hash.shaders[0] = $vs_bsmod_mesh_instanced();
     hash.shaders[1] = $fs_bsmod_rasterize();
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(NULL, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
         bs_mat4 proj, view, camera;
         bs_orthographic(0, render_size.x, 0, render_size.y, -500.0, 500.0, &proj);

@@ -117,6 +117,8 @@ BSMODAPI bs_Result _bsmod_rasterizeInstance(
         .push_constant_size = push_constant_size,
     });
 
+    bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
     memcpy(rasterization->push_constant, push_constant, push_constant_size);
 
     bs_Object* renderer_object = BS_RENDERER(-1, 0, 0);
@@ -148,8 +150,8 @@ BSMODAPI bs_Result _bsmod_rasterizeInstance(
         BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT, 0);
     if (result != BS_RESULT_OK) goto fail;
 
-    bs_transition(rasterization->image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
-    bs_transition(rasterization->scaled_image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
+    bs_transition(single_times_queue, rasterization->image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
+    bs_transition(single_times_queue, rasterization->scaled_image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
 
     bs_output(rasterization->renderer, (bs_Output) {
         .subpass = 0,
@@ -176,6 +178,8 @@ fail:
 }
 
 BSMODAPI void _bsmod_endRasterize() {
+    bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
     bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
     bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
 
@@ -185,7 +189,7 @@ BSMODAPI void _bsmod_endRasterize() {
     for (int i = 0; i < _bsmod_rasterizations.count; i++) {
         bsmod_Rasterization* rasterization = bs_fetchUnit(&_bsmod_rasterizations, i);
 
-        bs_beginRender(rasterization->renderer);
+        bs_beginRender(single_times_queue, rasterization->renderer);
 
         struct bsgfx_InstanceSubtypeMetadata* subtype_metadata = metadata->instance_subtypes + rasterization->subtype;
 
@@ -195,16 +199,16 @@ BSMODAPI void _bsmod_endRasterize() {
         bs_Batch* batch = bs_fetch(subtype_metadata->batch_source_id, subtype_metadata->batch_id);
 
         bs_Pipeline* pipeline;
-        if (bs_pipeline(&rasterization->pipeline_hash, &pipeline) != BS_RESULT_OK)
+        if (bs_pipeline(single_times_queue, single_times_queue, &rasterization->pipeline_hash, &pipeline) != BS_RESULT_OK)
             continue;
 
-        bs_clearDepth(0, rasterization->depth_image->dim, 1.0);
-        bs_pushConstant(pipeline, 0, rasterization->push_constant_size, rasterization->push_constant);
-        bs_render(batch, pipeline, index_offset, index_count, rasterization->instance_id, 1);
+        bs_clearDepth(single_times_queue, 0, rasterization->depth_image->dim, 1.0);
+        bs_pushConstant(single_times_queue, pipeline, 0, rasterization->push_constant_size, rasterization->push_constant);
+        bs_render(single_times_queue, batch, pipeline, index_offset, index_count, rasterization->instance_id, 1);
 
-        bs_endRender(rasterization->renderer);
+        bs_endRender(single_times_queue, rasterization->renderer);
         
-        bs_blit((bs_BlitOperation) {
+        bs_blit(single_times_queue, (bs_BlitOperation) {
             .source = rasterization->image, 
             .source_layout = BS_IMAGE_LAYOUT_GENERAL, 
             .source_scale = rasterization->image->dim, 
@@ -214,6 +218,7 @@ BSMODAPI void _bsmod_endRasterize() {
         });
 
         bs_copyImageToBufferAsync(
+            single_times_queue,
             rasterization->scaled_image,
             rasterization->buffer,
             0,

@@ -120,7 +120,7 @@ BSGFXAPI void _bsgfx_requiredForTransparency(bs_PipelineHash* inout) {
    * Render Pipe
    *============================================================================*/
 
-BSGFXAPI void _bsgfx_renderPrimitiveTiles() {
+BSGFXAPI void _bsgfx_renderPrimitiveTiles(bs_RendererScope* scope, bs_Queue* queue) {
     if (!bs_exists(BSGFX_BATCHES, BSGFX_BATCH_PRIMITIVE_TILES))
         return;
 
@@ -129,8 +129,10 @@ BSGFXAPI void _bsgfx_renderPrimitiveTiles() {
     hash.shaders[1] = $fs_bsgfx_tile();
 
     bs_Pipeline* pipeline;
-    if (bs_pipeline(&hash, &pipeline) != BS_RESULT_OK)
+    if (bs_pipeline(scope, scope->queue, &hash, &pipeline) != BS_RESULT_OK)
         return;
+
+    bs_Batch* batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_PRIMITIVE_TILES)->batch;
 
     struct {
         bs_mat4 camera;
@@ -138,16 +140,16 @@ BSGFXAPI void _bsgfx_renderPrimitiveTiles() {
         .camera = _poser_->camera.result,
     };
 
-    bs_beginCommentN(BS_CONSTANT_STRING("Tiles"));
+    bs_beginCommentN(queue, BS_CONSTANT_STRING("Tiles"));
 
-    bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-    bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_PRIMITIVE_TILES)->batch, pipeline, 0, BS_U32_MAX, 0, 1);
-    _bsgfx_renderPrimitives(_poser_->camera.result);
+    bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+    bs_render(queue, batch, pipeline, 0, BS_U32_MAX, 0, 1);
+    _bsgfx_renderPrimitives(scope, queue, _poser_->camera.result);
 
-    bs_endComment();
+    bs_endComment(queue);
 }
 
-BSGFXAPI void _bsgfx_renderAtlas() {
+BSGFXAPI void _bsgfx_renderAtlas(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     _bsgfx_requiredForStencilShadows(&hash);
 
@@ -155,32 +157,32 @@ BSGFXAPI void _bsgfx_renderAtlas() {
     hash.shaders[1] = $fs_bsgfx_atlas();
 
     bs_Pipeline* pipeline;
-    if (bs_pipeline(&hash, &pipeline) != BS_RESULT_OK)
+    if (bs_pipeline(scope, queue, &hash, &pipeline) != BS_RESULT_OK)
         return;
 
-    bs_beginCommentN(BS_CONSTANT_STRING("Atlas"));
+    bs_beginCommentN(queue, BS_CONSTANT_STRING("Atlas"));
 
-    bs_pushConstant(pipeline, 0, sizeof(_poser_->world_camera.result), &_poser_->world_camera.result);
-    _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS], pipeline);
+    bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->world_camera.result), &_poser_->world_camera.result);
+    _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS], pipeline);
 
-    bs_endComment();
+    bs_endComment(queue);
 }
 
-BSGFXAPI void _bsgfx_renderPoints() {
+BSGFXAPI void _bsgfx_renderPoints(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     hash.shaders[0] = $vs_bsgfx_point_instanced();
     hash.shaders[1] = $fs_bsgfx_color();
     hash.topology_type = BS_PRIMITIVE_TOPOLOGY_POINT_LIST;
 
     bs_Pipeline* pipeline;
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(pipeline, 0, sizeof(_poser_->camera.result), &_poser_->camera.result);
-        _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_POINT], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->camera.result), &_poser_->camera.result);
+        _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_POINT], pipeline);
     }
 }
 
-BSGFXAPI void _bsgfx_renderLines(const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _bsgfx_renderLines(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     hash.shaders[0] = $vs_bsgfx_line_instanced();
     hash.shaders[1] = $fs_bsgfx_color();
@@ -188,14 +190,14 @@ BSGFXAPI void _bsgfx_renderLines(const bs_mat4* camera, int subtype, bool skip_d
     hash.skip_depth_test = skip_depth_test;
 
     bs_Pipeline* pipeline;
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(pipeline, 0, sizeof(bs_mat4), camera);
-        _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_LINE], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(bs_mat4), camera);
+        _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_LINE], pipeline);
     }
 }
 
-BSGFXAPI void _bsgfx_renderLineModel(const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _bsgfx_renderLineModel(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
     if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
         return;
 
@@ -206,7 +208,7 @@ BSGFXAPI void _bsgfx_renderLineModel(const bs_mat4* camera, int subtype, bool sk
     hash.skip_depth_test = skip_depth_test;
 
     bs_Pipeline* pipeline;
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
 
         int white = bs_queryAtlas(atlas, "white"); // TODO: cache
@@ -219,19 +221,19 @@ BSGFXAPI void _bsgfx_renderLineModel(const bs_mat4* camera, int subtype, bool sk
             .uv = bs_atlasCoordinates(atlas, white),
         };
 
-        bs_pushConstant(pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
-        _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_SPHERE_MESH], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
+        _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_SPHERE_MESH], pipeline);
     }
 }
 
-BSGFXAPI void _bsgfx_renderAtlasIcons() {
+BSGFXAPI void _bsgfx_renderAtlasIcons(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     _bsgfx_requiredForTransparency(&hash);
     hash.shaders[0] = $vs_bsgfx_quad_instanced();
     hash.shaders[1] = $fs_bsgfx_atlas();
 
     bs_Pipeline* pipeline;
-    if (bs_pipeline(&hash, &pipeline) != BS_RESULT_OK)
+    if (bs_pipeline(scope, queue, &hash, &pipeline) != BS_RESULT_OK)
         return;
 
     struct {
@@ -245,22 +247,22 @@ BSGFXAPI void _bsgfx_renderAtlasIcons() {
         .resolution = BS_IV2_TO_V2(bs_resolution()),
     };
 
-    bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-    _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_ICON], pipeline);
+    bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+    _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_ICON], pipeline);
 }
 
-BSGFXAPI void _bsgfx_renderTileIcons() {
+BSGFXAPI void _bsgfx_renderTileIcons(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     _bsgfx_requiredForTransparency(&hash);
     hash.shaders[0] = $vs_bsgfx_quad_instanced();
     hash.shaders[1] = $fs_bsgfx_tile_screen();
 
     bs_Pipeline* pipeline;
-    if (bs_pipeline(&hash, &pipeline) != BS_RESULT_OK)
+    if (bs_pipeline(scope, queue, &hash, &pipeline) != BS_RESULT_OK)
         return;
 
-    bs_pushConstant(pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
-    _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_TILE_ICON], pipeline);
+    bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+    _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_TILE_ICON], pipeline);
 }
 
 

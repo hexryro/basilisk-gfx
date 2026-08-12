@@ -1677,23 +1677,48 @@
 		</function>
 
 
-		<function name="bsgfx_renderTileIcons"><return>void</return></function>
-		<function name="bsgfx_renderAtlasIcons"><return>void</return></function>
+		<function name="bsgfx_renderTileIcons">
+			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
+		
+		<function name="bsgfx_renderAtlasIcons">
+			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
 		<function name="bsgfx_renderLineModel">
 			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>const bs_mat4*</type><name>camera</name></param>
 			<param><type>int</type><name>subtype</name></param>
 			<param><type>bool</type><name>skip_depth_test</name></param>
 		</function>
 		<function name="bsgfx_renderLines">
 			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>const bs_mat4*</type><name>camera</name></param>
 			<param><type>int</type><name>subtype</name></param>
 			<param><type>bool</type><name>skip_depth_test</name></param>
 		</function>
-		<function name="bsgfx_renderPoints"><return>void</return></function>
-		<function name="bsgfx_renderAtlas"><return>void</return></function>
-		<function name="bsgfx_renderPrimitiveTiles"><return>void</return></function>
+		<function name="bsgfx_renderPoints">
+			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
+		<function name="bsgfx_renderAtlas">
+			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
+		<function name="bsgfx_renderPrimitiveTiles">
+			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
 
 		<function name="bsgfx_swapBufferBindings"><return>void</return></function>
 
@@ -1894,6 +1919,7 @@
 		</function>
 		<function name="bsgfx_renderSubtype">
 			<return>void</return>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>int</type><name>subtype</name></param>
 			<param><type>bs_Pipeline*</type><name>pipeline</name></param>
 		</function>
@@ -2104,8 +2130,17 @@
 			<param><type>int</type><name>package_id</name></param>
 		</function>
 
-		<function name="bsgfx_computePrefabShadows"><return>void</return></function>
-		<function name="bsgfx_renderPrefabShadowVolumes"><return>void</return></function>
+		<function name="bsgfx_computePrefabShadows">
+			<return>void</return>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
+		
+		<function name="bsgfx_renderPrefabShadowVolumes">
+			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
+		
 		<function name="bsgfx_prefabMetadata">
 			<return>bsgfx_PrefabMetadata*</return>
 			<param><type>int</type><name>mesh_id</name></param>
@@ -2135,10 +2170,13 @@
 		<function name="bsgfx_instancePrefabs"><return>void</return></function>
 		<function name="bsgfx_renderPrefabs">
 			<return>void</return>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>bs_Pipeline*</type><name>pipeline</name></param>
 			<param><type>int</type><name>key_start</name></param>
 		</function>
+		<!--
 		<function name="bsgfx_renderScenePrefabs"><return>void</return></function>
+		-->
 		<function name="bsgfx_renderPrefabPrimitives">
 			<return>void</return>
 			<param><type>bs_Pipeline*</type><name>pipeline</name></param>
@@ -2183,6 +2221,8 @@
 		<function name="bsgfx_instancePrimitives"><return>void</return></function>
 		<function name="bsgfx_renderPrimitives">
 			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>bs_mat4</type><name>camera</name></param>
 		</function>
 		<function name="bsgfx_queryPrimitive">
@@ -2280,7 +2320,12 @@
 			<param nullable="true"><type>bsgfx_TitleBar*</type><name>title_bar</name></param>
 			<param nullable="true"><type>bsgfx_MenuTabBar*</type><name>tab_bar</name></param>
 		</function>
-		<function name="bsgfx_renderColorPickers"><return>void</return></function>
+		
+		<function name="bsgfx_renderColorPickers">
+			<return>void</return>
+			<param><type>bs_RendererScope*</type><name>scope</name></param>
+			<param><type>bs_Queue*</type><name>queue</name></param>
+		</function>
 	</functions>
 
 	<externs>

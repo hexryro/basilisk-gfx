@@ -164,13 +164,10 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_endRender = (PFN_bs_endRender)GetProcAddress(module, "_val_bs_endRender");
     functions.bs_destroyRenderer = (PFN_bs_destroyRenderer)GetProcAddress(module, "_val_bs_destroyRenderer");
     functions.bs_resizeRenderer = (PFN_bs_resizeRenderer)GetProcAddress(module, "_val_bs_resizeRenderer");
-    functions.bs_singleTimesQueue = (PFN_bs_singleTimesQueue)GetProcAddress(module, "_val_bs_singleTimesQueue");
     functions.bs_queueFamily = (PFN_bs_queueFamily)GetProcAddress(module, "_val_bs_queueFamily");
     functions.bs_present = (PFN_bs_present)GetProcAddress(module, "_val_bs_present");
     functions.bs_acquire = (PFN_bs_acquire)GetProcAddress(module, "_val_bs_acquire");
     functions.bs_queueSwap = (PFN_bs_queueSwap)GetProcAddress(module, "_val_bs_queueSwap");
-    functions.bs_awaitQueue = (PFN_bs_awaitQueue)GetProcAddress(module, "_val_bs_awaitQueue");
-    functions.bs_awaitAcquisition = (PFN_bs_awaitAcquisition)GetProcAddress(module, "_val_bs_awaitAcquisition");
     functions.bs_enqueue = (PFN_bs_enqueue)GetProcAddress(module, "_val_bs_enqueue");
     functions.bs_imageIndex = (PFN_bs_imageIndex)GetProcAddress(module, "_val_bs_imageIndex");
     functions.bs_queue = (PFN_bs_queue)GetProcAddress(module, "_val_bs_queue");
@@ -179,11 +176,6 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_stallQueue = (PFN_bs_stallQueue)GetProcAddress(module, "_val_bs_stallQueue");
     functions.bs_stall = (PFN_bs_stall)GetProcAddress(module, "_val_bs_stall");
     functions.bs_poll = (PFN_bs_poll)GetProcAddress(module, "_val_bs_poll");
-    functions.bs_enterSingle = (PFN_bs_enterSingle)GetProcAddress(module, "_val_bs_enterSingle");
-    functions.bs_leaveSingle = (PFN_bs_leaveSingle)GetProcAddress(module, "_val_bs_leaveSingle");
-    functions.bs_getScope = (PFN_bs_getScope)GetProcAddress(module, "_val_bs_getScope");
-    functions.bs_setScope = (PFN_bs_setScope)GetProcAddress(module, "_val_bs_setScope");
-    functions.bs_runSingle = (PFN_bs_runSingle)GetProcAddress(module, "_val_bs_runSingle");
     functions.bs_image = (PFN_bs_image)GetProcAddress(module, "_val_bs_image");
     functions.bs_transition = (PFN_bs_transition)GetProcAddress(module, "_val_bs_transition");
     functions.bs_peekPng = (PFN_bs_peekPng)GetProcAddress(module, "_val_bs_peekPng");
@@ -216,10 +208,9 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_loadAtlasMemory = (PFN_bs_loadAtlasMemory)GetProcAddress(module, "_val_bs_loadAtlasMemory");
     functions.bs_parseArgs = (PFN_bs_parseArgs)GetProcAddress(module, "_val_bs_parseArgs");
     functions.bs_ini = (PFN_bs_ini)GetProcAddress(module, "_val_bs_ini");
-    functions.bs_load = (PFN_bs_load)GetProcAddress(module, "_val_bs_load");
     functions.bs_queryProcedures = (PFN_bs_queryProcedures)GetProcAddress(module, "_val_bs_queryProcedures");
-    functions.bsi_fetchCommands = (PFN_bsi_fetchCommands)GetProcAddress(module, "_val_bsi_fetchCommands");
-    functions.bsi_fetchDevice = (PFN_bsi_fetchDevice)GetProcAddress(module, "_val_bsi_fetchDevice");
+    functions.bs_queueSemaphore = (PFN_bs_queueSemaphore)GetProcAddress(module, "_val_bs_queueSemaphore");
+    functions.bs_acquisitionSemaphore = (PFN_bs_acquisitionSemaphore)GetProcAddress(module, "_val_bs_acquisitionSemaphore");
     functions.bs_resetQueue = (PFN_bs_resetQueue)GetProcAddress(module, "_val_bs_resetQueue");
     functions.bs_pushQueue = (PFN_bs_pushQueue)GetProcAddress(module, "_val_bs_pushQueue");
     functions.bsi_nameHandle = (PFN_bsi_nameHandle)GetProcAddress(module, "_val_bsi_nameHandle");
@@ -264,7 +255,6 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_features = (PFN_bs_features)GetProcAddress(module, "_val_bs_features");
     functions.bs_props = (PFN_bs_props)GetProcAddress(module, "_val_bs_props");
     functions.bs_config = (PFN_bs_config)GetProcAddress(module, "_val_bs_config");
-    functions.bs_scope = (PFN_bs_scope)GetProcAddress(module, "_val_bs_scope");
     functions.bs_context = (PFN_bs_context)GetProcAddress(module, "_val_bs_context");
     functions.bs_io = (PFN_bs_io)GetProcAddress(module, "_val_bs_io");
     functions.bs_system = (PFN_bs_system)GetProcAddress(module, "_val_bs_system");

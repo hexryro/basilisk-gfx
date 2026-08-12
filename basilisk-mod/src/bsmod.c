@@ -124,14 +124,14 @@ BSMODAPI void _bsmod_onTick() {
 
     static int last_selected_count = 0;
     static int last_selected_type = 0;
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
     switch (_bsmod_.selected_type) {
     case BSGFX_TYPE_TILE: {
         bsgfx_Primitive* primitive = bsgfx_get(BSGFX_TYPE_PRIMITIVE, _bsmod_.selected_tile_primitive);
 
         if (last_selected_type != _bsmod_.selected_type || last_selected_count != _bsmod_.selected_tiles.count) {
             bs_Batch* batch = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_TILE)->batch;
-            bs_Scope last = *bs_getScope();
-            bs_setScope(&(bs_Scope) { .queue = bs_singleTimesQueue() });
+
             bs_unpushBatch(batch);
 
             for (int i = 0; i < _bsmod_.selected_tiles.count; i++) {
@@ -147,8 +147,7 @@ BSMODAPI void _bsmod_onTick() {
                 bsgfx_pushTileAt(batch, primitive, _bsmod_.selected_tile_axis, coord.x, coord.y, 0, 0, &tile_index);
             }
 
-            bs_pushBatch(batch, BS_U32_MAX, BS_U32_MAX);
-            bs_setScope(&last);
+            bs_pushBatch(queue,batch, BS_U32_MAX, BS_U32_MAX);
 
             /**
 
@@ -467,6 +466,8 @@ BSMODAPI void _bsmod_onLoad() {
 
     _bsmod_loadMsdfResources();
 
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
     bs_Object* tile_batch_object = BS_BATCH(BSMOD_BATCHES, BSMOD_BATCH_TILE, 0);
     result = bs_batch(tile_batch_object, sizeof(int), $vs_bsgfx_tile_static(), BS_BATCH_KEEP_DATA);
     if (result == BS_RESULT_OK && bs_canPushBatch(tile_batch_object->batch)) {
@@ -475,7 +476,7 @@ BSMODAPI void _bsmod_onLoad() {
         bs_quad(&BS_V3(0, 0, 0), &BS_V2(1, 1), &quad);
 
         bsgfx_pushTile(tile_batch_object->batch, &quad, BS_V3(0, 0, 0), 0, 0, &range);
-        bs_pushBatch(tile_batch_object->batch, BS_U32_MAX, BS_U32_MAX);
+        bs_pushBatch(queue, tile_batch_object->batch, BS_U32_MAX, BS_U32_MAX);
     }
 
     //_bsmod_subtypes[BSMOD_SUBTYPE_SPHERE_HIGH_QUALITY] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, BSGFX_BATCH_MESH_INSTANCED, BSGFX_SUBTYPE_HAS_SHADOWS, sphere_high_quality_range);
@@ -545,7 +546,7 @@ BSMODAPI void _bsmod_onLoad() {
             .new_layout = BS_IMAGE_LAYOUT_PRESENT_SRC_KHR,
         });
 
-        bs_transition(depth->image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
+        bs_transition(queue, depth->image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
         bs_output(renderer_3d->renderer, (bs_Output) {
             .subpass = 0, 
             .image = depth->image,
@@ -570,10 +571,10 @@ BSMODAPI void _bsmod_onLoad() {
     bs_Object* primitive_icons = BS_ATLAS(BSMOD_ATLASES, BSMOD_ATLAS_PRIMITIVE_ICONS, 0);
     bs_Object* prefab_icons = BS_ATLAS(BSMOD_ATLASES, BSMOD_ATLAS_PREFAB_ICONS, 0);
 
-    bs_loadAtlasN(ui, _bsmod_.package, 0, BS_CONSTANT_STRING("ui"));
-    bs_loadAtlasN(material_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("material_icons"));
-    bs_loadAtlasN(primitive_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("primitive_icons"));
-    bs_loadAtlasN(prefab_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("prefab_icons"));
+    bs_loadAtlasN(queue, ui, _bsmod_.package, 0, BS_CONSTANT_STRING("ui"));
+    bs_loadAtlasN(queue, material_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("material_icons"));
+    bs_loadAtlasN(queue, primitive_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("primitive_icons"));
+    bs_loadAtlasN(queue, prefab_icons, _bsmod_.package, 0, BS_CONSTANT_STRING("prefab_icons"));
 
     _bsmod_bindAtlases();
 

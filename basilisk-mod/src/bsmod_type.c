@@ -334,11 +334,10 @@ BSMODAPI void _bsmod_select(bs_List* list, bsgfx_TypeId type, int id) {
 
 static void _bsmod_clearTiles() {
 	bs_Batch* batch = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_TILE)->batch;
-	bs_Scope last = *bs_getScope();
-	bs_setScope(&(bs_Scope) { .queue = bs_singleTimesQueue() });
+	bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
 	bs_unpushBatch(batch);
-	bs_pushBatch(batch, BS_U32_MAX, BS_U32_MAX);
-	bs_setScope(&last);
+	bs_pushBatch(queue, batch, BS_U32_MAX, BS_U32_MAX);
 }
 
 BSMODAPI void _bsmod_deselectAll() {
@@ -522,6 +521,8 @@ BSMODAPI void _val_bsmod_copyHoveringDataToBuffer() {
 }
 
 BSMODAPI void _bsmod_copyHoveringDataToBuffer() {
+	bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
 	bs_vec2 cursor = bs_cursorPosition();
 
 	bs_Renderer* renderer = bs_fetch(BSGFX_RENDERERS, BSGFX_RENDERER_LO_RES)->renderer;
@@ -546,16 +547,29 @@ BSMODAPI void _bsmod_copyHoveringDataToBuffer() {
 				continue;
 
 			bs_copyImageToBufferAsync(
+				single_times_queue,
 				image,
 				cursor_reads_buffer,
 				0,
 				BS_IMAGE_LAYOUT_GENERAL,
 				i * 4,
 				cursor_position,
-				BS_IV2(1, 1));
+				BS_IV2(1, 1)
+			);
 
-			if (_bsmod_.queue.screenshot)
-				bs_copyImageToBufferAsync(image, tile_read_buffer, 0, BS_IMAGE_LAYOUT_GENERAL, pixel_resolution.x * pixel_resolution.y * i * 4, BS_IV2(0, 0), pixel_resolution);
+			if (_bsmod_.queue.screenshot) {
+				bs_copyImageToBufferAsync(
+					single_times_queue, 
+					image, 
+					tile_read_buffer, 
+					0, 
+
+					BS_IMAGE_LAYOUT_GENERAL, 
+					pixel_resolution.x * pixel_resolution.y * i * 4, 
+					BS_IV2(0, 0), 
+					pixel_resolution
+				);
+			}
 		}
 	}
 }

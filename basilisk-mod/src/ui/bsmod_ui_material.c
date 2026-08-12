@@ -173,11 +173,13 @@ BSMODAPI void _bsmod_rasterizeMaterialIcons() {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
+    bs_Queue* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS)->queue;
+
     hash = bsgfx_defaultPipelineHash();
     hash.shaders[0] = $vs_bsmod_mesh_instanced();
     hash.shaders[1] = $fs_bsmod_rasterize();
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(NULL, queue, &hash, &pipeline) == BS_RESULT_OK) {
         const int width = 74;
 
         const bs_ivec2 render_size = { width * 2, width * 2 };

@@ -1006,38 +1006,43 @@ void bs_populateVertexDeclaration(
 }
 
 void bs_beginComment(
+    bs_Queue* queue, 
     char* value)
 {
-    next.bs_beginComment(value);
+    next.bs_beginComment(queue, value);
 }
 
 void bs_beginCommentN(
+    bs_Queue* queue, 
     char* value, 
     int value_length)
 {
-    next.bs_beginCommentN(value, value_length);
+    next.bs_beginCommentN(queue, value, value_length);
 }
 
 void bs_beginCommentV(
+    bs_Queue* queue, 
     char* format, 
     va_list args)
 {
-    next.bs_beginCommentV(format, args);
+    next.bs_beginCommentV(queue, format, args);
 }
 
 void bs_beginCommentF(
+    bs_Queue* queue, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    next.bs_beginCommentV(format, args);
+    next.bs_beginCommentV(queue, format, args);
     va_end(args);
 }
 
-void bs_endComment()
+void bs_endComment(
+    bs_Queue* queue)
 {
-    next.bs_endComment();
+    next.bs_endComment(queue);
 }
 
 bs_Image* bs_swapchainImage()
@@ -1046,55 +1051,62 @@ bs_Image* bs_swapchainImage()
 }
 
 void bs_clearStencil(
+    bs_Queue* queue, 
     bs_U32 index, 
     bs_ivec2 resolution, 
     bs_U32 value)
 {
-    next.bs_clearStencil(index, resolution, value);
+    next.bs_clearStencil(queue, index, resolution, value);
 }
 
 void bs_clearDepth(
+    bs_Queue* queue, 
     bs_U32 index, 
     bs_ivec2 dim, 
     float value)
 {
-    next.bs_clearDepth(index, dim, value);
+    next.bs_clearDepth(queue, index, dim, value);
 }
 
 void bs_clearDepthStencil(
+    bs_Queue* queue, 
     bs_U32 index, 
     bs_ivec2 dim, 
     float depth_value, 
     bs_U32 stencil_value)
 {
-    next.bs_clearDepthStencil(index, dim, depth_value, stencil_value);
+    next.bs_clearDepthStencil(queue, index, dim, depth_value, stencil_value);
 }
 
 void bs_clearColor(
+    bs_Queue* queue, 
     bs_U32 index, 
     bs_ivec2 dim, 
     bs_RGBA color)
 {
-    next.bs_clearColor(index, dim, color);
+    next.bs_clearColor(queue, index, dim, color);
 }
 
 void bs_stencilReference(
+    bs_Queue* queue, 
     bs_StencilFaceFlag face, 
     bs_U32 reference)
 {
-    next.bs_stencilReference(face, reference);
+    next.bs_stencilReference(queue, face, reference);
 }
 
 void bs_cull(
+    bs_Queue* queue, 
     bs_CullFlags flags)
 {
-    next.bs_cull(flags);
+    next.bs_cull(queue, flags);
 }
 
 void bs_setLineWidth(
+    bs_Queue* queue, 
     float width)
 {
-    next.bs_setLineWidth(width);
+    next.bs_setLineWidth(queue, width);
 }
 
 int bs_batchSize(
@@ -1104,6 +1116,7 @@ int bs_batchSize(
 }
 
 void bs_render(
+    bs_Queue* queue, 
     bs_Batch* batch, 
     bs_Pipeline* pipeline, 
     bs_U32 vertex_offset, 
@@ -1111,17 +1124,18 @@ void bs_render(
     bs_U32 first_instance, 
     bs_U32 num_instances)
 {
-    next.bs_render(batch, pipeline, vertex_offset, vertex_count, first_instance, num_instances);
+    next.bs_render(queue, batch, pipeline, vertex_offset, vertex_count, first_instance, num_instances);
 }
 
 void bs_barrier(
+    bs_Queue* queue, 
     bs_U32 dependency_flags, 
     bs_U32 src, 
     bs_U32 dst, 
     bs_U32 src_access, 
     bs_U32 dst_access)
 {
-    next.bs_barrier(dependency_flags, src, dst, src_access, dst_access);
+    next.bs_barrier(queue, dependency_flags, src, dst, src_access, dst_access);
 }
 
 void bs_rayTrace(
@@ -1158,9 +1172,10 @@ void bs_accelerateBatch(
 }
 
 bs_Result bs_build(
+    bs_Queue* queue, 
     bs_RayTracer* ray_tracer)
 {
-    return next.bs_build(ray_tracer);
+    return next.bs_build(queue, ray_tracer);
 }
 
 void bs_destroyRayTracer(
@@ -1170,12 +1185,13 @@ void bs_destroyRayTracer(
 }
 
 void bs_dispatchAsync(
+    bs_Queue* queue, 
     bs_Pipeline* pipeline, 
     bs_U32 x, 
     bs_U32 y, 
     bs_U32 z)
 {
-    next.bs_dispatchAsync(pipeline, x, y, z);
+    next.bs_dispatchAsync(queue, pipeline, x, y, z);
 }
 
 bs_Result bs_buffer(
@@ -1242,22 +1258,24 @@ void bs_destroyBuffer(
 }
 
 void bs_copyAsync(
+    bs_Queue* queue, 
     bs_Buffer* src, 
     bs_Buffer* dst, 
     bs_U32 src_offset, 
     bs_U32 dst_offset, 
     bs_U32 num_bytes)
 {
-    next.bs_copyAsync(src, dst, src_offset, dst_offset, num_bytes);
+    next.bs_copyAsync(queue, src, dst, src_offset, dst_offset, num_bytes);
 }
 
 void bs_setBufferAsync(
+    bs_Queue* queue, 
     bs_Buffer* buffer, 
     bs_U32 offset, 
     bs_U32 num_bytes, 
     bs_U32 value)
 {
-    next.bs_setBufferAsync(buffer, offset, num_bytes, value);
+    next.bs_setBufferAsync(queue, buffer, offset, num_bytes, value);
 }
 
 bs_Result bs_batch(
@@ -1323,11 +1341,12 @@ void bs_minimizeBatch(
 }
 
 bs_Result bs_pushBatch(
+    bs_Queue* queue, 
     bs_Batch* batch, 
     bs_U32 num_index_bytes, 
     bs_U32 num_vertex_bytes)
 {
-    return next.bs_pushBatch(batch, num_index_bytes, num_vertex_bytes);
+    return next.bs_pushBatch(queue, batch, num_index_bytes, num_vertex_bytes);
 }
 
 void bs_unpushBatch(
@@ -1664,11 +1683,12 @@ bs_Result bs_framebuffer(
 }
 
 void bs_runPass(
+    bs_Queue* queue, 
     bs_Renderer* renderer, 
-    bs_Callback callbacks[], 
+    bs_SubpassCallbackFunction callbacks[], 
     int callbacks_count)
 {
-    next.bs_runPass(renderer, callbacks, callbacks_count);
+    next.bs_runPass(queue, renderer, callbacks, callbacks_count);
 }
 
 bool bs_rendererIsDynamic(
@@ -1678,15 +1698,17 @@ bool bs_rendererIsDynamic(
 }
 
 void bs_beginRender(
+    bs_Queue* queue, 
     bs_Renderer* renderer)
 {
-    next.bs_beginRender(renderer);
+    next.bs_beginRender(queue, renderer);
 }
 
 void bs_endRender(
+    bs_Queue* queue, 
     bs_Renderer* renderer)
 {
-    next.bs_endRender(renderer);
+    next.bs_endRender(queue, renderer);
 }
 
 void bs_destroyRenderer(
@@ -1700,11 +1722,6 @@ void bs_resizeRenderer(
     bs_ivec2 resolution)
 {
     next.bs_resizeRenderer(renderer, resolution);
-}
-
-bs_Queue* bs_singleTimesQueue()
-{
-    return next.bs_singleTimesQueue();
 }
 
 bs_I32 bs_queueFamily(
@@ -1730,18 +1747,6 @@ int bs_queueSwap(
     bs_Queue* queue)
 {
     return next.bs_queueSwap(queue);
-}
-
-void bs_awaitQueue(
-    bs_Queue* queue, 
-    bs_PipelineStage stage)
-{
-    next.bs_awaitQueue(queue, stage);
-}
-
-void bs_awaitAcquisition()
-{
-    next.bs_awaitAcquisition();
 }
 
 void bs_enqueue(
@@ -1792,34 +1797,6 @@ bs_Result bs_poll(
     return next.bs_poll(queue);
 }
 
-bs_Scope bs_enterSingle()
-{
-    return next.bs_enterSingle();
-}
-
-void bs_leaveSingle(
-    bs_Scope* backup)
-{
-    next.bs_leaveSingle(backup);
-}
-
-bs_Scope* bs_getScope()
-{
-    return next.bs_getScope();
-}
-
-void bs_setScope(
-    bs_Scope* scope)
-{
-    next.bs_setScope(scope);
-}
-
-void bs_runSingle(
-    bs_Callback function)
-{
-    next.bs_runSingle(function);
-}
-
 bs_Result bs_image(
     bs_Object* object, 
     bs_ivec2 dim, 
@@ -1831,12 +1808,13 @@ bs_Result bs_image(
 }
 
 void bs_transition(
+    bs_Queue* queue, 
     bs_Image* image, 
     int index, 
     bs_ImageLayout old_layout, 
     bs_ImageLayout new_layout)
 {
-    next.bs_transition(image, index, old_layout, new_layout);
+    next.bs_transition(queue, image, index, old_layout, new_layout);
 }
 
 bs_Result bs_peekPng(
@@ -1983,6 +1961,7 @@ bs_Result bs_queryImageIndex(
 }
 
 void bs_copyImageToBufferAsync(
+    bs_Queue* queue, 
     bs_Image* image, 
     bs_Buffer* buffer, 
     int image_index, 
@@ -1991,7 +1970,7 @@ void bs_copyImageToBufferAsync(
     bs_ivec2 offset, 
     bs_ivec2 resolution)
 {
-    next.bs_copyImageToBufferAsync(image, buffer, image_index, layout, buffer_offset, offset, resolution);
+    next.bs_copyImageToBufferAsync(queue, image, buffer, image_index, layout, buffer_offset, offset, resolution);
 }
 
 void bs_copyBufferToImage(
@@ -2004,41 +1983,46 @@ void bs_copyBufferToImage(
 }
 
 void bs_blit(
+    bs_Queue* queue, 
     bs_BlitOperation operation)
 {
-    next.bs_blit(operation);
+    next.bs_blit(queue, operation);
 }
 
 bs_Result bs_loadImage(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
     char* path)
 {
-    return next.bs_loadImage(object, package_id, flags, path);
+    return next.bs_loadImage(queue, object, package_id, flags, path);
 }
 
 bs_Result bs_loadImageN(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
     char* path, 
     int path_length)
 {
-    return next.bs_loadImageN(object, package_id, flags, path, path_length);
+    return next.bs_loadImageN(queue, object, package_id, flags, path, path_length);
 }
 
 bs_Result bs_loadImageV(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
     char* format, 
     va_list args)
 {
-    return next.bs_loadImageV(object, package_id, flags, format, args);
+    return next.bs_loadImageV(queue, object, package_id, flags, format, args);
 }
 
 bs_Result bs_loadImageF(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_ImageBits flags, 
@@ -2047,7 +2031,7 @@ bs_Result bs_loadImageF(
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = next.bs_loadImageV(object, package_id, flags, format, args);
+    bs_Result _return = next.bs_loadImageV(queue, object, package_id, flags, format, args);
     va_end(args);
     return _return;
 }
@@ -2085,35 +2069,39 @@ bs_Result bs_sampler(
 }
 
 bs_Result bs_loadAtlas(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
     char* path)
 {
-    return next.bs_loadAtlas(object, package_id, flags, path);
+    return next.bs_loadAtlas(queue, object, package_id, flags, path);
 }
 
 bs_Result bs_loadAtlasN(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
     char* path, 
     int path_length)
 {
-    return next.bs_loadAtlasN(object, package_id, flags, path, path_length);
+    return next.bs_loadAtlasN(queue, object, package_id, flags, path, path_length);
 }
 
 bs_Result bs_loadAtlasV(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
     char* format, 
     va_list args)
 {
-    return next.bs_loadAtlasV(object, package_id, flags, format, args);
+    return next.bs_loadAtlasV(queue, object, package_id, flags, format, args);
 }
 
 bs_Result bs_loadAtlasF(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     bs_U32 flags, 
@@ -2122,7 +2110,7 @@ bs_Result bs_loadAtlasF(
 {
     va_list args;
     va_start(args, format);
-    bs_Result _return = next.bs_loadAtlasV(object, package_id, flags, format, args);
+    bs_Result _return = next.bs_loadAtlasV(queue, object, package_id, flags, format, args);
     va_end(args);
     return _return;
 }
@@ -2174,13 +2162,14 @@ void bs_destroyAtlas(
 }
 
 bs_Result bs_loadAtlasMemory(
+    bs_Queue* queue, 
     bs_Object* object, 
     int package_id, 
     char* resource_name, 
     char* data, 
     bs_U32 flags)
 {
-    return next.bs_loadAtlasMemory(object, package_id, resource_name, data, flags);
+    return next.bs_loadAtlasMemory(queue, object, package_id, resource_name, data, flags);
 }
 
 void bs_parseArgs(
@@ -2195,12 +2184,6 @@ void bs_ini()
     next.bs_ini();
 }
 
-void bs_load(
-    bs_Callback load_resources)
-{
-    next.bs_load(load_resources);
-}
-
 void bs_queryProcedures(
     bs_Procedure* procedures, 
     int count, 
@@ -2210,14 +2193,16 @@ void bs_queryProcedures(
     next.bs_queryProcedures(procedures, count, dll_handle, destination);
 }
 
-struct VkCommandBuffer_T* bsi_fetchCommands()
+bs_WaitSemaphore bs_queueSemaphore(
+    bs_Queue* queue, 
+    bs_PipelineStage stage)
 {
-    return next.bsi_fetchCommands();
+    return next.bs_queueSemaphore(queue, stage);
 }
 
-struct VkDevice_T* bsi_fetchDevice()
+bs_WaitSemaphore bs_acquisitionSemaphore()
 {
-    return next.bsi_fetchDevice();
+    return next.bs_acquisitionSemaphore();
 }
 
 bs_Result bs_resetQueue(
@@ -2227,9 +2212,11 @@ bs_Result bs_resetQueue(
 }
 
 bs_Result bs_pushQueue(
-    bs_Queue* queue)
+    bs_Queue* queue, 
+    int wait_semaphores_count, 
+    bs_WaitSemaphore wait_semaphores[])
 {
-    return next.bs_pushQueue(queue);
+    return next.bs_pushQueue(queue, wait_semaphores_count, wait_semaphores);
 }
 
 void bsi_nameHandle(
@@ -2785,11 +2772,6 @@ bs_Props* bs_props()
 bs_Config* bs_config()
 {
     return next.bs_config();
-}
-
-bs_Scope* bs_scope()
-{
-    return next.bs_scope();
 }
 
 bs_Context* bs_context()
@@ -3953,10 +3935,12 @@ bs_U64 bs_pipelineHash(
 }
 
 bs_Result bs_pipeline(
+    bs_RendererScope* scope, 
+    bs_Queue* queue, 
     bs_PipelineHash* descriptor, 
     bs_Pipeline** out)
 {
-    return next.bs_pipeline(descriptor, out);
+    return next.bs_pipeline(scope, queue, descriptor, out);
 }
 
 void bs_destroyPipeline(
@@ -3966,19 +3950,21 @@ void bs_destroyPipeline(
 }
 
 void bs_pushConstant(
+    bs_Queue* queue, 
     bs_Pipeline* pipeline, 
     bs_U32 offset, 
     bs_U32 size, 
     void* data)
 {
-    next.bs_pushConstant(pipeline, offset, size, data);
+    next.bs_pushConstant(queue, pipeline, offset, size, data);
 }
 
 bs_Result bs_rayTracingPipeline(
+    bs_Queue* queue, 
     bs_RayTracePipelineHash* pipeline_hash, 
     bs_Pipeline** out)
 {
-    return next.bs_rayTracingPipeline(pipeline_hash, out);
+    return next.bs_rayTracingPipeline(queue, pipeline_hash, out);
 }
 
 void bs_loadBindings()

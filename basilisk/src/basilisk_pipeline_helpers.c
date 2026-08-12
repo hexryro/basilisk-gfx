@@ -27,7 +27,7 @@
 #include <bsmod_cache.h>
 #include <basilisk_pipeline.h>
 
-void basilisk_renderDepthlessLines() {
+void basilisk_renderDepthlessLines(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -37,19 +37,19 @@ void basilisk_renderDepthlessLines() {
     hash.topology_type = BS_PRIMITIVE_TOPOLOGY_LINE_LIST;
     hash.skip_depth_test = true;
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginCommentN(BS_CONSTANT_STRING("[BSMOD] Lines (Depthless)"));
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("[BSMOD] Lines (Depthless)"));
 
-        bs_setLineWidth(4.0);
-        bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_LINE_DEPTHLESS], pipeline);
-        bs_setLineWidth(1.0);
+        bs_setLineWidth(queue, 4.0);
+        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_LINE_DEPTHLESS], pipeline);
+        bs_setLineWidth(queue, 1.0);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }
 
-void basilisk_renderLines() {
+void basilisk_renderLines(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -58,19 +58,19 @@ void basilisk_renderLines() {
     hash.shaders[1] = $fs_bsgfx_color();
     hash.topology_type = BS_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginCommentN(BS_CONSTANT_STRING("[BSMOD] Lines"));
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("[BSMOD] Lines"));
 
-        bs_setLineWidth(4.0);
-        bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_LINE], pipeline);
-        bs_setLineWidth(1.0);
+        bs_setLineWidth(queue, 4.0);
+        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_LINE], pipeline);
+        bs_setLineWidth(queue, 1.0);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }
 
-void basilisk_renderPoints() {
+void basilisk_renderPoints(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -80,21 +80,21 @@ void basilisk_renderPoints() {
     hash.topology_type = BS_PRIMITIVE_TOPOLOGY_POINT_LIST;
     hash.skip_depth_test = true;
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_POINT], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_POINT], pipeline);
     }
 }
 
-void basilisk_renderCones() {
+void basilisk_renderCones(bs_RendererScope* scope, bs_Queue* queue) {
     if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
         return;
 
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
-    bs_beginCommentN(BS_CONSTANT_STRING("Cones"));
+    bs_beginCommentN(queue, BS_CONSTANT_STRING("Cones"));
 
     bs_Object* atlas_object = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY);
 
@@ -111,14 +111,14 @@ void basilisk_renderCones() {
     hash.shaders[1] = $fs_bsgfx_model();
     hash.skip_depth_test = true;
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_CONE_MESH], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_CONE_MESH], pipeline);
     }
 }
 
-void basilisk_renderUIPost() {
+void basilisk_renderUIPost(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -127,7 +127,7 @@ void basilisk_renderUIPost() {
     hash.shaders[1] = $fs_bsgfx_lo_res_ui_post_0();
     bsgfx_requiredForTransparency(&hash);
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 inv_proj;
             bs_vec3 selected_color;
@@ -143,12 +143,14 @@ void basilisk_renderUIPost() {
         };
         bs_m4Inverse(&poser()->camera.proj, &push_const.inv_proj);
 
+        bs_Batch* screen_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)->batch;
+
         //  bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)->batch, pipeline, 6, 6, 0, 1);
+        bs_render(queue, screen_batch, pipeline, 6, 6, 0, 1);
     }
 }
 
-void basilisk_renderSelectedTile() {
+void basilisk_renderSelectedTile(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -157,23 +159,25 @@ void basilisk_renderSelectedTile() {
     hash.shaders[1] = $fs_bsgfx_tile_selected();
     hash.skip_depth_test = true;
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 camera;
         } push_const = {
             .camera = poser()->camera.result,
         };
 
-        bs_beginCommentN(BS_CONSTANT_STRING("Selected Tiles"));
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("Selected Tiles"));
 
-        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bs_render(bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_TILE)->batch, pipeline, 0, BS_U32_MAX, 0, 1);
+        bs_Batch* tile_batch = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_TILE)->batch;
 
-        bs_endComment();
+        bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+        bs_render(queue, tile_batch, pipeline, 0, BS_U32_MAX, 0, 1);
+
+        bs_endComment(queue);
     }
 }
 
-void basilisk_renderTiles() {
+void basilisk_renderTiles(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -191,14 +195,14 @@ void basilisk_renderTiles() {
         .reference = 2, // TODO
     };
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_TILE_ICON], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_TILE_ICON], pipeline);
     }
 }
 
-void basilisk_renderPrefabOutlines() {
+void basilisk_renderPrefabOutlines(bs_RendererScope* scope, bs_Queue* queue) {
     if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
         return;
 
@@ -212,8 +216,8 @@ void basilisk_renderPrefabOutlines() {
     hash.skip_depth_test = true;
     hash.cull_type = bsgfx_settings()->cull_backfaces ? BS_CULL_MODE_BACK_BIT : BS_CULL_MODE_NONE;
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_beginCommentN(BS_CONSTANT_STRING("Prefabs"));
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("Prefabs"));
 
         bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
         struct {
@@ -224,15 +228,15 @@ void basilisk_renderPrefabOutlines() {
             .uv = $BSGFX_ATLAS_ANY_white()->coords,
         };
 
-        bs_pushConstant(pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
-        bsgfx_renderPrefabs(pipeline, BSGFX_PREFAB_SUBTYPE_MESH_POLYGON_OUTLINE);
+        bs_pushConstant(queue, pipeline, 0, sizeof(mesh_push_const), &mesh_push_const);
+        bsgfx_renderPrefabs(queue, pipeline, BSGFX_PREFAB_SUBTYPE_MESH_POLYGON_OUTLINE);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 
 }
 
-void basilisk_renderRoundedQuads() {
+void basilisk_renderRoundedQuads(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -258,7 +262,7 @@ void basilisk_renderRoundedQuads() {
         .write_mask = 0x00,
     };
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 camera;
             float elapsed;
@@ -272,16 +276,16 @@ void basilisk_renderRoundedQuads() {
             .border_radius = 5.0,
         };
 
-        bs_beginCommentN(BS_CONSTANT_STRING("Rounded Quads"));
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("Rounded Quads"));
 
-        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_ATLAS_ICON], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_ATLAS_ICON], pipeline);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }
 
-void basilisk_renderUI() {
+void basilisk_renderUI(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -290,7 +294,7 @@ void basilisk_renderUI() {
     hash.shaders[1] = $fs_bsgfx_ui();
   //  bsgfx_requiredForTransparency(&hash);
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 camera;
             float elapsed;
@@ -303,16 +307,16 @@ void basilisk_renderUI() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginCommentN(BS_CONSTANT_STRING("UI"));
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("UI"));
 
-        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_UI], pipeline);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }
 
-void basilisk_renderFontSubtype(int subtype, bsgfx_Id font_id, bs_Shader* fragment_shader) {
+void basilisk_renderFontSubtype(bs_RendererScope* scope, bs_Queue* queue, int subtype, bsgfx_Id font_id, bs_Shader* fragment_shader) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -324,13 +328,13 @@ void basilisk_renderFontSubtype(int subtype, bsgfx_Id font_id, bs_Shader* fragme
     hash.shaders[1] = fragment_shader;
     bsgfx_requiredForTransparency(&hash);
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-        bs_pushConstant(pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
-        bsgfx_renderSubtype(subtype, pipeline);
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
+        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bsgfx_renderSubtype(queue, subtype, pipeline);
     }
 }
 
-void basilisk_renderUISolid() {
+void basilisk_renderUISolid(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -339,7 +343,7 @@ void basilisk_renderUISolid() {
     hash.shaders[1] = $fs_bsgfx_ui_color();
    // bsgfx_requiredForTransparency(&hash);
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 camera;
             float elapsed;
@@ -352,16 +356,16 @@ void basilisk_renderUISolid() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginCommentN(BS_CONSTANT_STRING("UI (Color only)"));
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("UI (Color only)"));
 
-        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_UI_COLOR], pipeline);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }
 
-void basilisk_renderUIStencil() {
+void basilisk_renderUIStencil(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -380,7 +384,7 @@ void basilisk_renderUIStencil() {
         .reference = 2, // TODO
     };
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 camera;
             float elapsed;
@@ -393,16 +397,16 @@ void basilisk_renderUIStencil() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginCommentN(BS_CONSTANT_STRING("UI Stencil"));
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("UI Stencil"));
 
-        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_UI_STENCIL], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_UI_STENCIL], pipeline);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }
 
-void basilisk_renderDither() {
+void basilisk_renderDither(bs_RendererScope* scope, bs_Queue* queue) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -411,7 +415,7 @@ void basilisk_renderDither() {
     hash.shaders[1] = $fs_bsgfx_dither();
     bsgfx_requiredForTransparency(&hash);
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 camera;
             float elapsed;
@@ -424,11 +428,11 @@ void basilisk_renderDither() {
             .resolution = BS_IV2_TO_V2(bs_resolution()),
         };
 
-        bs_beginCommentN(BS_CONSTANT_STRING("Dither"));
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("Dither"));
 
-        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bsgfx_renderSubtype(bsgfx_subtypes()[BSGFX_SUBTYPE_DITHER], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_DITHER], pipeline);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }

@@ -45,11 +45,11 @@ enum {
    *============================================================================*/
 
 static inline void _bsgfx_awaitComputeWrite() {
-    bs_barrier(0,
-        BS_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        BS_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        BS_ACCESS_SHADER_WRITE_BIT,
-        BS_ACCESS_SHADER_READ_BIT);
+//    bs_barrier(0,
+//        BS_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+//        BS_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+//        BS_ACCESS_SHADER_WRITE_BIT,
+//        BS_ACCESS_SHADER_READ_BIT);
 }
 
 BSGFXAPI void _bsgfx_computeShadowVolumes() {
@@ -233,13 +233,13 @@ static int _bsgfx_comparePrefabDepths(const bsgfx_Prefab** ap, const bsgfx_Prefa
 
 BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
     return;
-    bs_beginCommentN(BS_CONSTANT_STRING("Shadow Volumes (Fine)"));
+    //bs_beginCommentN(BS_CONSTANT_STRING("Shadow Volumes (Fine)"));
 
-    bs_barrier(0,
-        BS_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        BS_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-        BS_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-        BS_ACCESS_SHADER_READ_BIT);
+    //bs_barrier(0,
+    //    BS_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+    //    BS_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+    //    BS_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+    //    BS_ACCESS_SHADER_READ_BIT);
 
     /**
      Pipelines

@@ -261,12 +261,12 @@ BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* dat
 bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 	bs_Result result = BS_RESULT_OK;
 
-	bs_Scope scope = bs_enterSingle();
-
 	bs_Resource* resource; 
 	result = bs_queryResource(package_id, type, name, &resource);
 	if (result != BS_RESULT_OK)
-		goto end;
+		return result;
+
+	bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
 
 	bs_List* sources = bs_objectSources();
 
@@ -304,9 +304,9 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 
 		if (existing_image) {
 			bs_Object* image_object = BS_IMAGE(existing_image->head.source_id, existing_image->head.id, BS_OBJECT_FORCE_DESTROY);
-			result = bs_loadImage(image_object, package_id, existing_image->flags, name);
+			result = bs_loadImage(single_times_queue, image_object, package_id, existing_image->flags, name);
 			if (result != BS_RESULT_OK)
-				goto end;
+				return result;
 
 			for (int i = 0; i < bs_instance()->bind_sets_count; i++) {
 				bs_BindSet* bind_set = bs_instance()->bind_sets + i;
@@ -372,7 +372,7 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 
 		if (existing_atlas) {
 			bs_Atlas* atlas_object = BS_ATLAS(existing_atlas->head.source_id, existing_atlas->head.id, BS_OBJECT_FORCE_DESTROY);
-			if (bs_loadAtlas(atlas_object, package_id, 0, name) == BS_RESULT_OK) {
+			if (bs_loadAtlas(single_times_queue, atlas_object, package_id, 0, name) == BS_RESULT_OK) {
 				_bsmod_bindAtlases();
 				bs_pushDescriptors();
 			}
@@ -412,9 +412,6 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 	//	//bsgfx_loadTextureDimension(package_id, name, 64, BSGFX_IMAGE_64, BSGFX_SET_64, BSGFX_BINDING_64);
 	//	break;
 	}
-
-end:
-	bs_leaveSingle(&scope);
 
 	return result;
 }

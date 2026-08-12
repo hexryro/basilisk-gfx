@@ -441,29 +441,29 @@ int msdfgl_glyph_buffer_size(FT_Face face, int code, size_t* meta_size,
 static void _bsmod_renderGlyphAtlas() {
     bs_Result result;
 
-    bs_Object* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_MSDF);
-    bs_Object* renderer = bs_fetch(BSMOD_RENDERERS, BSMOD_RENDERER_MSDF);
-    bs_Object* msdf_glyphs = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS);
+    bs_Queue* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_MSDF)->queue;
+    bs_Renderer* renderer = bs_fetch(BSMOD_RENDERERS, BSMOD_RENDERER_MSDF)->renderer;
+    bs_Batch* msdf_glyphs = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS)->batch;
 
-    bs_beginRender(renderer);
+    bs_beginRender(queue, renderer);
 
     bs_PipelineHash hash = bsgfx_defaultPipelineHash();
     hash.shaders[0] = $vs_bsgfx_msdf_glyph();
     hash.shaders[1] = $fs_bsgfx_msdf_glyph();
 
     bs_Pipeline* pipeline;
-    result = bs_pipeline(&hash, &pipeline);
+    result = bs_pipeline(NULL, queue, &hash, &pipeline);
 
     if (result == BS_RESULT_OK) {
-        bs_unpushBatch(msdf_glyphs->batch);
+        bs_unpushBatch(msdf_glyphs);
 
        //bs_pushConstant(pipeline, 0, rasterization->push_constant_size, rasterization->push_constant);
-        bs_render(msdf_glyphs->batch, pipeline, BS_U32_MAX, BS_U32_MAX, 0, 1);
+        bs_render(queue, msdf_glyphs, pipeline, BS_U32_MAX, BS_U32_MAX, 0, 1);
 
-        bs_pushBatch(msdf_glyphs->batch, BS_U32_MAX, BS_U32_MAX);
+        bs_pushBatch(queue, msdf_glyphs, BS_U32_MAX, BS_U32_MAX);
     }
 
-    bs_endRender(renderer);
+    bs_endRender(queue, renderer);
 }
 
 void _bsmod_generateGlyphsMSDF() {
@@ -492,7 +492,7 @@ void _bsmod_loadMsdfResources() {
 
     if (result == BS_RESULT_OK) {
         bs_ivec2 resolution = bs_resolution();
-
+         
         //bs_Object* depth = BS_IMAGE(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH_3D, 0);
         //bs_image(depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_DST_BIT);
 

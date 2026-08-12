@@ -98,6 +98,7 @@ BSGFXAPI extern bsgfx_Procedures _bsgfx_procs_;
 #define BSGFX_QUEUE_IDS(X)                                           \
     X(BSGFX_QUEUE_GRAPHICS)                                          \
     X(BSGFX_QUEUE_COMPUTE)                                           \
+    X(BSGFX_QUEUE_SINGLE_TIMES)                                      \
     X(BSGFX_QUEUES_COUNT)
 
 #define BSGFX_RAY_TRACER_IDS(X)                                      \

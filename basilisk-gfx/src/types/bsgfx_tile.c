@@ -374,8 +374,11 @@ static void _bsgfx_loadTileTextures(int package_id) {
     if (_bsgfx_count(BSGFX_TYPE_PRIMITIVE) == 0) // todo better check
         return;
 
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
     bs_Object* tile_image = BS_IMAGE(BSGFX_IMAGES, BSGFX_IMAGE_TILE, BS_OBJECT_FORCE_DESTROY);
     result = bs_loadImageN(
+        queue,
         tile_image, 
         package_id, 
         BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_DST_BIT,
@@ -502,7 +505,9 @@ BSGFXAPI void _bsgfx_loadTiles(int package_id, bool force_destroy) {
             index = _bsgfx_pushTileAxis(primitive_tiles_object->batch, primitive, j, index);
         }
     }
-    bs_pushBatch(primitive_tiles_object->batch, BS_U32_MAX, BS_U32_MAX);
+
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+    bs_pushBatch(queue, primitive_tiles_object->batch, BS_U32_MAX, BS_U32_MAX);
 }
 
 BSGFXAPI void _bsgfx_instanceTiles() {

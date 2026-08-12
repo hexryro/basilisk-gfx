@@ -155,7 +155,7 @@ BSGFXAPI void _bsgfx_instancePrimitives() {
     }
 }
 
-BSGFXAPI void _bsgfx_renderPrimitives(bs_mat4 camera) {
+BSGFXAPI void _bsgfx_renderPrimitives(bs_RendererScope* scope, bs_Queue* queue, bs_mat4 camera) {
     bs_PipelineHash hash;
     struct {
         bs_mat4 camera;
@@ -177,11 +177,11 @@ BSGFXAPI void _bsgfx_renderPrimitives(bs_mat4 camera) {
     };
 
     bs_Pipeline* pipeline;
-    bs_pipeline(&hash, &pipeline);
+    bs_pipeline(scope, queue, &hash, &pipeline);
 
-    bs_pushConstant(pipeline, 0, sizeof(&push_const), &push_const);
-    _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_BOX], pipeline);
-    _bsgfx_renderSubtype(_bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_SPHERE], pipeline);
+    bs_pushConstant(queue, pipeline, 0, sizeof(&push_const), &push_const);
+    _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_BOX], pipeline);
+    _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_SPHERE], pipeline);
 }
 
 BSGFXAPI int _bsgfx_queryPrimitive(bs_GUID* guid) {

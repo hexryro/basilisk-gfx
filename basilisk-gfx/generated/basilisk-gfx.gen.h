@@ -1800,18 +1800,28 @@ BSGFXAPI bs_PipelineHash
 bsgfx_defaultPipelineHash();
 
  /**
+  @param scope
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_renderTileIcons();
+bsgfx_renderTileIcons(
+    bs_RendererScope* scope,
+    bs_Queue* queue);
 
  /**
+  @param scope
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_renderAtlasIcons();
+bsgfx_renderAtlasIcons(
+    bs_RendererScope* scope,
+    bs_Queue* queue);
 
  /**
+  @param scope
+  @param queue
   @param camera
   @param subtype
   @param skip_depth_test
@@ -1819,11 +1829,15 @@ bsgfx_renderAtlasIcons();
   */
 BSGFXAPI void
 bsgfx_renderLineModel(
+    bs_RendererScope* scope,
+    bs_Queue* queue,
     const bs_mat4* camera,
     int subtype,
     bool skip_depth_test);
 
  /**
+  @param scope
+  @param queue
   @param camera
   @param subtype
   @param skip_depth_test
@@ -1831,27 +1845,41 @@ bsgfx_renderLineModel(
   */
 BSGFXAPI void
 bsgfx_renderLines(
+    bs_RendererScope* scope,
+    bs_Queue* queue,
     const bs_mat4* camera,
     int subtype,
     bool skip_depth_test);
 
  /**
+  @param scope
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_renderPoints();
+bsgfx_renderPoints(
+    bs_RendererScope* scope,
+    bs_Queue* queue);
 
  /**
+  @param scope
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_renderAtlas();
+bsgfx_renderAtlas(
+    bs_RendererScope* scope,
+    bs_Queue* queue);
 
  /**
+  @param scope
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_renderPrimitiveTiles();
+bsgfx_renderPrimitiveTiles(
+    bs_RendererScope* scope,
+    bs_Queue* queue);
 
  /**
   @return void
@@ -2290,12 +2318,14 @@ bsgfx_subtypeHasFlag(
     bs_U32 flag);
 
  /**
+  @param queue
   @param subtype
   @param pipeline
   @return void
   */
 BSGFXAPI void
 bsgfx_renderSubtype(
+    bs_Queue* queue,
     int subtype,
     bs_Pipeline* pipeline);
 
@@ -2800,16 +2830,22 @@ bsgfx_loadLights(
     int package_id);
 
  /**
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_computePrefabShadows();
+bsgfx_computePrefabShadows(
+    bs_Queue* queue);
 
  /**
+  @param scope
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_renderPrefabShadowVolumes();
+bsgfx_renderPrefabShadowVolumes(
+    bs_RendererScope* scope,
+    bs_Queue* queue);
 
  /**
   @param mesh_id
@@ -2870,20 +2906,16 @@ BSGFXAPI void
 bsgfx_instancePrefabs();
 
  /**
+  @param queue
   @param pipeline
   @param key_start
   @return void
   */
 BSGFXAPI void
 bsgfx_renderPrefabs(
+    bs_Queue* queue,
     bs_Pipeline* pipeline,
     int key_start);
-
- /**
-  @return void
-  */
-BSGFXAPI void
-bsgfx_renderScenePrefabs();
 
  /**
   @param pipeline
@@ -2972,11 +3004,15 @@ BSGFXAPI void
 bsgfx_instancePrimitives();
 
  /**
+  @param scope
+  @param queue
   @param camera
   @return void
   */
 BSGFXAPI void
 bsgfx_renderPrimitives(
+    bs_RendererScope* scope,
+    bs_Queue* queue,
     bs_mat4 camera);
 
  /**
@@ -3174,10 +3210,14 @@ bsgfx_instanceWidgets(
     bsgfx_MenuTabBar* tab_bar);
 
  /**
+  @param scope
+  @param queue
   @return void
   */
 BSGFXAPI void
-bsgfx_renderColorPickers();
+bsgfx_renderColorPickers(
+    bs_RendererScope* scope,
+    bs_Queue* queue);
 
 BSGFXAPI extern bsgfx_Scene _bsgfx_current_scene_;
 BSGFXAPI extern bsgfx_Type _bsgfx_types_[BSGFX_TYPE_COUNT];

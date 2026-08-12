@@ -332,25 +332,29 @@ BSGFXAPI bool _bsgfx_subtypeHasFlag(int subtype, bs_U32 flag) {
  /**
   Render subtype
   */
-BSGFXAPI void _val_bsgfx_renderSubtype(int subtype, bs_Pipeline* pipeline) {
+BSGFXAPI void _val_bsgfx_renderSubtype(bs_Queue* queue, int subtype, bs_Pipeline* pipeline) {
 	if (!_bsgfx_validateSubtype("GFX", subtype))
 		return;
 
-	_bsgfx_renderSubtype(subtype, pipeline);
+	_bsgfx_renderSubtype(queue, subtype, pipeline);
 }
 
-BSGFXAPI void _bsgfx_renderSubtype(int subtype, bs_Pipeline* pipeline) {
+BSGFXAPI void _bsgfx_renderSubtype(bs_Queue* queue, int subtype, bs_Pipeline* pipeline) {
 	if (subtype < 0)
 		return;
 
 	bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
 	bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
 
-	if (!bs_exists(metadata->instance_subtypes[subtype].batch_source_id, metadata->instance_subtypes[subtype].batch_id))
+	int batch_source_id = metadata->instance_subtypes[subtype].batch_source_id;
+	int batch_id = metadata->instance_subtypes[subtype].batch_id;
+
+	if (!bs_exists(batch_source_id, batch_id))
 		return;
 
-	bs_render(
-		bs_fetch(metadata->instance_subtypes[subtype].batch_source_id, metadata->instance_subtypes[subtype].batch_id)->batch, pipeline,
+	bs_Batch* batch = bs_fetch(batch_source_id, batch_id)->batch;
+
+	bs_render(queue, batch, pipeline,
 		metadata->instance_subtypes[subtype].index_offset, 
 		metadata->instance_subtypes[subtype].index_count,
 		metadata->instance_subtypes[subtype].instance_offset,

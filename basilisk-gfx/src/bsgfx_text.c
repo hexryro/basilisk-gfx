@@ -216,7 +216,7 @@ BSGFXAPI void _bsgfx_instanceUnicodeTextN(int subtype, bsgfx_Font* font, bs_vec3
 
 // TODO: _bsgfx_instanceShapedTextN()
 
-BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flags, bs_Resource **out) {
+BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* name, bs_U32 flags, bs_Resource **out) {
     *out = NULL;
     bs_Result result;
 
@@ -226,7 +226,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(int package_id, const char* name, bs_U32 flag
         return result;
 
     bs_Object* atlas_object = BS_ATLAS(-1, -1, 0);
-    bs_loadAtlas(atlas_object, package_id, 0, name);
+    bs_loadAtlas(queue, atlas_object, package_id, 0, name);
 
     unsigned char* data = bfnt->data->value;
 
@@ -365,8 +365,10 @@ BSGFXAPI void _bsgfx_test() {
     if (bs_loadPackage(&package_id, "content/basilisk-fonts.bpak") != BS_RESULT_OK)
         return;
 
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
     bs_Resource* resource;
-    _bsgfx_loadFont(package_id, "project/fonts/segoeui.ttf", 0, &resource);
+    _bsgfx_loadFont(queue, package_id, "project/fonts/segoeui.ttf", 0, &resource);
 
     bsgfx_Font* font = resource->model;
     bs_bindImage(BSGFX_SET_FONTS, BSGFX_BINDING_FONTS, font->atlas_object->atlas->image, bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler, BS_IMAGE_LAYOUT_GENERAL);

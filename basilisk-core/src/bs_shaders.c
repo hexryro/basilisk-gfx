@@ -926,20 +926,20 @@ BSAPI bs_Pipeline* _bs_queryPipeline(bs_PipelineType type, bs_U64 hash) {
  /**
   Push constants
   */
-BSAPI void _val_bs_pushConstant(bs_Pipeline* pipeline, bs_U32 offset, bs_U32 size, void* data) {
+BSAPI void _val_bs_pushConstant(bs_Queue* queue, bs_Pipeline* pipeline, bs_U32 offset, bs_U32 size, void* data) {
     BS_VALIDATE(pipeline != NULL, ,);
     BS_VALIDATE((offset + size) <= pipeline->constant_size, , "Push constant %d + %d > %d", offset, size, pipeline->constant_size);
 
-    _bs_pushConstant(pipeline, offset, size, data);
+    _bs_pushConstant(queue, pipeline, offset, size, data);
 }
 
-BSAPI void _bs_pushConstant(bs_Pipeline* pipeline, bs_U32 offset, bs_U32 size, void* data) {
-    VkCommandBuffer command_buffer = bsi_fetchCommands();
+BSAPI void _bs_pushConstant(bs_Queue* queue, bs_Pipeline* pipeline, bs_U32 offset, bs_U32 size, void* data) {
+    VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
     vkCmdPushConstants(command_buffer, pipeline->vk_layout, pipeline->shader_stages, offset, size, data);
 
-    if (_bs_scope_.queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
-        _bs_pushQueue(_bs_scope_.queue);
-        vkQueueWaitIdle(_bs_scope_.queue->queue);
+    if (queue->flags & BS_QUEUE_SINGLE_TIMES_BIT) {
+        _bs_pushQueue(queue, 0, NULL);
+        vkQueueWaitIdle(queue->queue);
     }
 }
 
@@ -1129,32 +1129,34 @@ BSAPI bs_U64 _bs_pipelineHash(bs_PipelineHash* descriptor) {
     return hash;
 }
 
-BSAPI bs_Result _val_bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
+BSAPI bs_Result _val_bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_PipelineHash* descriptor, bs_Pipeline** out) {
     *out = NULL;
-    BS_VALIDATE(_bs_scope_.renderer != NULL, BS_RESULT_VALIDATION_ERROR, "Pipelines must be created within a renderer");
+    BS_VALIDATE(scope->renderer != NULL, BS_RESULT_VALIDATION_ERROR, "Pipelines must be created within a renderer");
     BS_VALIDATE(descriptor->shaders[0] != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(descriptor->shaders[1] != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(descriptor->shaders[0]->type == BS_SHADER_STAGE_VERTEX_BIT, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(descriptor->shaders[1]->type == BS_SHADER_STAGE_FRAGMENT_BIT, BS_RESULT_VALIDATION_ERROR,);
 
-    bool is_dynamic_renderer = _bs_rendererIsDynamic(_bs_scope_.renderer);
+    bool is_dynamic_renderer = _bs_rendererIsDynamic(scope->renderer);
     if (!is_dynamic_renderer) {
-        BS_VALIDATE(descriptor->subpass < _bs_scope_.renderer->num_subpasses, BS_RESULT_VALIDATION_ERROR,
+        BS_VALIDATE(descriptor->subpass < scope->renderer->num_subpasses, BS_RESULT_VALIDATION_ERROR,
             "Pipeline subpass (%d) falls outside renderer (%d) subpass count (%d)",
             descriptor->subpass,
-            _bs_scope_.renderer->head.id,
-            _bs_scope_.renderer->num_subpasses);
+            scope->renderer->head.id,
+            scope->renderer->num_subpasses);
     }
 
-    return _bs_pipeline(descriptor, out);
+    return _bs_pipeline(scope, queue, descriptor, out);
 }
 
-BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
+BSAPI bs_Result _bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_PipelineHash* descriptor, bs_Pipeline** out) {
     VkResult vk_result;
     bs_Result bs_result;
 
-    descriptor->subpass = _bs_scope_.subpass;
-    descriptor->renderer = _bs_scope_.renderer;
+    if (scope) {
+        descriptor->subpass = scope->subpass;
+        descriptor->renderer = scope->renderer;
+    }
 
     bs_Shader* vs = descriptor->shaders[0];
     bs_Shader* fs = descriptor->shaders[1];
@@ -1185,10 +1187,10 @@ BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
 
     int num_blend_states = 0;
 
-    bool is_dynamic_renderer = _bs_rendererIsDynamic(_bs_scope_.renderer);
+    bool is_dynamic_renderer = _bs_rendererIsDynamic(scope->renderer);
     if (!is_dynamic_renderer) {
-        for (int i = 0; i < _bs_scope_.renderer->num_outputs; i++) {
-            bs_Output* output = _bs_scope_.renderer->outputs + i;
+        for (int i = 0; i < scope->renderer->num_outputs; i++) {
+            bs_Output* output = scope->renderer->outputs + i;
             if (output->subpass != descriptor->subpass)
                 continue;
             if (_bs_isDepthFormat(output->image->format))
@@ -1212,8 +1214,8 @@ BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
         }
     }
     else {
-        for (int i = 0; i < _bs_scope_.renderer->num_outputs; i++) {
-            bs_Output* output = _bs_scope_.renderer->outputs + i;
+        for (int i = 0; i < scope->renderer->num_outputs; i++) {
+            bs_Output* output = scope->renderer->outputs + i;
             if (_bs_isDepthFormat(output->image->format)) {
                 render_info.depthAttachmentFormat = (VkFormat)output->image->format; // TODO: ensure only one?
             }
@@ -1365,7 +1367,7 @@ BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
         pipeline_ci.pMultisampleState = &multisampling_ci;
         pipeline_ci.pColorBlendState = &color_blending_ci;
         if (!is_dynamic_renderer)
-            pipeline_ci.pDepthStencilState = BS_RENDERER_SUBPASS_HAS_DEPTH(_bs_scope_.renderer->flags, 0) ? &depth_stencil_state : NULL; // todo should this be 0?
+            pipeline_ci.pDepthStencilState = BS_RENDERER_SUBPASS_HAS_DEPTH(scope->renderer->flags, 0) ? &depth_stencil_state : NULL; // todo should this be 0?
         else
             pipeline_ci.pDepthStencilState = &depth_stencil_state;
     }
@@ -1374,7 +1376,7 @@ BSAPI bs_Result _bs_pipeline(bs_PipelineHash* descriptor, bs_Pipeline** out) {
     pipeline_ci.pStages = shader_stages;
     pipeline_ci.layout = pipeline->vk_layout;
     if (!is_dynamic_renderer)
-        pipeline_ci.renderPass = _bs_scope_.renderer->render_pass;
+        pipeline_ci.renderPass = scope->renderer->render_pass;
     else
         pipeline_ci.pNext = &render_info;
     pipeline_ci.basePipelineIndex = -1;
@@ -1416,7 +1418,7 @@ static inline VkRayTracingShaderGroupCreateInfoKHR _bs_shaderGroup(VkRayTracingS
     };
 }
 
-BSAPI bs_Result _bs_rayTracingPipeline(bs_RayTracePipelineHash* pipeline_hash, bs_Pipeline** out) {
+BSAPI bs_Result _bs_rayTracingPipeline(bs_Queue* queue, bs_RayTracePipelineHash* pipeline_hash, bs_Pipeline** out) {
     VkResult vk_result;
     bs_Result bs_result;
 

@@ -64,34 +64,48 @@ BSGFXAPI bs_PipelineHash _preval_bsgfx_defaultPipelineHash() {
     return next.bsgfx_defaultPipelineHash();
 }
 
-BSGFXAPI void _preval_bsgfx_renderTileIcons() {
-    next.bsgfx_renderTileIcons();
+BSGFXAPI void _preval_bsgfx_renderTileIcons(bs_RendererScope* scope, bs_Queue* queue) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderTileIcons(scope, queue);
 }
 
-BSGFXAPI void _preval_bsgfx_renderAtlasIcons() {
-    next.bsgfx_renderAtlasIcons();
+BSGFXAPI void _preval_bsgfx_renderAtlasIcons(bs_RendererScope* scope, bs_Queue* queue) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderAtlasIcons(scope, queue);
 }
 
-BSGFXAPI void _preval_bsgfx_renderLineModel(const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _preval_bsgfx_renderLineModel(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
     BSGFX_VALIDATE(camera != NULL, ,);
-    next.bsgfx_renderLineModel(camera, subtype, skip_depth_test);
+    next.bsgfx_renderLineModel(scope, queue, camera, subtype, skip_depth_test);
 }
 
-BSGFXAPI void _preval_bsgfx_renderLines(const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _preval_bsgfx_renderLines(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
     BSGFX_VALIDATE(camera != NULL, ,);
-    next.bsgfx_renderLines(camera, subtype, skip_depth_test);
+    next.bsgfx_renderLines(scope, queue, camera, subtype, skip_depth_test);
 }
 
-BSGFXAPI void _preval_bsgfx_renderPoints() {
-    next.bsgfx_renderPoints();
+BSGFXAPI void _preval_bsgfx_renderPoints(bs_RendererScope* scope, bs_Queue* queue) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderPoints(scope, queue);
 }
 
-BSGFXAPI void _preval_bsgfx_renderAtlas() {
-    next.bsgfx_renderAtlas();
+BSGFXAPI void _preval_bsgfx_renderAtlas(bs_RendererScope* scope, bs_Queue* queue) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderAtlas(scope, queue);
 }
 
-BSGFXAPI void _preval_bsgfx_renderPrimitiveTiles() {
-    next.bsgfx_renderPrimitiveTiles();
+BSGFXAPI void _preval_bsgfx_renderPrimitiveTiles(bs_RendererScope* scope, bs_Queue* queue) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderPrimitiveTiles(scope, queue);
 }
 
 BSGFXAPI void _preval_bsgfx_swapBufferBindings() {
@@ -310,9 +324,10 @@ BSGFXAPI bool _preval_bsgfx_subtypeHasFlag(int subtype, bs_U32 flag) {
     return next.bsgfx_subtypeHasFlag(subtype, flag);
 }
 
-BSGFXAPI void _preval_bsgfx_renderSubtype(int subtype, bs_Pipeline* pipeline) {
+BSGFXAPI void _preval_bsgfx_renderSubtype(bs_Queue* queue, int subtype, bs_Pipeline* pipeline) {
+    BSGFX_VALIDATE(queue != NULL, ,);
     BSGFX_VALIDATE(pipeline != NULL, ,);
-    next.bsgfx_renderSubtype(subtype, pipeline);
+    next.bsgfx_renderSubtype(queue, subtype, pipeline);
 }
 
 BSGFXAPI void _preval_bsgfx_resetInstances() {
@@ -507,12 +522,15 @@ BSGFXAPI void _preval_bsgfx_loadLights(int package_id) {
     next.bsgfx_loadLights(package_id);
 }
 
-BSGFXAPI void _preval_bsgfx_computePrefabShadows() {
-    next.bsgfx_computePrefabShadows();
+BSGFXAPI void _preval_bsgfx_computePrefabShadows(bs_Queue* queue) {
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_computePrefabShadows(queue);
 }
 
-BSGFXAPI void _preval_bsgfx_renderPrefabShadowVolumes() {
-    next.bsgfx_renderPrefabShadowVolumes();
+BSGFXAPI void _preval_bsgfx_renderPrefabShadowVolumes(bs_RendererScope* scope, bs_Queue* queue) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderPrefabShadowVolumes(scope, queue);
 }
 
 BSGFXAPI bsgfx_PrefabMetadata* _preval_bsgfx_prefabMetadata(int mesh_id) {
@@ -542,13 +560,10 @@ BSGFXAPI void _preval_bsgfx_instancePrefabs() {
     next.bsgfx_instancePrefabs();
 }
 
-BSGFXAPI void _preval_bsgfx_renderPrefabs(bs_Pipeline* pipeline, int key_start) {
+BSGFXAPI void _preval_bsgfx_renderPrefabs(bs_Queue* queue, bs_Pipeline* pipeline, int key_start) {
+    BSGFX_VALIDATE(queue != NULL, ,);
     BSGFX_VALIDATE(pipeline != NULL, ,);
-    next.bsgfx_renderPrefabs(pipeline, key_start);
-}
-
-BSGFXAPI void _preval_bsgfx_renderScenePrefabs() {
-    next.bsgfx_renderScenePrefabs();
+    next.bsgfx_renderPrefabs(queue, pipeline, key_start);
 }
 
 BSGFXAPI void _preval_bsgfx_renderPrefabPrimitives(bs_Pipeline* pipeline, int key_start) {
@@ -591,8 +606,10 @@ BSGFXAPI void _preval_bsgfx_instancePrimitives() {
     next.bsgfx_instancePrimitives();
 }
 
-BSGFXAPI void _preval_bsgfx_renderPrimitives(bs_mat4 camera) {
-    next.bsgfx_renderPrimitives(camera);
+BSGFXAPI void _preval_bsgfx_renderPrimitives(bs_RendererScope* scope, bs_Queue* queue, bs_mat4 camera) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderPrimitives(scope, queue, camera);
 }
 
 BSGFXAPI int _preval_bsgfx_queryPrimitive(bs_GUID* guid) {
@@ -680,8 +697,10 @@ BSGFXAPI bool _preval_bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* tit
     return next.bsgfx_instanceWidgets(menu, title_bar, tab_bar);
 }
 
-BSGFXAPI void _preval_bsgfx_renderColorPickers() {
-    next.bsgfx_renderColorPickers();
+BSGFXAPI void _preval_bsgfx_renderColorPickers(bs_RendererScope* scope, bs_Queue* queue) {
+    BSGFX_VALIDATE(scope != NULL, ,);
+    BSGFX_VALIDATE(queue != NULL, ,);
+    next.bsgfx_renderColorPickers(scope, queue);
 }
 
 bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
@@ -795,7 +814,6 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_instancePrefab = _preval_bsgfx_instancePrefab;
     functions.bsgfx_instancePrefabs = _preval_bsgfx_instancePrefabs;
     functions.bsgfx_renderPrefabs = _preval_bsgfx_renderPrefabs;
-    functions.bsgfx_renderScenePrefabs = _preval_bsgfx_renderScenePrefabs;
     functions.bsgfx_renderPrefabPrimitives = _preval_bsgfx_renderPrefabPrimitives;
     functions.bsgfx_queryPrefabId = _preval_bsgfx_queryPrefabId;
     functions.bsgfx_closestPrefab = _preval_bsgfx_closestPrefab;

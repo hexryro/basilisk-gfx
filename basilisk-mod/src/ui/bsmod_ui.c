@@ -305,7 +305,7 @@ static void _bsmod_instanceDraggingIcon() {
     }
 }
 
-BSMODAPI void _bsmod_renderBillboards() {
+BSMODAPI void _bsmod_renderBillboards(bs_RendererScope* scope, bs_Queue* queue) {
     bs_Pipeline* pipeline;
     bs_PipelineHash hash;
 
@@ -315,7 +315,7 @@ BSMODAPI void _bsmod_renderBillboards() {
     hash.skip_depth_test = true;
     bsgfx_requiredForTransparency(&hash);
 
-    if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
+    if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         struct {
             bs_mat4 camera;
             bs_mat4 view;
@@ -325,12 +325,12 @@ BSMODAPI void _bsmod_renderBillboards() {
             .view = poser()->camera.view,
         };
 
-        bs_beginCommentN(BS_CONSTANT_STRING("Billboards"));
+        bs_beginCommentN(queue, BS_CONSTANT_STRING("Billboards"));
 
-        bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-        bsgfx_renderSubtype(_bsmod_subtypes_[BSMOD_SUBTYPE_BILLBOARD], pipeline);
+        bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
+        bsgfx_renderSubtype(queue, _bsmod_subtypes_[BSMOD_SUBTYPE_BILLBOARD], pipeline);
 
-        bs_endComment();
+        bs_endComment(queue);
     }
 }
 

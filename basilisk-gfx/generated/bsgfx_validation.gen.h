@@ -149,7 +149,6 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
     functions.bsgfx_instancePrefab = (PFN_bsgfx_instancePrefab)GetProcAddress(module, "_val_bsgfx_instancePrefab");
     functions.bsgfx_instancePrefabs = (PFN_bsgfx_instancePrefabs)GetProcAddress(module, "_val_bsgfx_instancePrefabs");
     functions.bsgfx_renderPrefabs = (PFN_bsgfx_renderPrefabs)GetProcAddress(module, "_val_bsgfx_renderPrefabs");
-    functions.bsgfx_renderScenePrefabs = (PFN_bsgfx_renderScenePrefabs)GetProcAddress(module, "_val_bsgfx_renderScenePrefabs");
     functions.bsgfx_renderPrefabPrimitives = (PFN_bsgfx_renderPrefabPrimitives)GetProcAddress(module, "_val_bsgfx_renderPrefabPrimitives");
     functions.bsgfx_queryPrefabId = (PFN_bsgfx_queryPrefabId)GetProcAddress(module, "_val_bsgfx_queryPrefabId");
     functions.bsgfx_closestPrefab = (PFN_bsgfx_closestPrefab)GetProcAddress(module, "_val_bsgfx_closestPrefab");
