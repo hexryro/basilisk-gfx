@@ -63,19 +63,6 @@ BSGFXAPI void _bsgfx_loadPrimitives(int package_id) {
         sizeof(bsgfx_RawPrimitive), sizeof(bsgfx_Primitive), _bsgfx_mapPrimitive,
         0, 0, 0, 0);
 
-    if (bs_exists(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED)) {
-        bs_Batch* mesh_instanced_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED);
-
-        if (bs_canPushBatch(mesh_instanced_batch)) {
-            bs_Range box_range = bs_pushCube(mesh_instanced_batch, BS_WHITE);
-            bs_Range sphere_range = bs_pushSphere(mesh_instanced_batch, BS_V3(0, 0, 0), 1.0, 16, 16, BS_WHITE);
-            bs_Range sphere_high_quality_range = bs_pushSphere(mesh_instanced_batch, BS_V3(0, 0, 0), 1.0, 64, 64, BS_WHITE);
-
-            _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_BOX] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, mesh_instanced_batch, BSGFX_SUBTYPE_HAS_SHADOWS, box_range);
-            _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_SPHERE] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, mesh_instanced_batch, BSGFX_SUBTYPE_HAS_SHADOWS, sphere_range);
-        }
-    }
-
     bs_U32 index = 0;
 
     for (int i = 0; i < _bsgfx_count(BSGFX_TYPE_PRIMITIVE); i++) {
@@ -109,7 +96,7 @@ BSGFXAPI int _bsgfx_primitiveSubtype(bsgfx_PrimitiveType type) {
 }
 
 BSGFXAPI int _bsgfx_instancePrimitive(int subtype, bs_mat4 transform, bs_U32 flags, int id, int material) {
-    return _bsgfx_instance(subtype, &transform, sizeof(bs_mat4), flags, 0, id, material);
+    return bsgfx_instance(subtype, &transform, sizeof(bs_mat4), flags, 0, id, material);
 }
 
 BSGFXAPI int _bsgfx_queryTilePrimitive(int tile_id) {

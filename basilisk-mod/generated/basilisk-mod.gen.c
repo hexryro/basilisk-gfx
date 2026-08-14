@@ -84,6 +84,11 @@ void bsmod_copyHoveringDataToBuffer()
     next.bsmod_copyHoveringDataToBuffer();
 }
 
+bs_Queue* bsmod_onQueue()
+{
+    return next.bsmod_onQueue();
+}
+
 void bsmod_onIni()
 {
     next.bsmod_onIni();
@@ -463,12 +468,14 @@ void bsmod_beginRasterize(
     next.bsmod_beginRasterize(render_size, output_size);
 }
 
-void bsmod_endRasterize()
+void bsmod_endRasterize(
+    bs_Queue* queue)
 {
-    next.bsmod_endRasterize();
+    next.bsmod_endRasterize(queue);
 }
 
 bs_Result bsmod_rasterizeInstance(
+    bs_Queue* queue, 
     bs_PipelineHash pipeline_hash, 
     int subtype, 
     int instance_id, 
@@ -479,7 +486,7 @@ bs_Result bsmod_rasterizeInstance(
     size_t push_constant_size, 
     unsigned char* push_constant)
 {
-    return next.bsmod_rasterizeInstance(pipeline_hash, subtype, instance_id, category, name, width, height, push_constant_size, push_constant);
+    return next.bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_id, category, name, width, height, push_constant_size, push_constant);
 }
 
 void bsmod_instanceTransform()

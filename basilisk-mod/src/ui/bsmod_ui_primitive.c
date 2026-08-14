@@ -161,9 +161,9 @@ BSMODAPI void _bsmod_rasterizePrimitiveIcons() {
             push_const.model = bs_m4x3(&transform);
 
             instance = bsgfx_instancePrimitive(subtype, transform, 0, 0, 0);
-            _bsmod_rasterizeInstance(hash, subtype, instance, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
+            _bsmod_rasterizeInstance(queue, hash, subtype, instance, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
         }
 
-        _bsmod_endRasterize();
+        _bsmod_endRasterize(queue);
     }
 }

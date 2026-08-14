@@ -61,6 +61,10 @@ BSMODAPI void _preval_bsmod_copyHoveringDataToBuffer() {
     next.bsmod_copyHoveringDataToBuffer();
 }
 
+BSMODAPI bs_Queue* _preval_bsmod_onQueue() {
+    return next.bsmod_onQueue();
+}
+
 BSMODAPI void _preval_bsmod_onIni() {
     next.bsmod_onIni();
 }
@@ -297,14 +301,16 @@ BSMODAPI void _preval_bsmod_beginRasterize(bs_ivec2 render_size, bs_ivec2 output
     next.bsmod_beginRasterize(render_size, output_size);
 }
 
-BSMODAPI void _preval_bsmod_endRasterize() {
-    next.bsmod_endRasterize();
+BSMODAPI void _preval_bsmod_endRasterize(bs_Queue* queue) {
+    BSMOD_VALIDATE(queue != NULL, ,);
+    next.bsmod_endRasterize(queue);
 }
 
-BSMODAPI bs_Result _preval_bsmod_rasterizeInstance(bs_PipelineHash pipeline_hash, int subtype, int instance_id, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant) {
+BSMODAPI bs_Result _preval_bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, int subtype, int instance_id, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant) {
+    BSMOD_VALIDATE(queue != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(push_constant != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_rasterizeInstance(pipeline_hash, subtype, instance_id, category, name, width, height, push_constant_size, push_constant);
+    return next.bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_id, category, name, width, height, push_constant_size, push_constant);
 }
 
 BSMODAPI void _preval_bsmod_instanceTransform() {
@@ -555,6 +561,7 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_subtypes = _preval_bsmod_subtypes;
     functions.bsmod_callbacks = _preval_bsmod_callbacks;
     functions.bsmod_copyHoveringDataToBuffer = _preval_bsmod_copyHoveringDataToBuffer;
+    functions.bsmod_onQueue = _preval_bsmod_onQueue;
     functions.bsmod_onIni = _preval_bsmod_onIni;
     functions.bsmod_onLateIni = _preval_bsmod_onLateIni;
     functions.bsmod_onCreateQuadSubtypes = _preval_bsmod_onCreateQuadSubtypes;

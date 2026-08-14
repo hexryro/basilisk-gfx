@@ -63,7 +63,7 @@
 		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorCallbackFunction)()</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_WindowConfigurationCallbackFunction)()</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_SubpassCallbackFunction)(bs_RendererScope)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_SubpassCallbackFunction)(bs_RendererScope*)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
@@ -2793,7 +2793,7 @@
             <param><type>bs_Renderer*</type><name>renderer</name></param>
         </function>
         <function name="bs_beginRender">
-            <return>void</return>
+            <return>bs_RendererScope</return>
             <param><type>bs_Queue*</type><name>queue</name></param>
             <param><type>bs_Renderer*</type><name>renderer</name></param>
         </function>

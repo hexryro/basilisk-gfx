@@ -96,6 +96,7 @@ typedef enum bsgfx_MaterialCategory bsgfx_MaterialCategory;
 typedef enum bsgfx_CollisionType bsgfx_CollisionType;
 typedef enum bsgfx_AnimatorTypeBit bsgfx_AnimatorTypeBit;
 typedef enum bsgfx_FontFlag bsgfx_FontFlag;
+typedef enum bsgfx_SubtypeFlag bsgfx_SubtypeFlag;
 typedef enum bsgfx_ModelSubtype bsgfx_ModelSubtype;
 typedef enum bsgfx_Pipe bsgfx_Pipe;
 typedef enum bsgfx_TypeId bsgfx_TypeId;
@@ -336,6 +337,10 @@ enum bsgfx_AnimatorTypeBit {
 enum bsgfx_FontFlag {
     BSGFX_FONT_FORCE_CREATE = 1 << 0,
     BSGFX_FONT_NO_CAPS = 1 << 1,
+};
+
+enum bsgfx_SubtypeFlag {
+    BSGFX_SUBTYPE_MANUAL_RESET = 1 << 0,
 };
 
 enum bsgfx_ModelSubtype {

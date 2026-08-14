@@ -26,6 +26,10 @@
   OR OTHER DEALINGS IN THE SOFTWARE.
   */ 
 
+#extension GL_ARB_shading_language_include : require
+
+#include "project/basilisk-gfx/shaders/bsgfx.glsl"
+
 #define IDX_CURR 0
 #define IDX_SHAPE 1
 #define IDX_INNER 2
@@ -44,8 +48,8 @@ precision mediump float;
 precision mediump samplerBuffer;
 precision mediump usamplerBuffer;
 
-layout(set = 0, binding = 0) uniform usamplerBuffer metadata;
-layout(set = 0, binding = 1) uniform samplerBuffer point_data;
+layout(set = BSMOD_SET_MSDF_BITMAP, binding = BSMOD_BINDING_MSDF_BITMAP) uniform usamplerBuffer metadata;
+layout(set = BSMOD_SET_MSDF_INDEX, binding = BSMOD_BINDING_MSDF_INDEX) uniform samplerBuffer point_data;
 
 #define meta_at(i) texelFetch(metadata, int(i)).r
 #define point_at(i) vec2(texelFetch(point_data, 2 * int(i)).r, \

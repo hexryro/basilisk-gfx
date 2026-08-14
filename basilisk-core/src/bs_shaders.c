@@ -1153,10 +1153,8 @@ BSAPI bs_Result _bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_Pipeli
     VkResult vk_result;
     bs_Result bs_result;
 
-    if (scope) {
-        descriptor->subpass = scope->subpass;
-        descriptor->renderer = scope->renderer;
-    }
+    descriptor->subpass = scope->subpass;
+    descriptor->renderer = scope->renderer;
 
     bs_Shader* vs = descriptor->shaders[0];
     bs_Shader* fs = descriptor->shaders[1];

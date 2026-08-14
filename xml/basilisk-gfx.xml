@@ -127,6 +127,10 @@
 			<line><name>BSGFX_FONT_FORCE_CREATE</name><value>1 &lt;&lt; 0</value></line>
 			<line><name>BSGFX_FONT_NO_CAPS</name><value>1 &lt;&lt; 1</value></line>
 		</enum>
+		
+		<enum name="bsgfx_SubtypeFlag">
+			<line><name>BSGFX_SUBTYPE_MANUAL_RESET</name><value>1 &lt;&lt; 0</value></line>
+		</enum>
 
 		<enum name="bsgfx_ModelSubtype">
 			<line><name>BSGFX_MODEL_SUBTYPE_DEFAULT</name></line>

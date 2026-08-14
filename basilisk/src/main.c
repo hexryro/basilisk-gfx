@@ -74,7 +74,7 @@ static void onLoadScene() {
 }
 
 static bs_Queue* onQueue() {
-	//bs_Queue* queue = bsmod_onQueue();
+	bs_Queue* queue = bsmod_onQueue();
 
 	return NULL;
 }

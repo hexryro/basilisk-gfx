@@ -222,9 +222,9 @@ BSMODAPI void _bsmod_rasterizeMaterialIcons() {
             push_const.model = matrix;
 
             int instance = bsgfx_instancePrimitive(sphere_subtype, BS_MAT4_IDENTITY, 0, 0, 0);
-            _bsmod_rasterizeInstance(hash, sphere_subtype, instance, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
+            _bsmod_rasterizeInstance(queue, hash, sphere_subtype, instance, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
         }
 
-        _bsmod_endRasterize();
+        _bsmod_endRasterize(queue);
     }
 }

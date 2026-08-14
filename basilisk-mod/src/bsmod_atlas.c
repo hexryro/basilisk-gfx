@@ -210,7 +210,8 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 
 	//result = bs_savePngN(batl + total_size_excluding_binary, BS_IV2(width, height), BS_PNG_GREY, BS_CONSTANT_STRING("test.png"));
 
-	result = _bsmod_packResource(BS_RESOURCE_ATLAS, batl, total_size, package_name, resource_name);
+	if (package_name && resource_name)
+		result = _bsmod_packResource(BS_RESOURCE_ATLAS, batl, total_size, package_name, resource_name);
 	bs_free(batl);
 //	if (result != BS_RESULT_OK)
 //		return result;

@@ -625,6 +625,12 @@ BSMODAPI void
 bsmod_copyHoveringDataToBuffer();
 
  /**
+  @return bs_Queue*
+  */
+BSMODAPI bs_Queue*
+bsmod_onQueue();
+
+ /**
   @return void
   */
 BSMODAPI void
@@ -1159,12 +1165,15 @@ bsmod_beginRasterize(
     bs_ivec2 output_size);
 
  /**
+  @param queue
   @return void
   */
 BSMODAPI void
-bsmod_endRasterize();
+bsmod_endRasterize(
+    bs_Queue* queue);
 
  /**
+  @param queue
   @param pipeline_hash
   @param subtype
   @param instance_id
@@ -1178,6 +1187,7 @@ bsmod_endRasterize();
   */
 BSMODAPI bs_Result
 bsmod_rasterizeInstance(
+    bs_Queue* queue,
     bs_PipelineHash pipeline_hash,
     int subtype,
     int instance_id,

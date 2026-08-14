@@ -1697,11 +1697,11 @@ bool bs_rendererIsDynamic(
     return next.bs_rendererIsDynamic(renderer);
 }
 
-void bs_beginRender(
+bs_RendererScope bs_beginRender(
     bs_Queue* queue, 
     bs_Renderer* renderer)
 {
-    next.bs_beginRender(queue, renderer);
+    return next.bs_beginRender(queue, renderer);
 }
 
 void bs_endRender(

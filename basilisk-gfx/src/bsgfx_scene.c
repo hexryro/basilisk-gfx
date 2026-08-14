@@ -164,6 +164,17 @@ static void _bsgfx_loadResources() {
     resolution.x /= BSGFX_PIXEL_SCALE;
     resolution.y /= BSGFX_PIXEL_SCALE;
 
+    if (bs_exists(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED)) {
+        if (bs_canPushBatch(mesh_instance_batch->batch)) {
+            bs_Range box_range = bs_pushCube(mesh_instance_batch->batch, BS_WHITE);
+            bs_Range sphere_range = bs_pushSphere(mesh_instance_batch->batch, BS_V3(0, 0, 0), 1.0, 16, 16, BS_WHITE);
+            bs_Range sphere_high_quality_range = bs_pushSphere(mesh_instance_batch->batch, BS_V3(0, 0, 0), 1.0, 64, 64, BS_WHITE);
+
+            _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_BOX] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, mesh_instance_batch->batch, BSGFX_SUBTYPE_HAS_SHADOWS, box_range);
+            _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_SPHERE] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, mesh_instance_batch->batch, BSGFX_SUBTYPE_HAS_SHADOWS, sphere_range);
+        }
+    }
+
     /*
     bs_Object* ray_trace_output = BS_IMAGE(-1, 0, 0);
 
@@ -218,7 +229,7 @@ static void _bsgfx_loadResources() {
     if (_bsgfx_callbacks_.loadScene)
         _bsgfx_callbacks_.loadScene();
 
-    if (_bsgfx_prefab_model_ && bs_exists(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED)) { // _bsgfx_prefab_model_ is temp
+    if (bs_exists(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED)) { 
         mesh_instance_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_MESH_INSTANCED);
         if (bs_canPushBatch(mesh_instance_batch->batch)) {
             bs_pushBatch(queue, mesh_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);

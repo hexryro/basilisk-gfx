@@ -50,5 +50,4 @@ void main() {
 
  //   out_index = bsgfx_extractInstanceId(index);
   //  out_flags = flags;
-
 }

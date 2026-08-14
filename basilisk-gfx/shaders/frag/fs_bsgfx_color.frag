@@ -3,9 +3,7 @@
 
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
 
-layout (location = BSGFX_LO_SUBPASS_0_OUT_COLOR) out vec4 out_color;
-layout (location = BSGFX_LO_SUBPASS_0_OUT_INDEX) out uint out_index;
-layout (location = BSGFX_LO_SUBPASS_0_OUT_FLAGS) out uint out_flags;
+layout (location = 0) out vec4 out_color;
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec4 in_color;
@@ -18,7 +16,6 @@ layout(location = 7) flat in uint in_material;
 layout(location = 8) in float in_depth;
 
 void main() {
-    out_index = in_instance;
-    out_flags = in_flags;
-    out_color = in_color;
+    out_color.r = in_texture.x;
+    out_color.y = in_texture.y;
 }

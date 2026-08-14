@@ -291,17 +291,19 @@ static void _bsmod_runRenderPass() {
         //            NULL);
     //}
 }
+*/
 
+void _bsmod_generateGlyphsMSDF();
 BSMODAPI bs_Queue* _bsmod_onQueue() {
     bs_Result result;
 
     bs_Queue* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS)->queue;
-    bs_Queue* bsgfx_queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
+   // bs_Queue* bsgfx_queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
 
-    bs_awaitQueue(bsgfx_queue, BS_PIPELINE_STAGE_VERTEX_INPUT_BIT);
-    bs_enqueue(queue, _bsmod_runRenderPass);
+   // bs_awaitQueue(bsgfx_queue, BS_PIPELINE_STAGE_VERTEX_INPUT_BIT);
+   // bs_enqueue(queue, _bsmod_runRenderPass);
 
-    result = bs_stall(queue);
+  //  result = bs_stall(queue);
     //if (result == BS_RESULT_DEVICE_LOST)
     //    bsgfx_onDeviceLost();
 
@@ -314,8 +316,10 @@ BSMODAPI bs_Queue* _bsmod_onQueue() {
     if (bs_keyDownOnce(BS_KEY_L))
         _bsmod_queueRasterize(BSMOD_CONTENT_PATH, "prefab_icons", _bsmod_rasterizePrefabIcons);
 
+    if (bs_keyDownOnce(BS_KEY_I))
+        _bsmod_generateGlyphsMSDF();
+
     _bsmod_pollRasterizer();
 
     return queue;
 }
-*/

@@ -1314,7 +1314,7 @@ typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
 typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
 typedef void (__stdcall* bs_ValidationErrorCallbackFunction)();
 typedef void (__stdcall* bs_WindowConfigurationCallbackFunction)();
-typedef void (__stdcall* bs_SubpassCallbackFunction)(bs_RendererScope);
+typedef void (__stdcall* bs_SubpassCallbackFunction)(bs_RendererScope*);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -5541,9 +5541,9 @@ bs_rendererIsDynamic(
  /**
   @param queue
   @param renderer
-  @return void
+  @return bs_RendererScope
   */
-BSAPI void
+BSAPI bs_RendererScope
 bs_beginRender(
     bs_Queue* queue,
     bs_Renderer* renderer);

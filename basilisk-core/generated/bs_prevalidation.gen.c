@@ -828,12 +828,12 @@ BSAPI bool _preval_bs_rendererIsDynamic(bs_Renderer* renderer) {
     return next.bs_rendererIsDynamic(renderer);
 }
 
-BSAPI void _preval_bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
-    BS_VALIDATE(queue != NULL, ,);
-    BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, ,);
-    BS_VALIDATE(renderer != NULL, ,);
-    BS_VALIDATE(renderer->head.type == BS_OBJECT_RENDERER, ,);
-    next.bs_beginRender(queue, renderer);
+BSAPI bs_RendererScope _preval_bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
+    BS_VALIDATE(queue != NULL, (bs_RendererScope) { 0 },);
+    BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, (bs_RendererScope) { 0 },);
+    BS_VALIDATE(renderer != NULL, (bs_RendererScope) { 0 },);
+    BS_VALIDATE(renderer->head.type == BS_OBJECT_RENDERER, (bs_RendererScope) { 0 },);
+    return next.bs_beginRender(queue, renderer);
 }
 
 BSAPI void _preval_bs_endRender(bs_Queue* queue, bs_Renderer* renderer) {

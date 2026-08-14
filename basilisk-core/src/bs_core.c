@@ -1901,16 +1901,16 @@ BSAPI bool _bs_rendererIsDynamic(bs_Renderer* renderer) {
     return renderer->render_pass == NULL;
 }
 
-BSAPI void _val_bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
+BSAPI bs_RendererScope _val_bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
     if (renderer->render_pass) {
         BS_VALIDATE(_bs_procs_.vkCmdBeginRenderingKHR != NULL, , );
         BS_VALIDATE(_bs_procs_.vkCmdEndRenderingKHR != NULL, , );
     }
 
-    _bs_beginRender(queue, renderer);
+    return _bs_beginRender(queue, renderer);
 }
 
-BSAPI void _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
+BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
     //_bs_scope_.renderer = renderer;
 
     VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
@@ -2001,6 +2001,11 @@ BSAPI void _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
 
     vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 
+    return (bs_RendererScope) {
+        .renderer = renderer,
+        .queue = queue,
+        .subpass = 0,
+    };
 }
 
 BSAPI void _bs_endRender(bs_Queue* queue, bs_Renderer* renderer) {
@@ -2027,13 +2032,13 @@ BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_Callback s
     _bs_runPass(queue, renderer, subpasses, subpasses_count);
 }
 
-BSAPI void _bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_Callback callbacks[], int callbacks_count) {
+BSAPI void _bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassCallbackFunction callbacks[], int callbacks_count) {
     _bs_beginRender(queue, renderer);
     VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     if (renderer->render_pass) {
         for (int i = 0; i < renderer->num_subpasses; i++) {
-            bs_Callback callback = callbacks[i];
+            bs_SubpassCallbackFunction callback = callbacks[i];
 
             if (i != 0) {
                 //_bs_scope_.subpass = i;
@@ -2046,12 +2051,17 @@ BSAPI void _bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_Callback callb
                 .subpass = i,
             };
 
-            callback(scope);
+            callback(&scope);
         }
     }
     else {
+        bs_RendererScope scope = {
+            .queue = queue,
+            .renderer = renderer,
+        };
+
         for (int i = 0; i < callbacks_count; i++)
-            callbacks[i]();
+            callbacks[i](&scope);
     }
     _bs_endRender(queue, renderer);
 }

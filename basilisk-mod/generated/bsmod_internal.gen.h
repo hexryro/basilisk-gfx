@@ -39,6 +39,7 @@
 typedef const int*(__stdcall* PFN_bsmod_subtypes)();
 typedef bsmod_Callbacks*(__stdcall* PFN_bsmod_callbacks)();
 typedef void(__stdcall* PFN_bsmod_copyHoveringDataToBuffer)();
+typedef bs_Queue*(__stdcall* PFN_bsmod_onQueue)();
 typedef void(__stdcall* PFN_bsmod_onIni)();
 typedef void(__stdcall* PFN_bsmod_onLateIni)();
 typedef void(__stdcall* PFN_bsmod_onCreateQuadSubtypes)(bs_Range range);
@@ -89,8 +90,8 @@ typedef bs_Result(__stdcall* PFN_bsmod_compileShader)(char* path, char* name, ch
 typedef void(__stdcall* PFN_bsmod_queueRasterize)(const char* package, const char* name, bs_Callback callback);
 typedef void(__stdcall* PFN_bsmod_pollRasterizer)();
 typedef void(__stdcall* PFN_bsmod_beginRasterize)(bs_ivec2 render_size, bs_ivec2 output_size);
-typedef void(__stdcall* PFN_bsmod_endRasterize)();
-typedef bs_Result(__stdcall* PFN_bsmod_rasterizeInstance)(bs_PipelineHash pipeline_hash, int subtype, int instance_id, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
+typedef void(__stdcall* PFN_bsmod_endRasterize)(bs_Queue* queue);
+typedef bs_Result(__stdcall* PFN_bsmod_rasterizeInstance)(bs_Queue* queue, bs_PipelineHash pipeline_hash, int subtype, int instance_id, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
 typedef void(__stdcall* PFN_bsmod_instanceTransform)();
 typedef void(__stdcall* PFN_bsmod_selectHoveringTypes)();
 typedef bsgfx_TypeId(__stdcall* PFN_bsmod_queryType)(const char* plural);
@@ -146,6 +147,7 @@ typedef struct {
     PFN_bsmod_subtypes bsmod_subtypes;
     PFN_bsmod_callbacks bsmod_callbacks;
     PFN_bsmod_copyHoveringDataToBuffer bsmod_copyHoveringDataToBuffer;
+    PFN_bsmod_onQueue bsmod_onQueue;
     PFN_bsmod_onIni bsmod_onIni;
     PFN_bsmod_onLateIni bsmod_onLateIni;
     PFN_bsmod_onCreateQuadSubtypes bsmod_onCreateQuadSubtypes;
@@ -253,6 +255,7 @@ typedef struct {
 BSMODAPI const int* _bsmod_subtypes();
 BSMODAPI bsmod_Callbacks* _bsmod_callbacks();
 BSMODAPI void _bsmod_copyHoveringDataToBuffer();
+BSMODAPI bs_Queue* _bsmod_onQueue();
 BSMODAPI void _bsmod_onIni();
 BSMODAPI void _bsmod_onLateIni();
 BSMODAPI void _bsmod_onCreateQuadSubtypes(bs_Range range);
@@ -303,8 +306,8 @@ BSMODAPI bs_Result _bsmod_compileShader(char* path, char* name, char* package);
 BSMODAPI void _bsmod_queueRasterize(const char* package, const char* name, bs_Callback callback);
 BSMODAPI void _bsmod_pollRasterizer();
 BSMODAPI void _bsmod_beginRasterize(bs_ivec2 render_size, bs_ivec2 output_size);
-BSMODAPI void _bsmod_endRasterize();
-BSMODAPI bs_Result _bsmod_rasterizeInstance(bs_PipelineHash pipeline_hash, int subtype, int instance_id, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
+BSMODAPI void _bsmod_endRasterize(bs_Queue* queue);
+BSMODAPI bs_Result _bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, int subtype, int instance_id, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
 BSMODAPI void _bsmod_instanceTransform();
 BSMODAPI void _bsmod_selectHoveringTypes();
 BSMODAPI bsgfx_TypeId _bsmod_queryType(const char* plural);
@@ -362,6 +365,7 @@ static inline bsmod_FunctionTable* _bsmod_getFunctions() {
     functions.bsmod_subtypes = _bsmod_subtypes;
     functions.bsmod_callbacks = _bsmod_callbacks;
     functions.bsmod_copyHoveringDataToBuffer = _bsmod_copyHoveringDataToBuffer;
+    functions.bsmod_onQueue = _bsmod_onQueue;
     functions.bsmod_onIni = _bsmod_onIni;
     functions.bsmod_onLateIni = _bsmod_onLateIni;
     functions.bsmod_onCreateQuadSubtypes = _bsmod_onCreateQuadSubtypes;

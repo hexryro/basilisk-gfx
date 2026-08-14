@@ -994,7 +994,8 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Queue* queue, bs_Object* object, int pack
     bs_Object* image_object = BS_IMAGE(-1, 0, flags & BS_ATLAS_FORCE_CREATE);
     bs_U32 swaps_count = flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
     atlas->image = image_object->image;
-    atlas->image->num_indices = header->pages_count;
+    if (header->pages_count > 1)
+        atlas->image->num_indices = header->pages_count;
     atlas->image->flags = flags;
     atlas->image->format = _bs_getFormat(BS_FORMAT_R8_UNORM, header->channels_count);
     atlas->image->dim = BS_IV2(header->width, header->height);

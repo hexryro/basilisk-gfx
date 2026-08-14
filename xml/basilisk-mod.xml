@@ -577,6 +577,9 @@
 		<function name="bsmod_copyHoveringDataToBuffer">
 			<return>void</return>
 		</function>
+		<function name="bsmod_onQueue">
+			<return>bs_Queue*</return>
+		</function>
 		<function name="bsmod_onIni">
 			<return>void</return>
 		</function>
@@ -776,9 +779,11 @@
 		</function>
 		<function name="bsmod_endRasterize">
 			<return>void</return>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 		</function>
 		<function name="bsmod_rasterizeInstance">
 			<return>bs_Result</return>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>bs_PipelineHash</type><name>pipeline_hash</name></param>
 			<param><type>int</type><name>subtype</name></param>
 			<param><type>int</type><name>instance_id</name></param>

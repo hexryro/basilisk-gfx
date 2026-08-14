@@ -47,6 +47,7 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_subtypes = (PFN_bsmod_subtypes)GetProcAddress(module, "_preval_bsmod_subtypes");
     functions.bsmod_callbacks = (PFN_bsmod_callbacks)GetProcAddress(module, "_preval_bsmod_callbacks");
     functions.bsmod_copyHoveringDataToBuffer = (PFN_bsmod_copyHoveringDataToBuffer)GetProcAddress(module, "_preval_bsmod_copyHoveringDataToBuffer");
+    functions.bsmod_onQueue = (PFN_bsmod_onQueue)GetProcAddress(module, "_preval_bsmod_onQueue");
     functions.bsmod_onIni = (PFN_bsmod_onIni)GetProcAddress(module, "_preval_bsmod_onIni");
     functions.bsmod_onLateIni = (PFN_bsmod_onLateIni)GetProcAddress(module, "_preval_bsmod_onLateIni");
     functions.bsmod_onCreateQuadSubtypes = (PFN_bsmod_onCreateQuadSubtypes)GetProcAddress(module, "_preval_bsmod_onCreateQuadSubtypes");
