@@ -151,15 +151,26 @@ BSMODAPI bs_Result _bsmod_packShader(spvc_compiler compiler, spvc_resources reso
    * Binding Format
    *============================================================================*/
 
-static bs_BindTypeIndex bsmod_convertBindType(spvc_resource_type type) {
-	switch (type) {
+static bs_DescriptorTypeIndex bsmod_convertBindType(spvc_compiler compiler, spvc_resource_type resource_type, spvc_type_id base_type_id) {
+	switch (resource_type) {
 	case SPVC_RESOURCE_TYPE_STORAGE_BUFFER: return BS_DESCRIPTOR_TYPE_STORAGE_BUFFER_INDEX;
 	case SPVC_RESOURCE_TYPE_UNIFORM_BUFFER: return BS_DESCRIPTOR_TYPE_UNIFORM_BUFFER_INDEX;
 	case SPVC_RESOURCE_TYPE_SEPARATE_IMAGE: return BS_DESCRIPTOR_TYPE_SAMPLED_IMAGE_INDEX;
 	case SPVC_RESOURCE_TYPE_SUBPASS_INPUT: return BS_DESCRIPTOR_TYPE_INPUT_ATTACHMENT_INDEX;
 	case SPVC_RESOURCE_TYPE_SEPARATE_SAMPLERS: return BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER_INDEX;
-	case SPVC_RESOURCE_TYPE_SAMPLED_IMAGE: return BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER_INDEX;
-//	case SPVC_RESOURCE_TYPE_ACCELERATION_STRUCTURE: return BS_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_INDEX;
+	case SPVC_RESOURCE_TYPE_SAMPLED_IMAGE: 
+		spvc_type type = spvc_compiler_get_type_handle(compiler, base_type_id);
+		SpvDim dim = spvc_type_get_image_dimension(type);
+
+		if (dim == SpvDimBuffer) {
+			if (spvc_type_get_image_is_storage(type))
+				return BS_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+			else
+				return BS_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+		}
+
+		return BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER_INDEX;
+		//	case SPVC_RESOURCE_TYPE_ACCELERATION_STRUCTURE: return BS_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_INDEX;
 	case SPVC_RESOURCE_TYPE_STORAGE_IMAGE: return BS_DESCRIPTOR_TYPE_STORAGE_IMAGE_INDEX;
 	default:
 		bs_warnF("SPVC buffer type (%d) not supported\n", type);
@@ -167,68 +178,82 @@ static bs_BindTypeIndex bsmod_convertBindType(spvc_resource_type type) {
 	}
 }
 
-static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resource* resource, bsmod_Package* package, bs_BindTypeIndex bind_type_index, bs_ShaderType shader_type) {
-	bs_Result bs_result;
-	spvc_result result;
+static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resource* resource, bsmod_Package* package, spvc_resource_type resource_type, bs_ShaderType shader_type) {
+	bs_Result result;
 
-	bs_BbndHeader header = {
-		.magic = BS_BBND_MAGIC,
-		.version = 1,
-		.set = spvc_compiler_get_decoration(compiler, resource->id, SpvDecorationDescriptorSet),
-		.point = spvc_compiler_get_decoration(compiler, resource->id, SpvDecorationBinding),
-		.descriptors_count = 1,
-		.type = bs_indexBindType(bind_type_index),
-		.type_index = bind_type_index,
-		.shader_stages = shader_type,
-	};
+	const int version = 1;
 
-	const size_t total_size_excluding_binary = sizeof(bs_BbndHeader);
-	const size_t total_size = total_size_excluding_binary;
+	spvc_type spirv_type = spvc_compiler_get_type_handle(compiler, resource->type_id);
+	int bind_set = spvc_compiler_get_decoration(compiler, resource->id, SpvDecorationDescriptorSet);
+	int bind_point = spvc_compiler_get_decoration(compiler, resource->id, SpvDecorationBinding);
 
-	//int block = spvc_compiler_get_decoration(compiler, resource->id, SpvDecorationUniform);
-
-	int len = snprintf(NULL, 0, "_bbnd/%d/%d", header.set, header.point);
+   /**
+    Resource name
+    */
+	int len = snprintf(NULL, 0, "_bbnd/%d/%d", bind_set, bind_point);
 	char* name = bs_alloca(len + 1);
-	snprintf(name, len + 1, "_bbnd/%d/%d", header.set, header.point);
+	snprintf(name, len + 1, "_bbnd/%d/%d", bind_set, bind_point);
 
+   /**
+    Allocate memory
+    */
+	const size_t total_size = BBND_HEADER_SIZE;
+	unsigned char* bbnd = bs_malloc(total_size);
+
+	bs_setLittleEndian32(BS_BBND_MAGIC, bbnd + BBND_MAGIC_OFFSET);
+	bs_setLittleEndian32(version, bbnd + BBND_VERSION_OFFSET);
+	bs_setLittleEndian32(bind_set, bbnd + BBND_BIND_SET_OFFSET);
+	bs_setLittleEndian32(bind_point, bbnd + BBND_BIND_POINT_OFFSET);
+
+   /**
+    Set descriptors count
+    */
+	bs_setLittleEndian32(1, bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
+
+	if (spvc_type_array_dimension_is_literal(spirv_type, 0)) {
+		int array_dimensions_count = spvc_type_get_num_array_dimensions(spirv_type);
+		if (array_dimensions_count == 1) {
+			int descriptors_count = spvc_type_get_array_dimension(spirv_type, 0);
+			bs_setLittleEndian32(descriptors_count, bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
+		}
+		else if (array_dimensions_count > 0) {
+			bs_warnN(BS_CONSTANT_STRING("Nested arrays are not supported"));
+			bs_setLittleEndian32(0, bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
+		}
+	}
+
+   /**
+    Query existing binding, combine shader stages
+    */
+	bs_U32 shader_stages = shader_type;
 	bsmod_Resource* existing = _bsmod_queryResource(package, BS_RESOURCE_BINDING, name);
 	if (existing) {
 		bsmod_Chunk* chunk = bs_fetchUnit(&package->chunks, existing->chunk);
-		bs_BbndHeader* existing_header = chunk->bin.data + existing->offset;
+		unsigned char* existing_data = chunk->bin.data + existing->offset;
 
-		if (existing_header->magic == BS_BBND_MAGIC) {
-			header.shader_stages |= existing_header->shader_stages;
-		}
-		else {
-			bs_warnF("Found existing binding \"%s\" with invalid magic, overwriting.\n", name);
-		}
+		bs_U32 existing_magic = bs_getLittleEndian32(existing_data + BBND_MAGIC_OFFSET);
+		bs_U32 existing_version = bs_getLittleEndian32(existing_data + BBND_VERSION_OFFSET);
+		bs_U32 existing_shader_stages = bs_getLittleEndian32(existing_data + BBND_SHADER_STAGES_OFFSET);
+
+		if (existing_magic != BS_BBND_MAGIC)
+			bs_warnF("Found existing binding \"%s\" with invalid magic, overwriting.", name);
+		else if (existing_version != version)
+			bs_warnF("Found existing binding \"%s\" with an older version (%d), overwriting.", name, existing_version);
+		else
+			shader_stages |= existing_shader_stages;
 	}
 
-	spvc_type spirv_type = spvc_compiler_get_type_handle(compiler, resource->type_id);
+	bs_setLittleEndian32(shader_stages, bbnd + BBND_SHADER_STAGES_OFFSET);
+	bs_setLittleEndian32(resource_type, bbnd + BBND_DESCRIPTOR_TYPE_OFFSET);
 
-	int count = spvc_type_get_num_array_dimensions(spirv_type);
-	if (count == 1 && spvc_type_array_dimension_is_literal(spirv_type, 0)) { // nested arrays not supported atm, idk how to handle
-		header.descriptors_count = spvc_type_get_array_dimension(spirv_type, 0);
-	}
+   /**
+    Pack resource
+    */
+	result = _bsmod_packResource(BS_RESOURCE_BINDING, bbnd, total_size, package->path, name);
 
-	size_t struct_size = 0;
-	result = spvc_compiler_get_declared_struct_size(compiler, spirv_type, &struct_size);
-	if (result != SPVC_SUCCESS) {
-		BSMOD_WARN_SPVC_ERROR("spvc_compiler_get_declared_struct_size", result,);
-	}
-
-	//.type = bs_serializeBindType(type),
-
-	//shader_stages |= shader_type;
-	//name = strdup(name);
-	//source = strdup(path);
-
-	unsigned char* bbnd = bs_malloc(total_size);
-	memcpy(bbnd, &header, sizeof(bs_BbndHeader));
-	bs_result = _bsmod_packResource(BS_RESOURCE_BINDING, bbnd, total_size, package->path, name);
 	bs_free(bbnd);
 
-	return bs_result;
+	return result;
 }
 
 
@@ -289,79 +314,6 @@ BSMODAPI void _bsmod_onCompileShader(bsmod_TrackParams params) {
 		}
 	}
 }
-
-/*
-static void _bsmod_saveBuffer(bs_Json* json, char* shader_type, const char* name, spvc_resource_type type, bs_U32* spirv, bs_U32 size, bool add_to_bindings) {
-	bsmod_Reflection reflection = _bsmod_reflectionData(spirv, size, type);
-
-	static bs_String* path;
-
-	const char* type_string = _bsmod_serializeBufferType(type);
-	for (int i = 0; i < reflection.num; i++) {
-		spvc_reflected_resource* data = reflection.data + i;
-
-		int set = spvc_compiler_get_decoration(reflection.compiler, data->id, SpvDecorationDescriptorSet);
-		int point = spvc_compiler_get_decoration(reflection.compiler, data->id, SpvDecorationBinding);
-		int block = spvc_compiler_get_decoration(reflection.compiler, data->id, SpvDecorationUniform);
-
-		path = bs_stringF(path, "%d_%d", set, point);
-
-	//	bs_ensureJsonF(json, bs_jsonObject(json), "%s[%d]", name, i);
-		bs_ensureJsonF(json, bs_jsonValue(data->name), "%s[%d].name", name, i);
-		bs_ensureJsonF(json, bs_jsonValue(set), "%s[%d].set", name, i);
-		bs_ensureJsonF(json, bs_jsonValue(point), "%s[%d].point", name, i);
-		bs_ensureJsonF(json, bs_jsonValue(type_string), "%s[%d].type", name, i);
-
-		spvc_type spirv_type = spvc_compiler_get_type_handle(reflection.compiler, data->type_id);
-		int count = spvc_type_get_num_array_dimensions(spirv_type);
-		if (count == 1 && spvc_type_array_dimension_is_literal(spirv_type, 0)) { // nested arrays not supported atm, idk how to handle
-			spvc_constant_id descriptor_count = spvc_type_get_array_dimension(spirv_type, 0);
-			bs_ensureJsonF(json, bs_jsonValue(descriptor_count), "%s[%d].count", name, i);
-
-			if (add_to_bindings)
-				bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(descriptor_count), "%s.count", path->value);
-		}
-		else {
-			bs_ensureJsonF(json, bs_jsonValue(1), "%s[%d].count", name, i);
-
-			if (add_to_bindings)
-				bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(1), "%s.count", path->value);
-		}
-
-		size_t struct_size = 0;
-		spvc_compiler_get_declared_struct_size(reflection.compiler, spirv_type, &struct_size);
-		bs_ensureJsonF(json, bs_jsonValue(struct_size), "%s[%d].size", name, i);
-
-		if (add_to_bindings) {
-			double size = bs_fetchJsonF(&_bsmod_.bindings_json, BS_JSON_UNDEFINED, "%s.size", path->value).as_number;
-			if (size != 0.0 && size != struct_size) {
-				bs_warnF("Existing binding (set: %d, point: %d) differs in size (old: %lld, new: %lld)\n", set, point, (size_t)size, (size_t)struct_size);
-				//continue;
-			}
-
-			bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(data->name), "%s.name", path->value);
-			bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(type_string), "%s.type", path->value);
-			bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(struct_size), "%s.size", path->value);
-			bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(set), "%s.set", path->value);
-			bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(point), "%s.point", path->value);
-
-			bs_JsonValue v = bs_fetchJsonF(&_bsmod_.bindings_json, BS_JSON_UNDEFINED, "%s.stages", path->value);
-			bool found = false;
-			for (int j = 0; j < v.size; j++) {
-				char* stage = v.as_array.as_strings[j];
-				if (strcmp(stage, shader_type) == 0) {
-					found = true;
-					break;
-				}
-			}
-
-			if (!found)
-				bs_ensureJsonF(&_bsmod_.bindings_json, bs_jsonValue(shader_type), "%s.stages[999]", path->value);
-		}
-	}
-}
-*/
-
 
 static bs_Json _bsmod_shader_references = { 0 };
 BSMODAPI void _bsmod_loadShaderReferences() {
@@ -458,23 +410,24 @@ static bool _bsmod_queryShaderType(char* path, glslang_stage_t* out_stage, bs_Sh
 	return BS_RESULT_OK;
 }
 
-static void _bsmod_packBindings(spvc_compiler compiler, spvc_resources resources, bsmod_Package* package, spvc_resource_type type, bs_ShaderType shader_type) {
+static void _bsmod_packBindings(spvc_compiler compiler, spvc_resources resources, bsmod_Package* package, spvc_resource_type resource_type, bs_ShaderType shader_type) {
 	spvc_result result;
 
 	size_t bindings_count = 0;
 	spvc_reflected_resource* resource_list = NULL;
-	result = spvc_resources_get_resource_list_for_type(resources, type, &resource_list, &bindings_count);
+	result = spvc_resources_get_resource_list_for_type(resources, resource_type, &resource_list, &bindings_count);
 
 	if (result != SPVC_SUCCESS) {
 		BSMOD_WARN_SPVC_ERROR("spvc_resources_get_resource_list_for_type", result,);
 		return BS_RESULT_GENERAL_ERROR;
 	}
 
-	bs_BindTypeIndex bind_type = bsmod_convertBindType(type);
 	for (int i = 0; i < bindings_count; i++) {
 		spvc_reflected_resource* resource = resource_list + i;
 		
-		_bsmod_packBinding(compiler, resource, package, bind_type, shader_type);
+		bs_DescriptorTypeIndex descriptor_type = bsmod_convertBindType(compiler, resource_type, resource->base_type_id);
+
+		_bsmod_packBinding(compiler, resource, package, descriptor_type, shader_type);
 	}
 }
 

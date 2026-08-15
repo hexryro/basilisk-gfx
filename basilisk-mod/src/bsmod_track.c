@@ -42,7 +42,7 @@ typedef struct {
 	bs_List entries;
 } bsmod_Hook;
 
-volatile long _bsmod_has_performed_tracked_changes_ = 0;
+volatile long _bsmod_has_performed_tracked_changes_ = 1;
 
 static bs_List _bsmod_string_pool = { .unit_size = sizeof(bs_StringPoolEntry), .increment = 64 };
 
@@ -137,51 +137,6 @@ static void _bsmod_saveHooks(bs_List* hooks) {
    * Hooks
    * Definition needs BSMODAPI
    *============================================================================*/
-
-BSMODAPI bs_Result _bsmod_onPackBindings() {
-	bs_Result result;
-
-	int descriptors_count = 0;
-	int bindings_count = 0;
-	int bind_sets_count = 0;
-
-	bool processed_bind_sets[BS_MAX_NUM_BIND_SETS] = { 0 };
-
-	bs_foreachJson(&_bsmod_.bindings_json, e) {
-		if (e.value.type != BS_JSON_OBJECT)
-			continue;
-
-		bs_Json root = bs_jsonRoot(&_bsmod_.bindings_json, e.value.as_object);
-
-		descriptors_count += bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("count")).as_number;
-		int bind_set = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("set")).as_number;
-
-		BSMOD_VALIDATE(bind_set >= 0, BS_RESULT_VALIDATION_ERROR,);
-		BSMOD_VALIDATE(bind_set < BS_MAX_NUM_BIND_SETS, BS_RESULT_VALIDATION_ERROR,);
-
-		if (!processed_bind_sets[bind_set])
-			bind_sets_count++;
-
-		processed_bind_sets[bind_set] = true;
-		bindings_count++;
-	};
-
-	bs_ensureJsonN(&_bsmod_.bindings_json, bs_jsonValue(bindings_count), BS_CONSTANT_STRING("bindingsCount"));
-	bs_ensureJsonN(&_bsmod_.bindings_json, bs_jsonValue(bind_sets_count), BS_CONSTANT_STRING("bindSetsCount"));
-	bs_ensureJsonN(&_bsmod_.bindings_json, bs_jsonValue(descriptors_count), BS_CONSTANT_STRING("descriptorsCount"));
-
-	char* raw;
-	result = bs_saveJson(&_bsmod_.bindings_json, BS_JSON_PRETTY, &raw);
-	if (result != BS_RESULT_OK)
-		return result;
-
-	result = _bsmod_packResourceN(BS_RESOURCE_BINARY, raw, strlen(raw), BSGFX_CONTENT_PATH, BS_CONSTANT_STRING("bindings"));
-	bs_free(raw);
-	if (result != BS_RESULT_OK)
-		return result;
-
-	return BS_RESULT_OK;
-}
 
 BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 	bsmod_AtlasPacker packer = _bsmod_createAtlasPacker();
@@ -506,20 +461,13 @@ BSMODAPI void _bsmod_onTrack() {
 	bs_String* cwd = bs_workingDirectory();
 	last = bs_stringN(last, cwd->value, cwd->len);
 
-	//static float timer = 1.0;
-	//timer += bs_deltaTime();
-	//if (timer < 1.0)
-	//	return;
-	//else
-	//	timer = 0.0;
-
 	bs_infoF(BS_PRINT_COLOR("track\n", BS_PRINT_RED));
 
 	bs_List* hooks = _bsmod_loadHooks();
 	if (!hooks)
 		return;
 
-	static bool reload_all = false; // temp
+	static bool reload_all = true; // temp
 	for (int i = 0; i < hooks->count; i++) {
 		bsmod_Hook* dir = bs_fetchUnit(hooks, i);
 

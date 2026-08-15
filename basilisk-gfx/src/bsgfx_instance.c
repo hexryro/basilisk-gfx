@@ -106,6 +106,7 @@ BSGFXAPI void _bsgfx_instanceType(int instance_type_id, int max_instance_count, 
 
 	bs_BufferUsageFlags usage_flags = 0;
 	bs_MemoryPropertyFlags memory_flags = BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
 	if (binding->type == BS_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
 		usage_flags |= BS_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	else if (binding->type == BS_DESCRIPTOR_TYPE_STORAGE_BUFFER)

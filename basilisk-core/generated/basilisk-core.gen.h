@@ -89,7 +89,6 @@ typedef struct bs_ImageSwaps bs_ImageSwaps;
 typedef struct bs_Image bs_Image;
 typedef struct bs_BshaHeader bs_BshaHeader;
 typedef struct bs_BshaAttribute bs_BshaAttribute;
-typedef struct bs_BbndHeader bs_BbndHeader;
 typedef struct bs_BiffHeader bs_BiffHeader;
 typedef struct bs_BiffPointer bs_BiffPointer;
 typedef struct bs_BatlHeader bs_BatlHeader;
@@ -201,8 +200,8 @@ typedef enum bs_Format bs_Format;
 typedef enum bs_ColorSpace bs_ColorSpace;
 typedef enum bs_PresentMode bs_PresentMode;
 typedef enum bs_ImageLayout bs_ImageLayout;
-typedef enum bs_BindType bs_BindType;
-typedef enum bs_BindTypeIndex bs_BindTypeIndex;
+typedef enum bs_DescriptorType bs_DescriptorType;
+typedef enum bs_DescriptorTypeIndex bs_DescriptorTypeIndex;
 typedef enum bs_VkObjectType bs_VkObjectType;
 
 #define BS_CONFIGURE_SOURCE(sources, index, count, ids)              \
@@ -2014,7 +2013,7 @@ enum bs_ImageLayout {
     BS_IMAGE_LAYOUT_PRESENT_SRC_KHR = 1000001002,
 };
 
-enum bs_BindType {
+enum bs_DescriptorType {
     BS_DESCRIPTOR_TYPE_SAMPLER = 0,
     BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER = 1,
     BS_DESCRIPTOR_TYPE_SAMPLED_IMAGE = 2,
@@ -2029,7 +2028,7 @@ enum bs_BindType {
     BS_DESCRIPTOR_TYPES_COUNT = 11,
 };
 
-enum bs_BindTypeIndex {
+enum bs_DescriptorTypeIndex {
     BS_DESCRIPTOR_TYPE_SAMPLER_INDEX = 0,
     BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER_INDEX = 1,
     BS_DESCRIPTOR_TYPE_SAMPLED_IMAGE_INDEX = 2,
@@ -2460,21 +2459,6 @@ struct bs_BshaAttribute {
     bs_U64 name_hash;
     bs_U32 location;
     bs_U32 size;
-};
-
-struct bs_BbndHeader {
-    bs_U32 magic;
-    bs_U32 version;
-    bs_U32 set;
-    bs_U32 point;
-    bs_U32 size;
-    bs_U32 descriptors_count;
-    bs_BindType type;
-    bs_BindTypeIndex type_index;
-    bs_U32 shader_stages;
-    bs_U32 reserved_0;
-    bs_U32 reserved_1;
-    bs_U32 reserved_2;
 };
 
 struct bs_BiffHeader {
@@ -2960,9 +2944,9 @@ struct bs_Binding {
     int location;
     int descriptors_count;
     bool in_use;
-    bs_BindType type;
-    bs_BindTypeIndex type_index;
     int size;
+    bs_DescriptorType type;
+    int type_index;
 };
 
 struct bs_BindSet {
@@ -9787,23 +9771,23 @@ bs_serializeImageLayout(
   @return const char*
   */
 BSAPI const char*
-bs_serializeBindType(
-    bs_BindType e);
+bs_serializeDescriptorType(
+    bs_DescriptorType e);
 
  /**
   @param value
-  @return bs_BindType
+  @return bs_DescriptorType
   */
-BSAPI bs_BindType
-bs_deserializeBindType(
+BSAPI bs_DescriptorType
+bs_deserializeDescriptorType(
     const char* value);
 
  /**
   @param index
-  @return bs_BindType
+  @return bs_DescriptorType
   */
-BSAPI bs_BindType
-bs_indexBindType(
+BSAPI bs_DescriptorType
+bs_indexDescriptorType(
     int index);
 
  /**

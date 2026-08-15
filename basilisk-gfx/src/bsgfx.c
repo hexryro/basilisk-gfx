@@ -295,8 +295,6 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
         _bsgfx_procs_.bsmod_onLateIni();
     */
 
-    bs_loadPackage(&_bsgfx_package_, BSGFX_CONTENT_PATH);
-
 /*
     bssteam_iniSteam();
     bssteam_iniSteamInput();
@@ -305,12 +303,14 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
 #endif
 */
 
-    bs_iniAudio();
 
    // bs_pause();
 
     if (_bsgfx_callbacks_.ini)
         _bsgfx_callbacks_.ini();
+
+    bs_loadPackage(&_bsgfx_package_, BSGFX_CONTENT_PATH);
+    bs_iniAudio();
 
     bs_loadBindings();
 

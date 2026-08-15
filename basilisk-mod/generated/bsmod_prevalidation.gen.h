@@ -59,7 +59,6 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_beginTrackChanges = (PFN_bsmod_beginTrackChanges)GetProcAddress(module, "_preval_bsmod_beginTrackChanges");
     functions.bsmod_tickTracker = (PFN_bsmod_tickTracker)GetProcAddress(module, "_preval_bsmod_tickTracker");
     functions.bsmod_onTrack = (PFN_bsmod_onTrack)GetProcAddress(module, "_preval_bsmod_onTrack");
-    functions.bsmod_onPackBindings = (PFN_bsmod_onPackBindings)GetProcAddress(module, "_preval_bsmod_onPackBindings");
     functions.bsmod_onCompileShader = (PFN_bsmod_onCompileShader)GetProcAddress(module, "_preval_bsmod_onCompileShader");
     functions.bsmod_onConvertFont = (PFN_bsmod_onConvertFont)GetProcAddress(module, "_preval_bsmod_onConvertFont");
     functions.bsmod_onPackAtlas = (PFN_bsmod_onPackAtlas)GetProcAddress(module, "_preval_bsmod_onPackAtlas");

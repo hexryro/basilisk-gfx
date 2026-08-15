@@ -365,6 +365,10 @@ BSMODAPI void _bsmod_onIni() {
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
         (LPCSTR)(&_bsmod_onIni),
         &_bsmod_.module);
+    _bsmod_iniCompiler();
+
+    _bsmod_onTrack();
+    _bsmod_tickTracker();
 
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_IMAGE, BSMOD_IMAGES_COUNT, BSMOD_IMAGE_IDS);
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_SAMPLER, BSMOD_SAMPLERS_COUNT, BSMOD_SAMPLER_IDS);
@@ -380,24 +384,6 @@ BSMODAPI void _bsmod_onIni() {
 
     result = bs_loadPackageN(&_bsmod_.bsgfx_package, BS_CONSTANT_STRING(BSGFX_CONTENT_PATH));
 
-    if (result == BS_RESULT_OK) {
-
-        bs_Resource* resource;
-        result = bs_loadResourceN(_bsmod_.bsgfx_package, 0, BS_RESOURCE_BINARY, &resource, BS_CONSTANT_STRING("bindings"));
-
-        if (result == BS_RESULT_OK) {
-            result = bs_json(resource->data->value, resource->data->len, &_bsmod_.bindings_json);
-        }
-    }
-
-    if (!_bsmod_.bindings_json.doc)
-        _bsmod_.bindings_json = bs_emptyJson();
-
-   // _bsmod_iniPackage(BSMOD_CONTENT_PATH);
-   // _bsmod_iniPackage(BSGFX_CONTENT_PATH);
-   // _bsmod_iniPackage(_bsmod_applicationContentPath());
-    // _bsmod_iniLisk();
-    _bsmod_iniCompiler();
 }
 
 BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track

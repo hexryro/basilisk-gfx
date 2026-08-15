@@ -89,7 +89,7 @@ typedef struct {
     bsmod_EditType edit_type;
     bsmod_EditType edit_type_old;
     bs_Json track_json;
-    bs_Json bindings_json;
+   // bs_Json bindings_json;
     bs_String* variadic;
     bs_List queue_load;
     HMODULE module;

@@ -223,7 +223,7 @@
 		<enum name="bs_BlendFactor" copyFrom="VkBlendFactor"/>
 		<enum name="bs_BlendOperationType" copyFrom="VkBlendOp"/>
 		<enum name="bs_CompareOp" copyFrom="VkCompareOp"/>
-		<serializableEnum name="BindType" deserialize="true" index="true" count="BS_DESCRIPTOR_TYPES_COUNT" copyFrom="VkDescriptorType"/>
+		<serializableEnum name="DescriptorType" deserialize="true" index="true" count="BS_DESCRIPTOR_TYPES_COUNT" copyFrom="VkDescriptorType"/>
 		<enum name="bs_TopologyType" copyFrom="VkPrimitiveTopology"/>
 		<enum name="bs_PolygonType" copyFrom="VkPolygonMode"/>
 		<enum name="bs_StoreOp" copyFrom="VkAttachmentStoreOp"/>
@@ -389,7 +389,7 @@
 			<name>#define BS_CONFIGURE_SOURCE(sources, index, count, ids)</name>
 			<line>sources[index] = bs_configureSource(index, count, (const char* []) { ids(BS_STRING_GEN) })</line>
 		</macro>
-
+		
 		<macro>
 			<name>#define BS_RGBA(r, g, b, a)</name>
 			<line>(bs_RGBA) { r, g, b, a }</line>
@@ -1269,20 +1269,6 @@
             <field><type>bs_U32</type><name>location</name></field>
             <field><type>bs_U32</type><name>size</name></field>
         </structure>
-		<structure name="bs_BbndHeader">
-            <field><type>bs_U32</type><name>magic</name></field>
-            <field><type>bs_U32</type><name>version</name></field>
-            <field><type>bs_U32</type><name>set</name></field>
-            <field><type>bs_U32</type><name>point</name></field>
-            <field><type>bs_U32</type><name>size</name></field>
-            <field><type>bs_U32</type><name>descriptors_count</name></field>
-            <field><type>bs_BindType</type><name>type</name></field>
-            <field><type>bs_BindTypeIndex</type><name>type_index</name></field>
-            <field><type>bs_U32</type><name>shader_stages</name></field>
-            <field><type>bs_U32</type><name>reserved_0</name></field>
-            <field><type>bs_U32</type><name>reserved_1</name></field>
-            <field><type>bs_U32</type><name>reserved_2</name></field>
-        </structure>
         <structure name="bs_BiffHeader">
             <field><type>bs_U32</type><name>magic</name></field>
             <field><type>bs_U32</type><name>version</name></field>
@@ -1727,9 +1713,9 @@
             <field><type>int</type><name>location</name></field>
             <field><type>int</type><name>descriptors_count</name></field>
             <field><type>bool</type><name>in_use</name></field>
-            <field><type>bs_BindType</type><name>type</name></field>
-            <field><type>bs_BindTypeIndex</type><name>type_index</name></field>
             <field><type>int</type><name>size</name></field>
+			<field><type>bs_DescriptorType</type><name>type</name></field>
+			<field><type>int</type><name>type_index</name></field>
         </structure>
         <structure name="bs_BindSet">
             <field><type>bs_U32</type><name>slot</name></field>

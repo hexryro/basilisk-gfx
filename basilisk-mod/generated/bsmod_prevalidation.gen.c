@@ -109,10 +109,6 @@ BSMODAPI void _preval_bsmod_onTrack() {
     next.bsmod_onTrack();
 }
 
-BSMODAPI bs_Result _preval_bsmod_onPackBindings() {
-    return next.bsmod_onPackBindings();
-}
-
 BSMODAPI void _preval_bsmod_onCompileShader(bsmod_TrackParams params) {
     next.bsmod_onCompileShader(params);
 }
@@ -573,7 +569,6 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_beginTrackChanges = _preval_bsmod_beginTrackChanges;
     functions.bsmod_tickTracker = _preval_bsmod_tickTracker;
     functions.bsmod_onTrack = _preval_bsmod_onTrack;
-    functions.bsmod_onPackBindings = _preval_bsmod_onPackBindings;
     functions.bsmod_onCompileShader = _preval_bsmod_onCompileShader;
     functions.bsmod_onConvertFont = _preval_bsmod_onConvertFont;
     functions.bsmod_onPackAtlas = _preval_bsmod_onPackAtlas;

@@ -544,8 +544,8 @@ BSMODAPI bs_Result _bsmod_packFont(
 	const char* resource_name,
 	int resource_name_length)
 {
-	_bsmod_generateGlyphsMSDF();
-
+	//_bsmod_generateGlyphsMSDF();
+	
 	return BS_RESULT_OK;
 
 	const int channels_count = 1;

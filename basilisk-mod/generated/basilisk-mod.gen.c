@@ -147,11 +147,6 @@ void bsmod_onTrack()
     next.bsmod_onTrack();
 }
 
-bs_Result bsmod_onPackBindings()
-{
-    return next.bsmod_onPackBindings();
-}
-
 void bsmod_onCompileShader(
     bsmod_TrackParams params)
 {

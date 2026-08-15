@@ -266,8 +266,11 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 	if (result != BS_RESULT_OK)
 		return result;
 
-	bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+	bs_Object* single_times_queue_object = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES);
+	if (!single_times_queue_object)
+		return result;
 
+	bs_Queue* single_times_queue = single_times_queue_object->queue;
 	bs_List* sources = bs_objectSources();
 
 	switch (type) {

@@ -5049,8 +5049,8 @@ const char* bs_serializeImageLayout(
     return NULL;
 }
 
-const char* bs_serializeBindType(
-    bs_BindType e)
+const char* bs_serializeDescriptorType(
+    bs_DescriptorType e)
 {
     switch (e) {
         case BS_DESCRIPTOR_TYPE_SAMPLER: return "BS_DESCRIPTOR_TYPE_SAMPLER";
@@ -5069,7 +5069,7 @@ const char* bs_serializeBindType(
     return NULL;
 }
 
-bs_BindType bs_deserializeBindType(
+bs_DescriptorType bs_deserializeDescriptorType(
     const char* value)
 {
     if (strcmp(value, "BS_DESCRIPTOR_TYPE_SAMPLER") == 0) return BS_DESCRIPTOR_TYPE_SAMPLER;
@@ -5088,10 +5088,10 @@ bs_BindType bs_deserializeBindType(
     return 0;
 }
 
-bs_BindType bs_indexBindType(
+bs_DescriptorType bs_indexDescriptorType(
     int index)
 {
-    static bs_BindType table[] = {
+    static bs_DescriptorType table[] = {
         BS_DESCRIPTOR_TYPE_SAMPLER,
         BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
         BS_DESCRIPTOR_TYPE_SAMPLED_IMAGE,

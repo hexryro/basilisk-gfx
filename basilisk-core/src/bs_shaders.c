@@ -45,7 +45,9 @@ struct bs_List _bs_pipelines_[BS_PIPELINE_TYPE_COUNT] = {0};
 static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
     VkResult result;
 
-    VkDescriptorSetLayoutBinding* layout_bindings = _bs_calloc(bind_set->bindings_count, sizeof(VkDescriptorSetLayoutBinding));
+    const size_t layout_bindings_size = bind_set->bindings_count * sizeof(VkDescriptorSetLayoutBinding);
+    VkDescriptorSetLayoutBinding* layout_bindings = bs_alloca(layout_bindings_size);
+    memset(layout_bindings, 0, layout_bindings_size);
 
     for (int i = 0; i < bind_set->bindings_count; i++) {
         VkDescriptorSetLayoutBinding* layout_binding = layout_bindings + i;
@@ -72,7 +74,6 @@ static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
     result = vkCreateDescriptorSetLayout(_bs_instance_->device, &layout_i, NULL, &layout);
     if (result != VK_SUCCESS) {
         _bs_warnF("Failed to create descriptor set layout for bind set %d (Vulkan result = %d)", bind_set->slot, result);
-        _bs_free(layout_bindings);
         return VK_NULL_HANDLE;
     }
 
@@ -86,7 +87,6 @@ static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
         }
     }
 
-    _bs_free(layout_bindings);
     return layout;
 }
 
@@ -216,7 +216,7 @@ BSAPI void _bs_pushDescriptors() {
     }
 }
 
-static inline bool _bs_bindIsImageType(bs_BindType type) {
+static inline bool _bs_bindIsImageType(bs_DescriptorType type) {
     _bs_criticalF("%s: Not implemented", __func__);
     return false;
     //return type == BS_BIND_TYPE_SAMPLER || type == BS_BIND_TYPE_COMBINED_IMAGE_SAMPLER || type == BS_BIND_TYPE_SAMPLED_IMAGE || type == BS_BIND_TYPE_STORAGE_IMAGE;
@@ -277,28 +277,29 @@ BSAPI void _bs_pushBindings() {
    * Bindings
    *============================================================================*/
 
-static inline bs_Result _bs_validateBinding(bs_U32 bind_set_slot, bs_U32 bind_point_slot, int descriptors_count) {
+static inline bs_Binding* _bs_validateBinding(bs_U32 bind_set_slot, bs_U32 bind_point_slot, int descriptors_count) {
    // BS_VALIDATE(_bs_instance_->descriptor_lookup != NULL, BS_RESULT_VALIDATION_ERROR, "No bindings have been loaded");
 
     bs_BindSet* bind_set;
     bs_Binding* binding;
 
     bind_set = bs_queryBindSet(bind_set_slot);
-    BS_VALIDATE(bind_set != NULL, BS_RESULT_VALIDATION_ERROR, );
+    BS_VALIDATE(bind_set != NULL, NULL, );
 
     binding = bs_queryBinding(bind_set, bind_point_slot);
-    BS_VALIDATE(binding != NULL, BS_RESULT_VALIDATION_ERROR, "Binding (%d, %d) is not used by any shader", bind_set_slot, bind_point_slot);
+    BS_VALIDATE(binding != NULL, NULL, "Binding (%d, %d) is not used by any shader", bind_set_slot, bind_point_slot);
 
     if (!binding->in_use) {
-        BS_VALIDATE(descriptors_count <= binding->descriptors_count, BS_RESULT_VALIDATION_ERROR, );
-        BS_VALIDATE((bind_set->bound_descriptors_count + descriptors_count) <= bind_set->descriptors_count, BS_RESULT_VALIDATION_ERROR, );
+        BS_VALIDATE(descriptors_count <= binding->descriptors_count, NULL, );
+        BS_VALIDATE((bind_set->bound_descriptors_count + descriptors_count) <= bind_set->descriptors_count, NULL, );
     }
 
-    return BS_RESULT_OK;
+    return binding;
 }
 
 BSAPI bs_Result _val_bs_binding(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Descriptor* descriptors, int descriptors_count) {
-    BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, descriptors_count) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR,);
+    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, descriptors_count);
+    if (!binding) return BS_RESULT_VALIDATION_ERROR;
 
     return _bs_binding(bind_set_slot, bind_point_slot, descriptors, descriptors_count);
 }
@@ -342,7 +343,9 @@ BSAPI bs_Result _val_bs_bindImages(bs_U32 bind_set_slot, bs_U32 bind_point_slot,
         BS_VALIDATE(descriptor->sampler->head.type == BS_OBJECT_SAMPLER, BS_RESULT_VALIDATION_ERROR,);
     }
 
-    BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, images_count) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR, );
+    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, images_count);
+    if (!binding) 
+        return BS_RESULT_VALIDATION_ERROR;
 
     return _bs_bindImages(bind_set_slot, bind_point_slot, in_descriptors, images_count);
 }
@@ -371,7 +374,10 @@ BSAPI bs_Result _bs_bindImages(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_
 }
 
 BSAPI bs_Result _val_bs_bindImage(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Image* image, bs_Sampler* sampler, bs_ImageLayout layout) {
-    BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, 1) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR, );
+    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, 1);
+    if (!binding)
+        return BS_RESULT_VALIDATION_ERROR;
+
     return _bs_bindImage(bind_set_slot, bind_point_slot, image, sampler, layout);
 }
 
@@ -387,7 +393,10 @@ BSAPI bs_Result _bs_bindImage(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_I
   Bind buffers
   */
 BSAPI bs_Result _val_bs_bindBuffers(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Buffer** buffers, int buffers_count) {
-    BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, 1) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR, );
+    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, 1);
+    if (!binding)
+        return BS_RESULT_VALIDATION_ERROR;
+
     return _bs_bindBuffers(bind_set_slot, bind_point_slot, buffers, buffers_count);
 }
 
@@ -419,7 +428,10 @@ BSAPI bs_Result _bs_bindBuffers(bs_U32 bind_set_slot, bs_U32 slot, bs_Buffer** b
 }
 
 BSAPI bs_Result _val_bs_bindBuffer(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Buffer* buffer) {
-    BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, 1) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR,);
+    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, 1);
+    if (!binding)
+        return BS_RESULT_VALIDATION_ERROR;
+
     return _bs_bindBuffer(bind_set_slot, bind_point_slot, buffer);
 }
 
@@ -432,7 +444,10 @@ BSAPI bs_Result _bs_bindBuffer(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_
   Bind acceleration structures
   */
 BSAPI bs_Result _val_bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_RayTracer** ray_tracers, int ray_tracers_count) {
-    BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, 1) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR,);
+    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, 1);
+    if (!binding)
+        return BS_RESULT_VALIDATION_ERROR;
+
     return _bs_bindAccelerationStructures(bind_set_slot, bind_point_slot, ray_tracers, ray_tracers_count);
 }
 
@@ -442,7 +457,10 @@ BSAPI bs_Result _bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 bind
 }
 
 BSAPI bs_Result _val_bs_bindAccelerationStructure(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_RayTracer* ray_tracer) {
-    BS_VALIDATE(_bs_validateBinding(bind_set_slot, bind_point_slot, 1) == BS_RESULT_OK, BS_RESULT_VALIDATION_ERROR,);
+    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, 1);
+    if (!binding)
+        return BS_RESULT_VALIDATION_ERROR;
+
     return _bs_bindAccelerationStructure(bind_set_slot, bind_point_slot, ray_tracer);
 }
 
@@ -543,25 +561,38 @@ BSAPI void _bs_loadBinding(bs_Binding* binding, int bind_set, int bind_point, in
         return;
     }
 
-    bs_BbndHeader* header = resource->data->value;
+    unsigned char* bbnd = resource->data->value;
 
-    if (header->magic != BS_BBND_MAGIC) {
+    bs_U32 magic = bs_getLittleEndian32(bbnd + BBND_MAGIC_OFFSET);
+
+    if (magic != BS_BBND_MAGIC) {
         BS_WARN_INVALID_MAGIC("bindings", path);
         return BS_RESULT_CORRUPTED;
     }
 
-    if (header->version != 1) {
+    bs_U32 version = bs_getLittleEndian32(bbnd + BBND_VERSION_OFFSET);
+
+    if (version != 1) {
         BS_WARN_UNSUPPORTED_VERSION("bindings", path);
         return BS_RESULT_NOT_SUPPORTED;
     }
 
-    binding->descriptors_count = header->descriptors_count;
-    binding->type = header->type;
-    binding->type_index = header->type_index;
+    int actual_bind_set = bs_getLittleEndian32(bbnd + BBND_BIND_SET_OFFSET);
+    int actual_binding = bs_getLittleEndian32(bbnd + BBND_BIND_POINT_OFFSET);
+    if (actual_bind_set != bind_set || actual_binding != bind_point) {
+        BS_WARN("Binding \"%s\" has mismatching bindings (%d, %d) != (%d, %d)", 
+            path, bind_set, bind_point, actual_bind_set, actual_binding);
+        return BS_RESULT_CORRUPTED;
+    }
+
+    binding->descriptors_count = bs_getLittleEndian32(bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
     binding->slot = bind_point;
     binding->set = bind_set;
-    binding->size = header->size;
-    binding->stages = header->shader_stages;
+    binding->stages = bs_getLittleEndian32(bbnd + BBND_SHADER_STAGES_OFFSET);
+    binding->type_index = bs_getLittleEndian32(bbnd + BBND_DESCRIPTOR_TYPE_OFFSET);
+    binding->type = bs_indexDescriptorType(binding->type_index);
+
+    assert(binding->descriptors_count >= 0);
 
     _bs_instance_->bindings_count++;
 }

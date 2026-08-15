@@ -106,6 +106,10 @@
     bs_criticalF("Invalid magic for %s \"%s\"", resource_type, path)
    // _bs_writeLogger(BS_LIBRARY_BASILISK, BS_MESSAGE_CRITICAL_ERROR, BS_RESULT_CORRUPTED, BS_RESULT_CORRUPTED, __func__, __FILE__, __LINE__, "Invalid magic for %s \"%s\"", resource_type, path)
 
+#define BS_WARN(format, ...) \
+    bs_warnF("%s at %s:%d: " format, __func__, __FILE__, __LINE__ __VA_OPT__(,) __VA_ARGS__)
+
+
 
 
   /*==============================================================================
@@ -152,6 +156,26 @@
   /*==============================================================================
    * BATL Version 1
    *============================================================================*/
+
+
+
+  /*==============================================================================
+   * BBND Version 1
+   *============================================================================*/
+ 
+ /**
+  Binding header
+  */
+#define BBND_MAGIC_OFFSET                    0 // U32
+#define BBND_VERSION_OFFSET                  4 // U32
+#define BBND_BIND_SET_OFFSET                 8 // U32
+#define BBND_BIND_POINT_OFFSET              12 // U32
+#define BBND_DESCRIPTOR_COUNT_OFFSET        16 // U32
+#define BBND_SHADER_STAGES_OFFSET           20 // U32
+#define BBND_DESCRIPTOR_TYPE_OFFSET         24 // U32
+#define BBND_RESERVED_0                     28 // U32
+
+#define BBND_HEADER_SIZE                    32
 
 
 

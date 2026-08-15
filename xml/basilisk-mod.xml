@@ -620,9 +620,6 @@
 			<return>void</return>
 		</function>
 
-		<function name="bsmod_onPackBindings">
-			<return>bs_Result</return>
-		</function>
 		<function name="bsmod_onCompileShader">
 			<return>void</return>
 			<param><type>bsmod_TrackParams</type><name>params</name></param>

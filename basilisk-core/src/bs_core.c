@@ -1519,8 +1519,8 @@ BSAPI bs_Result _bs_pushBatch(bs_Queue* queue, bs_Batch* batch, bs_U32 num_indic
 
     _bs_mapBuffer(batch->staging_buffer->buffer, vertex_size);
 
-    if (bindings.staging_was_bound)
-        _bs_bindBuffer(bindings.staging_bind_set, bindings.staging_binding, batch->staging_buffer->buffer);
+//    if (bindings.staging_was_bound)
+//        _bs_bindBuffer(bindings.staging_bind_set, bindings.staging_binding, batch->staging_buffer->buffer, BS_DESCRIPTOR_TYPE_STORAGE_BUFFER);
 
    /**
     Vertex buffer
@@ -1539,8 +1539,8 @@ BSAPI bs_Result _bs_pushBatch(bs_Queue* queue, bs_Batch* batch, bs_U32 num_indic
     _bs_stageList(batch->staging_buffer->buffer, &batch->vertices);
     _bs_copyAsync(queue, batch->staging_buffer->buffer, batch->vertex_buffer->buffer, 0, 0, BS_U32_MAX);
 
-    if (bindings.vertex_was_bound)
-        _bs_bindBuffer(bindings.vertex_bind_set, bindings.vertex_binding, batch->vertex_buffer->buffer);
+//    if (bindings.vertex_was_bound)
+//        _bs_bindBuffer(bindings.vertex_bind_set, bindings.vertex_binding, batch->vertex_buffer->buffer);
 
    /**
     Index buffer
@@ -1562,16 +1562,16 @@ BSAPI bs_Result _bs_pushBatch(bs_Queue* queue, bs_Batch* batch, bs_U32 num_indic
         _bs_copyAsync(queue, batch->staging_buffer->buffer, batch->index_buffer->buffer, 0, 0, BS_U32_MAX);
     }
 
-    if (bindings.index_was_bound)
-        _bs_bindBuffer(bindings.index_bind_set, bindings.index_binding, batch->index_buffer->buffer);
+//    if (bindings.index_was_bound)
+//        _bs_bindBuffer(bindings.index_bind_set, bindings.index_binding, batch->index_buffer->buffer);
 
     if (!(batch->flags & BS_BATCH_KEEP_DATA)) {
         _bs_destroyList(&batch->vertices);
         _bs_destroyList(&batch->indices);
     }
 
-    if (bindings.vertex_was_bound || bindings.index_was_bound || bindings.staging_was_bound)
-        _bs_pushDescriptors();
+//    if (bindings.vertex_was_bound || bindings.index_was_bound || bindings.staging_was_bound)
+//        _bs_pushDescriptors();
 
     batch->flags |= BS_BATCH_IS_PUSHED;
 

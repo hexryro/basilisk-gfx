@@ -703,12 +703,6 @@ BSMODAPI void
 bsmod_onTrack();
 
  /**
-  @return bs_Result
-  */
-BSMODAPI bs_Result
-bsmod_onPackBindings();
-
- /**
   @param params
   @return void
   */
