@@ -1417,6 +1417,7 @@
         </structure>
 		<structure name="bs_BufferSwap">
             <field><type>struct VkBuffer_T*</type><name>vk_buffer</name></field>
+            <field><type>struct VkBufferView_T*</type><name>vk_buffer_view</name></field>
             <field><type>struct VkDeviceMemory_T*</type><name>memory</name></field>
             <field><type>char*</type><name>data</name></field>
         </structure>
@@ -1683,7 +1684,7 @@
 		</structure>
 		<structure name="bs_Descriptor">
             <structure type="union">
-                <structure instance="as_image">
+                <structure instance=" as_image">
                     <field><type>struct VkSampler_T*</type><name>vk_sampler</name></field>
                     <field><type>struct VkImageView_T*</type><name>vk_image_view</name></field>
                     <field><type>enum VkImageLayout</type><name>vk_image_layout</name></field>
@@ -1693,10 +1694,15 @@
 				    <field><type>bs_Image*</type><name>image</name></field>
                     <field><type>bs_Sampler*</type><name>sampler</name></field>
                 </structure>
-                <structure instance="as_buffer">
+                <structure instance=" as_buffer">
                     <field><type>struct VkBuffer_T*</type><name>vk_buffer</name></field>
                     <field><type>bs_U64</type><name>vk_offset</name></field>
                     <field><type>bs_U64</type><name>vk_range</name></field>
+					
+                    <field><type>bs_Buffer*</type><name>buffer</name></field>
+                </structure>
+                <structure instance=" as_texel_buffer">
+                    <field><type>struct VkBufferView_T*</type><name>vk_buffer_view</name></field>
 					
                     <field><type>bs_Buffer*</type><name>buffer</name></field>
                 </structure>
@@ -2545,7 +2551,14 @@
             <param><type>bs_U32</type><name>y</name></param>
             <param><type>bs_U32</type><name>z</name></param>
         </function>
-        <function name="bs_buffer">
+		<function name="bs_bufferView">
+            <return>bs_Result</return>
+            <param><type>bs_Buffer*</type><name>buffer</name></param>
+            <param><type>bs_Format</type><name>format</name></param>
+            <param><type>bs_U64</type><name>start</name></param>
+            <param><type>bs_U64</type><name>count</name></param>
+        </function>
+		<function name="bs_buffer">
             <return>bs_Result</return>
             <param><type>bs_Object*</type><name>object</name></param>
             <param><type>bs_U32</type><name>num_bytes</name></param>

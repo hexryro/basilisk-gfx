@@ -1194,6 +1194,15 @@ void bs_dispatchAsync(
     next.bs_dispatchAsync(queue, pipeline, x, y, z);
 }
 
+bs_Result bs_bufferView(
+    bs_Buffer* buffer, 
+    bs_Format format, 
+    bs_U64 start, 
+    bs_U64 count)
+{
+    return next.bs_bufferView(buffer, format, start, count);
+}
+
 bs_Result bs_buffer(
     bs_Object* object, 
     bs_U32 num_bytes, 

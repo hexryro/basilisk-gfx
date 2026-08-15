@@ -101,6 +101,7 @@ typedef void(__stdcall* PFN_bs_accelerateBatch)(bs_RayTracer* ray_tracer, bs_Bat
 typedef bs_Result(__stdcall* PFN_bs_build)(bs_Queue* queue, bs_RayTracer* ray_tracer);
 typedef void(__stdcall* PFN_bs_destroyRayTracer)(bs_RayTracer* ray_tracer);
 typedef void(__stdcall* PFN_bs_dispatchAsync)(bs_Queue* queue, bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z);
+typedef bs_Result(__stdcall* PFN_bs_bufferView)(bs_Buffer* buffer, bs_Format format, bs_U64 start, bs_U64 count);
 typedef bs_Result(__stdcall* PFN_bs_buffer)(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags);
 typedef bool(__stdcall* PFN_bs_bufferIsMapped)(bs_Buffer* buffer);
 typedef char*(__stdcall* PFN_bs_bufferMap)(bs_Buffer* buffer);
@@ -633,6 +634,7 @@ typedef struct {
     PFN_bs_build bs_build;
     PFN_bs_destroyRayTracer bs_destroyRayTracer;
     PFN_bs_dispatchAsync bs_dispatchAsync;
+    PFN_bs_bufferView bs_bufferView;
     PFN_bs_buffer bs_buffer;
     PFN_bs_bufferIsMapped bs_bufferIsMapped;
     PFN_bs_bufferMap bs_bufferMap;
@@ -1165,6 +1167,7 @@ BSAPI void _bs_accelerateBatch(bs_RayTracer* ray_tracer, bs_Batch* batch);
 BSAPI bs_Result _bs_build(bs_Queue* queue, bs_RayTracer* ray_tracer);
 BSAPI void _bs_destroyRayTracer(bs_RayTracer* ray_tracer);
 BSAPI void _bs_dispatchAsync(bs_Queue* queue, bs_Pipeline* pipeline, bs_U32 x, bs_U32 y, bs_U32 z);
+BSAPI bs_Result _bs_bufferView(bs_Buffer* buffer, bs_Format format, bs_U64 start, bs_U64 count);
 BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags);
 BSAPI bool _bs_bufferIsMapped(bs_Buffer* buffer);
 BSAPI char* _bs_bufferMap(bs_Buffer* buffer);
@@ -1699,6 +1702,7 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_build = _bs_build;
     functions.bs_destroyRayTracer = _bs_destroyRayTracer;
     functions.bs_dispatchAsync = _bs_dispatchAsync;
+    functions.bs_bufferView = _bs_bufferView;
     functions.bs_buffer = _bs_buffer;
     functions.bs_bufferIsMapped = _bs_bufferIsMapped;
     functions.bs_bufferMap = _bs_bufferMap;

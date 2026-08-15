@@ -2623,6 +2623,7 @@ struct bs_Shader {
 
 struct bs_BufferSwap {
     struct VkBuffer_T* vk_buffer;
+    struct VkBufferView_T* vk_buffer_view;
     struct VkDeviceMemory_T* memory;
     char* data;
 };
@@ -2923,13 +2924,17 @@ struct bs_Descriptor {
             bs_U32 padding;
             bs_Image* image;
             bs_Sampler* sampler;
-        }as_image;
+        } as_image;
         struct {
             struct VkBuffer_T* vk_buffer;
             bs_U64 vk_offset;
             bs_U64 vk_range;
             bs_Buffer* buffer;
-        }as_buffer;
+        } as_buffer;
+        struct {
+            struct VkBufferView_T* vk_buffer_view;
+            bs_Buffer* buffer;
+        } as_texel_buffer;
     };
     int object_type;
     int reserved;
@@ -4767,6 +4772,20 @@ bs_dispatchAsync(
     bs_U32 x,
     bs_U32 y,
     bs_U32 z);
+
+ /**
+  @param buffer
+  @param format
+  @param start
+  @param count
+  @return bs_Result
+  */
+BSAPI bs_Result
+bs_bufferView(
+    bs_Buffer* buffer,
+    bs_Format format,
+    bs_U64 start,
+    bs_U64 count);
 
  /**
   @param object

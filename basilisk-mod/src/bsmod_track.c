@@ -467,7 +467,7 @@ BSMODAPI void _bsmod_onTrack() {
 	if (!hooks)
 		return;
 
-	static bool reload_all = true; // temp
+	static bool reload_all = false; // temp
 	for (int i = 0; i < hooks->count; i++) {
 		bsmod_Hook* dir = bs_fetchUnit(hooks, i);
 

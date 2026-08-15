@@ -101,6 +101,7 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_build = (PFN_bs_build)GetProcAddress(module, "_preval_bs_build");
     functions.bs_destroyRayTracer = (PFN_bs_destroyRayTracer)GetProcAddress(module, "_preval_bs_destroyRayTracer");
     functions.bs_dispatchAsync = (PFN_bs_dispatchAsync)GetProcAddress(module, "_preval_bs_dispatchAsync");
+    functions.bs_bufferView = (PFN_bs_bufferView)GetProcAddress(module, "_preval_bs_bufferView");
     functions.bs_buffer = (PFN_bs_buffer)GetProcAddress(module, "_preval_bs_buffer");
     functions.bs_bufferIsMapped = (PFN_bs_bufferIsMapped)GetProcAddress(module, "_preval_bs_bufferIsMapped");
     functions.bs_bufferMap = (PFN_bs_bufferMap)GetProcAddress(module, "_preval_bs_bufferMap");

@@ -260,6 +260,7 @@ static void _bs_prepareDescriptorTemplate(bs_BindSet* bind_set) {
     };
 
     vkCreateDescriptorUpdateTemplate(_bs_instance_->device, &ci, NULL, &bind_set->vk_update_template);
+    bind_set->needs_update = true;
 }
 
 BSAPI void _bs_pushBindings() {
@@ -297,25 +298,23 @@ static inline bs_Binding* _bs_validateBinding(bs_U32 bind_set_slot, bs_U32 bind_
     return binding;
 }
 
-BSAPI bs_Result _val_bs_binding(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Descriptor* descriptors, int descriptors_count) {
-    bs_Binding* binding = _bs_validateBinding(bind_set_slot, bind_point_slot, descriptors_count);
-    if (!binding) return BS_RESULT_VALIDATION_ERROR;
+BSAPI bs_Result _val_bs_binding(bs_BindSet* bind_set, bs_Binding* binding, bs_Descriptor* descriptors, int descriptors_count) {
+    _bs_validateBinding(bind_set->slot, binding->slot, descriptors_count);
+    if (!binding) 
+        return BS_RESULT_VALIDATION_ERROR;
 
-    return _bs_binding(bind_set_slot, bind_point_slot, descriptors, descriptors_count);
+    return _bs_binding(bind_set, binding, descriptors, descriptors_count);
 }
 
-BSAPI bs_Result _bs_binding(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Descriptor* descriptors, int descriptors_count) {
+BSAPI bs_Result _bs_binding(bs_BindSet* bind_set, bs_Binding* binding, bs_Descriptor* descriptors, int descriptors_count) {
    // _bs_pushDescriptorPools();
-
-    bs_BindSet* bind_set = _bs_queryBindSet(bind_set_slot);
-    bs_Binding* binding = _bs_queryBinding(bind_set, bind_point_slot);
 
     if (!binding->in_use) {
         binding->location = bind_set->bound_descriptors_count * sizeof(bs_Descriptor);
         bind_set->bound_descriptors_count += descriptors_count;
        // binding->location = bind_set->descriptors_size;
 
-        bs_logWithTimestampF(BS_MESSAGE_INFO, BS_PRINT_COLOR("+", BS_PRINT_GREEN) " Binding %d, %d", bind_set_slot, bind_point_slot);
+        bs_logWithTimestampF(BS_MESSAGE_INFO, BS_PRINT_COLOR("+", BS_PRINT_GREEN) " Binding %d, %d", bind_set->slot, binding->slot);
         binding->in_use = true;
     }
     memcpy(((unsigned char*)bind_set->descriptors) + binding->location, descriptors, descriptors_count * sizeof(bs_Descriptor));
@@ -354,6 +353,9 @@ BSAPI bs_Result _bs_bindImages(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_
     size_t size = images_count * sizeof(bs_Descriptor);
     bs_Descriptor* descriptors = _alloca(size);
 
+    bs_BindSet* bind_set = _bs_queryBindSet(bind_set_slot);
+    bs_Binding* binding = _bs_queryBinding(bind_set, bind_point_slot);
+
     for (int i = 0; i < images_count; i++) {
         bs_ImageDescriptor* descriptor = in_descriptors + i;
 
@@ -370,7 +372,7 @@ BSAPI bs_Result _bs_bindImages(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_
         };
     }
 
-    return _bs_binding(bind_set_slot, bind_point_slot, descriptors, images_count);
+    return _bs_binding(bind_set, binding, descriptors, images_count);
 }
 
 BSAPI bs_Result _val_bs_bindImage(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Image* image, bs_Sampler* sampler, bs_ImageLayout layout) {
@@ -403,28 +405,45 @@ BSAPI bs_Result _val_bs_bindBuffers(bs_U32 bind_set_slot, bs_U32 bind_point_slot
 BSAPI bs_Result _bs_bindBuffers(bs_U32 bind_set_slot, bs_U32 slot, bs_Buffer** buffers, int buffers_count) {
     bs_Result result;
 
+    bs_BindSet* bind_set = _bs_queryBindSet(bind_set_slot);
+    bs_Binding* binding = _bs_queryBinding(bind_set, slot);
+
     size_t size = buffers_count * sizeof(bs_Descriptor);
     bs_Descriptor* descriptors = _alloca(size);
 
     for (int i = 0; i < buffers_count; i++) {
         bs_Buffer* buffer = buffers[i];
 
-        descriptors[i] = (bs_Descriptor) {
-            .as_buffer = {
-                .vk_buffer = buffer->_[buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frame : 0].vk_buffer,
-                .vk_range = buffer->num_bytes,
-                .buffer = buffer,
-            },
-            .bind_set = bind_set_slot,
-            .bind_point = slot,
-        };
+        if (binding->type == BS_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER || binding->type == BS_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER) {
+            descriptors[i] = (bs_Descriptor){
+                .as_texel_buffer = {
+                    .vk_buffer_view = buffer->_[buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frame : 0].vk_buffer_view,
+                    .buffer = buffer,
+                },
+                .bind_set = bind_set_slot,
+                .bind_point = slot,
+            };
+        }
+        else {
+
+            descriptors[i] = (bs_Descriptor){
+                .as_buffer = {
+                    .vk_buffer = buffer->_[buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frame : 0].vk_buffer,
+                    .vk_range = buffer->num_bytes,
+                    .buffer = buffer,
+                },
+                .bind_set = bind_set_slot,
+                .bind_point = slot,
+            };
+        }
+
 
         buffer->flags |= BSI_BUFFER_IS_BOUND;
         buffer->bind_set = bind_set_slot;
         buffer->binding = slot;
     }
 
-    return _bs_binding(bind_set_slot, slot, descriptors, buffers_count);
+    return _bs_binding(bind_set, binding, descriptors, buffers_count);
 }
 
 BSAPI bs_Result _val_bs_bindBuffer(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Buffer* buffer) {
@@ -452,6 +471,9 @@ BSAPI bs_Result _val_bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 
 }
 
 BSAPI bs_Result _bs_bindAccelerationStructures(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_RayTracer** ray_tracers, int ray_tracers_count) {
+    bs_BindSet* bind_set = _bs_queryBindSet(bind_set_slot);
+    bs_Binding* binding = _bs_queryBinding(bind_set, bind_point_slot);
+
     _bs_warnN(BS_CONSTANT_STRING("_bs_bindAccelerationStructures has not been implemented yet"));
     return BS_RESULT_NOT_IMPLEMENTED;
 }

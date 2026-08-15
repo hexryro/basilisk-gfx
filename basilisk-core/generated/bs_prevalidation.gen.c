@@ -431,6 +431,12 @@ BSAPI void _preval_bs_dispatchAsync(bs_Queue* queue, bs_Pipeline* pipeline, bs_U
     next.bs_dispatchAsync(queue, pipeline, x, y, z);
 }
 
+BSAPI bs_Result _preval_bs_bufferView(bs_Buffer* buffer, bs_Format format, bs_U64 start, bs_U64 count) {
+    BS_VALIDATE(buffer != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, BS_RESULT_VALIDATION_ERROR,);
+    return next.bs_bufferView(buffer, format, start, count);
+}
+
 BSAPI bs_Result _preval_bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_buffer(object, num_bytes, usage_flags, memory_flags, flags);
@@ -2822,6 +2828,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_build = _preval_bs_build;
     functions.bs_destroyRayTracer = _preval_bs_destroyRayTracer;
     functions.bs_dispatchAsync = _preval_bs_dispatchAsync;
+    functions.bs_bufferView = _preval_bs_bufferView;
     functions.bs_buffer = _preval_bs_buffer;
     functions.bs_bufferIsMapped = _preval_bs_bufferIsMapped;
     functions.bs_bufferMap = _preval_bs_bufferMap;

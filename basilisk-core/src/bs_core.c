@@ -466,6 +466,38 @@ static void _bs_nameBuffer(bs_Object* object, const char* name) {
 }
 
  /**
+  Create buffer view
+  */
+BSAPI bs_Result _bs_bufferView(bs_Buffer* buffer, bs_Format format, bs_U64 start, bs_U64 count) {
+    VkResult result;
+
+    bs_U32 num_swaps = _bs_bufferSwapsCount(buffer);
+
+    VkBufferViewCreateInfo info = {
+        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
+        .format = format,
+        .offset = start,
+        .range = count,
+    };
+
+    for (int i = 0; i < num_swaps; i++) {
+        info.buffer = buffer->_[i].vk_buffer;
+
+        VkBufferView view;
+        result = vkCreateBufferView(_bs_instance_->device, &info, NULL, &view);
+
+        if (result != VK_SUCCESS) {
+            BS_WARN_VULKAN_ERROR("vkCreateBufferView", result, "");
+            return bs_convertVulkanResult(result);
+        }
+
+        buffer->_[i].vk_buffer_view = view;
+    }
+
+    return BS_RESULT_OK;
+}
+
+ /**
   Create Buffer
   */
 BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
@@ -493,7 +525,7 @@ BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFl
         return BS_RESULT_GENERAL_ERROR;
     }
 
-    bs_U32 num_swaps = flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
+    bs_U32 num_swaps = _bs_bufferSwapsCount(buffer);
 
     VkBufferCreateInfo buffer_i = {
         .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,

@@ -208,9 +208,13 @@ static inline float shoelace(const vec2 a, const vec2 b) {
    * Serializer
    *============================================================================*/
 
-int msdfgl_serialize_glyph(FT_Face face, int code, char* meta_buffer, float* point_buffer) {
+int msdfgl_serialize_glyph(FT_Face face, bs_U32 codepoint, char* meta_buffer, float* point_buffer) {
+    FT_UInt glyph_id = FT_Get_Char_Index(face, codepoint);
 
-    if (FT_Load_Char(face, code, FT_LOAD_NO_SCALE))
+    if (glyph_id == 0)
+        return -1;
+
+    if (FT_Load_Glyph(face, glyph_id, FT_LOAD_DEFAULT))
         return -1;
 
     FT_Outline_Funcs fns;
@@ -494,12 +498,34 @@ static void _bsmod_renderGlyphAtlas() {
     }
 }
 
+bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t end);
 void _bsmod_generateGlyphsMSDF() {
     bs_Object* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION);
     bs_Object* renderer = bs_fetch(BSMOD_RENDERERS, BSMOD_RENDERER_MSDF);
     bs_Object* msdf_glyphs = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS);
 
+    FT_Error error;
+    FT_Face face;
+    FT_Library freetype_library = NULL;
+
+     if (!freetype_library) {
+        error = FT_Init_FreeType(&freetype_library);
+        if (error) {
+            BSMOD_WARN_FREETYPE_ERROR("FT_Init_FreeType", error, );
+            //return _bsmod_convertFreetypeError(error);
+        }
+    }
+
+    error = FT_New_Face(freetype_library, "project/fonts/segoeui.ttf", 0, &face);
+    if (error) {
+        BSMOD_WARN_FREETYPE_ERROR("FT_New_Face", error, );
+      //  return _bsmod_convertFreetypeError(error);
+    }
+
+
     if (bs_resetQueue(queue->queue) == BS_RESULT_OK) {
+        _msdfgl_generate_glyphs_internal(face, 65, 66);
+
         _bsmod_renderGlyphAtlas();
         bs_pushQueue(queue->queue, 0, NULL);
     }
@@ -557,7 +583,7 @@ void _bsmod_loadMsdfResources() {
     }
 }
 
-bs_Result _msdfgl_generate_glyphs_internal(bsgfx_Font* font2, FT_Face face, int32_t start, int32_t end) {
+bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t end) {
 
     int retval = -2;
 
@@ -604,23 +630,28 @@ bs_Result _msdfgl_generate_glyphs_internal(bsgfx_Font* font2, FT_Face face, int3
     bs_buffer(
         point_data_object, 
         point_size_sum, 
-        BS_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT,
+        BS_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT,
         BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         0);
 
     bs_buffer(
         metadata_object,
         point_size_sum,
-        BS_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT,
+        BS_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT,
         BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         0);
+
+    bs_bufferView(point_data_object->buffer, BS_FORMAT_R8_UINT, 0, BS_U64_MAX);
+    bs_bufferView(metadata_object->buffer, BS_FORMAT_R8G8B8A8_UNORM, 0, BS_U64_MAX);
 
     bs_mapBuffer(point_data_object->buffer, BS_U32_MAX);
     bs_mapBuffer(metadata_object->buffer, BS_U32_MAX);
 
-
     bs_bindBuffer(BSMOD_SET_MSDF_BITMAP, BSMOD_BINDING_MSDF_BITMAP, point_data_object->buffer);
-    bs_bindBuffer(BSMOD_BINDING_MSDF_INDEX, BSMOD_BINDING_MSDF_INDEX, metadata_object->buffer);
+    bs_bindBuffer(BSMOD_SET_MSDF_INDEX, BSMOD_BINDING_MSDF_INDEX, metadata_object->buffer);
+
+    bs_pushBindings();
+    bs_pushDescriptors();
 
     void* point_data = point_data_object->buffer->_->data;
     void* metadata = metadata_object->buffer->_->data;
