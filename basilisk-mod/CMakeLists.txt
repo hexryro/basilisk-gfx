@@ -30,6 +30,12 @@ add_library(${PROJECT_NAME} SHARED
     ${TYPE_FILES}
 )
 
+if (DEFINED RENDERDOC_PATH)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    RENDERDOC_PATH="${RENDERDOC_PATH}"
+)
+endif()
+
 source_group("Views" FILES ${VIEWS})
 source_group("Source Files" FILES ${SOURCE_FILES})
 

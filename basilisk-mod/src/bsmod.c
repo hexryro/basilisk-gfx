@@ -28,6 +28,10 @@
 #include <bsmod_cache.h>
 #include <stdio.h>
 
+#ifdef RENDERDOC_PATH
+#include RENDERDOC_PATH
+#endif
+
 Bsmod _bsmod_ = {
     .bsgfx_package = -1,
     .package = -1,
@@ -446,7 +450,30 @@ BSMODAPI void _bsmod_bindAtlases() {
         bs_bindImages(BSMOD_SET_IMAGE_ATLAS_ICONS, BSMOD_BINDING_IMAGE_ATLAS_ICONS, icon_atlases, BSMOD_ATLAS_ICONS_COUNT);
 }
 
+void _bsmod_generateGlyphsMSDF();
 void _bsmod_loadMsdfResources();
+
+static void _bsmod_iniRenderDoc() {
+#ifdef RENDERDOC_PATH
+    _bsmod_.renderdoc_module = GetModuleHandleA("renderdoc.dll");
+
+    if (_bsmod_.renderdoc_module) {
+        pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress(_bsmod_.renderdoc_module, "RENDERDOC_GetAPI");
+        if (RENDERDOC_GetAPI) {
+            int result = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_6_0, (void**)&_bsmod_.renderdoc_api);
+            if (result != 1)
+                BS_WARN("RENDERDOC_GetAPI returned %d", result);
+            else {
+                _bsmod_.renderdoc_device = RENDERDOC_DEVICEPOINTER_FROM_VKINSTANCE(bs_instance()->instance);
+                bs_logF("Loaded renderdoc API");
+            }
+        }
+        else
+            BS_WARN("Failed to query proc address RENDERDOC_GetAPI");
+    }
+#endif
+}
+
 BSMODAPI void _bsmod_onLoad() {
     bs_Result result;
 
@@ -564,5 +591,8 @@ BSMODAPI void _bsmod_onLoad() {
 
     _bsmod_bindAtlases();
 
-    _bsmod_beginTrackChanges();
+  //  _bsmod_beginTrackChanges();
+
+    _bsmod_iniRenderDoc();
+    _bsmod_generateGlyphsMSDF();
 }

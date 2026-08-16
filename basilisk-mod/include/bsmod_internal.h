@@ -28,6 +28,10 @@
 
 #include <bsmod_internal.gen.h>
 
+#ifdef RENDERDOC_PATH
+#include RENDERDOC_PATH
+#endif
+
 typedef struct {
     int package;
     int bsgfx_package;
@@ -93,6 +97,11 @@ typedef struct {
     bs_String* variadic;
     bs_List queue_load;
     HMODULE module;
+#ifdef RENDERDOC_PATH
+    HMODULE renderdoc_module;
+    RENDERDOC_API_1_6_0* renderdoc_api;
+    RENDERDOC_DevicePointer renderdoc_device;
+#endif
 } Bsmod;
 
 BSMODAPI extern Bsmod _bsmod_;

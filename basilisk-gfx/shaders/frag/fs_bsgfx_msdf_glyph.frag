@@ -55,7 +55,18 @@ layout(set = BSMOD_SET_MSDF_INDEX, binding = BSMOD_BINDING_MSDF_INDEX) uniform s
 #define point_at(i) vec2(texelFetch(point_data, 2 * int(i)).r, \
                          texelFetch(point_data, 2 * int(i) + 1).r)
 
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec4 in_color;
+layout(location = 2) in vec3 in_normal;
+layout(location = 3) in vec3 in_world_position;
+layout(location = 4) in vec3 in_texture;
+layout(location = 5) flat in uint in_instance;
+layout(location = 6) flat in uint in_flags;
+layout(location = 7) flat in uint in_material;
+layout(location = 8) in float in_depth;
+
 layout(push_constant) uniform constants {
+    mat4 transform;
     vec2 offset;
     vec2 translate;
     vec2 scale;
@@ -226,9 +237,8 @@ void main() {
     vec3 d = get_pixel_distance(p);
 
     color = vec4(d / range + 0.5, 1.0);
-
     // For testing
-    // color = median(color.rgb) > 0.5 ? vec4(1.0, 1.0, 1.0, 1.0) : vec4(0.0, 0.0, 0.0, 1.0);
+   // color = median(color.rgb) > 0.5 ? vec4(1.0, 1.0, 1.0, 1.0) : vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 void merge_segment(int s, int other) {

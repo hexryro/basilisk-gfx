@@ -34,6 +34,12 @@
 #include <freetype/ftimage.h>
 #include <freetype/ftoutln.h>
 
+#include <windows.h>
+
+#ifdef RENDERDOC_PATH
+#include RENDERDOC_PATH
+#endif
+
 typedef struct msdfgl_index_entry {
     float offset_x;
     float offset_y;
@@ -214,7 +220,7 @@ int msdfgl_serialize_glyph(FT_Face face, bs_U32 codepoint, char* meta_buffer, fl
     if (glyph_id == 0)
         return -1;
 
-    if (FT_Load_Glyph(face, glyph_id, FT_LOAD_DEFAULT))
+    if (FT_Load_Glyph(face, glyph_id, FT_LOAD_NO_SCALE))
         return -1;
 
     FT_Outline_Funcs fns;
@@ -442,7 +448,18 @@ int msdfgl_glyph_buffer_size(FT_Face face, int code, size_t* meta_size,
     return 0;
 }
 
-static void _bsmod_renderGlyphAtlas() {
+typedef struct {
+    bs_mat4 camera;
+    bs_vec2 offset;
+    bs_vec2 translate;
+    bs_vec2 scale;
+    float range;
+    int meta_offset;
+    int point_offset;
+    float glyph_height;
+} bsmod_MSDFPushConstant;
+
+static void _bsmod_renderGlyphAtlas(bsmod_MSDFPushConstant push_const) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -463,28 +480,24 @@ static void _bsmod_renderGlyphAtlas() {
     };
 
     if (bs_pipeline(&scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
-        const int width = 74;
+        const int width = 1024;
+        const int height = 1024;
 
-        const bs_ivec2 render_size = { width, width };
-        const bs_ivec2 output_size = { width, width };
+        const bs_ivec2 render_size = { width, height };
+        const bs_ivec2 output_size = { width, height };
 
         bs_mat4 proj, view, camera;
         bs_orthographic(0, render_size.x, 0, render_size.y, -500.0, 500.0, &proj);
         bs_lookAt(&BS_V3(0, 0, 1), &BS_V3(0, 0, 0), &BS_V3(0, 1, 0), &view);
 
         bs_m4Mul(&proj, &view, &camera);
-
-        struct {
-            bs_mat4 camera;
-        } push_const = {
-            .camera = camera,
-        };
+        push_const.camera = camera;
 
         _bsmod_beginRasterize(render_size, output_size);
 
         int subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI];
 
-        bs_mat4x3 matrix = bsgfx_matrix(BS_V3(0, 0, 0), BS_V3(width, width, 0));
+        bs_mat4x3 matrix = bsgfx_matrix(BS_V3(0, 0, 0), BS_V3(width, height, 0));
         int instance = bsgfx_instanceQuad(
             subtype,
             matrix,
@@ -500,6 +513,12 @@ static void _bsmod_renderGlyphAtlas() {
 
 bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t end);
 void _bsmod_generateGlyphsMSDF() {
+
+#ifdef RENDERDOC_PATH
+    if (_bsmod_.renderdoc_device)
+        _bsmod_.renderdoc_api->StartFrameCapture(_bsmod_.renderdoc_device, NULL);
+#endif
+
     bs_Object* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION);
     bs_Object* renderer = bs_fetch(BSMOD_RENDERERS, BSMOD_RENDERER_MSDF);
     bs_Object* msdf_glyphs = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS);
@@ -525,12 +544,20 @@ void _bsmod_generateGlyphsMSDF() {
 
     if (bs_resetQueue(queue->queue) == BS_RESULT_OK) {
         _msdfgl_generate_glyphs_internal(face, 65, 66);
-
-        _bsmod_renderGlyphAtlas();
         bs_pushQueue(queue->queue, 0, NULL);
     }
 
-    //_bsmod_pollRasterizer();
+#ifdef RENDERDOC_PATH
+    if (_bsmod_.renderdoc_device) {
+        bs_U32 result = _bsmod_.renderdoc_api->EndFrameCapture(_bsmod_.renderdoc_api, NULL);
+
+        if (result != 1)
+            BS_WARN("EndFrameCapture returned %d", result);
+    }
+#endif
+
+    bs_stallQueue(queue->queue);
+    _bsmod_pollRasterizer();
 }
 
 BSMODAPI void _bsmod_rasterizeGlyphAtlas() {
@@ -555,32 +582,33 @@ void _bsmod_loadMsdfResources() {
 
     if (result == BS_RESULT_OK) {
         bs_ivec2 resolution = bs_resolution();
-         
-        //bs_Object* depth = BS_IMAGE(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH_3D, 0);
-        //bs_image(depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_DST_BIT);
 
-        bs_Object* color = BS_IMAGE(BSMOD_IMAGES, BSMOD_IMAGE_COLOR, 0);
+        bs_Object* color = BS_IMAGE(-1, 0, 0);
+        bs_Object* depth = BS_IMAGE(-1, 0, 0);
 
         bs_image(color, resolution, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
+        bs_image(depth, resolution, 0, BS_FORMAT_D32_SFLOAT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
         bs_output(renderer->renderer, (bs_Output) {
             .subpass = 0,
-            .image = bs_context()->swapchain_image->image,
-            .load_op = BS_ATTACHMENT_LOAD_OP_LOAD,
-            .store_op = BS_ATTACHMENT_STORE_OP_STORE,
-            .old_layout = BS_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            .new_layout = BS_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+            .image = color->image,
+            .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
+            .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .flags = 0
         });
 
-        bs_dependency(renderer->renderer, -1, 0, BS_DEPENDENCY_BY_REGION_BIT,
-            BS_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-            BS_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | BS_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-            BS_ACCESS_MEMORY_READ_BIT,
-            BS_ACCESS_COLOR_ATTACHMENT_READ_BIT | BS_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | BS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
-
-      //  bs_renderPass(renderer->renderer);
-        bs_framebuffer(renderer->renderer, resolution);
+        bs_output(renderer->renderer, (bs_Output) {
+            .subpass = 0,
+            .image = depth->image,
+            .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
+            .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .flags = 0
+        });
     }
+}
+
+static inline int _msdfgl_is_control(int32_t code) {
+    return (code <= 31) || (code >= 128 && code <= 159);
 }
 
 bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t end) {
@@ -592,24 +620,16 @@ bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t 
     if (nrender <= 0)
         return -1;
 
-    //if (!atlas->nglyphs && range && !start) {
-    //    /* We can generate an optimized lookup for the atlas index. */
-    //    font->_direct_lookup_upper_limit = end;
-    //}
+    const float font_scale = 4;
+    const float font_range = 2;
+
     size_t* meta_sizes = NULL, * point_sizes = NULL;
     msdfgl_index_entry* atlas_index = NULL;
 
-    /* We will start with a square texture. */
-    //int new_texture_height = atlas->texture_height ? atlas->texture_height : 1;
-    //int new_index_size = atlas->nallocated ? atlas->nallocated : 1;
-
-    /* Calculate the amount of memory needed on the GPU.*/
     meta_sizes = bs_alloca(nrender * sizeof(size_t));
     point_sizes = bs_alloca(nrender * sizeof(size_t));
 
-    /* Amount of new memory needed for the index. */
-    //size_t index_size = nrender * sizeof(msdfgl_index_entry);
-    //atlas_index = bs_calloc(1, index_size);
+    atlas_index = bs_alloca(nrender * sizeof(msdfgl_index_entry));
 
     size_t meta_size_sum = 0, point_size_sum = 0;
     for (size_t i = 0; (int)i < (int)nrender; i++) {
@@ -619,10 +639,6 @@ bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t 
         meta_size_sum += meta_sizes[i];
         point_size_sum += point_sizes[i];
     }
-
-    /* Allocate the calculated amount. */
-    //point_data = bs_calloc(point_size_sum, 1);
-    //metadata = bs_calloc(meta_size_sum, 1);
 
     bs_Object* point_data_object = BS_BUFFER(-1, -1, 0);
     bs_Object* metadata_object = BS_BUFFER(-1, -1, 0);
@@ -636,19 +652,19 @@ bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t 
 
     bs_buffer(
         metadata_object,
-        point_size_sum,
+        meta_size_sum,
         BS_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT,
         BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         0);
 
-    bs_bufferView(point_data_object->buffer, BS_FORMAT_R8_UINT, 0, BS_U64_MAX);
-    bs_bufferView(metadata_object->buffer, BS_FORMAT_R8G8B8A8_UNORM, 0, BS_U64_MAX);
+    bs_bufferView(point_data_object->buffer, BS_FORMAT_R32_SFLOAT, 0, BS_U64_MAX);
+    bs_bufferView(metadata_object->buffer, BS_FORMAT_R8_UINT, 0, BS_U64_MAX);
 
     bs_mapBuffer(point_data_object->buffer, BS_U32_MAX);
     bs_mapBuffer(metadata_object->buffer, BS_U32_MAX);
 
-    bs_bindBuffer(BSMOD_SET_MSDF_BITMAP, BSMOD_BINDING_MSDF_BITMAP, point_data_object->buffer);
-    bs_bindBuffer(BSMOD_SET_MSDF_INDEX, BSMOD_BINDING_MSDF_INDEX, metadata_object->buffer);
+    bs_bindBuffer(BSMOD_SET_MSDF_BITMAP, BSMOD_BINDING_MSDF_BITMAP, metadata_object->buffer);
+    bs_bindBuffer(BSMOD_SET_MSDF_INDEX, BSMOD_BINDING_MSDF_INDEX, point_data_object->buffer);
 
     bs_pushBindings();
     bs_pushDescriptors();
@@ -665,264 +681,65 @@ bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t 
         int index = start + (int)i;
         msdfgl_serialize_glyph(face, index, meta_ptr, (float*)point_ptr);
 
-       // msdfgl_map_item_t* m = msdfgl_map_insert(&font->character_index, index);
-       // m->index = atlas->nglyphs + i;
-       // m->advance[0] = (float)font->face->glyph->metrics.horiAdvance;
-       // m->advance[1] = (float)font->face->glyph->metrics.vertAdvance;
+        buffer_width = face->glyph->metrics.width / SERIALIZER_SCALE + font_range;
+        buffer_height = face->glyph->metrics.height / SERIALIZER_SCALE + font_range;
+        buffer_width *= font_scale;
+        buffer_height *= font_scale;
 
-        // If we are generating a range starting from 0, we reuse the NULL
-        // character bitmap for all control characters.
-        //if (range && start == 0 && index != 0 && _msdfgl_is_control(index)) {
-        //    atlas_index[i] = atlas_index[0];
-        //    while ((int)(atlas->nglyphs + i) > new_index_size)
-        //        new_index_size *= 2;
-        //    continue;
-        //}
+        atlas_index[i].offset_x = 0;
+        atlas_index[i].offset_y = 0;
+        atlas_index[i].size_x = buffer_width;
+        atlas_index[i].size_y = buffer_height;
+        atlas_index[i].bearing_x = (float)face->glyph->metrics.horiBearingX;
+        atlas_index[i].bearing_y = (float)face->glyph->metrics.horiBearingY;
+        atlas_index[i].glyph_width = (float)face->glyph->metrics.width;
+        atlas_index[i].glyph_height = (float)face->glyph->metrics.height;
 
-//        buffer_width = face->glyph->metrics.width / SERIALIZER_SCALE + font->range;
-//        buffer_height = face->glyph->metrics.height / SERIALIZER_SCALE + font->range;
-//        buffer_width *= font->scale;
-//        buffer_height *= font->scale;
-//
         meta_ptr += meta_sizes[i];
         point_ptr += point_sizes[i];
-
-//        if (atlas->offset_x + buffer_width > atlas->texture_width) {
-//            atlas->offset_y += (atlas->y_increment + atlas->padding);
-//            atlas->offset_x = 1;
-//            atlas->y_increment = 0;
-//        }
-//        atlas->y_increment = (size_t)buffer_height > atlas->y_increment
-//            ? (size_t)buffer_height
-//            : atlas->y_increment;
-
-        //atlas_index[i].offset_x = (GLfloat)atlas->offset_x;
-        //atlas_index[i].offset_y = (GLfloat)atlas->offset_y;
-        //atlas_index[i].size_x = buffer_width;
-        //atlas_index[i].size_y = buffer_height;
-        //atlas_index[i].bearing_x = (GLfloat)font->face->glyph->metrics.horiBearingX;
-        //atlas_index[i].bearing_y = (GLfloat)font->face->glyph->metrics.horiBearingY;
-        //atlas_index[i].glyph_width = (GLfloat)font->face->glyph->metrics.width;
-        //atlas_index[i].glyph_height = (GLfloat)font->face->glyph->metrics.height;
-
-//        atlas->offset_x += (size_t)buffer_width + atlas->padding;
-
-        //while ((atlas->offset_y + buffer_height) > new_texture_height) {
-        //    new_texture_height *= 2;
-        //}
-        //if (new_texture_height > font->context->_max_texture_size) {
-        //    goto error;
-        //}
-        //while ((int)(atlas->nglyphs + i) >= new_index_size) {
-        //    new_index_size *= 2;
-        //}
     }
 
-    /* Allocate and fill the buffers on GPU. */
-    /*
-    glBindBuffer(GL_ARRAY_BUFFER, font->_meta_input_buffer);
-    glBufferData(GL_ARRAY_BUFFER, meta_size_sum, metadata, GL_DYNAMIC_READ);
+    const int atlas_width = 1024, atlas_height = 1024;
 
-    glBindBuffer(GL_ARRAY_BUFFER, font->_point_input_buffer);
-    glBufferData(GL_ARRAY_BUFFER, point_size_sum, point_data, GL_DYNAMIC_READ);
+    bs_mat4 framebuffer_projection;
+    bs_mat4 atlas_projection;
 
-    if ((int)atlas->nallocated == new_index_size) {
-        glBindBuffer(GL_ARRAY_BUFFER, atlas->index_buffer);
-    }
-    else {
-        GLuint new_buffer;
-        glGenBuffers(1, &new_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, new_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(msdfgl_index_entry) * new_index_size, 0,
-            GL_DYNAMIC_READ);
-        if (glGetError() == GL_OUT_OF_MEMORY) {
-            glDeleteBuffers(1, &new_buffer);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            goto error;
-        }
-        if (atlas->nglyphs) {
-            glBindBuffer(GL_COPY_READ_BUFFER, atlas->index_buffer);
-            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_ARRAY_BUFFER, 0, 0,
-                atlas->nglyphs * sizeof(msdfgl_index_entry));
-            glBindBuffer(GL_COPY_READ_BUFFER, 0);
-        }
-        atlas->nallocated = new_index_size;
-        glDeleteBuffers(1, &atlas->index_buffer);
-        atlas->index_buffer = new_buffer;
-    }
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(msdfgl_index_entry) * atlas->nglyphs,
-        index_size, atlas_index);
+    bs_orthographic(0, atlas_width, 0, atlas_height, -1.0, 1.0, &framebuffer_projection);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    */
+    bs_orthographic(-atlas_width, atlas_width, -atlas_height, atlas_height, -1.0, 1.0, &atlas_projection);
 
-    /* Link sampler textures to the buffers. */
-    /*
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_BUFFER, font->_meta_input_texture);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_R8UI, font->_meta_input_buffer);
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_BUFFER, font->_point_input_texture);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, font->_point_input_buffer);
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_BUFFER, atlas->index_texture);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, atlas->index_buffer);
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    */
-
-    /* Generate the atlas texture and bind it as the framebuffer. */
-    /*
-    if (atlas->texture_height == new_texture_height) {
-        // No need to extend the texture.
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, atlas->atlas_framebuffer);
-        glBindTexture(GL_TEXTURE_2D, atlas->atlas_texture);
-        glViewport(0, 0, atlas->texture_width, atlas->texture_height);
-    }
-    else {
-        GLuint new_texture;
-        GLuint new_framebuffer;
-        glGenTextures(1, &new_texture);
-        glGenFramebuffers(1, &new_framebuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, new_framebuffer);
-
-        glBindTexture(GL_TEXTURE_2D, new_texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, atlas->texture_width,
-            new_texture_height, 0, GL_RGBA, GL_FLOAT, NULL);
-
-        if (glGetError() == GL_OUT_OF_MEMORY) {
-            // Buffer size too big, are you trying to type Klingon?
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glDeleteFramebuffers(1, &new_framebuffer);
-            glDeleteTextures(1, &new_texture);
-            goto error;
-        }
-
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-            new_texture, 0);
-        glViewport(0, 0, atlas->texture_width, new_texture_height);
-        glClearColor(0.0, 0.0, 0.0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        if (atlas->texture_height) {
-            // Old texture had data -> copy.
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, atlas->atlas_framebuffer);
-            glBlitFramebuffer(0, 0, atlas->texture_width, atlas->texture_height, 0, 0,
-                atlas->texture_width, atlas->texture_height,
-                GL_COLOR_BUFFER_BIT, GL_NEAREST);
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-        }
-
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-        atlas->texture_height = new_texture_height;
-        glDeleteTextures(1, &atlas->atlas_texture);
-        atlas->atlas_texture = new_texture;
-        glDeleteFramebuffers(1, &atlas->atlas_framebuffer);
-        atlas->atlas_framebuffer = new_framebuffer;
-    }
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    GLfloat framebuffer_projection[4][4];
-    _msdfgl_ortho(0, (GLfloat)atlas->texture_width, 0, (GLfloat)atlas->texture_height,
-        -1.0, 1.0, framebuffer_projection);
-    _msdfgl_ortho(-(GLfloat)atlas->texture_width, (GLfloat)atlas->texture_width,
-        -(GLfloat)atlas->texture_height, (GLfloat)atlas->texture_height, -1.0,
-        1.0, atlas->projection);
-
-    glUseProgram(ctx->gen_shader);
-    glUniform1i(ctx->metadata_uniform, 0);
-    glUniform1i(ctx->point_data_uniform, 1);
-
-    glUniformMatrix4fv(ctx->_atlas_projection_uniform, 1, GL_FALSE,
-        (GLfloat*)framebuffer_projection);
-
-    glUniform2f(ctx->_scale_uniform, font->scale, font->scale);
-    glUniform1f(ctx->_range_uniform, font->range);
-    glUniform1i(ctx->_meta_offset_uniform, 0);
-    glUniform1i(ctx->_point_offset_uniform, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        fprintf(stderr, "msdfgl: framebuffer incomplete: %x\n",
-            glCheckFramebufferStatus(GL_FRAMEBUFFER));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_BUFFER, font->_meta_input_texture);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_BUFFER, font->_point_input_texture);
-
-    glBindVertexArray(ctx->bbox_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, ctx->bbox_vbo);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-    glEnableVertexAttribArray(0);
+    bsmod_MSDFPushConstant push_const = {
+        .scale = { font_scale, font_scale},
+        .range = font_range,
+        .meta_offset = 0,
+        .point_offset = 0,
+    };
 
     int meta_offset = 0;
     int point_offset = 0;
     for (int i = 0; i < nrender; ++i) {
-        if (range && start == 0 && i != 0 && _msdfgl_is_control(i))
+        if (end && start == 0 && i != 0 && _msdfgl_is_control(i))
             continue;
 
         msdfgl_index_entry g = atlas_index[i];
-        float w = g.size_x;
-        float h = g.size_y;
-        GLfloat bounding_box[] = { 0, 0, w, 0, 0, h, 0, h, w, 0, w, h };
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(bounding_box), bounding_box);
 
-        glUniform2f(
-            ctx->_translate_uniform, -g.bearing_x / SERIALIZER_SCALE + font->range / 2.0f,
-            (g.glyph_height - g.bearing_y) / SERIALIZER_SCALE + font->range / 2.0f);
+        push_const.translate = BS_V2(
+            -g.bearing_x / SERIALIZER_SCALE + font_range / 2.0f,
+            (g.glyph_height - g.bearing_y) / SERIALIZER_SCALE + font_range / 2.0f
+        );
+        push_const.glyph_height = g.size_y;
 
-        glUniform2f(ctx->_texture_offset_uniform, g.offset_x, g.offset_y);
-        glUniform1i(ctx->_meta_offset_uniform, meta_offset);
-        glUniform1i(ctx->_point_offset_uniform, point_offset / (2 * sizeof(GLfloat)));
-        glUniform1f(ctx->_glyph_height_uniform, g.size_y);
+        push_const.meta_offset = meta_offset;
+        push_const.point_offset = point_offset / (2 * sizeof(float));
 
-        // No need for draw call if there are no contours
         if (((unsigned char*)metadata)[meta_offset])
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            _bsmod_renderGlyphAtlas(push_const);
 
         meta_offset += meta_sizes[i];
         point_offset += point_sizes[i];
     }
 
-    glDisableVertexAttribArray(0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-    glUseProgram(0);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    atlas->nglyphs += nrender;
     retval = nrender;
-
-error:
-    if (meta_sizes)
-        free(meta_sizes);
-    if (point_sizes)
-        free(point_sizes);
-    if (atlas_index)
-        free(atlas_index);
-    if (point_data)
-        free(point_data);
-    if (metadata)
-        free(metadata);
-
-    glViewport(original_viewport[0], original_viewport[1], original_viewport[2], original_viewport[3]);
-    */
 
     return BS_RESULT_OK;
 }

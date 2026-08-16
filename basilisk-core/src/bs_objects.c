@@ -460,6 +460,8 @@ BSAPI const char* _val_bs_idName(bs_U32 source_id, bs_U32 id) {
 }
 
 BSAPI const char* _bs_idName(bs_U32 source_id, bs_U32 id) {
+    if (source_id == BS_U32_MAX)
+        return "";
     bs_ObjectSource* source = _bs_fetchObjectSource(source_id);
     return source->ids[id].name;
 }
@@ -528,6 +530,7 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
     if (source_id == BS_U32_MAX) {
         result = _bs_allocateObject(size, flexible_array_size, flexible_count, flags);
         result->head->type = object_type;
+        result->head->source_id = source_id;
         return result;
     }
 
