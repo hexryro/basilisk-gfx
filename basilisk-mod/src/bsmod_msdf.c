@@ -468,7 +468,7 @@ static void _bsmod_renderGlyphAtlas(bsmod_MSDFPushConstant push_const) {
     bs_Batch* msdf_glyphs = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS)->batch;
 
     hash = bsgfx_defaultPipelineHash();
-    hash.shaders[0] = $vs_bsgfx_quad_instanced();
+    hash.shaders[0] = $vs_bsmod_tracker_quad_instanced();
     hash.shaders[1] = $fs_bsgfx_msdf_glyph();
 
     //hash.shaders[0] = $vs_bsgfx_msdf_glyph();
@@ -495,7 +495,7 @@ static void _bsmod_renderGlyphAtlas(bsmod_MSDFPushConstant push_const) {
 
         _bsmod_beginRasterize(render_size, output_size);
 
-        int subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI];
+        int subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_TRACKER_QUAD_MSDF];
 
         bs_mat4x3 matrix = bsgfx_matrix(BS_V3(0, 0, 0), BS_V3(width, height, 0));
         int instance = bsgfx_instanceQuad(
@@ -515,8 +515,10 @@ bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t 
 void _bsmod_generateGlyphsMSDF() {
 
 #ifdef RENDERDOC_PATH
-    if (_bsmod_.renderdoc_device)
+    if (_bsmod_.renderdoc_device) {
+        bs_logF("Starting frame capture");
         _bsmod_.renderdoc_api->StartFrameCapture(_bsmod_.renderdoc_device, NULL);
+    }
 #endif
 
     bs_Object* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION);
@@ -549,6 +551,8 @@ void _bsmod_generateGlyphsMSDF() {
 
 #ifdef RENDERDOC_PATH
     if (_bsmod_.renderdoc_device) {
+        bs_logF("Ending frame capture");
+
         bs_U32 result = _bsmod_.renderdoc_api->EndFrameCapture(_bsmod_.renderdoc_api, NULL);
 
         if (result != 1)
@@ -562,49 +566,6 @@ void _bsmod_generateGlyphsMSDF() {
 
 BSMODAPI void _bsmod_rasterizeGlyphAtlas() {
 
-}
-
-void _bsmod_loadMsdfResources() {
-    bs_Result result;
-
-    bs_Object* queue = BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_MSDF, 0);
-    bs_Object* renderer = BS_RENDERER(BSMOD_RENDERERS, BSMOD_RENDERER_MSDF, 0);
-    bs_Object* msdf_glyphs = BS_BATCH(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS, 0);
-
-    bs_batch(msdf_glyphs, sizeof(int), $vs_bsgfx_msdf_glyph(), 0);
-
-    result = bs_queue(queue, BS_QUEUE_GRAPHICS_BIT);
-    if (result != BS_RESULT_OK) {
-        return;
-    }
-
-    result = bs_renderer(renderer, 0);
-
-    if (result == BS_RESULT_OK) {
-        bs_ivec2 resolution = bs_resolution();
-
-        bs_Object* color = BS_IMAGE(-1, 0, 0);
-        bs_Object* depth = BS_IMAGE(-1, 0, 0);
-
-        bs_image(color, resolution, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
-        bs_image(depth, resolution, 0, BS_FORMAT_D32_SFLOAT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
-
-        bs_output(renderer->renderer, (bs_Output) {
-            .subpass = 0,
-            .image = color->image,
-            .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
-            .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            .flags = 0
-        });
-
-        bs_output(renderer->renderer, (bs_Output) {
-            .subpass = 0,
-            .image = depth->image,
-            .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
-            .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            .flags = 0
-        });
-    }
 }
 
 static inline int _msdfgl_is_control(int32_t code) {

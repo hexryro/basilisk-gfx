@@ -35,15 +35,7 @@ void _bsgfx_allocateMaterials();
 static void _bsgfx_loadResources() {
     bs_Result result;
 
-    bs_Object* queue_obj = BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES, 0);
-    bs_Queue* queue = queue_obj->queue;
-    bs_queue(queue_obj, BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_SINGLE_TIMES_BIT);
-
-    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_GRAPHICS_BIT);
-    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_COMPUTE, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_COMPUTE_BIT);
-
-    bs_sampler(BS_SAMPLER(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST, 0), BS_FILTER_NEAREST, 0);
-    bs_sampler(BS_SAMPLER(BSGFX_SAMPLERS, BSGFX_SAMPLER_LINEAR, 0), BS_FILTER_LINEAR, 0);
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
 
     bs_Object* jonts_buffer = BS_BUFFER(BSGFX_BUFFERS, BSGFX_BUFFER_JOINTS, false);
     result = bs_buffer(jonts_buffer,
@@ -55,8 +47,6 @@ static void _bsgfx_loadResources() {
     if (result == BS_RESULT_OK && bs_mapBuffer(jonts_buffer->buffer, BS_U32_MAX) == BS_RESULT_OK) {
         bs_bindBuffer(BSGFX_SET_JOINTS, BSGFX_BINDING_JOINTS, jonts_buffer->buffer);
     }
-
-    _bsgfx_iniInstances();
     
     // batches
     bs_Object* screen_batch = BS_BATCH(BSGFX_BATCHES, BSGFX_BATCH_SCREEN, 0);

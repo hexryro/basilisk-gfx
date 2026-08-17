@@ -42,6 +42,8 @@ struct bs_List _bs_pipelines_[BS_PIPELINE_TYPE_COUNT] = {0};
    * Descriptors
    *============================================================================*/
 
+static void _bs_prepareDescriptorTemplate(bs_BindSet* bind_set);
+
 static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
     VkResult result;
 
@@ -57,12 +59,15 @@ static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
             _bs_warnF("Failed to push descriptor layouts for binding (%d, %d), binding has no shader stages", bind_set->slot, binding->slot);
             continue;
         }
+
+        printf("%d: %d, %d\n", i, bind_set->slot, binding->slot);
         
         layout_binding->binding = binding->slot;
         layout_binding->descriptorCount = binding->descriptors_count; // == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE) ? _bs_num_objects.images : 1;
         layout_binding->descriptorType = (VkDescriptorType)binding->type;
         layout_binding->stageFlags = binding->stages;
     }
+    printf("\n");
 
     VkDescriptorSetLayoutCreateInfo layout_i = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -182,6 +187,8 @@ static void _bs_pushDescriptorPools() {
 
         bind_set->vk_layout = _bs_pushDescriptorLayout(bind_set);
         bind_set->vk_set    = _bs_pushDescriptorSet(bind_set, bind_set->vk_layout, descriptor_pool);
+
+        _bs_prepareDescriptorTemplate(bind_set);
     }
 
     bs_logN(BS_CONSTANT_STRING("Pushed descriptor pools"));
@@ -196,7 +203,7 @@ BSAPI void _val_bs_pushDescriptors() {
         if (!bind_set->needs_update)
             continue;
 
-        BS_VALIDATE(bind_set->vk_update_template != NULL,,);
+       // BS_VALIDATE(bind_set->vk_update_template != NULL,,);
     }
 
     _bs_pushDescriptors();
@@ -207,6 +214,9 @@ BSAPI void _bs_pushDescriptors() {
         bs_BindSet* bind_set = _bs_instance_->bind_sets + i;
 
         if (!bind_set->needs_update)
+            continue;
+
+        if (!bind_set->vk_update_template)
             continue;
 
         bind_set->needs_update = false;
@@ -229,15 +239,16 @@ static void _bs_prepareDescriptorTemplate(bs_BindSet* bind_set) {
     VkDescriptorUpdateTemplateEntry entries[BS_MAX_NUM_BINDINGS];
     bs_U32 num_entries = 0;
 
-    if (bind_set->vk_update_template)
+    if (bind_set->vk_update_template) {
         vkDestroyDescriptorUpdateTemplate(_bs_instance_->device, bind_set->vk_update_template, NULL);
+        bind_set->vk_update_template = NULL;
+    }
 
     for (bs_U32 i = 0; i < bind_set->bindings_count; i++) {
         bs_Binding* binding = bind_set->bindings + i;
         bs_U32 stride = sizeof(bs_Descriptor);
 
         if (!binding->in_use) continue;
-        
         entries[num_entries++] = (VkDescriptorUpdateTemplateEntry) {
             .dstBinding = binding->slot,
             .descriptorCount = binding->descriptors_count,
@@ -559,8 +570,6 @@ BSAPI bs_Binding* _bs_queryBinding(const bs_BindSet* bind_set, bs_U32 id) {
 
  /**
   Load bindings
-
-  TODO: Rework this, should not use JSON, write own format instead
   */
 static int _bs_compareBindings(const bs_Binding* a, const bs_Binding* b) {
     if (a->set < b->set) return -1;
@@ -615,13 +624,14 @@ BSAPI void _bs_loadBinding(bs_Binding* binding, int bind_set, int bind_point, in
     binding->type = bs_indexDescriptorType(binding->type_index);
 
     assert(binding->descriptors_count >= 0);
-
-    _bs_instance_->bindings_count++;
 }
 
-static int _bs_loadPackageBindings(bs_Package* package, int package_id) {
-    int descriptors_count = 0;
-    for (int i = 0; i < package->resource_headers_count; i++) {
+static void _bs_loadPackageBindings(bs_Package* package, int package_id) {
+    int start = package->resource_type_offsets[BS_RESOURCE_BINDING].offset;
+    int count = package->resource_type_offsets[BS_RESOURCE_BINDING].num;
+    int end = start + count;
+
+    for (int i = start; i < end; i++) {
         bs_ResourceHeader* resource_header = package->resource_headers + i;
         if (resource_header->type != BS_RESOURCE_BINDING)
             continue;
@@ -644,14 +654,21 @@ static int _bs_loadPackageBindings(bs_Package* package, int package_id) {
         bs_U64 bind_point = _bs_toULong(bind_point_string + 1);
         if (bind_point == BS_U64_MAX) continue;
 
-        bs_Binding* binding = _bs_instance_->bindings + _bs_instance_->bindings_count;
+        bs_Binding* binding = NULL;
+        for (int j = 0; j < _bs_instance_->bindings_count; j++) {
+            if (_bs_instance_->bindings[j].set == bind_set && _bs_instance_->bindings[j].slot == bind_point) {
+                binding = _bs_instance_->bindings + j;
+                break;
+            }
+        }
+
+        if (binding == NULL)
+            binding = _bs_instance_->bindings + _bs_instance_->bindings_count++;
+
         _bs_loadBinding(binding, bind_set, bind_point, package_id, resource_header->name);
 
-        descriptors_count += binding->descriptors_count;
         _bs_instance_->bind_sets_count = BS_MAX(_bs_instance_->bind_sets_count, bind_set + 1);
     }
-
-    return descriptors_count;
 }
 
 BSAPI void _bs_loadBindings() {
@@ -671,38 +688,78 @@ BSAPI void _bs_loadBindings() {
     Allocate memory
     */
     const size_t bind_sets_size = BS_MAX_NUM_BIND_SETS * sizeof(bs_BindSet);
-    const size_t bindings_size = bindings_count * sizeof(bs_Binding);
 
-    if (bindings_size == 0)
+    if (bindings_count == 0)
         return;
 
-    _bs_instance_->bind_sets = _bs_realloc(_bs_instance_->bind_sets, bind_sets_size);
-    _bs_instance_->bindings = _bs_realloc(_bs_instance_->bindings, bindings_size);
-    memset(_bs_instance_->bind_sets, 0, bind_sets_size);
-    memset(_bs_instance_->bindings, 0, bindings_size);
+    int old_bind_sets_count = _bs_instance_->bind_sets_count;
+    int old_bindings_count = _bs_instance_->bindings_count;
+    int old_descriptors_count = _bs_instance_->descriptors_count;
+
+    _bs_instance_->bind_sets_count = 0;
+    _bs_instance_->descriptors_count = 0;
+
+    void* old = _bs_instance_->bind_sets;
+    if (!_bs_instance_->bind_sets) {
+        _bs_instance_->bind_sets = _bs_realloc(_bs_instance_->bind_sets, bind_sets_size);
+        for (int i = 0; i < old_bind_sets_count; i++) {
+            _bs_instance_->bind_sets[i].bindings = NULL;
+            _bs_instance_->bind_sets[i].descriptors = NULL;
+        }
+        memset(_bs_instance_->bind_sets, 0, bind_sets_size);
+    }
+
+    int bindings_capacity = old_bindings_count + bindings_count;
+    if (old_bindings_count < bindings_capacity) {
+        size_t bindings_size = bindings_capacity * sizeof(bs_Binding);
+        size_t old_size = old_bindings_count * sizeof(bs_Binding);
+
+        _bs_instance_->bindings = _bs_realloc(_bs_instance_->bindings, bindings_size);
+        memset(_bs_instance_->bindings + old_bindings_count, 0, bindings_size - old_size);
+    }
+
     _bs_instance_->descriptor_pool_needs_update = true;
 
    /**
     Load bindings
     */
-    int desriptors_count = 0;
     for (int i = 0; i < packages->count; i++) {
         bs_Package* package = _bs_fetchUnit(packages, i);
-        desriptors_count += _bs_loadPackageBindings(package, i);
+        _bs_loadPackageBindings(package, i);
     }
 
-    const size_t descriptors_size = desriptors_count * sizeof(bs_Descriptor);
-    _bs_instance_->descriptors = _bs_realloc(_bs_instance_->descriptors, descriptors_size);
-    memset(_bs_instance_->descriptors, 0, descriptors_size);
+    int descriptors_count = 0;
+    for (int i = 0; i < _bs_instance_->bindings_count; i++)
+        descriptors_count += _bs_instance_->bindings[i].descriptors_count;
+
+    _bs_instance_->descriptors_count = descriptors_count;
+
+    if (old_descriptors_count < descriptors_count) {
+        const size_t descriptors_size = descriptors_count * sizeof(bs_Descriptor);
+        size_t old_size = old_descriptors_count * sizeof(bs_Descriptor);
+
+        _bs_instance_->descriptors = _bs_realloc(_bs_instance_->descriptors, descriptors_size);
+        memset(_bs_instance_->descriptors + old_descriptors_count, 0, descriptors_size - old_size);
+    }
 
    /**
     Sort bindings
     */
     qsort(_bs_instance_->bindings, _bs_instance_->bindings_count, sizeof(bs_Binding), _bs_compareBindings);
 
+    for (int i = 0; i < BS_MAX_NUM_BIND_SETS; i++) {
+        bs_BindSet* bind_set = _bs_instance_->bind_sets + i;
+
+        bind_set->bindings = NULL;
+        bind_set->bindings_count = 0;
+        bind_set->descriptors = NULL;
+        bind_set->descriptors_count = 0;
+        bind_set->max_binding = 0;
+    }
+
     int current_set = -1;
     int descriptor_offset = 0;
-    for (int i = 0; i < bindings_count; i++) {
+    for (int i = 0; i < _bs_instance_->bindings_count; i++) {
         bs_Binding* binding = _bs_instance_->bindings + i;
         bs_BindSet* bind_set = _bs_instance_->bind_sets + binding->set;
 
@@ -711,11 +768,10 @@ BSAPI void _bs_loadBindings() {
         if (binding->set != current_set) {
             current_set = binding->set;
 
-            *bind_set = (bs_BindSet){
-                .slot = current_set,
-                .bindings = binding,
-                .descriptors = _bs_instance_->descriptors + descriptor_offset,
-            };
+            bind_set->needs_update = true;
+            bind_set->slot = current_set;
+            bind_set->bindings = binding;
+            bind_set->descriptors = _bs_instance_->descriptors + descriptor_offset;
         }
 
         _bs_instance_->max_bind_set = BS_MAX(_bs_instance_->max_bind_set, bind_set->slot);
@@ -725,24 +781,6 @@ BSAPI void _bs_loadBindings() {
         bind_set->descriptors_count += binding->descriptors_count;
         descriptor_offset += binding->descriptors_count;
     }
-
-   /**
-    Logging
-    */
-    static bs_String* s;
-    for (int i = 0; i < _bs_instance_->bind_sets_count; i++) {
-        bs_BindSet* bind_set = _bs_instance_->bind_sets + i;
-
-        s = bs_appendStringF(s, "Bind set %d", bind_set->slot);
-
-        for (int j = 0; j < bind_set->bindings_count; j++) {
-            bs_Binding* binding = bind_set->bindings + j;
-            s = bs_appendStringF(s, "    Binding %d", binding->slot);
-
-        }
-    }
-
-    bs_logN(s->value, s->len);
 
    /**
     Create lookup table

@@ -85,7 +85,7 @@ BSGFXAPI bool _bsgfx_validateInstanceType(const char* library_name, int instance
   Create instance type
   */
 BSGFXAPI void _val_bsgfx_instanceType(int instance_type_id, int max_instance_count, int bind_set, int point) {
-	BSGFX_VALIDATE(_poser_->instance_buffers[instance_type_id] != NULL,,);
+	//BSGFX_VALIDATE(_poser_->instance_buffers[instance_type_id] != NULL,,);
 	BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA),,);
 
 	bs_BindSet* bind_set_query = bs_queryBindSet(bind_set);

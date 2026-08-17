@@ -2,6 +2,7 @@
 #extension GL_ARB_shading_language_include : require
 
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
+#define BSGFX_QUAD_INSTANCES
 #include "project/basilisk-gfx/shaders/bsgfx_quad.glsl"
 #include "project/basilisk-gfx/shaders/bsgfx_material.glsl"
 

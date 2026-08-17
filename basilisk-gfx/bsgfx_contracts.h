@@ -83,7 +83,11 @@
 	#define BSGFX_INSTANCE_TYPE_POINT					3
 	#define BSGFX_INSTANCE_TYPE_QUAD					4
 	#define BSGFX_INSTANCE_TYPE_MESH_STATIC				5
-	#define BSGFX_INSTANCE_TYPE_COUNT					6 // MAKE SURE TO INCREMENT
+     /**
+	  Used to instance quads from the tracker thread
+      */
+	#define BSMOD_INSTANCE_TYPE_TRACKER_QUAD			6
+	#define BSGFX_INSTANCE_TYPE_COUNT					7 // MAKE SURE TO INCREMENT
 
    /**
     Index output flags
@@ -101,8 +105,6 @@
 	#define BSGFX_ID_SHADER_RESERVED_0					(1 << (BSGFX_INSTANCE_TYPE_COUNT + 5))
 	#define BSGFX_ID_IS_PREFAB					(1 << (BSGFX_INSTANCE_TYPE_COUNT + 6))
 	#define BSGFX_ID_IN_SHADOW_TEXTURED				(1 << (BSGFX_INSTANCE_TYPE_COUNT + 7))
-	#define BSGFX_ID_X_AXIS							(1 << (BSGFX_INSTANCE_TYPE_COUNT + 8))
-	#define BSGFX_ID_Y_AXIS							(1 << (BSGFX_INSTANCE_TYPE_COUNT + 9))
 
 	#define BSGFX_ID_FONT_IS_SELECTED					BSGFX_ID_SHADER_RESERVED_0
 
@@ -127,6 +129,7 @@
 	#define BSGFX_QUAD_INSTANCE_COUNT					(4096 * 8)
 	#define BSGFX_TEXT_INSTANCE_COUNT					(512)
 	#define BSGFX_MAX_NUM_JOINTS						(1024)
+	#define BSMOD_TRACKER_QUAD_INSTANCE_COUNT		    (4096 * 8)
 
 
 
@@ -135,7 +138,7 @@
 	*============================================================================*/
 
 	struct bsgfx_RayPayload {
-		float hitSky;
+		float hit_sky;
 	};
 
 	struct bsgfx_InstanceTypeMetadata {
@@ -300,6 +303,7 @@
 	#define BSGFX_SET_POINT_INSTANCES					0
 	#define BSGFX_SET_QUAD_LEGACY_INSTANCES				0
 	#define BSGFX_SET_QUAD_INSTANCES					0
+	#define BSMOD_SET_TRACKER_QUAD_INSTANCES			0
 	#define BSGFX_SET_TEXT_INSTANCES					0
 	#define BSGFX_SET_IMAGE_ATLAS_ANY					0
 	#define BSGFX_SET_BUFFER_ATLAS_ANY					0
@@ -343,6 +347,7 @@
 	#define BSGFX_BINDING_FONT_SANS_SERIF				23
 	#define BSAPP_BINDING_MATERIAL_TEXTURES				24
 	#define BSGFX_BINDING_MESH_STATIC_INSTANCES			25
+	#define BSMOD_BINDING_TRACKER_QUAD_INSTANCES		26
 
 	#define BSGFX_MAX_FONTS_COUNT						16 // 16 maxPerStageDescriptorSamplers guaranteed
 

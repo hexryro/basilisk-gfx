@@ -284,17 +284,6 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
         NULL);
     */
 
-    /*
-    if (_bsgfx_procs_.bsmod_onIni)
-        _bsgfx_procs_.bsmod_onIni();
-
-    if (_bsgfx_procs_.bsmod_onTrack && bs_args()->track_changes)
-        _bsgfx_procs_.bsmod_onTrack();
-
-    if (_bsgfx_procs_.bsmod_onLateIni)
-        _bsgfx_procs_.bsmod_onLateIni();
-    */
-
 /*
     bssteam_iniSteam();
     bssteam_iniSteamInput();
@@ -306,13 +295,23 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
 
    // bs_pause();
 
+    bs_loadPackage(&_bsgfx_package_, BSGFX_CONTENT_PATH);
+    _bsgfx_iniInstances();
+
+    bs_Object* queue_obj = BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES, 0);
+    bs_Queue* queue = queue_obj->queue;
+    bs_queue(queue_obj, BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_SINGLE_TIMES_BIT);
+
+    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_GRAPHICS_BIT);
+    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_COMPUTE, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_COMPUTE_BIT);
+
+    bs_sampler(BS_SAMPLER(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST, 0), BS_FILTER_NEAREST, 0);
+    bs_sampler(BS_SAMPLER(BSGFX_SAMPLERS, BSGFX_SAMPLER_LINEAR, 0), BS_FILTER_LINEAR, 0);
+
     if (_bsgfx_callbacks_.ini)
         _bsgfx_callbacks_.ini();
 
-    bs_loadPackage(&_bsgfx_package_, BSGFX_CONTENT_PATH);
     bs_iniAudio();
-
-    bs_loadBindings();
 
     if (_bsgfx_callbacks_.lateIni)
         _bsgfx_callbacks_.lateIni();

@@ -12,7 +12,7 @@ layout(set = BSGFX_SET_LO_RES_0, binding = BSGFX_BINDING_LO_RES_0_POSITION_ATTAC
 
 void main() {
 	vec3 orig = vec3(0.0, 1.0, 0.0), dir = vec3(0.0, -1.0, 0.0);
-	pay.hitSky = 0.0f;
+	pay.hit_sky = 0.0f;
 
 
 

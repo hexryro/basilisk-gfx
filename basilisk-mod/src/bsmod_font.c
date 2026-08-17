@@ -544,9 +544,9 @@ BSMODAPI bs_Result _bsmod_packFont(
 	const char* resource_name,
 	int resource_name_length)
 {
-	//_bsmod_generateGlyphsMSDF();
-	
-	return BS_RESULT_OK;
+
+	if (!bs_exists(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION))
+		return BS_RESULT_OK;
 
 	const int channels_count = 1;
 	const int padding = 0;
@@ -695,6 +695,8 @@ BSMODAPI bs_Result _bsmod_packFont(
 	}
 
 	const int glyphs_count = packer.rects.count;
+
+	_bsmod_generateGlyphsMSDF();
 
    /**
     Read Kernings

@@ -305,6 +305,8 @@ BSAPI bs_Result _bs_loadPackageN(int* out, const char* path, int path_length) {
         return BS_RESULT_CORRUPTED;
     }
 
+    bs_loadBindings();
+
     return BS_RESULT_OK;
 }
 

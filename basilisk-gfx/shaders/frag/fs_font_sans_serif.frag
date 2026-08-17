@@ -3,6 +3,7 @@
 #extension GL_EXT_samplerless_texture_functions : require
 
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
+#define BSGFX_QUAD_INSTANCES
 #include "project/basilisk-gfx/shaders/bsgfx_quad.glsl"
 #include "project/basilisk-gfx/shaders/bsgfx_material.glsl"
 

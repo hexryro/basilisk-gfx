@@ -111,14 +111,14 @@ static void onLog(const bs_LogQueueItem* item) {
 		[BS_LIBRARY_WIN32] = "[WIN32]",
 	};
 
-	const char const* levels[BS_MESSAGE_LEVELS_COUNT] = {
+	static const char* levels[BS_MESSAGE_LEVELS_COUNT] = {
 		[BS_MESSAGE_INFO] = "[INFO]",
 		[BS_MESSAGE_WARNING] = "[WARNING]",
 		[BS_MESSAGE_VALIDATION_ERROR] = "[VALIDATION]",
 	};
 
 #ifdef _DEBUG
-	const char const* levels_color[BS_MESSAGE_LEVELS_COUNT] = {
+	static const char* levels_color[BS_MESSAGE_LEVELS_COUNT] = {
 		[BS_MESSAGE_INFO] = BS_PRINT_COLOR("[INFO]", BS_PRINT_CYAN),
 		[BS_MESSAGE_WARNING] = BS_PRINT_COLOR("[WARNING]", BS_PRINT_YELLOW),
 		[BS_MESSAGE_VALIDATION_ERROR] = BS_PRINT_COLOR("[VALIDATION]", BS_PRINT_RED),

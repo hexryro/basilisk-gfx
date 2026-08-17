@@ -293,7 +293,6 @@ static void _bsmod_runRenderPass() {
 }
 */
 
-void _bsmod_generateGlyphsMSDF();
 BSMODAPI bs_Queue* _bsmod_onQueue() {
     bs_Result result;
 
@@ -315,9 +314,6 @@ BSMODAPI bs_Queue* _bsmod_onQueue() {
 
     if (bs_keyDownOnce(BS_KEY_L))
         _bsmod_queueRasterize(BSMOD_CONTENT_PATH, "prefab_icons", _bsmod_rasterizePrefabIcons);
-
-    if (bs_keyDownOnce(BS_KEY_I))
-        _bsmod_generateGlyphsMSDF();
 
     _bsmod_pollRasterizer();
 

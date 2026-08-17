@@ -43,6 +43,7 @@ BSGFX_CACHE_FS(fs_bsmod_billboard)
 
 BSGFX_CACHE_VS(vs_bsmod_mesh_instanced)
 BSGFX_CACHE_VS(vs_bsmod_billboard)
+BSGFX_CACHE_VS(vs_bsmod_tracker_quad_instanced)
 
 
 

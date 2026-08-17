@@ -10,8 +10,8 @@ file(GLOB TYPE_FILES "src/types/*.*")
 
 file(GLOB UI_FILES "src/ui/*.*")
 
-file(GLOB VS_SHADER_FILES "resources/shaders/vert/*.*")
-file(GLOB FS_SHADER_FILES "resources/shaders/frag/*.*")
+file(GLOB VS_SHADER_FILES "shaders/vert/*.*")
+file(GLOB FS_SHADER_FILES "shaders/frag/*.*")
 
 file(GLOB_RECURSE GENERATE_FILES "generated/*.*")
 file(GLOB_RECURSE HEADER_FILES "include/*.h")

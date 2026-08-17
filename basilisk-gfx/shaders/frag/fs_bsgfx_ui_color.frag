@@ -3,6 +3,7 @@
 #extension GL_EXT_samplerless_texture_functions : require
 
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
+#define BSGFX_QUAD_INSTANCES
 #include "project/basilisk-gfx/shaders/bsgfx_quad.glsl"
 
 layout (location = 0) out vec4 out_color;

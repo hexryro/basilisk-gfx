@@ -362,18 +362,85 @@ static void _bsmod_onLoadVariables() {
 
 }
 
+void _bsmod_loadMsdfResources() {
+    bs_Result result;
+
+    bs_Object* queue = BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_MSDF, 0);
+    bs_Object* renderer = BS_RENDERER(BSMOD_RENDERERS, BSMOD_RENDERER_MSDF, 0);
+    bs_Object* msdf_glyphs = BS_BATCH(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS, 0);
+
+    bs_batch(msdf_glyphs, sizeof(int), $vs_bsmod_tracker_quad_instanced(), 0);
+
+    result = bs_queue(queue, BS_QUEUE_GRAPHICS_BIT);
+    if (result != BS_RESULT_OK) {
+        return;
+    }
+
+    result = bs_renderer(renderer, 0);
+
+    if (result == BS_RESULT_OK) {
+        bs_ivec2 resolution = bs_resolution();
+
+        bs_Object* color = BS_IMAGE(-1, 0, 0);
+        bs_Object* depth = BS_IMAGE(-1, 0, 0);
+
+        bs_image(color, resolution, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
+        bs_image(depth, resolution, 0, BS_FORMAT_D32_SFLOAT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
+
+        bs_output(renderer->renderer, (bs_Output) {
+            .subpass = 0,
+            .image = color->image,
+            .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
+            .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .flags = 0
+        });
+
+        bs_output(renderer->renderer, (bs_Output) {
+            .subpass = 0,
+            .image = depth->image,
+            .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
+            .new_layout = BS_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            .flags = 0
+        });
+    }
+}
+
+static void _bsmod_iniRenderDoc() {
+#ifdef RENDERDOC_PATH
+    _bsmod_.renderdoc_module = GetModuleHandleA("renderdoc.dll");
+
+    if (_bsmod_.renderdoc_module) {
+        pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress(_bsmod_.renderdoc_module, "RENDERDOC_GetAPI");
+        if (RENDERDOC_GetAPI) {
+            int result = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_6_0, (void**)&_bsmod_.renderdoc_api);
+            if (result != 1)
+                BS_WARN("RENDERDOC_GetAPI returned %d", result);
+            else {
+                _bsmod_.renderdoc_device = RENDERDOC_DEVICEPOINTER_FROM_VKINSTANCE(bs_instance()->instance);
+
+                if (_bsmod_.renderdoc_device)
+                    bs_logF("Loaded RenderDoc API");
+                else
+                    bs_logF("Failed to create RenderDoc device");
+            }
+        }
+        else
+            BS_WARN("Failed to query proc address RENDERDOC_GetAPI");
+    }
+#endif
+}
+
 BSMODAPI void _bsmod_onIni() {
     bs_Result result;
+
+    _bsmod_iniRenderDoc();
 
     GetModuleHandleExA(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
         (LPCSTR)(&_bsmod_onIni),
         &_bsmod_.module);
     _bsmod_iniCompiler();
-
-    _bsmod_onTrack();
-    _bsmod_tickTracker();
-
+    
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_IMAGE, BSMOD_IMAGES_COUNT, BSMOD_IMAGE_IDS);
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_SAMPLER, BSMOD_SAMPLERS_COUNT, BSMOD_SAMPLER_IDS);
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_BUFFER, BSMOD_BUFFERS_COUNT, BSMOD_BUFFER_IDS);
@@ -383,10 +450,47 @@ BSMODAPI void _bsmod_onIni() {
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_RAY_TRACER, BSMOD_RAY_TRACERS_COUNT, BSMOD_RAY_TRACER_IDS);
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_ATLAS, BSMOD_ATLASES_COUNT, BSMOD_ATLAS_IDS);
 
+    result = bs_loadPackageN(&_bsmod_.package, BS_CONSTANT_STRING(BSMOD_CONTENT_PATH));
+    bsmod_iniPackage(_bsmod_.package);
+    result = bs_loadPackageN(&_bsmod_.bsgfx_package, BS_CONSTANT_STRING(BSGFX_CONTENT_PATH));
+
+
+
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+
+    bs_Object* quad_instance_batch = BS_BATCH(BSMOD_BATCHES, BSMOD_BATCH_TRACKER_QUAD_INSTANCED, 0);
+    bs_batch(quad_instance_batch, sizeof(bs_U32), $vs_bsgfx_quad_instanced(), 0);
+
+    bs_Quad quad;
+    bs_quad(&(bs_vec3) { 0 }, & (bs_vec2) { 1.0, 1.0 }, & quad);
+
+    if (quad_instance_batch && bs_canPushBatch(quad_instance_batch->batch)) {
+        bsgfx_instanceType(BSMOD_INSTANCE_TYPE_TRACKER_QUAD, BSMOD_TRACKER_QUAD_INSTANCE_COUNT, BSMOD_SET_TRACKER_QUAD_INSTANCES, BSMOD_BINDING_TRACKER_QUAD_INSTANCES);
+
+        bs_Range range = bs_pushQuad(quad_instance_batch->batch, &quad, BS_WHITE);
+
+        _bsmod_subtypes_[BSMOD_SUBTYPE_TRACKER_QUAD_MSDF] = bsgfx_subtype(BSMOD_INSTANCE_TYPE_TRACKER_QUAD, quad_instance_batch->batch, 0, range);
+
+        // if (_bsgfx_procs_.bsmod_onCreateQuadSubtypes)
+        //     _bsgfx_procs_.bsmod_onCreateQuadSubtypes(range);
+
+        bs_pushBatch(queue, quad_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
+    }
+
+
+
+
+
+    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_GRAPHICS_BIT);
+    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION, 0), BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_DONT_SIGNAL);
+
+    _bsmod_loadMsdfResources();
+
+    _bsmod_onTrack();
+    _bsmod_tickTracker();
+
     _bsmod_onLoadVariables();
     _bsmod_loadShaderReferences();
-
-    result = bs_loadPackageN(&_bsmod_.bsgfx_package, BS_CONSTANT_STRING(BSGFX_CONTENT_PATH));
 
 }
 
@@ -396,9 +500,6 @@ BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track
     //_bsmod_savePackage(BSMOD_CONTENT_PATH);
     //_bsmod_savePackage(BSGFX_CONTENT_PATH);
     //_bsmod_savePackage(_bsmod_applicationContentPath());
-
-    result = bs_loadPackageN(&_bsmod_.package, BS_CONSTANT_STRING(BSMOD_CONTENT_PATH));
-    bsmod_iniPackage(_bsmod_.package);
 }
 
 BSMODAPI void _bsmod_onCreateQuadSubtypes(bs_Range range) {
@@ -450,34 +551,10 @@ BSMODAPI void _bsmod_bindAtlases() {
         bs_bindImages(BSMOD_SET_IMAGE_ATLAS_ICONS, BSMOD_BINDING_IMAGE_ATLAS_ICONS, icon_atlases, BSMOD_ATLAS_ICONS_COUNT);
 }
 
-void _bsmod_generateGlyphsMSDF();
 void _bsmod_loadMsdfResources();
-
-static void _bsmod_iniRenderDoc() {
-#ifdef RENDERDOC_PATH
-    _bsmod_.renderdoc_module = GetModuleHandleA("renderdoc.dll");
-
-    if (_bsmod_.renderdoc_module) {
-        pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress(_bsmod_.renderdoc_module, "RENDERDOC_GetAPI");
-        if (RENDERDOC_GetAPI) {
-            int result = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_6_0, (void**)&_bsmod_.renderdoc_api);
-            if (result != 1)
-                BS_WARN("RENDERDOC_GetAPI returned %d", result);
-            else {
-                _bsmod_.renderdoc_device = RENDERDOC_DEVICEPOINTER_FROM_VKINSTANCE(bs_instance()->instance);
-                bs_logF("Loaded renderdoc API");
-            }
-        }
-        else
-            BS_WARN("Failed to query proc address RENDERDOC_GetAPI");
-    }
-#endif
-}
 
 BSMODAPI void _bsmod_onLoad() {
     bs_Result result;
-
-    _bsmod_loadMsdfResources();
 
     bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
 
@@ -493,9 +570,6 @@ BSMODAPI void _bsmod_onLoad() {
     }
 
     //_bsmod_subtypes[BSMOD_SUBTYPE_SPHERE_HIGH_QUALITY] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, BSGFX_BATCH_MESH_INSTANCED, BSGFX_SUBTYPE_HAS_SHADOWS, sphere_high_quality_range);
-
-    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_GRAPHICS_BIT);
-    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION, 0), BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_DONT_SIGNAL);
 
     bs_Object* renderer_object = BS_RENDERER(BSMOD_RENDERERS, BSMOD_RENDERER, BS_OBJECT_HAS_SWAPS_BIT);
     result = bs_renderer(renderer_object, 0);
@@ -591,8 +665,5 @@ BSMODAPI void _bsmod_onLoad() {
 
     _bsmod_bindAtlases();
 
-  //  _bsmod_beginTrackChanges();
-
-    _bsmod_iniRenderDoc();
-    _bsmod_generateGlyphsMSDF();
+    _bsmod_beginTrackChanges();
 }

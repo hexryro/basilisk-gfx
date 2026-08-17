@@ -34,7 +34,7 @@
         return ret;                                                  \
     }
 
-#define BSMOD_IMAGE_IDS(X)									\
+#define BSMOD_IMAGE_IDS(X)                                  \
     X(BSMOD_IMAGE_DEPTH)                                    \
     X(BSMOD_IMAGE_DEPTH_3D)                                 \
     X(BSMOD_IMAGE_COLOR)                                    \
@@ -46,18 +46,19 @@
 #define BSMOD_BUFFER_IDS(X)                                 \
 	X(BSMOD_BUFFERS_COUNT)
 
-#define BSMOD_BATCH_IDS(X)									\
+#define BSMOD_BATCH_IDS(X)                                  \
     X(BSMOD_BATCH_TILE)                                     \
     X(BSMOD_BATCH_MSDF_GLYPHS)                              \
+    X(BSMOD_BATCH_TRACKER_QUAD_INSTANCED)                   \
     X(BSMOD_BATCHES_COUNT)
 
-#define BSMOD_RENDERER_IDS(X)								\
+#define BSMOD_RENDERER_IDS(X)                               \
     X(BSMOD_RENDERER)                                       \
     X(BSMOD_RENDERER_3D)                                    \
     X(BSMOD_RENDERER_MSDF)                                  \
     X(BSMOD_RENDERERS_COUNT)
 
-#define BSMOD_QUEUE_IDS(X)									\
+#define BSMOD_QUEUE_IDS(X)                                  \
     X(BSMOD_QUEUE_GRAPHICS)                                 \
     X(BSMOD_QUEUE_GRAPHICS_RASTERIZATION)                   \
     X(BSMOD_QUEUE_MSDF)                                     \
@@ -107,6 +108,7 @@ typedef enum {
     BSMOD_SUBTYPE_TILE_ICON,
     BSMOD_SUBTYPE_SPHERE_HIGH_QUALITY,
     BSMOD_SUBTYPE_BILLBOARD,
+    BSMOD_SUBTYPE_TRACKER_QUAD_MSDF,
     BSMOD_SUBTYPE_COUNT,
 } bsmod_Subtypes;
 
