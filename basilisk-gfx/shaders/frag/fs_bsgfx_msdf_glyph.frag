@@ -67,7 +67,7 @@ layout(location = 8) in float in_depth;
 
 layout(push_constant) uniform constants {
     mat4 transform;
-    vec2 offset;
+    vec2 size;
     vec2 translate;
     vec2 scale;
     float range;
@@ -131,7 +131,7 @@ bool less(vec2 a, vec2 b) {
 
 
 void main() {
-    vec2 offset = pushConst.offset;
+    vec2 size = pushConst.size;
     vec2 translate = pushConst.translate;
     vec2 scale = pushConst.scale;
     float range = pushConst.range;
@@ -139,7 +139,7 @@ void main() {
     int point_offset = pushConst.point_offset;
     float glyph_height = pushConst.glyph_height;
 
-    vec2 coords = gl_FragCoord.xy - offset;
+    vec2 coords = vec2(in_texture.x, 1.0 - in_texture.y) * vec2(size.x, size.y);
 
     vec2 p = ((coords + 0.49) / scale) - vec2(translate.x, -translate.y);
     p.y  = (glyph_height / scale.y) - p.y;

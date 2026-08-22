@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <threads.h>
 
-#ifdef _WIN32 // lol
+#ifdef _WIN32 
 #include <windows.h>
 #include <DbgHelp.h>
 #endif
@@ -127,12 +127,15 @@ BSAPI void _bs_writeLogger(
     va_list args;
     va_start(args, message);
 
-    _log_queue_[_queue_end_].library = library;
-    _log_queue_[_queue_end_].level = level;
-    _log_queue_[_queue_end_].result = result;
-    _log_queue_[_queue_end_].function = function;
-    _log_queue_[_queue_end_].file = file;
-    _log_queue_[_queue_end_].line = line;
+    _log_queue_[_queue_end_] = (bs_LogQueueItem) {
+        .library = library,
+        .level = level,
+        .result = result,
+        .function = function,
+        .file = file,
+        .line = line,
+        .thread_id = thrd_current()._Tid,
+    };
 
     vsnprintf(
         _log_queue_[_queue_end_].message, 

@@ -1192,6 +1192,7 @@
                 <field><type>bs_Sound*</type><name>sound</name></field>
                 <field><type>bs_Atlas*</type><name>atlas</name></field>
                 <field><type>bs_Image*</type><name>image</name></field>
+                <field><type>struct bsgfx_Font*</type><name>font</name></field>
             </structure>
         </structure>
         <structure name="bs_ResourceHeader">
@@ -1426,7 +1427,7 @@
             <field><type>bs_BufferBits</type><name>flags</name></field>
             <field><type>bs_U32</type><name>bind_set</name></field>
             <field><type>bs_U32</type><name>binding</name></field>
-            <field><type>bs_U32</type><name>num_bytes</name></field>
+            <field><type>size_t</type><name>num_bytes</name></field>
             <field><type>bs_BufferUsageFlags</type><name>usage_flags</name></field>
             <field><type>bs_MemoryPropertyFlags</type><name>memory_flags</name></field>
             <field><type>bs_BufferSwap</type><name>_</name><size></size></field>
@@ -1893,6 +1894,7 @@
 			<field><type>const char*</type><name>function</name></field>
 			<field><type>const char*</type><name>file</name></field>
 			<field><type>int</type><name>line</name></field>
+			<field><type>bs_U32</type><name>thread_id</name></field>
 			<field><type>char</type><name>message</name><size>BS_MAX_LOG_SIZE</size></field>
 		</structure>
     </structures>
@@ -2561,7 +2563,7 @@
 		<function name="bs_buffer">
             <return>bs_Result</return>
             <param><type>bs_Object*</type><name>object</name></param>
-            <param><type>bs_U32</type><name>num_bytes</name></param>
+            <param><type>size_t</type><name>num_bytes</name></param>
             <param><type>bs_BufferUsageFlags</type><name>usage_flags</name></param>
             <param><type>bs_MemoryPropertyFlags</type><name>memory_flags</name></param>
             <param><type>bs_BufferBits</type><name>flags</name></param>
@@ -2838,6 +2840,7 @@
         <function name="bs_queue">
             <return>bs_Result</return>
             <param><type>bs_Object*</type><name>object</name></param>
+            <param><type>bs_U32</type><name>queue_index</name></param>
             <param><type>bs_QueueBits</type><name>flags</name></param>
         </function>
         <function name="bs_destroyQueue">

@@ -46,6 +46,7 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
         &module);
 
     functions.bsgfx_test = (PFN_bsgfx_test)GetProcAddress(module, "_val_bsgfx_test");
+    functions.bsgfx_subtypes = (PFN_bsgfx_subtypes)GetProcAddress(module, "_val_bsgfx_subtypes");
     functions.bsgfx_textDimensions = (PFN_bsgfx_textDimensions)GetProcAddress(module, "_val_bsgfx_textDimensions");
     functions.bsgfx_defaultPipelineHash = (PFN_bsgfx_defaultPipelineHash)GetProcAddress(module, "_val_bsgfx_defaultPipelineHash");
     functions.bsgfx_renderTileIcons = (PFN_bsgfx_renderTileIcons)GetProcAddress(module, "_val_bsgfx_renderTileIcons");
@@ -87,20 +88,14 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
     functions.bsgfx_queueAnimation = (PFN_bsgfx_queueAnimation)GetProcAddress(module, "_val_bsgfx_queueAnimation");
     functions.bsgfx_runAnimator = (PFN_bsgfx_runAnimator)GetProcAddress(module, "_val_bsgfx_runAnimator");
     functions.bsgfx_animator = (PFN_bsgfx_animator)GetProcAddress(module, "_val_bsgfx_animator");
-    functions.bsgfx_subtypeInstances = (PFN_bsgfx_subtypeInstances)GetProcAddress(module, "_val_bsgfx_subtypeInstances");
-    functions.bsgfx_iniInstances = (PFN_bsgfx_iniInstances)GetProcAddress(module, "_val_bsgfx_iniInstances");
+    functions.bsgfx_ensureInstanceCount = (PFN_bsgfx_ensureInstanceCount)GetProcAddress(module, "_val_bsgfx_ensureInstanceCount");
     functions.bsgfx_instanceType = (PFN_bsgfx_instanceType)GetProcAddress(module, "_val_bsgfx_instanceType");
-    functions.bsgfx_subtypeRange = (PFN_bsgfx_subtypeRange)GetProcAddress(module, "_val_bsgfx_subtypeRange");
     functions.bsgfx_deleteSubtype = (PFN_bsgfx_deleteSubtype)GetProcAddress(module, "_val_bsgfx_deleteSubtype");
-    functions.bsgfx_instanceCount = (PFN_bsgfx_instanceCount)GetProcAddress(module, "_val_bsgfx_instanceCount");
-    functions.bsgfx_subtypeCount = (PFN_bsgfx_subtypeCount)GetProcAddress(module, "_val_bsgfx_subtypeCount");
-    functions.bsgfx_subtypes = (PFN_bsgfx_subtypes)GetProcAddress(module, "_val_bsgfx_subtypes");
     functions.bsgfx_subtype = (PFN_bsgfx_subtype)GetProcAddress(module, "_val_bsgfx_subtype");
-    functions.bsgfx_instance = (PFN_bsgfx_instance)GetProcAddress(module, "_val_bsgfx_instance");
-    functions.bsgfx_tickInstances = (PFN_bsgfx_tickInstances)GetProcAddress(module, "_val_bsgfx_tickInstances");
-    functions.bsgfx_subtypeHasFlag = (PFN_bsgfx_subtypeHasFlag)GetProcAddress(module, "_val_bsgfx_subtypeHasFlag");
+    functions.bsgfx_instantiate = (PFN_bsgfx_instantiate)GetProcAddress(module, "_val_bsgfx_instantiate");
+    functions.bsgfx_tickInstanceType = (PFN_bsgfx_tickInstanceType)GetProcAddress(module, "_val_bsgfx_tickInstanceType");
     functions.bsgfx_renderSubtype = (PFN_bsgfx_renderSubtype)GetProcAddress(module, "_val_bsgfx_renderSubtype");
-    functions.bsgfx_resetInstances = (PFN_bsgfx_resetInstances)GetProcAddress(module, "_val_bsgfx_resetInstances");
+    functions.bsgfx_resetInstanceType = (PFN_bsgfx_resetInstanceType)GetProcAddress(module, "_val_bsgfx_resetInstanceType");
     functions.bsgfx_resetSubtype = (PFN_bsgfx_resetSubtype)GetProcAddress(module, "_val_bsgfx_resetSubtype");
     functions.bsgfx_instanceHiResMesh = (PFN_bsgfx_instanceHiResMesh)GetProcAddress(module, "_val_bsgfx_instanceHiResMesh");
     functions.bsgfx_instanceMesh = (PFN_bsgfx_instanceMesh)GetProcAddress(module, "_val_bsgfx_instanceMesh");

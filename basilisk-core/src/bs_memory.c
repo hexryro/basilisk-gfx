@@ -219,10 +219,6 @@ BSAPI void* _bs_realloc(void* p, bs_U64 size) {
     return p;
 }
 
-BSAPI void* _bs_fetchUnit(bs_List* list, bs_U32 offset) {
-    return ((bs_U8*)list->data) + offset * list->unit_size;
-}
-
 
 
   /*==============================================================================
@@ -650,6 +646,10 @@ BSAPI bs_List _bs_list(int unit_size, int increment) {
         .unit_size = unit_size,
         .increment = increment,
     };
+}
+
+BSAPI void* _bs_fetchUnit(bs_List* list, bs_U32 offset) {
+    return ((bs_U8*)list->data) + offset * list->unit_size;
 }
 
 

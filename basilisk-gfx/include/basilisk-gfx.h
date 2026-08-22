@@ -65,7 +65,6 @@ BSGFXAPI extern bsgfx_Procedures _bsgfx_procs_;
 
 #define BSGFX_BUFFER_IDS(X)                                          \
     X(BSGFX_BUFFER_JOINTS)                                           \
-    X(BSGFX_BUFFER_INSTANCE_METADATA)                                \
     X(BSGFX_BUFFER_LO_RES_CURSOR_READS)                              \
     X(BSGFX_BUFFER_LO_RES_SCREENSHOT)                                \
     X(BSGFX_BUFFER_MATERIALS)                                        \
@@ -137,92 +136,54 @@ BSGFXAPI int
 bsgfx_fetchSource(
     bs_ObjectType type);
 
-#define BSGFX_DEPENDENCY_ALWAYS                                      \
-    BSGFX_IMAGE_64,                                                  \
-    BSGFX_IMAGE_256,                                                 \
-    BSGFX_IMAGE_512,                                                 \
-    BSGFX_SAMPLER_LINEAR
+enum {
+    BSGFX_SUBTYPE_BIPYRAMID,
+    BSGFX_SUBTYPE_PRIMITIVE_BOX,
+    BSGFX_SUBTYPE_PRIMITIVE_SPHERE,
+    BSGFX_SUBTYPE_TILE,
+    BSGFX_SUBTYPE_TILE_2,
+    BSGFX_SUBTYPE_64_HI,
+    BSGFX_SUBTYPE_256_HI,
+    BSGFX_SUBTYPE_ATLAS_ICON,
+    BSGFX_SUBTYPE_UI,
+    BSGFX_SUBTYPE_UI_COLOR,
+    BSGFX_SUBTYPE_UI_STENCIL,
+    BSGFX_SUBTYPE_COLOR_PICKER,
+    BSGFX_SUBTYPE_COLOR_PICKER_HUE,
+    BSGFX_SUBTYPE_COLOR_PICKER_ALPHA,
+    BSGFX_SUBTYPE_DITHER,
+    BSGFX_SUBTYPE_CORNER_GRADIENT,
+    BSGFX_SUBTYPE_TILE_ICON,
+    BSGFX_SUBTYPE_QUAD_MATERIAL_TEXTURE,
+    BSGFX_SUBTYPE_PRIMITIVE_HI,
+    BSGFX_SUBTYPE_ATLAS_PREFAB,
+    BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT,
+    BSGFX_SUBTYPE_PLANE_MESH,
+    BSGFX_SUBTYPE_ATLAS,
+    BSGFX_SUBTYPE_CONE_MESH,
+    BSGFX_SUBTYPE_SPHERE_MESH,
+    BSGFX_SUBTYPE_POINT,
+    BSGFX_SUBTYPE_LINE,
+    BSGFX_SUBTYPE_LINE_2D,
+    BSGFX_SUBTYPE_LINE_DEPTHLESS,
+    BSGFX_SUBTYPE_FONT,
 
-#define BSGFX_DEPENDENCY_PLAYER                                      \
-    BSGFX_BATCH_BONE_INSTANCED,                                      \
-    BSGFX_BATCH_MESH_INSTANCED,                                      \
-    BSGFX_BUFFER_JOINTS
+    BSGFX_SUBTYPE_COUNT,
+};
 
-#define BSGFX_DEPENDENCY_TILE                                        \
-    BSGFX_IMAGE_TILE
+enum {
+    BSGFX_INSTANCE_TYPE_2_BONE,
+    BSGFX_INSTANCE_TYPE_2_MESH,
+    BSGFX_INSTANCE_TYPE_2_LINE,
+    BSGFX_INSTANCE_TYPE_2_POINT,
+    BSGFX_INSTANCE_TYPE_2_QUAD,
+    BSGFX_INSTANCE_TYPE_2_MESH_STATIC,
+    BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD,
 
-#define BSGFX_DEPENDENCY_LO_RES                                      \
-    BSGFX_QUEUE_GRAPHICS,                                            \
-    BSGFX_IMAGE_LO_RES_0_DEPTH,                                      \
-    BSGFX_IMAGE_LO_RES_0_COLOR,                                      \
-    BSGFX_IMAGE_LO_RES_0_NORMAL,                                     \
-    BSGFX_IMAGE_LO_RES_0_POSITION,                                   \
-    BSGFX_IMAGE_LO_RES_0_INDEX,                                      \
-    BSGFX_IMAGE_LO_RES_0_FLAGS,                                      \
-    BSGFX_IMAGE_LO_RES_0_VERTEX,                                     \
-    BSGFX_IMAGE_LO_RES_1_COLOR,                                      \
-    BSGFX_RENDERER_LO_RES
+    BSGFX_INSTANCE_TYPE_2_COUNT,
+};
 
-#define BSGFX_DEPENDENCY_SHADOWS                                     \
-    BSGFX_DEPENDENCY_LO_RES,                                         \
-    BSGFX_BUFFER_INSTANCE_METADATA,                                  \
-    BSGFX_BATCH_VOLUME_COMPUTED,                                     \
-    BSGFX_BATCH_PREFAB_SHADOWS,                                      \
-    BSGFX_BATCH_VOLUME_INSTANCED,                                    \
-    BSGFX_BATCH_VOLUME_SCREEN,                                       \
-    BSGFX_QUEUE_COMPUTE
-
-#define BSGFX_DEPENDENCY_HI_RES                                      \
-    BSGFX_RENDERER_HI_RES,                                           \
-    BSGFX_IMAGE_HI_RES_0_DEPTH
-
-#define BSGFX_DEPENDENCY_FOLIAGE                                     \
-    BSGFX_BATCH_FOLIAGE
-
-#define BSGFX_DEPENDENCY_ATLAS                                       \
-    BSGFX_SAMPLER_NEAREST,                                           \
-    BSGFX_IMAGE_ANY
-
-#define BSGFX_DEPENDENCY_INGAME                                      \
-    BSGFX_DEPENDENCY_HI_RES,                                         \
-    BSGFX_DEPENDENCY_LO_RES,                                         \
-    BSGFX_DEPENDENCY_SHADOWS,                                        \
-    BSGFX_DEPENDENCY_ATLAS,                                          \
-    BSGFX_DEPENDENCY_FOLIAGE,                                        \
-    BSGFX_DEPENDENCY_TILE,                                           \
-    BSGFX_DEPENDENCY_PLAYER,                                         \
-    BSGFX_RAY_TRACER_MAIN,                                           \
-    BSGFX_IMAGE_RAYTRACE_TEST,                                       \
-    BSGFX_BATCH_ITEMS,                                               \
-    BSGFX_BUFFER_MATERIALS,                                          \
-    BSGFX_ATLAS_ANY,                                                 \
-    BSGFX_BATCH_MESH_TYPE_VOLUME_COMPUTED,                           \
-    /* images*/                                                      \
-    BSGFX_IMAGE_64,                                                  \
-    BSGFX_IMAGE_256,                                                 \
-    BSGFX_IMAGE_512,                                                 \
-    /* batches */                                                    \
-    BSGFX_BATCH_QUAD_INSTANCED,                                      \
-    BSGFX_BATCH_SCREEN,                                              \
-    BSGFX_BATCH_SPHERE_INSTANCED,                                    \
-    BSGFX_BATCH_PRIMITIVE_TILES,                                     \
-    /* fonts */                                                      \
-    BSGFX_FONT_STANDARD,                                             \
-    BSGFX_FONT_TEMPLE,                                               \
-    BSGFX_FONT_CONSOLAS,                                             \
-    BSGFX_FONT_ARIAL_16,
-
-#define BSGFX_DEPENDENCY_TEXT                                        \
-    BSGFX_BATCH_QUAD_INSTANCED,                                      \
-    BSGFX_BATCH_TEXT_INSTANCED
-
-#define BSGFX_DEPENDENCY_DEBUG                                       \
-    BSGFX_DEPENDENCY_TEXT,                                           \
-    BSGFX_BUFFER_LO_RES_CURSOR_READS,                                \
-    BSGFX_BUFFER_LO_RES_SCREENSHOT,                                  \
-    BSGFX_FONT_SMALL,                                                \
-    BSGFX_BATCH_LINE_INSTANCED,                                      \
-    BSGFX_BATCH_POINT_INSTANCED
-
+BSGFXAPI extern bsgfx_InstanceSubtype* _bsgfx_subtypes_[BSGFX_SUBTYPE_COUNT];
+BSGFXAPI extern bsgfx_InstanceType* _bsgfx_instance_types_[BSGFX_INSTANCE_TYPE_2_COUNT];
 
 #endif

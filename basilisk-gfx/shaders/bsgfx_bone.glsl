@@ -6,7 +6,7 @@
 // - bindings -
 
 layout(set = BSGFX_SET_JOINTS, binding = BSGFX_BINDING_JOINTS) readonly uniform bsgfx_joint_uniform {
-    mat4 bsgfx_joints[BSGFX_MAX_NUM_JOINTS];
+    mat4 bsgfx_joints[1024]; // TODO storage buffer
 };
 
 struct bsgfx_BoneInstance {
@@ -34,7 +34,7 @@ vec4 bsgfx_animatev4(uint bone_index, vec3 pos, ivec4 bid, vec4 wei) {
     uint start_joint = bsgfx_extractBoneOffset(bone_index);
     uint count = bsgfx_extractBoneCount(bone_index);
 
-    if ((start_joint + bsgfx_v4Max(bid)) >= BSGFX_MAX_NUM_JOINTS)
+    if ((start_joint + bsgfx_v4Max(bid)) >= 1024)
         return vec4(0.0);
 
     if ((start_joint + bsgfx_v4Min(bid)) < 0)

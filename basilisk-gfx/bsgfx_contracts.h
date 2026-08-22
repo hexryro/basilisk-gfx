@@ -42,9 +42,6 @@
 	typedef bs_vec3 vec3;
 	typedef bs_vec4 vec4;
 
-	typedef struct bsgfx_InstanceMetadata bsgfx_InstanceMetadata;
-	typedef struct bsgfx_InstanceTypeMetadata bsgfx_InstanceTypeMetadata;
-	typedef struct bsgfx_InstanceSubtypeMetadata bsgfx_InstanceSubtypeMetadata;
 	typedef struct bsgfx_VolumeOffset bsgfx_VolumeOffset;
 	typedef struct bsgfx_MaterialContract bsgfx_MaterialContract;
 
@@ -63,10 +60,6 @@
    * Macros
    *============================================================================*/
 
-	#define BSGFX_MAX_NUM_SUBTYPES 256
-	#define BSGFX_MAX_NUM_TEXTURED_VOLUMES 128
-	#define BSGFX_MAX_MATERIALS_COUNT 512
-
    /**
 	Subtype flags
 	*/
@@ -74,37 +67,17 @@
 	#define BSGFX_SUBTYPE_PRE_COMPUTE_SHADOWS			(1 << 1)
 	#define BSGFX_SUBTYPE_HAS_FINE_SHADOWS				(1 << 3) // dont use with BSGFX_SUBTYPE_HAS_SHADOWS
 
-	/**
-	 Instance types
-	 */
-	#define BSGFX_INSTANCE_TYPE_BONE					0
-	#define BSGFX_INSTANCE_TYPE_MESH					1
-	#define BSGFX_INSTANCE_TYPE_LINE					2
-	#define BSGFX_INSTANCE_TYPE_POINT					3
-	#define BSGFX_INSTANCE_TYPE_QUAD					4
-	#define BSGFX_INSTANCE_TYPE_MESH_STATIC				5
-     /**
-	  Used to instance quads from the tracker thread
-      */
-	#define BSMOD_INSTANCE_TYPE_TRACKER_QUAD			6
-	#define BSGFX_INSTANCE_TYPE_COUNT					7 // MAKE SURE TO INCREMENT
-
    /**
     Index output flags
     */
-	#define BSGFX_ID_INSTANCE_TYPE_BONE				(1 << BSGFX_INSTANCE_TYPE_BONE)
-	#define BSGFX_ID_INSTANCE_TYPE_MESH				(1 << BSGFX_INSTANCE_TYPE_MESH)
-	#define BSGFX_ID_INSTANCE_TYPE_LINE				(1 << BSGFX_INSTANCE_TYPE_LINE)
-	#define BSGFX_ID_INSTANCE_TYPE_POINT				(1 << BSGFX_INSTANCE_TYPE_POINT)
-	#define BSGFX_ID_INSTANCE_TYPE_QUAD				(1 << BSGFX_INSTANCE_TYPE_QUAD)
-	#define BSGFX_ID_SELECTED							(1 << (BSGFX_INSTANCE_TYPE_COUNT + 0))
-	#define BSGFX_ID_IN_SHADOW							(1 << (BSGFX_INSTANCE_TYPE_COUNT + 1))
-	#define BSGFX_ID_IS_WATER							(1 << (BSGFX_INSTANCE_TYPE_COUNT + 2))
-	#define BSGFX_ID_HIGHLIGHT							(1 << (BSGFX_INSTANCE_TYPE_COUNT + 3))
-	#define BSGFX_ID_IS_PRIMITIVE						(1 << (BSGFX_INSTANCE_TYPE_COUNT + 4))
-	#define BSGFX_ID_SHADER_RESERVED_0					(1 << (BSGFX_INSTANCE_TYPE_COUNT + 5))
-	#define BSGFX_ID_IS_PREFAB					(1 << (BSGFX_INSTANCE_TYPE_COUNT + 6))
-	#define BSGFX_ID_IN_SHADOW_TEXTURED				(1 << (BSGFX_INSTANCE_TYPE_COUNT + 7))
+	#define BSGFX_ID_SELECTED							(1 << 0)
+	#define BSGFX_ID_IN_SHADOW							(1 << 1)
+	#define BSGFX_ID_IS_WATER							(1 << 2)
+	#define BSGFX_ID_HIGHLIGHT							(1 << 3)
+	#define BSGFX_ID_IS_PRIMITIVE						(1 << 4)
+	#define BSGFX_ID_SHADER_RESERVED_0					(1 << 5)
+	#define BSGFX_ID_IS_PREFAB							(1 << 6)
+	#define BSGFX_ID_IN_SHADOW_TEXTURED					(1 << 7)
 
 	#define BSGFX_ID_FONT_IS_SELECTED					BSGFX_ID_SHADER_RESERVED_0
 
@@ -112,24 +85,7 @@
 	//#define BSGFX_MESH_HI_RES_SCREEN_KEY 30000
 	//#define BSGFX_PREFAB_LO_RES_SCREEN_KEY 80000
 	//#define BSGFX_PREFAB_PRIMITIVE_LO_RES_SCREEN_KEY 90000
-
-
-   /**
-    Instance buffer sizes
-    */
-	#define BSGFX_MESH_INSTANCE_COUNT					(819)
-	#define BSGFX_MESH_STATIC_INSTANCE_COUNT			(819)
-	#define BSGFX_MESH_2_INSTANCE_COUNT					(819)
-	#define BSGFX_MESH_COLOR_INSTANCE_COUNT				(512)
-	#define BSGFX_TILE_INSTANCE_COUNT					(4096)
-	#define BSGFX_BONE_INSTANCE_COUNT					(128)
-	#define BSGFX_LINE_INSTANCE_COUNT					(512)
-	#define BSGFX_POINT_INSTANCE_COUNT					(512)
-	#define BSGFX_QUAD_LEGACY_INSTANCE_COUNT			(4096 * 2)
-	#define BSGFX_QUAD_INSTANCE_COUNT					(4096 * 8)
-	#define BSGFX_TEXT_INSTANCE_COUNT					(512)
-	#define BSGFX_MAX_NUM_JOINTS						(1024)
-	#define BSMOD_TRACKER_QUAD_INSTANCE_COUNT		    (4096 * 8)
+	#define BSGFX_MAX_MATERIALS_COUNT 1024
 
 
 
@@ -141,28 +97,11 @@
 		float hit_sky;
 	};
 
-	struct bsgfx_InstanceTypeMetadata {
-		int count;
-		int allocated;
-		int subtype_count;
-		int reserved;
-	};
-
-	struct bsgfx_InstanceSubtypeMetadata {
-		int index_offset;
-		int index_count;
-		int instance_offset;
-		int instance_count;
-		int instance_type;
-		int batch_source_id;
-		int batch_id;
-		uint flags;
-	};
-
 	struct bsgfx_VolumeOffset {
 		int texture;
 		int start;
 	};
+	/*
 
 #define BSGFX_VOLUME_VERTEX_SIZE 6
 
@@ -181,10 +120,11 @@
 		bsgfx_InstanceSubtypeMetadata instance_subtypes[BSGFX_MAX_NUM_SUBTYPES];
 		bsgfx_VolumeOffset textured_volumes[BSGFX_MAX_NUM_TEXTURED_VOLUMES];
 	};
+	*/
 
 	struct bsgfx_InstanceHeader {
 		int id;
-		int subtype;
+		int reserved;
 		uint16_t material;
 		uint16_t flags;
 		uint bone_index;
@@ -316,10 +256,11 @@
 	#define BSGFX_SET_512								0
 	#define BSGFX_SET_IMAGE_LEVEL_THUMBNAIL				0
 	#define BSGFX_SET_MATERIALS							0
-	#define BSGFX_SET_MINIMAP							0
 	#define BSGFX_SET_ACCELERATION_STRUCTURE			0
 	#define BSGFX_SET_RAY_TRACE_OUTPUT					0
 	#define BSAPP_SET_MATERIAL_TEXTURES					4
+	#define BSGFX_SET_INSTANCE_TYPES					0
+	#define BSGFX_SET_INSTANCE_SUBTYPES					0
 
 	#define BSGFX_BINDING_34_24							0
 	#define BSGFX_BINDING_JOINTS						1
@@ -339,7 +280,7 @@
 	#define BSGFX_BINDING_FONTS							15
 	#define BSGFX_BINDING_IMAGE_LEVEL_THUMBNAIL			16
 	#define BSGFX_BINDING_MATERIALS						17
-	#define BSGFX_BINDING_MINIMAP						18
+	#define BSGFX_BINDING_RESERVED						18
 	#define BSGFX_BINDING_QUAD_INSTANCES				19
 	#define BSGFX_BINDING_ACCELERATION_STRUCTURE		20
 	#define BSGFX_BINDING_RAY_TRACE_OUTPUT				21
@@ -348,14 +289,14 @@
 	#define BSAPP_BINDING_MATERIAL_TEXTURES				24
 	#define BSGFX_BINDING_MESH_STATIC_INSTANCES			25
 	#define BSMOD_BINDING_TRACKER_QUAD_INSTANCES		26
+	#define BSGFX_BINDING_INSTANCE_TYPES				27
+	#define BSGFX_BINDING_INSTANCE_SUBTYPES				28
 
 	#define BSGFX_MAX_FONTS_COUNT						16 // 16 maxPerStageDescriptorSamplers guaranteed
 
    /**
     Bind set 1
     */
-	#define BSGFX_SET_MESH_DATA						1
-	#define BSGFX_BINDING_MESH_DATA					4
 
    /**
     Bind set 2

@@ -2375,6 +2375,7 @@ struct bs_Resource {
         bs_Sound* sound;
         bs_Atlas* atlas;
         bs_Image* image;
+        struct bsgfx_Font* font;
     };
 };
 
@@ -2633,7 +2634,7 @@ struct bs_Buffer {
     bs_BufferBits flags;
     bs_U32 bind_set;
     bs_U32 binding;
-    bs_U32 num_bytes;
+    size_t num_bytes;
     bs_BufferUsageFlags usage_flags;
     bs_MemoryPropertyFlags memory_flags;
     bs_BufferSwap _[];
@@ -3130,6 +3131,7 @@ struct bs_LogQueueItem {
     const char* function;
     const char* file;
     int line;
+    bs_U32 thread_id;
     char message[BS_MAX_LOG_SIZE];
 };
 
@@ -4798,7 +4800,7 @@ bs_bufferView(
 BSAPI bs_Result
 bs_buffer(
     bs_Object* object,
-    bs_U32 num_bytes,
+    size_t num_bytes,
     bs_BufferUsageFlags usage_flags,
     bs_MemoryPropertyFlags memory_flags,
     bs_BufferBits flags);
@@ -5631,12 +5633,14 @@ bs_imageIndex();
 
  /**
   @param object
+  @param queue_index
   @param flags
   @return bs_Result
   */
 BSAPI bs_Result
 bs_queue(
     bs_Object* object,
+    bs_U32 queue_index,
     bs_QueueBits flags);
 
  /**

@@ -135,6 +135,8 @@ BSMODAPI bool _bsmod_instanceTilePreview(bsgfx_Widget* widget, bs_vec2* position
    *============================================================================*/
 
 BSMODAPI void _bsmod_onDragTile(bsmod_DraggingParams params) {
+    BS_WARN("Not implemented");
+    /*
     if (_bsmod_.hovering.tile < 0 || _bsmod_.hovering.primitive < 0)
         return;
 
@@ -199,4 +201,5 @@ BSMODAPI void _bsmod_onDragTile(bsmod_DraggingParams params) {
         _bsmod_saveTypeN(BSGFX_TYPE_TILE, "Created %d tiles", _bsmod_.selected_tiles.count);
         _bsmod_deselectAll();
     }
+    */
 }

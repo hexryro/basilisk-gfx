@@ -30,6 +30,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <threads.h>
 
 Basilisk basilisk = {
 	.sources = { -1 },
@@ -58,8 +59,7 @@ static void onLoadScene() {
 	$fs_bsgfx_atlas();
 
 	basilisk_createRenderers();
-
-	//basilisk_loadFonts();
+		//basilisk_loadFonts();
 
 	bs_loadPackage(&basilisk.package_id, "content/basilisk.bpak");
 	bsmod_iniPackage(basilisk.package_id);
@@ -124,13 +124,17 @@ static void onLog(const bs_LogQueueItem* item) {
 		[BS_MESSAGE_VALIDATION_ERROR] = BS_PRINT_COLOR("[VALIDATION]", BS_PRINT_RED),
 	};
 
-	printf("%s %s %s\n", libraries[item->library], levels_color[item->level], item->message);
+	const char* color = BS_PRINT_MAGENTA;
+	if (item->thread_id == basilisk.main_thread_id)
+		color = BS_PRINT_GREEN;
+
+	printf("%s %s %s[%d]" BS_PRINT_RESET " %s\n", libraries[item->library], levels_color[item->level], color, item->thread_id, item->message);
 	if (item->function) {
 		printf("    at %s at %s:%d\n", item->function, item->file, item->line);
 	}
 #endif
 
-	bs_writeLogFileF("%s %s %s\n", libraries[item->library], levels[item->level], item->message);
+	bs_writeLogFileF("%s %s [%d] %s\n", libraries[item->library], levels[item->level], item->thread_id, item->message);
 	if (item->function) {
 		bs_writeLogFileF("    at %s at %s:%d\n", item->function, item->file, item->line);
 	}
@@ -149,6 +153,7 @@ int main(int argc, char* argv[]) {
 	bsgfx_enableValidation();
 	bsmod_enableValidation();
 
+	basilisk.main_thread_id = thrd_current()._Tid;
 	//return 0;
 
 	bs_Callbacks* core_callbacks = bs_callbacks();

@@ -197,7 +197,7 @@ BSGFXAPI void _bsgfx_renderLines(bs_RendererScope* scope, bs_Queue* queue, const
     }
 }
 
-BSGFXAPI void _bsgfx_renderLineModel(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _bsgfx_renderLineModel(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test) {
     if (!bs_exists(BSGFX_ATLASES, BSGFX_ATLAS_ANY))
         return;
 

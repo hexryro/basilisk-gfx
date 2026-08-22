@@ -1205,7 +1205,7 @@ bs_Result bs_bufferView(
 
 bs_Result bs_buffer(
     bs_Object* object, 
-    bs_U32 num_bytes, 
+    size_t num_bytes, 
     bs_BufferUsageFlags usage_flags, 
     bs_MemoryPropertyFlags memory_flags, 
     bs_BufferBits flags)
@@ -1772,9 +1772,10 @@ int bs_imageIndex()
 
 bs_Result bs_queue(
     bs_Object* object, 
+    bs_U32 queue_index, 
     bs_QueueBits flags)
 {
-    return next.bs_queue(object, flags);
+    return next.bs_queue(object, queue_index, flags);
 }
 
 void bs_destroyQueue(

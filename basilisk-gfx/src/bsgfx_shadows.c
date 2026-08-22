@@ -56,12 +56,12 @@ BSGFXAPI void _bsgfx_computeShadowVolumes() {
     /*
     bs_setBufferAsync(
         bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer,
-        offsetof(bsgfx_InstanceMetadata, computed_volume_vertices),
+        offsetof(bsgfx_Instantiator, computed_volume_vertices),
         BSGFX_NUM_VOLUME_COMPUTATIONS * sizeof(unsigned int), 0);
 
     bs_setBufferAsync(
         bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer,
-        offsetof(bsgfx_InstanceMetadata, computed_subtype_volume_vertices),
+        offsetof(bsgfx_Instantiator, computed_subtype_volume_vertices),
         BSGFX_MAX_NUM_SUBTYPES * sizeof(int), 0);
 
     // Reset shadow geometry to 0's
@@ -195,7 +195,7 @@ BSGFXAPI void _bsgfx_renderShadowVolumes() {
     });
 
     bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
-    bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
+    bsgfx_Instantiator* metadata = bs_bufferMap(metadata_buffer);
 
     int count = metadata->computed_volume_vertices[BSGFX_SHADOW_COMPUTATION_MESH];
 
@@ -302,7 +302,7 @@ BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
     };
     bs_Pipeline* prefab_pipeline = bs_pipeline(&hash);
 
-    bsgfx_InstanceMetadata* metadata = bs_bufferMap(bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer);
+    bsgfx_Instantiator* metadata = bs_bufferMap(bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer);
     int total_index_count = metadata->computed_volume_vertices[BSGFX_SHADOW_COMPUTATION_MESH_TEXTURED] / 2;
     const int volume_index_count = 8 * 3; // 8 triangles
 

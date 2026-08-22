@@ -53,6 +53,10 @@ BSGFXAPI void _preval_bsgfx_test() {
     next.bsgfx_test();
 }
 
+BSGFXAPI bsgfx_InstanceSubtype** _preval_bsgfx_subtypes() {
+    return next.bsgfx_subtypes();
+}
+
 BSGFXAPI void _preval_bsgfx_textDimensions(bsgfx_Font* font, bs_vec2* out, char* name, int length) {
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(out != NULL, ,);
@@ -76,17 +80,19 @@ BSGFXAPI void _preval_bsgfx_renderAtlasIcons(bs_RendererScope* scope, bs_Queue* 
     next.bsgfx_renderAtlasIcons(scope, queue);
 }
 
-BSGFXAPI void _preval_bsgfx_renderLineModel(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _preval_bsgfx_renderLineModel(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test) {
     BSGFX_VALIDATE(scope != NULL, ,);
     BSGFX_VALIDATE(queue != NULL, ,);
     BSGFX_VALIDATE(camera != NULL, ,);
+    BSGFX_VALIDATE(subtype != NULL, ,);
     next.bsgfx_renderLineModel(scope, queue, camera, subtype, skip_depth_test);
 }
 
-BSGFXAPI void _preval_bsgfx_renderLines(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _preval_bsgfx_renderLines(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test) {
     BSGFX_VALIDATE(scope != NULL, ,);
     BSGFX_VALIDATE(queue != NULL, ,);
     BSGFX_VALIDATE(camera != NULL, ,);
+    BSGFX_VALIDATE(subtype != NULL, ,);
     next.bsgfx_renderLines(scope, queue, camera, subtype, skip_depth_test);
 }
 
@@ -136,14 +142,16 @@ BSGFXAPI void _preval_bsgfx_loadScene(const char* name) {
     next.bsgfx_loadScene(name);
 }
 
-BSGFXAPI bool _preval_bsgfx_validateSubtype(const char* library_name, int subtype) {
+BSGFXAPI bool _preval_bsgfx_validateSubtype(const char* library_name, bsgfx_InstanceSubtype* subtype) {
     BSGFX_VALIDATE(library_name != NULL, false,);
+    BSGFX_VALIDATE(subtype != NULL, false,);
     return next.bsgfx_validateSubtype(library_name, subtype);
 }
 
-BSGFXAPI bool _preval_bsgfx_validateInstanceType(const char* library_name, int instance_type_id) {
+BSGFXAPI bool _preval_bsgfx_validateInstanceType(const char* library_name, bsgfx_InstanceType* instance_type) {
     BSGFX_VALIDATE(library_name != NULL, false,);
-    return next.bsgfx_validateInstanceType(library_name, instance_type_id);
+    BSGFX_VALIDATE(instance_type != NULL, false,);
+    return next.bsgfx_validateInstanceType(library_name, instance_type);
 }
 
 BSGFXAPI void _preval_bsgfx_worldToScreen(const bs_vec3* position, const bs_mat4* camera, const bs_vec2* resolution, bs_vec2* out) {
@@ -274,68 +282,54 @@ BSGFXAPI bsgfx_Animator _preval_bsgfx_animator(bs_Armature* armature, int restin
     return next.bsgfx_animator(armature, resting_animation_id, animations_count);
 }
 
-BSGFXAPI bs_List* _preval_bsgfx_subtypeInstances(int subtype) {
-    return next.bsgfx_subtypeInstances(subtype);
+BSGFXAPI bs_Result _preval_bsgfx_ensureInstanceCount(bsgfx_InstanceType* instance_type, bs_U32 instances_count, bs_U32 overhead_count) {
+    BSGFX_VALIDATE(instance_type != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsgfx_ensureInstanceCount(instance_type, instances_count, overhead_count);
 }
 
-BSGFXAPI bs_Result _preval_bsgfx_iniInstances() {
-    return next.bsgfx_iniInstances();
+BSGFXAPI bs_Result _preval_bsgfx_instanceType(size_t instance_size, int bind_set, int binding, bsgfx_InstanceType** out) {
+    BSGFX_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsgfx_instanceType(instance_size, bind_set, binding, out);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceType(int type, int max_instance_count, int bind_set, int binding) {
-    next.bsgfx_instanceType(type, max_instance_count, bind_set, binding);
+BSGFXAPI void _preval_bsgfx_deleteSubtype(bsgfx_InstanceSubtype* instance_subtype) {
+    BSGFX_VALIDATE(instance_subtype != NULL, ,);
+    next.bsgfx_deleteSubtype(instance_subtype);
 }
 
-BSGFXAPI bs_Range _preval_bsgfx_subtypeRange(int subtype) {
-    return next.bsgfx_subtypeRange(subtype);
+BSGFXAPI bs_Result _preval_bsgfx_subtype(bsgfx_InstanceType* instance_type, bs_Batch* batch, bs_U32 flags, bs_Range range, bsgfx_InstanceSubtype** out) {
+    BSGFX_VALIDATE(instance_type != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BSGFX_VALIDATE(batch != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BSGFX_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsgfx_subtype(instance_type, batch, flags, range, out);
 }
 
-BSGFXAPI void _preval_bsgfx_deleteSubtype(int subtype) {
-    next.bsgfx_deleteSubtype(subtype);
-}
-
-BSGFXAPI int _preval_bsgfx_instanceCount(int subtype) {
-    return next.bsgfx_instanceCount(subtype);
-}
-
-BSGFXAPI int _preval_bsgfx_subtypeCount(int instance_type_id) {
-    return next.bsgfx_subtypeCount(instance_type_id);
-}
-
-BSGFXAPI const int* _preval_bsgfx_subtypes() {
-    return next.bsgfx_subtypes();
-}
-
-BSGFXAPI int _preval_bsgfx_subtype(int type, bs_Batch* batch, bs_U32 flags, bs_Range range) {
-    BSGFX_VALIDATE(batch != NULL, 0,);
-    return next.bsgfx_subtype(type, batch, flags, range);
-}
-
-BSGFXAPI int _preval_bsgfx_instance(int subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instantiate(bsgfx_InstanceSubtype* instance_subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
+    BSGFX_VALIDATE(instance_subtype != NULL, 0,);
     BSGFX_VALIDATE(data != NULL, 0,);
-    return next.bsgfx_instance(subtype, data, data_size, flags, bone_index, id, material);
+    return next.bsgfx_instantiate(instance_subtype, data, data_size, flags, bone_index, id, material);
 }
 
-BSGFXAPI void _preval_bsgfx_tickInstances() {
-    next.bsgfx_tickInstances();
+BSGFXAPI void _preval_bsgfx_tickInstanceType(bsgfx_InstanceType* instance_type) {
+    BSGFX_VALIDATE(instance_type != NULL, ,);
+    next.bsgfx_tickInstanceType(instance_type);
 }
 
-BSGFXAPI bool _preval_bsgfx_subtypeHasFlag(int subtype, bs_U32 flag) {
-    return next.bsgfx_subtypeHasFlag(subtype, flag);
-}
-
-BSGFXAPI void _preval_bsgfx_renderSubtype(bs_Queue* queue, int subtype, bs_Pipeline* pipeline) {
+BSGFXAPI void _preval_bsgfx_renderSubtype(bs_Queue* queue, bsgfx_InstanceSubtype* instance_subtype, bs_Pipeline* pipeline) {
     BSGFX_VALIDATE(queue != NULL, ,);
+    BSGFX_VALIDATE(instance_subtype != NULL, ,);
     BSGFX_VALIDATE(pipeline != NULL, ,);
-    next.bsgfx_renderSubtype(queue, subtype, pipeline);
+    next.bsgfx_renderSubtype(queue, instance_subtype, pipeline);
 }
 
-BSGFXAPI void _preval_bsgfx_resetInstances() {
-    next.bsgfx_resetInstances();
+BSGFXAPI void _preval_bsgfx_resetInstanceType(bsgfx_InstanceType* instance_type) {
+    BSGFX_VALIDATE(instance_type != NULL, ,);
+    next.bsgfx_resetInstanceType(instance_type);
 }
 
-BSGFXAPI void _preval_bsgfx_resetSubtype(int subtype) {
-    next.bsgfx_resetSubtype(subtype);
+BSGFXAPI void _preval_bsgfx_resetSubtype(bsgfx_InstanceSubtype* instance_subtype) {
+    BSGFX_VALIDATE(instance_subtype != NULL, ,);
+    next.bsgfx_resetSubtype(instance_subtype);
 }
 
 BSGFXAPI void _preval_bsgfx_instanceHiResMesh(bs_Mesh* mesh, const bs_vec3* position, const bs_vec4* rotation, float scale, int subtype_offset, bool origin_at_center) {
@@ -345,12 +339,14 @@ BSGFXAPI void _preval_bsgfx_instanceHiResMesh(bs_Mesh* mesh, const bs_vec3* posi
     next.bsgfx_instanceHiResMesh(mesh, position, rotation, scale, subtype_offset, origin_at_center);
 }
 
-BSGFXAPI int _preval_bsgfx_instanceMesh(int subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instanceMesh(bsgfx_InstanceSubtype* subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
     BSGFX_VALIDATE(data != NULL, 0,);
     return next.bsgfx_instanceMesh(subtype, data, flags, id, material);
 }
 
-BSGFXAPI int _preval_bsgfx_instanceBoneMesh(int subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instanceBoneMesh(bsgfx_InstanceSubtype* subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
     BSGFX_VALIDATE(data != NULL, 0,);
     return next.bsgfx_instanceBoneMesh(subtype, data, flags, id, material);
 }
@@ -386,7 +382,8 @@ BSGFXAPI int _preval_bsgfx_instancePoint(bs_vec3 position, bs_RGBA color, float 
     return next.bsgfx_instancePoint(position, color, size);
 }
 
-BSGFXAPI int _preval_bsgfx_instanceQuad(int subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instanceQuad(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
     return next.bsgfx_instanceQuad(subtype, transform, coords, flags, id, material);
 }
 
@@ -396,27 +393,32 @@ BSGFXAPI void _preval_bsgfx_instanceDepthlessCircle(const bs_mat4* transform, in
     next.bsgfx_instanceDepthlessCircle(transform, segments, radius, color, out);
 }
 
-BSGFXAPI int _preval_bsgfx_instanceAtlas(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instanceAtlas(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
     return next.bsgfx_instanceAtlas(subtype, transform, texture, flags, id, material);
 }
 
-BSGFXAPI int _preval_bsgfx_instanceAtlasFlipped(int subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instanceAtlasFlipped(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
     return next.bsgfx_instanceAtlasFlipped(subtype, transform, texture, flags, id, material);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceASCIIText(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text) {
+BSGFXAPI void _preval_bsgfx_instanceASCIIText(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text) {
+    BSGFX_VALIDATE(subtype != NULL, ,);
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(text != NULL, ,);
     next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+BSGFXAPI void _preval_bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+    BSGFX_VALIDATE(subtype != NULL, ,);
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(text != NULL, ,);
     next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceASCIITextV(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args) {
+BSGFXAPI void _preval_bsgfx_instanceASCIITextV(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args) {
+    BSGFX_VALIDATE(subtype != NULL, ,);
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(format != NULL, ,);
     next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
@@ -590,11 +592,12 @@ BSGFXAPI void _preval_bsgfx_loadPrimitives(int package_id) {
     next.bsgfx_loadPrimitives(package_id);
 }
 
-BSGFXAPI int _preval_bsgfx_primitiveSubtype(bsgfx_PrimitiveType type) {
+BSGFXAPI bsgfx_InstanceSubtype* _preval_bsgfx_primitiveSubtype(bsgfx_PrimitiveType type) {
     return next.bsgfx_primitiveSubtype(type);
 }
 
-BSGFXAPI int _preval_bsgfx_instancePrimitive(int subtype, bs_mat4 transform, bs_U32 flags, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instancePrimitive(bsgfx_InstanceSubtype* subtype, bs_mat4 transform, bs_U32 flags, int id, int material) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
     return next.bsgfx_instancePrimitive(subtype, transform, flags, id, material);
 }
 
@@ -707,6 +710,7 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     static bsgfx_FunctionTable functions = { 0 };
 
     functions.bsgfx_test = _preval_bsgfx_test;
+    functions.bsgfx_subtypes = _preval_bsgfx_subtypes;
     functions.bsgfx_textDimensions = _preval_bsgfx_textDimensions;
     functions.bsgfx_defaultPipelineHash = _preval_bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _preval_bsgfx_renderTileIcons;
@@ -750,20 +754,14 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_queueAnimation = _preval_bsgfx_queueAnimation;
     functions.bsgfx_runAnimator = _preval_bsgfx_runAnimator;
     functions.bsgfx_animator = _preval_bsgfx_animator;
-    functions.bsgfx_subtypeInstances = _preval_bsgfx_subtypeInstances;
-    functions.bsgfx_iniInstances = _preval_bsgfx_iniInstances;
+    functions.bsgfx_ensureInstanceCount = _preval_bsgfx_ensureInstanceCount;
     functions.bsgfx_instanceType = _preval_bsgfx_instanceType;
-    functions.bsgfx_subtypeRange = _preval_bsgfx_subtypeRange;
     functions.bsgfx_deleteSubtype = _preval_bsgfx_deleteSubtype;
-    functions.bsgfx_instanceCount = _preval_bsgfx_instanceCount;
-    functions.bsgfx_subtypeCount = _preval_bsgfx_subtypeCount;
-    functions.bsgfx_subtypes = _preval_bsgfx_subtypes;
     functions.bsgfx_subtype = _preval_bsgfx_subtype;
-    functions.bsgfx_instance = _preval_bsgfx_instance;
-    functions.bsgfx_tickInstances = _preval_bsgfx_tickInstances;
-    functions.bsgfx_subtypeHasFlag = _preval_bsgfx_subtypeHasFlag;
+    functions.bsgfx_instantiate = _preval_bsgfx_instantiate;
+    functions.bsgfx_tickInstanceType = _preval_bsgfx_tickInstanceType;
     functions.bsgfx_renderSubtype = _preval_bsgfx_renderSubtype;
-    functions.bsgfx_resetInstances = _preval_bsgfx_resetInstances;
+    functions.bsgfx_resetInstanceType = _preval_bsgfx_resetInstanceType;
     functions.bsgfx_resetSubtype = _preval_bsgfx_resetSubtype;
     functions.bsgfx_instanceHiResMesh = _preval_bsgfx_instanceHiResMesh;
     functions.bsgfx_instanceMesh = _preval_bsgfx_instanceMesh;

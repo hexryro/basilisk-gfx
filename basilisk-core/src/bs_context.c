@@ -390,7 +390,7 @@ static void _bs_prepareLogicalDevice() {
     VkDeviceQueueCreateInfo queue_ci = {
         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = _bs_queueFamily(BS_QUEUE_GRAPHICS_BIT),
-        .queueCount = 1,
+        .queueCount = 2,
         .pQueuePriorities = &queue_priority,
     };
 

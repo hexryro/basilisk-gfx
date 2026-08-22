@@ -69,10 +69,11 @@ BSGFXAPI void _bsgfx_computePrefabShadows(bs_Queue* queue) {
     if (!_bsgfx_prefab_model_)
         return;
     return;
+    /*
 
     bs_setBufferAsync(queue,
         bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer,
-        offsetof(bsgfx_InstanceMetadata, computed_volume_vertices),
+        offsetof(bsgfx_Instantiator, computed_volume_vertices),
         BSGFX_NUM_VOLUME_COMPUTATIONS * sizeof(unsigned int), 0);
 
     // Reset shadow geometry
@@ -115,6 +116,7 @@ BSGFXAPI void _bsgfx_computePrefabShadows(bs_Queue* queue) {
         bs_pushConstant(queue, pipeline, 0, sizeof(push_constant), &push_constant);
         bs_dispatchAsync(queue, pipeline, 1, 1, 1);
     }
+    */
 }
 
 BSGFXAPI void _val_bsgfx_renderPrefabShadowVolumes(bs_RendererScope* scope, bs_Queue* queue) {
@@ -125,13 +127,14 @@ BSGFXAPI void _val_bsgfx_renderPrefabShadowVolumes(bs_RendererScope* scope, bs_Q
 }
 
 BSGFXAPI void _bsgfx_renderPrefabShadowVolumes(bs_RendererScope* scope, bs_Queue* queue) {
+    /*
     bs_Pipeline* pipeline;
     bs_PipelineHash hash;
 
     bs_beginCommentN(queue, BS_CONSTANT_STRING("Shadow Volumes"));
 
     bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
-    bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
+    bsgfx_Instantiator* metadata = bs_bufferMap(metadata_buffer);
 
     int count = metadata->computed_volume_vertices[BSGFX_SHADOW_COMPUTATION_MESH];
 
@@ -179,6 +182,7 @@ BSGFXAPI void _bsgfx_renderPrefabShadowVolumes(bs_RendererScope* scope, bs_Queue
     }
 
     bs_endComment(queue);
+    */
 }
 
 static void _bsgfx_mapPrefab(bsgfx_RawPrefab* unmapped, bsgfx_Prefab* mapped) {
@@ -276,6 +280,9 @@ BSGFXAPI void _bsgfx_loadPrefabs(int package_id, bs_Model* model) {
 
     bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
 
+    bsgfx_InstanceType* mesh_instance_type = _bsgfx_instance_types_[BSGFX_INSTANCE_TYPE_2_MESH];
+    bsgfx_InstanceType* static_mesh_instance_type = _bsgfx_instance_types_[BSGFX_INSTANCE_TYPE_2_MESH_STATIC];
+
     if (bs_canPushBatch(batch)) {
         static int* cached_subtypes;
         static int cached_subtypes_count;
@@ -303,22 +310,22 @@ BSGFXAPI void _bsgfx_loadPrefabs(int package_id, bs_Model* model) {
                 if (primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE] >= 0)
                     _bsgfx_deleteSubtype(primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE]);
 
-                primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH_STATIC, batch, 0, primitive_range);
+                _bsgfx_subtype(static_mesh_instance_type, batch, 0, primitive_range, &primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE]);
             }
 
             mesh->extra = cached_subtypes + cached_subtype_offset;
             for (int j = 0; j < BSGFX_PREFAB_SUBTYPE_COUNT; j++) {
-                int subtype = mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH];
-                if (subtype >= 0)
+                bsgfx_InstanceSubtype* subtype = mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH];
+                if (subtype != NULL)
                     _bsgfx_deleteSubtype(subtype);
             }
 
-            mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH_STATIC, batch, BSGFX_SUBTYPE_HAS_SHADOWS, range);
-            mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_POLYGON_OUTLINE] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, batch, 0, range);
-            mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_TEXTURED] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, batch, BSGFX_SUBTYPE_HAS_SHADOWS | BSGFX_SUBTYPE_HAS_FINE_SHADOWS, range);
-            mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_HI_RES_SCREEN] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, batch, 0, range);
-            mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_LO_RES_SCREEN] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, batch, 0, range);
-            mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_VOLUME] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH_STATIC, volume_batch, 0, (bs_Range) { 0 });
+            _bsgfx_subtype(static_mesh_instance_type, batch, BSGFX_SUBTYPE_HAS_SHADOWS, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH]);
+            _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_POLYGON_OUTLINE]);
+            _bsgfx_subtype(mesh_instance_type, batch, BSGFX_SUBTYPE_HAS_SHADOWS | BSGFX_SUBTYPE_HAS_FINE_SHADOWS, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_TEXTURED]);
+            _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_HI_RES_SCREEN]);
+            _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_LO_RES_SCREEN]);
+            _bsgfx_subtype(static_mesh_instance_type, volume_batch, 0, (bs_Range) { 0 }, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_VOLUME]);
             cached_subtype_offset += BSGFX_PREFAB_SUBTYPE_COUNT;
 
         }
@@ -333,7 +340,7 @@ BSGFXAPI void _bsgfx_loadPrefabs(int package_id, bs_Model* model) {
 
         bs_Quad plane;
         bs_quad(&BS_V3(0, 0, 0), &BS_V2(1, 1), &plane);
-        _bsgfx_subtypes_[BSGFX_SUBTYPE_PLANE_MESH] = _bsgfx_subtype(BSGFX_INSTANCE_TYPE_MESH, batch, BSGFX_SUBTYPE_HAS_SHADOWS, bs_pushQuad(batch, &plane, BS_WHITE));
+        _bsgfx_subtype(mesh_instance_type, batch, BSGFX_SUBTYPE_HAS_SHADOWS, bs_pushQuad(batch, &plane, BS_WHITE), &_bsgfx_subtypes_[BSGFX_SUBTYPE_PLANE_MESH]);
     }
 
     _bsgfx_type(
@@ -362,8 +369,8 @@ BSGFXAPI void _bsgfx_prefabTransform(bsgfx_Prefab* prefab, bs_mat4* out) {
 
 BSGFXAPI int _bsgfx_instancePrefabModel(int mesh_id, bs_mat4 transform, bsgfx_PrefabSubtype prefab_subtype, int material_id) {
     bs_Mesh* mesh = _bsgfx_prefab_model_->meshes + mesh_id;
-    int subtype = mesh->extra[prefab_subtype];
-    return _bsgfx_instance(subtype, &transform, sizeof(bs_mat4), BSGFX_ID_IS_PREFAB, 0, 0, material_id);
+    bsgfx_InstanceSubtype* subtype = mesh->extra[prefab_subtype];
+    return _bsgfx_instantiate(subtype, &transform, sizeof(bs_mat4), BSGFX_ID_IS_PREFAB, 0, 0, material_id);
 }
 
  /**
@@ -386,7 +393,7 @@ BSGFXAPI int _bsgfx_instancePrefab(int id, bsgfx_PrefabSubtype prefab_subtype) {
     bs_mat4 transform;
     _bsgfx_prefabTransform(prefab, &transform);
 
-    int subtype = mesh->extra[prefab_subtype];
+    bsgfx_InstanceSubtype* subtype = mesh->extra[prefab_subtype];
     int material = prefab->material_id;
     int texture = prefab->texture_id;
     int quad_instance_offset = -1;
@@ -421,7 +428,7 @@ BSGFXAPI int _bsgfx_instancePrefab(int id, bsgfx_PrefabSubtype prefab_subtype) {
 
     //if (_bsgfx_procs_.bsmod_isSelected && _bsgfx_procs_.bsmod_isSelected(BSGFX_TYPE_PREFAB, id))
     //    flags |= BSGFX_ID_SELECTED;
-    return _bsgfx_instance(subtype, &transform, sizeof(bs_mat4), flags, quad_instance_offset, id, material);
+    return _bsgfx_instantiate(subtype, &transform, sizeof(bs_mat4), flags, quad_instance_offset, id, material);
 }
 
 BSGFXAPI void _bsgfx_instancePrefabs() {
@@ -449,7 +456,7 @@ BSGFXAPI void _bsgfx_renderPrefabs(bs_Queue* queue, bs_Pipeline* pipeline, int k
         bs_Mesh* mesh = model->meshes + i;
         if (!mesh->extra)
             continue;
-        int subtype = mesh->extra[key_start];
+        bsgfx_InstanceSubtype* subtype = mesh->extra[key_start];
         _bsgfx_renderSubtype(queue, subtype, pipeline);
     }
 }
@@ -499,7 +506,7 @@ BSGFXAPI void _bsgfx_renderPrefabPrimitives(bs_Queue* queue, bs_Pipeline* pipeli
 
         for (int j = 0; j < mesh->primitives_count; j++) {
             bs_Primitive* primitive = mesh->primitives + j;
-            int subtype = primitive->extra[key_start];
+            bsgfx_InstanceSubtype* subtype = primitive->extra[key_start];
             _bsgfx_renderSubtype(queue, subtype, pipeline);
         }
     }

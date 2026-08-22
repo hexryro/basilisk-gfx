@@ -72,13 +72,11 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
         bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
         if (resource && resource->model) {
             bsgfx_Font* font = resource->model;
-            basilisk_renderFontSubtype(scope, queue, bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
+            basilisk_renderFontSubtype(scope, queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
         }
     }
     basilisk_renderUIStencil(scope, queue);
     basilisk_renderDither(scope, queue);
-
-
 
   //  bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
     basilisk_renderTiles(scope, queue);

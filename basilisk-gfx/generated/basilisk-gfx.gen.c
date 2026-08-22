@@ -74,6 +74,11 @@ void bsgfx_test()
     next.bsgfx_test();
 }
 
+bsgfx_InstanceSubtype** bsgfx_subtypes()
+{
+    return next.bsgfx_subtypes();
+}
+
 void bsgfx_textDimensions(
     bsgfx_Font* font, 
     bs_vec2* out, 
@@ -106,7 +111,7 @@ void bsgfx_renderLineModel(
     bs_RendererScope* scope, 
     bs_Queue* queue, 
     const bs_mat4* camera, 
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bool skip_depth_test)
 {
     next.bsgfx_renderLineModel(scope, queue, camera, subtype, skip_depth_test);
@@ -116,7 +121,7 @@ void bsgfx_renderLines(
     bs_RendererScope* scope, 
     bs_Queue* queue, 
     const bs_mat4* camera, 
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bool skip_depth_test)
 {
     next.bsgfx_renderLines(scope, queue, camera, subtype, skip_depth_test);
@@ -179,16 +184,16 @@ void bsgfx_loadScene(
 
 bool bsgfx_validateSubtype(
     const char* library_name, 
-    int subtype)
+    bsgfx_InstanceSubtype* subtype)
 {
     return next.bsgfx_validateSubtype(library_name, subtype);
 }
 
 bool bsgfx_validateInstanceType(
     const char* library_name, 
-    int instance_type_id)
+    bsgfx_InstanceType* instance_type)
 {
-    return next.bsgfx_validateInstanceType(library_name, instance_type_id);
+    return next.bsgfx_validateInstanceType(library_name, instance_type);
 }
 
 void bsgfx_worldToScreen(
@@ -377,66 +382,41 @@ bsgfx_Animator bsgfx_animator(
     return next.bsgfx_animator(armature, resting_animation_id, animations_count);
 }
 
-bs_List* bsgfx_subtypeInstances(
-    int subtype)
+bs_Result bsgfx_ensureInstanceCount(
+    bsgfx_InstanceType* instance_type, 
+    bs_U32 instances_count, 
+    bs_U32 overhead_count)
 {
-    return next.bsgfx_subtypeInstances(subtype);
+    return next.bsgfx_ensureInstanceCount(instance_type, instances_count, overhead_count);
 }
 
-bs_Result bsgfx_iniInstances()
-{
-    return next.bsgfx_iniInstances();
-}
-
-void bsgfx_instanceType(
-    int type, 
-    int max_instance_count, 
+bs_Result bsgfx_instanceType(
+    size_t instance_size, 
     int bind_set, 
-    int binding)
+    int binding, 
+    bsgfx_InstanceType** out)
 {
-    next.bsgfx_instanceType(type, max_instance_count, bind_set, binding);
-}
-
-bs_Range bsgfx_subtypeRange(
-    int subtype)
-{
-    return next.bsgfx_subtypeRange(subtype);
+    return next.bsgfx_instanceType(instance_size, bind_set, binding, out);
 }
 
 void bsgfx_deleteSubtype(
-    int subtype)
+    bsgfx_InstanceSubtype* instance_subtype)
 {
-    next.bsgfx_deleteSubtype(subtype);
+    next.bsgfx_deleteSubtype(instance_subtype);
 }
 
-int bsgfx_instanceCount(
-    int subtype)
-{
-    return next.bsgfx_instanceCount(subtype);
-}
-
-int bsgfx_subtypeCount(
-    int instance_type_id)
-{
-    return next.bsgfx_subtypeCount(instance_type_id);
-}
-
-const int* bsgfx_subtypes()
-{
-    return next.bsgfx_subtypes();
-}
-
-int bsgfx_subtype(
-    int type, 
+bs_Result bsgfx_subtype(
+    bsgfx_InstanceType* instance_type, 
     bs_Batch* batch, 
     bs_U32 flags, 
-    bs_Range range)
+    bs_Range range, 
+    bsgfx_InstanceSubtype** out)
 {
-    return next.bsgfx_subtype(type, batch, flags, range);
+    return next.bsgfx_subtype(instance_type, batch, flags, range, out);
 }
 
-int bsgfx_instance(
-    int subtype, 
+int bsgfx_instantiate(
+    bsgfx_InstanceSubtype* instance_subtype, 
     const char* data, 
     int data_size, 
     bs_U32 flags, 
@@ -444,38 +424,33 @@ int bsgfx_instance(
     int id, 
     int material)
 {
-    return next.bsgfx_instance(subtype, data, data_size, flags, bone_index, id, material);
+    return next.bsgfx_instantiate(instance_subtype, data, data_size, flags, bone_index, id, material);
 }
 
-void bsgfx_tickInstances()
+void bsgfx_tickInstanceType(
+    bsgfx_InstanceType* instance_type)
 {
-    next.bsgfx_tickInstances();
-}
-
-bool bsgfx_subtypeHasFlag(
-    int subtype, 
-    bs_U32 flag)
-{
-    return next.bsgfx_subtypeHasFlag(subtype, flag);
+    next.bsgfx_tickInstanceType(instance_type);
 }
 
 void bsgfx_renderSubtype(
     bs_Queue* queue, 
-    int subtype, 
+    bsgfx_InstanceSubtype* instance_subtype, 
     bs_Pipeline* pipeline)
 {
-    next.bsgfx_renderSubtype(queue, subtype, pipeline);
+    next.bsgfx_renderSubtype(queue, instance_subtype, pipeline);
 }
 
-void bsgfx_resetInstances()
+void bsgfx_resetInstanceType(
+    bsgfx_InstanceType* instance_type)
 {
-    next.bsgfx_resetInstances();
+    next.bsgfx_resetInstanceType(instance_type);
 }
 
 void bsgfx_resetSubtype(
-    int subtype)
+    bsgfx_InstanceSubtype* instance_subtype)
 {
-    next.bsgfx_resetSubtype(subtype);
+    next.bsgfx_resetSubtype(instance_subtype);
 }
 
 void bsgfx_instanceHiResMesh(
@@ -490,7 +465,7 @@ void bsgfx_instanceHiResMesh(
 }
 
 int bsgfx_instanceMesh(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     const bsgfx_MeshInstance* data, 
     bs_U32 flags, 
     int id, 
@@ -500,7 +475,7 @@ int bsgfx_instanceMesh(
 }
 
 int bsgfx_instanceBoneMesh(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     const bsgfx_BoneInstance* data, 
     bs_U32 flags, 
     int id, 
@@ -566,7 +541,7 @@ int bsgfx_instancePoint(
 }
 
 int bsgfx_instanceQuad(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bs_mat4x3 transform, 
     bs_vec4 coords, 
     bs_U32 flags, 
@@ -587,7 +562,7 @@ void bsgfx_instanceDepthlessCircle(
 }
 
 int bsgfx_instanceAtlas(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bs_mat4x3 transform, 
     int texture, 
     bs_U32 flags, 
@@ -598,7 +573,7 @@ int bsgfx_instanceAtlas(
 }
 
 int bsgfx_instanceAtlasFlipped(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bs_mat4x3 transform, 
     int texture, 
     bs_U32 flags, 
@@ -609,7 +584,7 @@ int bsgfx_instanceAtlasFlipped(
 }
 
 void bsgfx_instanceASCIIText(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
@@ -619,7 +594,7 @@ void bsgfx_instanceASCIIText(
 }
 
 void bsgfx_instanceASCIITextN(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
@@ -630,7 +605,7 @@ void bsgfx_instanceASCIITextN(
 }
 
 void bsgfx_instanceASCIITextV(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
@@ -641,7 +616,7 @@ void bsgfx_instanceASCIITextV(
 }
 
 void bsgfx_instanceASCIITextF(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
@@ -902,14 +877,14 @@ void bsgfx_loadPrimitives(
     next.bsgfx_loadPrimitives(package_id);
 }
 
-int bsgfx_primitiveSubtype(
+bsgfx_InstanceSubtype* bsgfx_primitiveSubtype(
     bsgfx_PrimitiveType type)
 {
     return next.bsgfx_primitiveSubtype(type);
 }
 
 int bsgfx_instancePrimitive(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bs_mat4 transform, 
     bs_U32 flags, 
     int id, 

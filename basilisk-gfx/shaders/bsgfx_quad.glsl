@@ -7,15 +7,18 @@
 #define QUAD_INSTANCES_BINDING      BSGFX_BINDING_QUAD_INSTANCES
 #define QUAD_INSTANCES_COUNT        BSGFX_QUAD_INSTANCE_COUNT
 
+struct bsgfx_QuadInstance {
+    bsgfx_InstanceHeader header;
+    float transform[12];
+    vec2 coords;
+    vec2 offset;
+};
+
 #elif defined BSMOD_TRACKER_QUAD_INSTANCES
 
 #define QUAD_INSTANCES_SET          BSMOD_SET_TRACKER_QUAD_INSTANCES
 #define QUAD_INSTANCES_BINDING      BSMOD_BINDING_TRACKER_QUAD_INSTANCES
 #define QUAD_INSTANCES_COUNT        BSMOD_TRACKER_QUAD_INSTANCE_COUNT
-
-#endif
-
-#include "project/basilisk-gfx/shaders/bsgfx.glsl"
 
 struct bsgfx_QuadInstance {
     bsgfx_InstanceHeader header;
@@ -23,6 +26,10 @@ struct bsgfx_QuadInstance {
     vec2 coords;
     vec2 offset;
 };
+
+#endif
+
+#include "project/basilisk-gfx/shaders/bsgfx.glsl"
 
 layout(set = QUAD_INSTANCES_SET, binding = QUAD_INSTANCES_BINDING) readonly buffer bsgfx_quad_instance_buffer {
     bsgfx_QuadInstance bsgfx_quad_instances[QUAD_INSTANCES_COUNT];

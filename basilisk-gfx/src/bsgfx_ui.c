@@ -48,7 +48,7 @@ static inline bs_mat4x3 _bsgfx_roundedMatrix(bs_vec3 position, bs_vec3 scale, bs
 }
 
 static void _bsgfx_instanceBackground(
-	int subtype,
+	bsgfx_InstanceSubtype* subtype,
 	bs_vec3 position,
 	bs_vec2 dimensions,
 	bs_vec4 border_radii,

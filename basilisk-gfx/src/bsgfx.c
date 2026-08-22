@@ -52,7 +52,8 @@ bs_U32 _bsgfx_num_shader_joints_ = 0;
 
 bsgfx_Application _bsgfx_app_;
 
-int _bsgfx_subtypes_[BSGFX_SUBTYPE_COUNT] = { 0 };
+bsgfx_InstanceSubtype* _bsgfx_subtypes_[BSGFX_SUBTYPE_COUNT] = { 0 };
+bsgfx_InstanceType* _bsgfx_instance_types_[BSGFX_INSTANCE_TYPE_2_COUNT] = { 0 };
 
 // TODO: object configuration generation
 
@@ -60,6 +61,10 @@ static int _bsgfx_sources_[BS_OBJECT_TYPE_COUNT] = { -1 };
 
 int bsgfx_fetchSource(bs_ObjectType type) {
     return _bsgfx_sources_[type];
+}
+
+BSGFXAPI bsgfx_InstanceSubtype** _bsgfx_subtypes() {
+    return _bsgfx_subtypes_;
 }
 
 BSGFXAPI bsgfx_Scene* _bsgfx_currentScene() {
@@ -158,12 +163,24 @@ static void _bsgfx_tick() {
     if (_bsgfx_callbacks_.tick)
         _bsgfx_callbacks_.tick();
 
-    _bsgfx_tickInstances();
+    int to_reset[] = {
+        BSGFX_INSTANCE_TYPE_2_BONE,
+        BSGFX_INSTANCE_TYPE_2_MESH,
+        BSGFX_INSTANCE_TYPE_2_LINE,
+        BSGFX_INSTANCE_TYPE_2_POINT,
+        BSGFX_INSTANCE_TYPE_2_QUAD,
+        BSGFX_INSTANCE_TYPE_2_MESH_STATIC,
+    };
+    int to_reset_count = sizeof(to_reset) / sizeof(*to_reset);
+
+    for (int i = 0; i < to_reset_count; i++)
+        bsgfx_tickInstanceType(_bsgfx_subtypes_[to_reset[i]]);
 
     if (_bsgfx_callbacks_.pipeline)
         _bsgfx_callbacks_.pipeline();
 
-    _bsgfx_resetInstances();
+    for (int i = 0; i < to_reset_count; i++)
+        bsgfx_resetInstanceType(_bsgfx_subtypes_[to_reset[i]]);
 
     //_bsgfx_pipeline();
     _bsgfx_tickMaterials();
@@ -296,14 +313,13 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
    // bs_pause();
 
     bs_loadPackage(&_bsgfx_package_, BSGFX_CONTENT_PATH);
-    _bsgfx_iniInstances();
 
     bs_Object* queue_obj = BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES, 0);
     bs_Queue* queue = queue_obj->queue;
-    bs_queue(queue_obj, BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_SINGLE_TIMES_BIT);
+    bs_queue(queue_obj, 0, BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_SINGLE_TIMES_BIT);
 
-    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_GRAPHICS_BIT);
-    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_COMPUTE, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_COMPUTE_BIT);
+    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), 0, BS_QUEUE_GRAPHICS_BIT);
+    bs_queue(BS_QUEUE(BSGFX_QUEUES, BSGFX_QUEUE_COMPUTE, BS_OBJECT_HAS_SWAPS_BIT), 0, BS_QUEUE_COMPUTE_BIT);
 
     bs_sampler(BS_SAMPLER(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST, 0), BS_FILTER_NEAREST, 0);
     bs_sampler(BS_SAMPLER(BSGFX_SAMPLERS, BSGFX_SAMPLER_LINEAR, 0), BS_FILTER_LINEAR, 0);
