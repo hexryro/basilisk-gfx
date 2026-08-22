@@ -215,7 +215,6 @@ BSGFXAPI void _bsgfx_runAnimator(bsgfx_Animator* animator, bsgfx_AnimatorCallbac
   */
 BSGFXAPI int _val_bsgfx_skeleton(bs_Armature* armature) {
     BSGFX_VALIDATE(_bsgfx_shader_joints_ != NULL, -1, );
-    BSGFX_VALIDATE((_bsgfx_num_shader_joints_ + armature->bones_count) <= BSGFX_MAX_NUM_JOINTS, -1, );
 
     return _bsgfx_skeleton(armature);
 }

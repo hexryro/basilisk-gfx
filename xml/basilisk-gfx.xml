@@ -59,43 +59,11 @@
 		<typedef><type>void</type><name>(__stdcall* PFN_bsgfx_TypeMapper)(void*, void*)</name></typedef>
 		
 		<typedef><type>bool</type><name>(__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*)</name></typedef>
+
+		<typedef><type>struct bsgfx_InstanceHeader</type><name>bsgfx_InstanceHeader</name></typedef>
 	</typedefs>
 
 	<enums>
-		<enum name="bsgfx_Subtype">
-			<line><name>BSGFX_SUBTYPE_BIPYRAMID</name></line>
-			<line><name>BSGFX_SUBTYPE_PRIMITIVE_BOX</name></line>
-			<line><name>BSGFX_SUBTYPE_PRIMITIVE_SPHERE</name></line>
-			<line><name>BSGFX_SUBTYPE_TILE</name></line>
-			<line><name>BSGFX_SUBTYPE_TILE_2</name></line>
-			<line><name>BSGFX_SUBTYPE_64_HI</name></line>
-			<line><name>BSGFX_SUBTYPE_256_HI</name></line>
-			<line><name>BSGFX_SUBTYPE_ATLAS_ICON</name></line>
-			<line><name>BSGFX_SUBTYPE_UI</name></line>
-			<line><name>BSGFX_SUBTYPE_UI_COLOR</name></line>
-			<line><name>BSGFX_SUBTYPE_UI_STENCIL</name></line>
-			<line><name>BSGFX_SUBTYPE_COLOR_PICKER</name></line>
-			<line><name>BSGFX_SUBTYPE_COLOR_PICKER_HUE</name></line>
-			<line><name>BSGFX_SUBTYPE_COLOR_PICKER_ALPHA</name></line>
-			<line><name>BSGFX_SUBTYPE_DITHER</name></line>
-			<line><name>BSGFX_SUBTYPE_CORNER_GRADIENT</name></line>
-			<line><name>BSGFX_SUBTYPE_TILE_ICON</name></line>
-			<line><name>BSGFX_SUBTYPE_QUAD_MATERIAL_TEXTURE</name></line>
-			<line><name>BSGFX_SUBTYPE_PRIMITIVE_HI</name></line>
-			<line><name>BSGFX_SUBTYPE_ATLAS_PREFAB</name></line>
-			<line><name>BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT</name></line>
-			<line><name>BSGFX_SUBTYPE_PLANE_MESH</name></line>
-			<line><name>BSGFX_SUBTYPE_ATLAS</name></line>
-			<line><name>BSGFX_SUBTYPE_CONE_MESH</name></line>
-			<line><name>BSGFX_SUBTYPE_SPHERE_MESH</name></line>
-			<line><name>BSGFX_SUBTYPE_POINT</name></line>
-			<line><name>BSGFX_SUBTYPE_LINE</name></line>
-			<line><name>BSGFX_SUBTYPE_LINE_2D</name></line>
-			<line><name>BSGFX_SUBTYPE_LINE_DEPTHLESS</name></line>
-			<line><name>BSGFX_SUBTYPE_FONT</name></line>
-			<line><name>BSGFX_SUBTYPE_COUNT</name></line>
-		</enum>
-
 		<enum name="bsgfx_MaterialCategory">
 			<line><name>BSGFX_MATERIAL_CATEGORY_NONE</name></line>
 			<line><name>BSGFX_MATERIAL_CATEGORY_UI_COLOR_SCHEME</name></line>
@@ -128,7 +96,7 @@
 			<line><name>BSGFX_FONT_NO_CAPS</name><value>1 &lt;&lt; 1</value></line>
 		</enum>
 		
-		<enum name="bsgfx_SubtypeFlag">
+		<enum name="bsgfx_InstanceSubtypeFlag">
 			<line><name>BSGFX_SUBTYPE_MANUAL_RESET</name><value>1 &lt;&lt; 0</value></line>
 		</enum>
 
@@ -1060,6 +1028,18 @@
 			<field><type>bs_vec2</type><name>offset</name></field>
 		</structure>
 		
+		<structure name="bsgfx_PointInstance">
+			<field><type>bs_vec3</type><name>coord</name></field>
+			<field><type>float</type><name>size</name></field>
+			<field><type>bs_vec4</type><name>color</name></field>
+		</structure>
+		
+		<structure name="bsgfx_LineInstance">
+			<field><type>bs_vec4</type><name>start</name></field>
+			<field><type>bs_vec4</type><name>end</name></field>
+			<field><type>bs_vec4</type><name>color</name></field>
+		</structure>
+
 		<structure name="bsgfx_Scene">
 			<field><type>const char*</type><name>name</name></field>
 			<field><type>bs_U64</type><name>name_hash</name></field>
@@ -1120,11 +1100,6 @@
 			<field><type>du_animatorCallback(pose)</type></field>
 		</structure>
 
-		<structure name="bsgfx_InstanceBuffer">
-			<field><type>struct bsgfx_InstanceHeader</type><name>header</name></field>
-			<field><type>char</type><name>data</name><size>64</size></field>
-		</structure>
-
 		<structure name="bsgfx_Settings">
 			<field><type>bool</type><name>cull_backfaces</name></field>
 			<field><type>float</type><name>master_volume</name></field>
@@ -1153,8 +1128,6 @@
 				<field><type>bs_mat4</type><name>result</name></field>
 			</structure>
 			<field><type>float</type><name>zoom</name></field>
-			<field><type>bool</type><name>instances_ticked</name></field>
-			<field><type>bs_Buffer*</type><name>instance_buffers</name><size>BSGFX_INSTANCE_TYPE_COUNT</size></field>
 			<structure instance=" members[BSGFX_MAX_NUMBER_PLAYERS]">
 				<field><type>int</type><name>joint_offset</name></field>
 			</structure>
@@ -1187,6 +1160,24 @@
 			<field><type>int</type><name>accessors</name><size></size></field>
 		</structure>
 
+		<structure name="bsgfx_InstanceType">
+			<field><type>int</type><name>instance_count</name></field>
+			<field comment="Byte size of one instance of this type (including bsgfx_InstanceHeader)"><type>int</type><name>instance_size</name></field>
+			<field><type>bs_List</type><name>subtypes</name></field>
+			<field><type>bs_Buffer*</type><name>device_instances</name></field>
+		</structure>
+		
+		<structure name="bsgfx_InstanceSubtype">
+			<field><type>int</type><name>index_offset</name></field>
+			<field><type>int</type><name>index_count</name></field>
+			<field><type>int</type><name>instance_offset</name></field>
+			<field><type>int</type><name>batch_source_id</name></field>
+			<field><type>int</type><name>batch_id</name></field>
+			<field><type>uint</type><name>flags</name></field>
+			<field><type>bsgfx_InstanceType*</type><name>instance_type2</name></field>
+			<field><type>bs_List</type><name>host_instances</name></field>
+		</structure>
+		
 		<structure name="bsgfx_Type">
 			<field><type>int</type><name>version</name></field>
 			<field><type>int</type><name>capacity</name></field>
@@ -1552,7 +1543,7 @@
 					<field><type>float</type><name>border_radius</name></field>
 					<field><type>int</type><name>outline_material_id</name></field>
 					<field><type>bs_Atlas*</type><name>atlas</name></field>
-					<field><type>int</type><name>atlas_subtype</name></field>
+					<field><type>bsgfx_InstanceSubtype*</type><name>atlas_subtype</name></field>
 					<field><type>bool</type><name>flipped</name></field>
 					<field><type>bool</type><name>mirrored</name></field>
 				</structure>
@@ -1589,7 +1580,7 @@
 				<structure instance=" background">
 					<field><type>bs_vec2</type><name>size</name></field>
 					<field><type>float</type><name>border_radius</name></field>
-					<field><type>int</type><name>subtype</name></field>
+					<field><type>bsgfx_InstanceSubtype*</type><name>subtype</name></field>
 					<field><type>int</type><name>material_id</name></field>
 					<field><type>int</type><name>outline_material_id</name></field>
 					<field><type>int</type><name>shadow_material_id</name></field>
@@ -1641,7 +1632,7 @@
 			<field><type>float</type><name>border_radius</name></field>
 			<field><type>int</type><name>shadow_material_id</name></field>
 			<field><type>int</type><name>outline_material_id</name></field>
-			<field><type>int</type><name>text_subtype</name></field>
+			<field><type>bsgfx_InstanceSubtype*</type><name>text_subtype</name></field>
 		</structure>
 
 		<structure name="bsgfx_TitleBar">
@@ -1668,6 +1659,10 @@
 			<return>void</return>
 		</function>
 
+		<function name="bsgfx_subtypes">
+			<return>bsgfx_InstanceSubtype**</return>
+		</function>
+		
 		<function name="bsgfx_textDimensions">
 			<return>void</return>
 			<param><type>bsgfx_Font*</type><name>font</name></param>
@@ -1679,7 +1674,6 @@
 		<function name="bsgfx_defaultPipelineHash">
 			<return>bs_PipelineHash</return>
 		</function>
-
 
 		<function name="bsgfx_renderTileIcons">
 			<return>void</return>
@@ -1697,7 +1691,7 @@
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
 			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>const bs_mat4*</type><name>camera</name></param>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bool</type><name>skip_depth_test</name></param>
 		</function>
 		<function name="bsgfx_renderLines">
@@ -1705,7 +1699,7 @@
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
 			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>const bs_mat4*</type><name>camera</name></param>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bool</type><name>skip_depth_test</name></param>
 		</function>
 		<function name="bsgfx_renderPoints">
@@ -1752,13 +1746,13 @@
 		<function name="bsgfx_validateSubtype">
 			<return>bool</return>
 			<param><type>const char*</type><name>library_name</name></param>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 		</function>
 		
 		<function name="bsgfx_validateInstanceType">
 			<return>bool</return>
 			<param><type>const char*</type><name>library_name</name></param>
-			<param><type>int</type><name>instance_type_id</name></param>
+			<param><type>bsgfx_InstanceType*</type><name>instance_type</name></param>
 		</function>
 		
 		<function name="bsgfx_worldToScreen">
@@ -1868,46 +1862,34 @@
 			<param><type>int</type><name>resting_animation_id</name></param>
 			<param><type>int</type><name>animations_count</name></param>
 		</function>
-
-		<function name="bsgfx_subtypeInstances">
-			<return>bs_List*</return>
-			<param><type>int</type><name>subtype</name></param>
+		<function name="bsgfx_ensureInstanceCount">
+			<return>bs_Result</return>
+			<param><type>bsgfx_InstanceType*</type><name>instance_type</name></param>
+			<param><type>bs_U32</type><name>instances_count</name></param>
+			<param><type>bs_U32</type><name>overhead_count</name></param>
 		</function>
-		<function name="bsgfx_iniInstances"><return>bs_Result</return></function>
 		<function name="bsgfx_instanceType">
-			<return>void</return>
-			<param><type>int</type><name>type</name></param>
-			<param><type>int</type><name>max_instance_count</name></param>
+			<return>bs_Result</return>
+			<param><type>size_t</type><name>instance_size</name></param>
 			<param><type>int</type><name>bind_set</name></param>
 			<param><type>int</type><name>binding</name></param>
-		</function>
-		<function name="bsgfx_subtypeRange">
-			<return>bs_Range</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceType**</type><name>out</name></param>
 		</function>
 		<function name="bsgfx_deleteSubtype">
 			<return>void</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>instance_subtype</name></param>
 		</function>
-		<function name="bsgfx_instanceCount">
-			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
-		</function>
-		<function name="bsgfx_subtypeCount">
-			<return>int</return>
-			<param><type>int</type><name>instance_type_id</name></param>
-		</function>
-		<function name="bsgfx_subtypes"><return>const int*</return></function>
 		<function name="bsgfx_subtype">
-			<return>int</return>
-			<param><type>int</type><name>type</name></param>
+			<return>bs_Result</return>
+			<param><type>bsgfx_InstanceType*</type><name>instance_type</name></param>
 			<param><type>bs_Batch*</type><name>batch</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
 			<param><type>bs_Range</type><name>range</name></param>
+			<param><type>bsgfx_InstanceSubtype**</type><name>out</name></param>
 		</function>
-		<function name="bsgfx_instance">
+		<function name="bsgfx_instantiate">
 			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>instance_subtype</name></param>
 			<param><type>const char*</type><name>data</name></param>
 			<param><type>int</type><name>data_size</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
@@ -1915,22 +1897,23 @@
 			<param><type>int</type><name>id</name></param>
 			<param><type>int</type><name>material</name></param>
 		</function>
-		<function name="bsgfx_tickInstances"><return>void</return></function>
-		<function name="bsgfx_subtypeHasFlag">
-			<return>bool</return>
-			<param><type>int</type><name>subtype</name></param>
-			<param><type>bs_U32</type><name>flag</name></param>
+		<function name="bsgfx_tickInstanceType">
+			<return>void</return>
+			<param><type>bsgfx_InstanceType*</type><name>instance_type</name></param>
 		</function>
 		<function name="bsgfx_renderSubtype">
 			<return>void</return>
 			<param><type>bs_Queue*</type><name>queue</name></param>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>instance_subtype</name></param>
 			<param><type>bs_Pipeline*</type><name>pipeline</name></param>
 		</function>
-		<function name="bsgfx_resetInstances"><return>void</return></function>
+		<function name="bsgfx_resetInstanceType">
+			<return>void</return>
+			<param><type>bsgfx_InstanceType*</type><name>instance_type</name></param>
+		</function>
 		<function name="bsgfx_resetSubtype">
 			<return>void</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>instance_subtype</name></param>
 		</function>
 		
 		<function name="bsgfx_instanceHiResMesh">
@@ -1944,7 +1927,7 @@
 		</function>
 		<function name="bsgfx_instanceMesh">
 			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>const bsgfx_MeshInstance*</type><name>data</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
 			<param><type>int</type><name>id</name></param>
@@ -1952,7 +1935,7 @@
 		</function>
 		<function name="bsgfx_instanceBoneMesh">
 			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>const bsgfx_BoneInstance*</type><name>data</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
 			<param><type>int</type><name>id</name></param>
@@ -2002,7 +1985,7 @@
 		</function>
 		<function name="bsgfx_instanceQuad">
 			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bs_mat4x3</type><name>transform</name></param>
 			<param><type>bs_vec4</type><name>coords</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
@@ -2019,7 +2002,7 @@
 		</function>
 		<function name="bsgfx_instanceAtlas">
 			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bs_mat4x3</type><name>transform</name></param>
 			<param><type>int</type><name>texture</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
@@ -2028,7 +2011,7 @@
 		</function>
 		<function name="bsgfx_instanceAtlasFlipped">
 			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bs_mat4x3</type><name>transform</name></param>
 			<param><type>int</type><name>texture</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
@@ -2037,7 +2020,7 @@
 		</function>
 		<variadicStringTemplate name="bsgfx_instanceASCIIText" string="text">
 			<return>void</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bsgfx_Font*</type><name>font</name></param>
 			<param><type>bs_vec3</type><name>position</name></param>
 			<param><type>int</type><name>pt_size</name></param>
@@ -2207,12 +2190,12 @@
 			<param><type>int</type><name>package_id</name></param>
 		</function>
 		<function name="bsgfx_primitiveSubtype">
-			<return>int</return>
+			<return>bsgfx_InstanceSubtype*</return>
 			<param><type>bsgfx_PrimitiveType</type><name>type</name></param>
 		</function>
 		<function name="bsgfx_instancePrimitive">
 			<return>int</return>
-			<param><type>int</type><name>subtype</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bs_mat4</type><name>transform</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
 			<param><type>int</type><name>id</name></param>
@@ -2336,7 +2319,6 @@
 		<extern><type>bsgfx_Scene</type><name>bsgfx_current_scene</name></extern>
 		<extern><type>bsgfx_Type</type><name>bsgfx_types</name><size>BSGFX_TYPE_COUNT</size></extern>
 		
-		<extern><type>int</type><name>bsgfx_subtypes</name><size>BSGFX_SUBTYPE_COUNT</size></extern>
 		<extern><type>const char*</type><name>bsgfx_material_categories</name><size>BSGFX_MATERIAL_CATEGORY_COUNT</size></extern>
 
 		<extern><type>bs_List</type><name>bsgfx_materials</name></extern>

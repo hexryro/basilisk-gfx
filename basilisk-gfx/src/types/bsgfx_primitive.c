@@ -86,7 +86,7 @@ BSGFXAPI void _bsgfx_loadPrimitives(int package_id) {
    // _bsgfx_instancePrimitives();
 }
 
-BSGFXAPI int _bsgfx_primitiveSubtype(bsgfx_PrimitiveType type) {
+BSGFXAPI bsgfx_InstanceSubtype* _bsgfx_primitiveSubtype(bsgfx_PrimitiveType type) {
     switch (type) {
     case BSGFX_PRIMITIVE_TYPE_BOX: return _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_BOX];
     case BSGFX_PRIMITIVE_TYPE_SPHERE: return _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_SPHERE];
@@ -95,8 +95,8 @@ BSGFXAPI int _bsgfx_primitiveSubtype(bsgfx_PrimitiveType type) {
     return -1;
 }
 
-BSGFXAPI int _bsgfx_instancePrimitive(int subtype, bs_mat4 transform, bs_U32 flags, int id, int material) {
-    return bsgfx_instance(subtype, &transform, sizeof(bs_mat4), flags, 0, id, material);
+BSGFXAPI int _bsgfx_instancePrimitive(bsgfx_InstanceSubtype* subtype, bs_mat4 transform, bs_U32 flags, int id, int material) {
+    return bsgfx_instantiate(subtype, &transform, sizeof(bs_mat4), flags, 0, id, material);
 }
 
 BSGFXAPI int _bsgfx_queryTilePrimitive(int tile_id) {
@@ -138,7 +138,7 @@ BSGFXAPI void _bsgfx_instancePrimitives() {
         //if (primitive->type == BSGFX_PRIMITIVE_TYPE_BOX) // tiles are rendered over these
         //    continue;
 
-        _bsgfx_instance(_bsgfx_subtypes_[primitive->subtype_index], &transform, sizeof(bs_mat4), flags, 0, i, 0);
+        _bsgfx_instantiate(_bsgfx_subtypes_[primitive->subtype_index], &transform, sizeof(bs_mat4), flags, 0, i, 0);
     }
 }
 

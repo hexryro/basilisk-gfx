@@ -37,6 +37,7 @@ typedef struct {
     int bsgfx_package;
     int selected_tile_primitive;
     int selected_tile_axis;
+    /*
     struct {
         bs_RGBA color;
         bs_vec3 normal;
@@ -54,6 +55,7 @@ typedef struct {
         int tile;
         int tile_axis;
     } hovering;
+    */
     bs_List selected_ids;
     bs_List selected_tiles;
     int editor_resource_type;
@@ -88,7 +90,7 @@ typedef struct {
         bool skip_mesh_index_write;
     } queue;
     int dragging_object_id;
-    int dragging_subtype;
+    bsgfx_InstanceSubtype* dragging_subtype;
     int dragging_id;
     bsmod_EditType edit_type;
     bsmod_EditType edit_type_old;

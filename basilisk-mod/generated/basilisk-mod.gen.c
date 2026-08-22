@@ -184,6 +184,7 @@ void bsmod_onPackTextureArray(
 }
 
 bs_Result bsmod_packFont(
+    bsmod_RenderMode render_mode[], 
     char* package_name, 
     char* ttf_path, 
     bsmod_UnicodeBlockRange blocks[], 
@@ -193,7 +194,7 @@ bs_Result bsmod_packFont(
     char* resource_name, 
     int resource_name_length)
 {
-    return next.bsmod_packFont(package_name, ttf_path, blocks, blocks_count, pt_sizes, pt_sizes_count, resource_name, resource_name_length);
+    return next.bsmod_packFont(render_mode, package_name, ttf_path, blocks, blocks_count, pt_sizes, pt_sizes_count, resource_name, resource_name_length);
 }
 
 bsmod_TextureInfo* bsmod_packAtlasTexture(
@@ -336,6 +337,14 @@ bsmod_Resource* bsmod_queryResource(
     return next.bsmod_queryResource(package, type, name);
 }
 
+bs_Result bsmod_loadResource(
+    int type, 
+    int package_id, 
+    char* name)
+{
+    return next.bsmod_loadResource(type, package_id, name);
+}
+
 bs_Result bsmod_iniPackage(
     int package_id)
 {
@@ -472,8 +481,9 @@ void bsmod_endRasterize(
 bs_Result bsmod_rasterizeInstance(
     bs_Queue* queue, 
     bs_PipelineHash pipeline_hash, 
-    int subtype, 
-    int instance_id, 
+    bsgfx_InstanceSubtype* subtype, 
+    int instance_offset, 
+    int instance_count, 
     int category, 
     char* name, 
     int width, 
@@ -481,7 +491,7 @@ bs_Result bsmod_rasterizeInstance(
     size_t push_constant_size, 
     unsigned char* push_constant)
 {
-    return next.bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_id, category, name, width, height, push_constant_size, push_constant);
+    return next.bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_offset, instance_count, category, name, width, height, push_constant_size, push_constant);
 }
 
 void bsmod_instanceTransform()

@@ -133,11 +133,11 @@ BSMODAPI void _preval_bsmod_onPackTextureArray(bsmod_TrackParams params) {
     next.bsmod_onPackTextureArray(params);
 }
 
-BSMODAPI bs_Result _preval_bsmod_packFont(char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length) {
+BSMODAPI bs_Result _preval_bsmod_packFont(bsmod_RenderMode render_mode[], char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length) {
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(ttf_path != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_packFont(package_name, ttf_path, blocks, blocks_count, pt_sizes, pt_sizes_count, resource_name, resource_name_length);
+    return next.bsmod_packFont(render_mode, package_name, ttf_path, blocks, blocks_count, pt_sizes, pt_sizes_count, resource_name, resource_name_length);
 }
 
 BSMODAPI bsmod_TextureInfo* _preval_bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, char* name) {
@@ -224,6 +224,11 @@ BSMODAPI bsmod_Resource* _preval_bsmod_queryResource(bsmod_Package* package, bs_
     return next.bsmod_queryResource(package, type, name);
 }
 
+BSMODAPI bs_Result _preval_bsmod_loadResource(int type, int package_id, char* name) {
+    BSMOD_VALIDATE(name != NULL, BS_RESULT_VALIDATION_ERROR,);
+    return next.bsmod_loadResource(type, package_id, name);
+}
+
 BSMODAPI bs_Result _preval_bsmod_iniPackage(int package_id) {
     return next.bsmod_iniPackage(package_id);
 }
@@ -302,11 +307,12 @@ BSMODAPI void _preval_bsmod_endRasterize(bs_Queue* queue) {
     next.bsmod_endRasterize(queue);
 }
 
-BSMODAPI bs_Result _preval_bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, int subtype, int instance_id, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant) {
+BSMODAPI bs_Result _preval_bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant) {
     BSMOD_VALIDATE(queue != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BSMOD_VALIDATE(subtype != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(push_constant != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_id, category, name, width, height, push_constant_size, push_constant);
+    return next.bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_offset, instance_count, category, name, width, height, push_constant_size, push_constant);
 }
 
 BSMODAPI void _preval_bsmod_instanceTransform() {
@@ -590,6 +596,7 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_queryPackage = _preval_bsmod_queryPackage;
     functions.bsmod_ensurePackage = _preval_bsmod_ensurePackage;
     functions.bsmod_queryResource = _preval_bsmod_queryResource;
+    functions.bsmod_loadResource = _preval_bsmod_loadResource;
     functions.bsmod_iniPackage = _preval_bsmod_iniPackage;
     functions.bsmod_packResource = _preval_bsmod_packResource;
     functions.bsmod_packResourceN = _preval_bsmod_packResourceN;

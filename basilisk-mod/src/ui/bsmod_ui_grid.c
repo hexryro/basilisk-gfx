@@ -322,7 +322,7 @@ typedef struct {
 
 typedef struct {
     bsmod_SideMenuTabId tab_id;
-    int subtype;
+    bsgfx_InstanceSubtype* subtype2;
     bsmod_IdCategory* sorted_ids;
     bs_U32 source_id;
     bs_U32 object_id;
@@ -358,7 +358,7 @@ static void _bsmod_checkHoverGrid(bsgfx_Widget* widget, bsgfx_GridParams* grid) 
     }
     else if (_bsmod_.dragging_id == grid->index) {
         _bsmod_.dragging_object_id = params->object_id;
-        _bsmod_.dragging_subtype = params->subtype;
+        _bsmod_.dragging_subtype = params->subtype2;
     }
 }
 
@@ -402,7 +402,7 @@ static bool _bsmod_instanceAtlasPreview(bsgfx_Widget* widget, bsgfx_GridParams g
     }
 
     bsgfx_instanceQuad(
-        params->subtype,
+        params->subtype2,
         bsgfx_matrix(
             BS_V3(grid.position->x, grid.position->y, 60.0),
             BS_V3(widget->grid.size.x, widget->grid.size.y, 0.0)
@@ -426,7 +426,7 @@ static bool _bsmod_instanceImageArrayPreview(bsgfx_Widget* widget, bsgfx_GridPar
     );
     matrix.f[8] = grid.index;
     bsgfx_instanceQuad(
-        params->subtype,
+        params->subtype2,
         matrix,
         BS_V4(0.0, 0.0, 1.0, 1.0),
         0, 0, 0);
@@ -450,7 +450,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
     static int scroll;
 
     bsmod_GridPreviewParams params = {
-        .subtype = -1,
+        .subtype2 = NULL,
     };
     bsgfx_Widget widget = {
         .type = BSGFX_WIDGET_GRID,
@@ -466,7 +466,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
 
     widget.grid.count = 0;
     widget.grid.action = NULL;
-    params.subtype = -1;
+    params.subtype2 = NULL;
 
     bs_Atlas* atlas = NULL;
     bs_Image* image_array = NULL;
@@ -478,7 +478,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
         atlas = bs_fetch(BSMOD_ATLASES, params.object_id = BSMOD_ATLAS_PREFAB_ICONS)->head;
         widget.grid.action = _bsmod_instanceAtlasPreview;
         widget.grid.count = atlas->count;
-        params.subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_PREFAB_ICON];
+        params.subtype2 = _bsmod_subtypes_[BSMOD_SUBTYPE_PREFAB_ICON];
 
         break;
     case BSMOD_DIRECTORY_PRIMITIVES:
@@ -486,7 +486,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
         atlas = bs_fetch(BSMOD_ATLASES, params.object_id = BSMOD_ATLAS_PRIMITIVE_ICONS)->head;
         widget.grid.count = atlas->count;
         widget.grid.action = _bsmod_instanceAtlasPreview;
-        params.subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_PRIMITIVE_ICON];
+        params.subtype2 = _bsmod_subtypes_[BSMOD_SUBTYPE_PRIMITIVE_ICON];
 
         break;
     case BSMOD_DIRECTORY_TILES: 
@@ -494,7 +494,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
         widget.grid.count = image_array->num_indices;
         widget.grid.action = _bsmod_instanceImageArrayPreview;
         widget.grid.padding = 8.0;
-        params.subtype = _bsmod_subtypes_[BSGFX_SUBTYPE_TILE];
+        params.subtype2 = _bsmod_subtypes_[BSGFX_SUBTYPE_TILE];
         params.object_id = BSGFX_IMAGE_TILE;
         scale = 2.0;
         break;

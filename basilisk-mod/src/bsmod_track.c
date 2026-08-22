@@ -156,55 +156,6 @@ BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 			.size = 1,
 			.rasterize = true,
 		},
-		{
-			.block = BSMOD_UNICODE_BLOCK_LATIN_EXTENDED_A,
-			.offset = 0x0100,
-			.count = 0x017F - 0x0100,
-			.size = 1,
-			.rasterize = true,
-		},
-		{
-			.block = BSMOD_UNICODE_BLOCK_LATIN_EXTENDED_B,
-			.offset = 0x0180,
-			.count = 0x024F - 0x0180,
-			.size = 1,
-			.rasterize = true,
-		},
-		{
-			.block = BSMOD_UNICODE_BLOCK_IPA_EXTENSIONS,
-			.offset = 0x0250,
-			.count = 0x02AF - 0x0250,
-			.size = 1,
-			.rasterize = true,
-		},
-		{
-			.block = BSMOD_UNICODE_BLOCK_SPACING_MODIFIER_LETTERS,
-			.offset = 0x02B0,
-			.count = 0x02FF - 0x02B0,
-			.size = 1,
-			.rasterize = true,
-		},
-		{
-			.block = BSMOD_UNICODE_BLOCK_GREEK,
-			.offset = 0x0370,
-			.count = 0x03FF - 0x0370,
-			.size = 1,
-			.rasterize = true,
-		},
-		{
-			.block = BSMOD_UNICODE_BLOCK_CYRILLIC,
-			.offset = 0x0400,
-			.count = 0x04FF - 0x0400,
-			.size = 1,
-			.rasterize = true,
-		},
-		{
-			.block = BSMOD_UNICODE_BLOCK_ARMENIAN,
-			.offset = 0x0530,
-			.count = 0x058F - 0x0530,
-			.size = 1,
-			.rasterize = true,
-		}
 	};
 
 	int ranges_count = sizeof(ranges) / sizeof(*ranges);
@@ -214,7 +165,17 @@ BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 
 	int pt_sizes_count = sizeof(pt_sizes) / sizeof(*pt_sizes);
 
-	bsmod_packFont(params.package, params.path, ranges, ranges_count, pt_sizes, pt_sizes_count, params.path, strlen(params.path));
+	bsmod_packFont(
+		BSMOD_RENDER_MODE_SDF,
+		params.package, 
+		params.path, 
+		ranges, 
+		ranges_count, 
+		pt_sizes, 
+		pt_sizes_count, 
+		params.path, 
+		strlen(params.path)
+	);
 }
 
 static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* packer) {
@@ -461,7 +422,7 @@ BSMODAPI void _bsmod_onTrack() {
 	bs_String* cwd = bs_workingDirectory();
 	last = bs_stringN(last, cwd->value, cwd->len);
 
-	bs_infoF(BS_PRINT_COLOR("track\n", BS_PRINT_RED));
+	bs_infoF(BS_PRINT_COLOR("track", BS_PRINT_RED));
 
 	bs_List* hooks = _bsmod_loadHooks();
 	if (!hooks)

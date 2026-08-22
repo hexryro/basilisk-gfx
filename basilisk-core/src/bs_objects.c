@@ -84,7 +84,7 @@ BSAPI bs_Result _bs_queryResource(int package_id, bs_ResourceType type, const ch
 
     for (int i = 0; i < range.num; i++) {
         bs_ResourceHeader* resource = package->resource_headers + range.offset + i;
-        if (resource->name_hash == hash) {
+        if (resource->name_hash == hash && resource->type == type) {
             *out = resource->resource;
             return BS_RESULT_OK;
         }
@@ -120,7 +120,7 @@ BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_ResourceType 
     bs_ResourceHeader* existing = NULL;
     for (int i = 0; i < package->resource_type_offsets[type].num; i++) {
         bs_ResourceHeader* resource = package->resource_headers + package->resource_type_offsets[type].offset + i;
-        if (resource->name_hash == hash) {
+        if (resource->name_hash == hash && resource->type == type) {
             existing = resource;
             break;
         }
@@ -149,7 +149,7 @@ BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_ResourceType 
         "%s_%03d.bpak", 
         package->path, (existing->chunk + 1)
     );
-
+    
     if (ext) ext[0] = '.';
 
     if (result == BS_RESULT_OK) {
@@ -284,7 +284,7 @@ BSAPI bs_Result _bs_loadPackageN(int* out, const char* path, int path_length) {
         
         for (int j = 0; j < old_headers_count; j++) {
             bs_ResourceHeader* existing_header = old_headers + j;
-            if (existing_header->name_hash == name_hash) {
+            if (existing_header->name_hash == name_hash && existing_header->type == type) {
                 added->resource = existing_header->resource;
                 break;
             }

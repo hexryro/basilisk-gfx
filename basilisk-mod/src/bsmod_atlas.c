@@ -183,10 +183,13 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 		memcpy(offset, "\0\n", 2);
 		offset += 2;
 
-		int w = width;
-
 		if (info->get_data)
 			info->data = info->get_data(packer, rect->id);
+
+		if (!info->data)
+			goto next;
+
+		int w = width;
 
 		// lodepng is upside down (:
 		unsigned char* atlas_offset = batl + total_size_excluding_binary;

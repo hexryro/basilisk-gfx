@@ -33,6 +33,8 @@
    *============================================================================*/
 
 BSMODAPI void _bsmod_onDragMaterial(bsmod_DraggingParams params) {
+    BS_WARN("Not implemented");
+    /*
     if (_bsmod_.hovering.flags & BSGFX_ID_IS_PREFAB) {
         bsgfx_Prefab* prefab = bsgfx_get(BSGFX_TYPE_PREFAB, _bsmod_.hovering.instance_id);
         bsgfx_RawPrefab* raw_prefab = bsgfx_getRaw(BSGFX_TYPE_PREFAB, _bsmod_.hovering.instance_id);
@@ -41,7 +43,7 @@ BSMODAPI void _bsmod_onDragMaterial(bsmod_DraggingParams params) {
             _bsmod_saveTypeN(BSGFX_TYPE_PREFAB, BS_CONSTANT_STRING("Changed prefab material"));
         }
     }
-
+    */
 }
 
 
@@ -222,7 +224,7 @@ BSMODAPI void _bsmod_rasterizeMaterialIcons() {
             push_const.model = matrix;
 
             int instance = bsgfx_instancePrimitive(sphere_subtype, BS_MAT4_IDENTITY, 0, 0, 0);
-            _bsmod_rasterizeInstance(queue, hash, sphere_subtype, instance, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
+            _bsmod_rasterizeInstance(queue, hash, sphere_subtype, instance, 1, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
         }
 
         _bsmod_endRasterize(queue);

@@ -51,6 +51,7 @@ typedef struct bsmod_DraggingParams bsmod_DraggingParams;
 typedef struct bsmod_GridClickParams bsmod_GridClickParams;
 typedef struct bsmod_SideMenuTab bsmod_SideMenuTab;
 
+typedef enum bsmod_RenderMode bsmod_RenderMode;
 typedef enum bsmod_EditType bsmod_EditType;
 typedef enum bsmod_DraggingType bsmod_DraggingType;
 typedef enum bsmod_SideMenuTabId bsmod_SideMenuTabId;
@@ -114,6 +115,16 @@ typedef void (__stdcall* PFN_void)();
 typedef unsigned char* (__stdcall* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int);
 typedef const char* (__stdcall* PFN_bsmod_GridMenu)(bs_List* widgets);
 typedef void (__stdcall* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int);
+enum bsmod_RenderMode {
+    BSMOD_RENDER_MODE_NORMAL,
+    BSMOD_RENDER_MODE_LIGHT,
+    BSMOD_RENDER_MODE_MONO,
+    BSMOD_RENDER_MODE_LCD,
+    BSMOD_RENDER_MODE_LCD_V,
+    BSMOD_RENDER_MODE_SDF,
+    BSMOD_RENDER_MODE_MSDF,
+};
+
 enum bsmod_EditType {
     BSMOD_EDIT_UNDEFINED,
     BSMOD_EDIT_POSITION,
@@ -751,6 +762,7 @@ bsmod_onPackTextureArray(
     bsmod_TrackParams params);
 
  /**
+  @param render_mode
   @param package_name
   @param ttf_path
   @param blocks
@@ -763,6 +775,7 @@ bsmod_onPackTextureArray(
   */
 BSMODAPI bs_Result
 bsmod_packFont(
+    bsmod_RenderMode render_mode[],
     char* package_name,
     char* ttf_path,
     bsmod_UnicodeBlockRange blocks[],
@@ -985,6 +998,18 @@ bsmod_queryResource(
     const char* name);
 
  /**
+  @param type
+  @param package_id
+  @param name
+  @return bs_Result
+  */
+BSMODAPI bs_Result
+bsmod_loadResource(
+    int type,
+    int package_id,
+    char* name);
+
+ /**
   @param package_id
   @return bs_Result
   */
@@ -1170,7 +1195,8 @@ bsmod_endRasterize(
   @param queue
   @param pipeline_hash
   @param subtype
-  @param instance_id
+  @param instance_offset
+  @param instance_count
   @param category
   @param name
   @param width
@@ -1183,8 +1209,9 @@ BSMODAPI bs_Result
 bsmod_rasterizeInstance(
     bs_Queue* queue,
     bs_PipelineHash pipeline_hash,
-    int subtype,
-    int instance_id,
+    bsgfx_InstanceSubtype* subtype,
+    int instance_offset,
+    int instance_count,
     int category,
     char* name,
     int width,

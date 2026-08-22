@@ -36,10 +36,10 @@ Bsmod _bsmod_ = {
     .bsgfx_package = -1,
     .package = -1,
     .history = BS_I64_MAX,
-    .hovering = {
-        .prefab = -1,
-        .primitive = -1,
-    },
+   // .hovering = {
+   //     .prefab = -1,
+   //     .primitive = -1,
+   // },
     .selected_type = -1,
     .axis = -1,
     .dragging_id = -1,
@@ -102,8 +102,6 @@ static void _bsmod_instanceAxisFace(
     bsgfx_instanceDepthlessLine(d, c, color);
     bsgfx_instanceDepthlessLine(c, a, color);
 }
-
-bs_Result _bsmod_loadResource(int type, int package_id, char* name);
 
 BSMODAPI void _bsmod_onTick() {
     _bsmod_tickTracker();
@@ -371,7 +369,7 @@ void _bsmod_loadMsdfResources() {
 
     bs_batch(msdf_glyphs, sizeof(int), $vs_bsmod_tracker_quad_instanced(), 0);
 
-    result = bs_queue(queue, BS_QUEUE_GRAPHICS_BIT);
+    result = bs_queue(queue, 1, BS_QUEUE_GRAPHICS_BIT);
     if (result != BS_RESULT_OK) {
         return;
     }
@@ -465,11 +463,13 @@ BSMODAPI void _bsmod_onIni() {
     bs_quad(&(bs_vec3) { 0 }, & (bs_vec2) { 1.0, 1.0 }, & quad);
 
     if (quad_instance_batch && bs_canPushBatch(quad_instance_batch->batch)) {
-        bsgfx_instanceType(BSMOD_INSTANCE_TYPE_TRACKER_QUAD, BSMOD_TRACKER_QUAD_INSTANCE_COUNT, BSMOD_SET_TRACKER_QUAD_INSTANCES, BSMOD_BINDING_TRACKER_QUAD_INSTANCES);
+        bsgfx_instanceType(sizeof(bsgfx_QuadInstance), BSMOD_SET_TRACKER_QUAD_INSTANCES, BSMOD_BINDING_TRACKER_QUAD_INSTANCES, & _bsgfx_instance_types_[BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD]);
 
         bs_Range range = bs_pushQuad(quad_instance_batch->batch, &quad, BS_WHITE);
 
-        _bsmod_subtypes_[BSMOD_SUBTYPE_TRACKER_QUAD_MSDF] = bsgfx_subtype(BSMOD_INSTANCE_TYPE_TRACKER_QUAD, quad_instance_batch->batch, 0, range);
+        bsgfx_InstanceType* tracker_quad_instance_type = _bsgfx_instance_types_[BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD];
+
+        bsgfx_subtype(tracker_quad_instance_type, quad_instance_batch->batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_TRACKER_QUAD_MSDF]);
 
         // if (_bsgfx_procs_.bsmod_onCreateQuadSubtypes)
         //     _bsgfx_procs_.bsmod_onCreateQuadSubtypes(range);
@@ -477,12 +477,8 @@ BSMODAPI void _bsmod_onIni() {
         bs_pushBatch(queue, quad_instance_batch->batch, BS_U32_MAX, BS_U32_MAX);
     }
 
-
-
-
-
-    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), BS_QUEUE_GRAPHICS_BIT);
-    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION, 0), BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_DONT_SIGNAL);
+    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS, BS_OBJECT_HAS_SWAPS_BIT), 0, BS_QUEUE_GRAPHICS_BIT);
+    bs_queue(BS_QUEUE(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION, 0), 1, BS_QUEUE_GRAPHICS_BIT | BS_QUEUE_DONT_SIGNAL);
 
     _bsmod_loadMsdfResources();
 
@@ -503,11 +499,12 @@ BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track
 }
 
 BSMODAPI void _bsmod_onCreateQuadSubtypes(bs_Range range) {
+    bsgfx_InstanceType* quad_instance_type = _bsgfx_instance_types_[BSGFX_INSTANCE_TYPE_2_QUAD];
     bs_Batch* batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_QUAD_INSTANCED)->batch;
-    _bsmod_subtypes_[BSMOD_SUBTYPE_MATERIAL_ICON] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, batch, 0, range);
-    _bsmod_subtypes_[BSMOD_SUBTYPE_PRIMITIVE_ICON] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, batch, 0, range);
-    _bsmod_subtypes_[BSMOD_SUBTYPE_PREFAB_ICON] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, batch, 0, range);
-    _bsmod_subtypes_[BSMOD_SUBTYPE_BILLBOARD] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, batch, 0, range);
+    bsgfx_subtype(quad_instance_type, batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_MATERIAL_ICON]);
+    bsgfx_subtype(quad_instance_type, batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_PRIMITIVE_ICON]);
+    bsgfx_subtype(quad_instance_type, batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_PREFAB_ICON]);
+    bsgfx_subtype(quad_instance_type, batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_BILLBOARD]);
 }
 
 BSMODAPI void _bsmod_bindAtlases() {

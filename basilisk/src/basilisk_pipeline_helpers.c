@@ -316,7 +316,7 @@ void basilisk_renderUI(bs_RendererScope* scope, bs_Queue* queue) {
     }
 }
 
-void basilisk_renderFontSubtype(bs_RendererScope* scope, bs_Queue* queue, int subtype, bsgfx_Id font_id, bs_Shader* fragment_shader) {
+void basilisk_renderFontSubtype(bs_RendererScope* scope, bs_Queue* queue, bsgfx_InstanceSubtype* subtype, bsgfx_Id font_id, bs_Shader* fragment_shader) {
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 

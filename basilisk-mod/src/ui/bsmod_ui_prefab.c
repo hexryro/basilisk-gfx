@@ -75,6 +75,8 @@ BSMODAPI bool _bsmod_instancePrefabPreview(bsgfx_Widget* widget, bs_vec2* positi
    *============================================================================*/
 
 BSMODAPI void _bsmod_onDragPrefab(bsmod_DraggingParams params) {
+    BS_WARN("Not implemented");
+    /*
     if (_bsmod_.hovering.tile < 0 || _bsmod_.hovering.primitive < 0)
         return;
 
@@ -111,6 +113,7 @@ BSMODAPI void _bsmod_onDragPrefab(bsmod_DraggingParams params) {
         });
         _bsmod_saveTypeN(BSGFX_TYPE_PREFAB, BS_CONSTANT_STRING("Created prefab"));
     }
+    */
 }
 
 
@@ -165,7 +168,7 @@ BSMODAPI void _bsmod_rasterizePrefabIcons() {
 
         for (int i = 0; i < count; i++) {
             bs_Mesh* mesh = model->meshes + i;
-            int subtype = mesh->extra[BSGFX_MODEL_SUBTYPE_DEFAULT];
+            bsgfx_InstanceSubtype* subtype = mesh->extra[BSGFX_MODEL_SUBTYPE_DEFAULT];
 
             bs_mat4 transform;
             bs_fitAabb(&mesh->aabb, &BS_IV2_TO_V2(render_size), &rotation, &transform);
@@ -176,7 +179,7 @@ BSMODAPI void _bsmod_rasterizePrefabIcons() {
             push_const.model = bs_m4x3(&transform);
 
             instance = bsgfx_instancePrefabModel(i, transform, BSGFX_PREFAB_SUBTYPE_MESH, $bsmod_light_blue()->id);
-            _bsmod_rasterizeInstance(queue, hash, subtype, instance, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
+            _bsmod_rasterizeInstance(queue, hash, subtype, instance, 1, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
         }
 
         _bsmod_endRasterize(queue);

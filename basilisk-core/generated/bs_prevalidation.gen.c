@@ -437,7 +437,7 @@ BSAPI bs_Result _preval_bs_bufferView(bs_Buffer* buffer, bs_Format format, bs_U6
     return next.bs_bufferView(buffer, format, start, count);
 }
 
-BSAPI bs_Result _preval_bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
+BSAPI bs_Result _preval_bs_buffer(bs_Object* object, size_t num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_buffer(object, num_bytes, usage_flags, memory_flags, flags);
 }
@@ -893,9 +893,9 @@ BSAPI int _preval_bs_imageIndex() {
     return next.bs_imageIndex();
 }
 
-BSAPI bs_Result _preval_bs_queue(bs_Object* object, bs_QueueBits flags) {
+BSAPI bs_Result _preval_bs_queue(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_queue(object, flags);
+    return next.bs_queue(object, queue_index, flags);
 }
 
 BSAPI void _preval_bs_destroyQueue(bs_Queue* queue) {

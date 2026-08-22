@@ -27,8 +27,9 @@
 #include <bsmod_cache.h>
 
 typedef struct {
-    int instance_id;
-    int subtype;
+    int instance_offset;
+    int instance_count;
+    bsgfx_InstanceSubtype* subtype;
     int category;
     char* name;
     bs_Image* image;
@@ -76,8 +77,9 @@ static void _bsmod_destroyRasterizer(bsmod_Rasterization* rasterization) {
 BSMODAPI bs_Result _val_bsmod_rasterizeInstance(
     bs_Queue* queue,
     bs_PipelineHash pipeline_hash,
-    int subtype,
-    int instance_id,
+    bsgfx_InstanceSubtype* subtype,
+    int instance_offset,
+    int instance_count,
     int category,
     char* name,
     int width,
@@ -88,19 +90,20 @@ BSMODAPI bs_Result _val_bsmod_rasterizeInstance(
     if (!bsgfx_validateSubtype("MOD", subtype))
         return BS_RESULT_VALIDATION_ERROR;
 
-    if (!bsgfx_validateInstanceType("MOD", instance_id))
-        return BS_RESULT_VALIDATION_ERROR;
+    //if (!bsgfx_validateInstanceType("MOD", instance_id))
+    //    return BS_RESULT_VALIDATION_ERROR;
 
     // BSGFX_VALIDATE(push_constant_size < BS_MAX_PUSH_CONSTANT_SIZE,); // TODO: check _bs_settings_ or something
 
-    return _bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_id, category, name, width, height, push_constant_size, push_constant);
+    return _bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_offset, instance_count, category, name, width, height, push_constant_size, push_constant);
 }
 
 BSMODAPI bs_Result _bsmod_rasterizeInstance(
     bs_Queue* queue,
     bs_PipelineHash pipeline_hash,
-    int subtype, 
-    int instance_id, 
+    bsgfx_InstanceSubtype* subtype,
+    int instance_offset,
+    int instance_count,
     int category,
     char* name, 
     int width, 
@@ -111,7 +114,8 @@ BSMODAPI bs_Result _bsmod_rasterizeInstance(
     bs_Result result;
 
     bsmod_Rasterization* rasterization = bs_pushBack(&_bsmod_rasterizations, &(bsmod_Rasterization) {
-        .instance_id = instance_id,
+        .instance_offset = instance_offset,
+        .instance_count = instance_count,
         .subtype = subtype,
         .pipeline_hash = pipeline_hash,
         .name = strdup(name),
@@ -178,13 +182,10 @@ fail:
 }
 
 BSMODAPI void _bsmod_endRasterize(bs_Queue* queue) {
-    bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
+    //bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
     //bs_Queue* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION)->queue;
 
-    bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
-    bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
-
-    bsgfx_tickInstances();
+    //bsgfx_tickInstanceType();
     bs_pushDescriptors();
 
     for (int i = 0; i < _bsmod_rasterizations.count; i++) {
@@ -192,11 +193,10 @@ BSMODAPI void _bsmod_endRasterize(bs_Queue* queue) {
 
         bs_RendererScope scope = bs_beginRender(queue, rasterization->renderer);
 
-        struct bsgfx_InstanceSubtypeMetadata* subtype_metadata = metadata->instance_subtypes + rasterization->subtype;
-        int index_offset = subtype_metadata->index_offset;
-        int index_count = subtype_metadata->index_count;
+        int index_offset = rasterization->subtype->index_offset;
+        int index_count = rasterization->subtype->index_count;
 
-        bs_Batch* batch = bs_fetch(subtype_metadata->batch_source_id, subtype_metadata->batch_id)->batch;
+        bs_Batch* batch = bs_fetch(rasterization->subtype->batch_source_id, rasterization->subtype->batch_id)->batch;
 
         bs_Pipeline* pipeline;
         if (bs_pipeline(&scope, queue, &rasterization->pipeline_hash, &pipeline) != BS_RESULT_OK)
@@ -204,7 +204,7 @@ BSMODAPI void _bsmod_endRasterize(bs_Queue* queue) {
 
         bs_clearDepth(queue, 0, rasterization->depth_image->dim, 1.0);
         bs_pushConstant(queue, pipeline, 0, rasterization->push_constant_size, rasterization->push_constant);
-        bs_render(queue, batch, pipeline, index_offset, index_count, rasterization->instance_id, 1);
+        bs_render(queue, batch, pipeline, index_offset, index_count, rasterization->instance_offset, rasterization->instance_count);
 
         bs_endRender(queue, rasterization->renderer);
         

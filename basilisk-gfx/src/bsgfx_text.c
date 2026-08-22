@@ -94,7 +94,7 @@ static inline float _bsgfx_convertDesignUnits(bsgfx_Font* font, float pt_size, f
     return (units / (float)font->units_per_em) * pt_size;
 }
 
-BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
     // TODO: check if basic latin block is available
     int pt_size_id = _bsgfx_queryPtSize(font, pt_size);
     assert(pt_size_id != -1);
@@ -196,7 +196,7 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(int subtype, bsgfx_Font* font, bs_vec3 p
     }
 }
 
-BSGFXAPI void _bsgfx_instanceUnicodeTextN(int subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char32_t* text, int text_length) {
+BSGFXAPI void _bsgfx_instanceUnicodeTextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char32_t* text, int text_length) {
     int pt_size_id = _bsgfx_queryPtSize(font, pt_size);
     assert(pt_size_id != -1);
 

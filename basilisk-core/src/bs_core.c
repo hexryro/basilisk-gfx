@@ -500,7 +500,7 @@ BSAPI bs_Result _bs_bufferView(bs_Buffer* buffer, bs_Format format, bs_U64 start
  /**
   Create Buffer
   */
-BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
+BSAPI bs_Result _bs_buffer(bs_Object* object, size_t num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
     VkResult result;
 
     if (!object->buffer)
@@ -595,7 +595,7 @@ BSAPI bs_Result _bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFl
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _val_bs_buffer(bs_Object* object, bs_U32 num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
+BSAPI bs_Result _val_bs_buffer(bs_Object* object, size_t num_bytes, bs_BufferUsageFlags usage_flags, bs_MemoryPropertyFlags memory_flags, bs_BufferBits flags) {
     BS_VALIDATE(num_bytes > 0, BS_RESULT_VALIDATION_ERROR, );
   //  BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_BUFFER, BS_RESULT_VALIDATION_ERROR);
 
@@ -2645,13 +2645,13 @@ static void _bs_nameQueue(bs_Object* object, const char* name) {
     }
 }
 
-BSAPI bs_Result _val_bs_queue(bs_Object* object, bs_QueueBits flags) {
+BSAPI bs_Result _val_bs_queue(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags) {
  //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_QUEUE, BS_RESULT_VALIDATION_ERROR);
 
-    return _bs_queue(object, flags);
+    return _bs_queue(object, queue_index, flags);
 }
 
-BSAPI bs_Result _bs_queue(bs_Object* object, bs_QueueBits flags) {
+BSAPI bs_Result _bs_queue(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags) {
     VkResult vk_result;
     bs_Queue* queue = object->queue;
 
@@ -2673,7 +2673,7 @@ BSAPI bs_Result _bs_queue(bs_Object* object, bs_QueueBits flags) {
     int num_swaps = _bs_queueSwapsCount(queue);
 
     queue->family = _bs_queueFamily(flags);
-    vkGetDeviceQueue(_bs_instance_->device, queue->family, 0, &queue->queue);
+    vkGetDeviceQueue(_bs_instance_->device, queue->family, queue_index, &queue->queue);
 
    /**
     Command Buffers

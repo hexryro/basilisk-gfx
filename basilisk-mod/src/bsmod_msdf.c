@@ -450,7 +450,7 @@ int msdfgl_glyph_buffer_size(FT_Face face, int code, size_t* meta_size,
 
 typedef struct {
     bs_mat4 camera;
-    bs_vec2 offset;
+    bs_vec2 size;
     bs_vec2 translate;
     bs_vec2 scale;
     float range;
@@ -495,73 +495,32 @@ static void _bsmod_renderGlyphAtlas(bsmod_MSDFPushConstant push_const) {
 
         _bsmod_beginRasterize(render_size, output_size);
 
-        int subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_TRACKER_QUAD_MSDF];
+        bsgfx_InstanceSubtype* subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_TRACKER_QUAD_MSDF];
 
-        bs_mat4x3 matrix = bsgfx_matrix(BS_V3(0, 0, 0), BS_V3(width, height, 0));
+        int glyph_width = 64, glyph_height = 64;
+        bs_mat4x3 matrix = bsgfx_matrix(BS_V3(92, 108, 0), BS_V3(glyph_width, glyph_height, 0));
         int instance = bsgfx_instanceQuad(
+            subtype,
+            matrix,
+            BS_V4(0, 0, 1, 1),
+            0, 0, 0);
+        matrix = bsgfx_matrix(BS_V3(400, 208, 0), BS_V3(glyph_width, glyph_height, 0));
+        int instance2 = bsgfx_instanceQuad(
             subtype,
             matrix,
             BS_V4(0, 0, 1, 1),
             0, 0, 0);
 
         //int instance = bsgfx_instancePrimitive(sphere_subtype, BS_MAT4_IDENTITY, 0, 0, 0);
-        _bsmod_rasterizeInstance(queue, hash, subtype, instance, 0, "test", render_size.x, render_size.y, sizeof(push_const), &push_const);
+        _bsmod_rasterizeInstance(queue, hash, subtype, instance, 2, 0, "test", glyph_width, glyph_height, sizeof(push_const), &push_const);
 
         _bsmod_endRasterize(queue);
     }
 }
 
-bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t end);
-void _bsmod_generateGlyphsMSDF() {
+bs_Result _msdfgl_generate_glyphs_internal(const char* package_path, const char* resource_name, FT_Face face, int32_t start, int32_t end);
+void _bsmod_generateGlyphsMSDF(const char* package_path, const char* resource_name) {
 
-#ifdef RENDERDOC_PATH
-    if (_bsmod_.renderdoc_device) {
-        bs_logF("Starting frame capture");
-        _bsmod_.renderdoc_api->StartFrameCapture(_bsmod_.renderdoc_device, NULL);
-    }
-#endif
-
-    bs_Object* queue = bs_fetch(BSMOD_QUEUES, BSMOD_QUEUE_GRAPHICS_RASTERIZATION);
-    bs_Object* renderer = bs_fetch(BSMOD_RENDERERS, BSMOD_RENDERER_MSDF);
-    bs_Object* msdf_glyphs = bs_fetch(BSMOD_BATCHES, BSMOD_BATCH_MSDF_GLYPHS);
-
-    FT_Error error;
-    FT_Face face;
-    FT_Library freetype_library = NULL;
-
-     if (!freetype_library) {
-        error = FT_Init_FreeType(&freetype_library);
-        if (error) {
-            BSMOD_WARN_FREETYPE_ERROR("FT_Init_FreeType", error, );
-            //return _bsmod_convertFreetypeError(error);
-        }
-    }
-
-    error = FT_New_Face(freetype_library, "project/fonts/segoeui.ttf", 0, &face);
-    if (error) {
-        BSMOD_WARN_FREETYPE_ERROR("FT_New_Face", error, );
-      //  return _bsmod_convertFreetypeError(error);
-    }
-
-
-    if (bs_resetQueue(queue->queue) == BS_RESULT_OK) {
-        _msdfgl_generate_glyphs_internal(face, 65, 66);
-        bs_pushQueue(queue->queue, 0, NULL);
-    }
-
-#ifdef RENDERDOC_PATH
-    if (_bsmod_.renderdoc_device) {
-        bs_logF("Ending frame capture");
-
-        bs_U32 result = _bsmod_.renderdoc_api->EndFrameCapture(_bsmod_.renderdoc_api, NULL);
-
-        if (result != 1)
-            BS_WARN("EndFrameCapture returned %d", result);
-    }
-#endif
-
-    bs_stallQueue(queue->queue);
-    _bsmod_pollRasterizer();
 }
 
 BSMODAPI void _bsmod_rasterizeGlyphAtlas() {
@@ -572,135 +531,3 @@ static inline int _msdfgl_is_control(int32_t code) {
     return (code <= 31) || (code >= 128 && code <= 159);
 }
 
-bs_Result _msdfgl_generate_glyphs_internal(FT_Face face, int32_t start, int32_t end) {
-
-    int retval = -2;
-
-    int nrender = end - start;
-
-    if (nrender <= 0)
-        return -1;
-
-    const float font_scale = 4;
-    const float font_range = 2;
-
-    size_t* meta_sizes = NULL, * point_sizes = NULL;
-    msdfgl_index_entry* atlas_index = NULL;
-
-    meta_sizes = bs_alloca(nrender * sizeof(size_t));
-    point_sizes = bs_alloca(nrender * sizeof(size_t));
-
-    atlas_index = bs_alloca(nrender * sizeof(msdfgl_index_entry));
-
-    size_t meta_size_sum = 0, point_size_sum = 0;
-    for (size_t i = 0; (int)i < (int)nrender; i++) {
-        int index = start + (int)i;
-        msdfgl_glyph_buffer_size(face, index, &meta_sizes[i], &point_sizes[i]);
-
-        meta_size_sum += meta_sizes[i];
-        point_size_sum += point_sizes[i];
-    }
-
-    bs_Object* point_data_object = BS_BUFFER(-1, -1, 0);
-    bs_Object* metadata_object = BS_BUFFER(-1, -1, 0);
-
-    bs_buffer(
-        point_data_object, 
-        point_size_sum, 
-        BS_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT,
-        BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        0);
-
-    bs_buffer(
-        metadata_object,
-        meta_size_sum,
-        BS_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT,
-        BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        0);
-
-    bs_bufferView(point_data_object->buffer, BS_FORMAT_R32_SFLOAT, 0, BS_U64_MAX);
-    bs_bufferView(metadata_object->buffer, BS_FORMAT_R8_UINT, 0, BS_U64_MAX);
-
-    bs_mapBuffer(point_data_object->buffer, BS_U32_MAX);
-    bs_mapBuffer(metadata_object->buffer, BS_U32_MAX);
-
-    bs_bindBuffer(BSMOD_SET_MSDF_BITMAP, BSMOD_BINDING_MSDF_BITMAP, metadata_object->buffer);
-    bs_bindBuffer(BSMOD_SET_MSDF_INDEX, BSMOD_BINDING_MSDF_INDEX, point_data_object->buffer);
-
-    bs_pushBindings();
-    bs_pushDescriptors();
-
-    void* point_data = point_data_object->buffer->_->data;
-    void* metadata = metadata_object->buffer->_->data;
-
-    /* Serialize the glyphs into RAM. */
-    char* meta_ptr = metadata;
-    char* point_ptr = point_data;
-    for (size_t i = 0; (int)i < (int)nrender; i++) {
-        float buffer_width, buffer_height;
-
-        int index = start + (int)i;
-        msdfgl_serialize_glyph(face, index, meta_ptr, (float*)point_ptr);
-
-        buffer_width = face->glyph->metrics.width / SERIALIZER_SCALE + font_range;
-        buffer_height = face->glyph->metrics.height / SERIALIZER_SCALE + font_range;
-        buffer_width *= font_scale;
-        buffer_height *= font_scale;
-
-        atlas_index[i].offset_x = 0;
-        atlas_index[i].offset_y = 0;
-        atlas_index[i].size_x = buffer_width;
-        atlas_index[i].size_y = buffer_height;
-        atlas_index[i].bearing_x = (float)face->glyph->metrics.horiBearingX;
-        atlas_index[i].bearing_y = (float)face->glyph->metrics.horiBearingY;
-        atlas_index[i].glyph_width = (float)face->glyph->metrics.width;
-        atlas_index[i].glyph_height = (float)face->glyph->metrics.height;
-
-        meta_ptr += meta_sizes[i];
-        point_ptr += point_sizes[i];
-    }
-
-    const int atlas_width = 1024, atlas_height = 1024;
-
-    bs_mat4 framebuffer_projection;
-    bs_mat4 atlas_projection;
-
-    bs_orthographic(0, atlas_width, 0, atlas_height, -1.0, 1.0, &framebuffer_projection);
-
-    bs_orthographic(-atlas_width, atlas_width, -atlas_height, atlas_height, -1.0, 1.0, &atlas_projection);
-
-    bsmod_MSDFPushConstant push_const = {
-        .scale = { font_scale, font_scale},
-        .range = font_range,
-        .meta_offset = 0,
-        .point_offset = 0,
-    };
-
-    int meta_offset = 0;
-    int point_offset = 0;
-    for (int i = 0; i < nrender; ++i) {
-        if (end && start == 0 && i != 0 && _msdfgl_is_control(i))
-            continue;
-
-        msdfgl_index_entry g = atlas_index[i];
-
-        push_const.translate = BS_V2(
-            -g.bearing_x / SERIALIZER_SCALE + font_range / 2.0f,
-            (g.glyph_height - g.bearing_y) / SERIALIZER_SCALE + font_range / 2.0f
-        );
-        push_const.glyph_height = g.size_y;
-
-        push_const.meta_offset = meta_offset;
-        push_const.point_offset = point_offset / (2 * sizeof(float));
-
-        if (((unsigned char*)metadata)[meta_offset])
-            _bsmod_renderGlyphAtlas(push_const);
-
-        meta_offset += meta_sizes[i];
-        point_offset += point_sizes[i];
-    }
-
-    retval = nrender;
-
-    return BS_RESULT_OK;
-}

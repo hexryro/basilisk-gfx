@@ -46,18 +46,21 @@ typedef struct bsgfx_Text bsgfx_Text;
 typedef struct bsgfx_MeshInstance bsgfx_MeshInstance;
 typedef struct bsgfx_BoneInstance bsgfx_BoneInstance;
 typedef struct bsgfx_QuadInstance bsgfx_QuadInstance;
+typedef struct bsgfx_PointInstance bsgfx_PointInstance;
+typedef struct bsgfx_LineInstance bsgfx_LineInstance;
 typedef struct bsgfx_Scene bsgfx_Scene;
 typedef struct bsgfx_Material bsgfx_Material;
 typedef struct bsgfx_Collider bsgfx_Collider;
 typedef struct bsgfx_SweepCollision bsgfx_SweepCollision;
 typedef struct bsgfx_Animator bsgfx_Animator;
 typedef struct bsgfx_AnimatorCallbacks bsgfx_AnimatorCallbacks;
-typedef struct bsgfx_InstanceBuffer bsgfx_InstanceBuffer;
 typedef struct bsgfx_Settings bsgfx_Settings;
 typedef struct Poser Poser;
 typedef struct bsgfx_Callbacks bsgfx_Callbacks;
 typedef struct bsgfx_Application bsgfx_Application;
 typedef struct bsgfx_TypeHeader bsgfx_TypeHeader;
+typedef struct bsgfx_InstanceType bsgfx_InstanceType;
+typedef struct bsgfx_InstanceSubtype bsgfx_InstanceSubtype;
 typedef struct bsgfx_Type bsgfx_Type;
 typedef struct bsgfx_Foliage bsgfx_Foliage;
 typedef struct bsgfx_RawFoliage bsgfx_RawFoliage;
@@ -91,12 +94,11 @@ typedef struct bsgfx_MenuTabBar bsgfx_MenuTabBar;
 typedef struct bsgfx_Menu bsgfx_Menu;
 typedef struct bsgfx_TitleBar bsgfx_TitleBar;
 
-typedef enum bsgfx_Subtype bsgfx_Subtype;
 typedef enum bsgfx_MaterialCategory bsgfx_MaterialCategory;
 typedef enum bsgfx_CollisionType bsgfx_CollisionType;
 typedef enum bsgfx_AnimatorTypeBit bsgfx_AnimatorTypeBit;
 typedef enum bsgfx_FontFlag bsgfx_FontFlag;
-typedef enum bsgfx_SubtypeFlag bsgfx_SubtypeFlag;
+typedef enum bsgfx_InstanceSubtypeFlag bsgfx_InstanceSubtypeFlag;
 typedef enum bsgfx_ModelSubtype bsgfx_ModelSubtype;
 typedef enum bsgfx_Pipe bsgfx_Pipe;
 typedef enum bsgfx_TypeId bsgfx_TypeId;
@@ -273,40 +275,7 @@ typedef bs_U32 bsgfx_PrimitiveFlags;
 typedef bs_U32 bsgfx_SpawnerFlags;
 typedef void (__stdcall* PFN_bsgfx_TypeMapper)(void*, void*);
 typedef bool (__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*);
-enum bsgfx_Subtype {
-    BSGFX_SUBTYPE_BIPYRAMID,
-    BSGFX_SUBTYPE_PRIMITIVE_BOX,
-    BSGFX_SUBTYPE_PRIMITIVE_SPHERE,
-    BSGFX_SUBTYPE_TILE,
-    BSGFX_SUBTYPE_TILE_2,
-    BSGFX_SUBTYPE_64_HI,
-    BSGFX_SUBTYPE_256_HI,
-    BSGFX_SUBTYPE_ATLAS_ICON,
-    BSGFX_SUBTYPE_UI,
-    BSGFX_SUBTYPE_UI_COLOR,
-    BSGFX_SUBTYPE_UI_STENCIL,
-    BSGFX_SUBTYPE_COLOR_PICKER,
-    BSGFX_SUBTYPE_COLOR_PICKER_HUE,
-    BSGFX_SUBTYPE_COLOR_PICKER_ALPHA,
-    BSGFX_SUBTYPE_DITHER,
-    BSGFX_SUBTYPE_CORNER_GRADIENT,
-    BSGFX_SUBTYPE_TILE_ICON,
-    BSGFX_SUBTYPE_QUAD_MATERIAL_TEXTURE,
-    BSGFX_SUBTYPE_PRIMITIVE_HI,
-    BSGFX_SUBTYPE_ATLAS_PREFAB,
-    BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT,
-    BSGFX_SUBTYPE_PLANE_MESH,
-    BSGFX_SUBTYPE_ATLAS,
-    BSGFX_SUBTYPE_CONE_MESH,
-    BSGFX_SUBTYPE_SPHERE_MESH,
-    BSGFX_SUBTYPE_POINT,
-    BSGFX_SUBTYPE_LINE,
-    BSGFX_SUBTYPE_LINE_2D,
-    BSGFX_SUBTYPE_LINE_DEPTHLESS,
-    BSGFX_SUBTYPE_FONT,
-    BSGFX_SUBTYPE_COUNT,
-};
-
+typedef struct bsgfx_InstanceHeader bsgfx_InstanceHeader;
 enum bsgfx_MaterialCategory {
     BSGFX_MATERIAL_CATEGORY_NONE,
     BSGFX_MATERIAL_CATEGORY_UI_COLOR_SCHEME,
@@ -339,7 +308,7 @@ enum bsgfx_FontFlag {
     BSGFX_FONT_NO_CAPS = 1 << 1,
 };
 
-enum bsgfx_SubtypeFlag {
+enum bsgfx_InstanceSubtypeFlag {
     BSGFX_SUBTYPE_MANUAL_RESET = 1 << 0,
 };
 
@@ -1168,6 +1137,18 @@ struct bsgfx_QuadInstance {
     bs_vec2 offset;
 };
 
+struct bsgfx_PointInstance {
+    bs_vec3 coord;
+    float size;
+    bs_vec4 color;
+};
+
+struct bsgfx_LineInstance {
+    bs_vec4 start;
+    bs_vec4 end;
+    bs_vec4 color;
+};
+
 struct bsgfx_Scene {
     const char* name;
     bs_U64 name_hash;
@@ -1228,11 +1209,6 @@ struct bsgfx_AnimatorCallbacks {
     du_animatorCallback(pose) ;
 };
 
-struct bsgfx_InstanceBuffer {
-    struct bsgfx_InstanceHeader header;
-    char data[64];
-};
-
 struct bsgfx_Settings {
     bool cull_backfaces;
     float master_volume;
@@ -1261,8 +1237,6 @@ struct Poser {
         bs_mat4 result;
     } screen_camera;
     float zoom;
-    bool instances_ticked;
-    bs_Buffer* instance_buffers[BSGFX_INSTANCE_TYPE_COUNT];
     struct {
         int joint_offset;
     } members[BSGFX_MAX_NUMBER_PLAYERS];
@@ -1293,6 +1267,24 @@ struct bsgfx_TypeHeader {
     int flexible_count;
     int count;
     int accessors[];
+};
+
+struct bsgfx_InstanceType {
+    int instance_count;
+    int instance_size;
+    bs_List subtypes;
+    bs_Buffer* device_instances;
+};
+
+struct bsgfx_InstanceSubtype {
+    int index_offset;
+    int index_count;
+    int instance_offset;
+    int batch_source_id;
+    int batch_id;
+    uint flags;
+    bsgfx_InstanceType* instance_type2;
+    bs_List host_instances;
 };
 
 struct bsgfx_Type {
@@ -1658,7 +1650,7 @@ struct bsgfx_Widget {
             float border_radius;
             int outline_material_id;
             bs_Atlas* atlas;
-            int atlas_subtype;
+            bsgfx_InstanceSubtype* atlas_subtype;
             bool flipped;
             bool mirrored;
         } icon;
@@ -1695,7 +1687,7 @@ struct bsgfx_Widget {
         struct {
             bs_vec2 size;
             float border_radius;
-            int subtype;
+            bsgfx_InstanceSubtype* subtype;
             int material_id;
             int outline_material_id;
             int shadow_material_id;
@@ -1747,7 +1739,7 @@ struct bsgfx_Menu {
     float border_radius;
     int shadow_material_id;
     int outline_material_id;
-    int text_subtype;
+    bsgfx_InstanceSubtype* text_subtype;
 };
 
 struct bsgfx_TitleBar {
@@ -1783,6 +1775,12 @@ bsgfx_disableValidation();
   */
 BSGFXAPI void
 bsgfx_test();
+
+ /**
+  @return bsgfx_InstanceSubtype**
+  */
+BSGFXAPI bsgfx_InstanceSubtype**
+bsgfx_subtypes();
 
  /**
   @param font
@@ -1837,7 +1835,7 @@ bsgfx_renderLineModel(
     bs_RendererScope* scope,
     bs_Queue* queue,
     const bs_mat4* camera,
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bool skip_depth_test);
 
  /**
@@ -1853,7 +1851,7 @@ bsgfx_renderLines(
     bs_RendererScope* scope,
     bs_Queue* queue,
     const bs_mat4* camera,
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bool skip_depth_test);
 
  /**
@@ -1938,17 +1936,17 @@ bsgfx_loadScene(
 BSGFXAPI bool
 bsgfx_validateSubtype(
     const char* library_name,
-    int subtype);
+    bsgfx_InstanceSubtype* subtype);
 
  /**
   @param library_name
-  @param instance_type_id
+  @param instance_type
   @return bool
   */
 BSGFXAPI bool
 bsgfx_validateInstanceType(
     const char* library_name,
-    int instance_type_id);
+    bsgfx_InstanceType* instance_type);
 
  /**
   @param position
@@ -2207,87 +2205,57 @@ bsgfx_animator(
     int animations_count);
 
  /**
-  @param subtype
-  @return bs_List*
-  */
-BSGFXAPI bs_List*
-bsgfx_subtypeInstances(
-    int subtype);
-
- /**
+  @param instance_type
+  @param instances_count
+  @param overhead_count
   @return bs_Result
   */
 BSGFXAPI bs_Result
-bsgfx_iniInstances();
+bsgfx_ensureInstanceCount(
+    bsgfx_InstanceType* instance_type,
+    bs_U32 instances_count,
+    bs_U32 overhead_count);
 
  /**
-  @param type
-  @param max_instance_count
+  @param instance_size
   @param bind_set
   @param binding
-  @return void
+  @param out
+  @return bs_Result
   */
-BSGFXAPI void
+BSGFXAPI bs_Result
 bsgfx_instanceType(
-    int type,
-    int max_instance_count,
+    size_t instance_size,
     int bind_set,
-    int binding);
+    int binding,
+    bsgfx_InstanceType** out);
 
  /**
-  @param subtype
-  @return bs_Range
-  */
-BSGFXAPI bs_Range
-bsgfx_subtypeRange(
-    int subtype);
-
- /**
-  @param subtype
+  @param instance_subtype
   @return void
   */
 BSGFXAPI void
 bsgfx_deleteSubtype(
-    int subtype);
+    bsgfx_InstanceSubtype* instance_subtype);
 
  /**
-  @param subtype
-  @return int
-  */
-BSGFXAPI int
-bsgfx_instanceCount(
-    int subtype);
-
- /**
-  @param instance_type_id
-  @return int
-  */
-BSGFXAPI int
-bsgfx_subtypeCount(
-    int instance_type_id);
-
- /**
-  @return const int*
-  */
-BSGFXAPI const int*
-bsgfx_subtypes();
-
- /**
-  @param type
+  @param instance_type
   @param batch
   @param flags
   @param range
-  @return int
+  @param out
+  @return bs_Result
   */
-BSGFXAPI int
+BSGFXAPI bs_Result
 bsgfx_subtype(
-    int type,
+    bsgfx_InstanceType* instance_type,
     bs_Batch* batch,
     bs_U32 flags,
-    bs_Range range);
+    bs_Range range,
+    bsgfx_InstanceSubtype** out);
 
  /**
-  @param subtype
+  @param instance_subtype
   @param data
   @param data_size
   @param flags
@@ -2297,8 +2265,8 @@ bsgfx_subtype(
   @return int
   */
 BSGFXAPI int
-bsgfx_instance(
-    int subtype,
+bsgfx_instantiate(
+    bsgfx_InstanceSubtype* instance_subtype,
     const char* data,
     int data_size,
     bs_U32 flags,
@@ -2307,46 +2275,40 @@ bsgfx_instance(
     int material);
 
  /**
+  @param instance_type
   @return void
   */
 BSGFXAPI void
-bsgfx_tickInstances();
-
- /**
-  @param subtype
-  @param flag
-  @return bool
-  */
-BSGFXAPI bool
-bsgfx_subtypeHasFlag(
-    int subtype,
-    bs_U32 flag);
+bsgfx_tickInstanceType(
+    bsgfx_InstanceType* instance_type);
 
  /**
   @param queue
-  @param subtype
+  @param instance_subtype
   @param pipeline
   @return void
   */
 BSGFXAPI void
 bsgfx_renderSubtype(
     bs_Queue* queue,
-    int subtype,
+    bsgfx_InstanceSubtype* instance_subtype,
     bs_Pipeline* pipeline);
 
  /**
+  @param instance_type
   @return void
   */
 BSGFXAPI void
-bsgfx_resetInstances();
+bsgfx_resetInstanceType(
+    bsgfx_InstanceType* instance_type);
 
  /**
-  @param subtype
+  @param instance_subtype
   @return void
   */
 BSGFXAPI void
 bsgfx_resetSubtype(
-    int subtype);
+    bsgfx_InstanceSubtype* instance_subtype);
 
  /**
   @param mesh
@@ -2376,7 +2338,7 @@ bsgfx_instanceHiResMesh(
   */
 BSGFXAPI int
 bsgfx_instanceMesh(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     const bsgfx_MeshInstance* data,
     bs_U32 flags,
     int id,
@@ -2392,7 +2354,7 @@ bsgfx_instanceMesh(
   */
 BSGFXAPI int
 bsgfx_instanceBoneMesh(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     const bsgfx_BoneInstance* data,
     bs_U32 flags,
     int id,
@@ -2493,7 +2455,7 @@ bsgfx_instancePoint(
   */
 BSGFXAPI int
 bsgfx_instanceQuad(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bs_mat4x3 transform,
     bs_vec4 coords,
     bs_U32 flags,
@@ -2527,7 +2489,7 @@ bsgfx_instanceDepthlessCircle(
   */
 BSGFXAPI int
 bsgfx_instanceAtlas(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bs_mat4x3 transform,
     int texture,
     bs_U32 flags,
@@ -2545,7 +2507,7 @@ bsgfx_instanceAtlas(
   */
 BSGFXAPI int
 bsgfx_instanceAtlasFlipped(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bs_mat4x3 transform,
     int texture,
     bs_U32 flags,
@@ -2562,7 +2524,7 @@ bsgfx_instanceAtlasFlipped(
   */
 BSGFXAPI void
 bsgfx_instanceASCIIText(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
@@ -2579,7 +2541,7 @@ bsgfx_instanceASCIIText(
   */
 BSGFXAPI void
 bsgfx_instanceASCIITextN(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
@@ -2597,7 +2559,7 @@ bsgfx_instanceASCIITextN(
   */
 BSGFXAPI void
 bsgfx_instanceASCIITextV(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
@@ -2615,7 +2577,7 @@ bsgfx_instanceASCIITextV(
   */
 BSGFXAPI void
 bsgfx_instanceASCIITextF(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
@@ -2972,9 +2934,9 @@ bsgfx_loadPrimitives(
 
  /**
   @param type
-  @return int
+  @return bsgfx_InstanceSubtype*
   */
-BSGFXAPI int
+BSGFXAPI bsgfx_InstanceSubtype*
 bsgfx_primitiveSubtype(
     bsgfx_PrimitiveType type);
 
@@ -2988,7 +2950,7 @@ bsgfx_primitiveSubtype(
   */
 BSGFXAPI int
 bsgfx_instancePrimitive(
-    int subtype,
+    bsgfx_InstanceSubtype* subtype,
     bs_mat4 transform,
     bs_U32 flags,
     int id,
@@ -3226,7 +3188,6 @@ bsgfx_renderColorPickers(
 
 BSGFXAPI extern bsgfx_Scene _bsgfx_current_scene_;
 BSGFXAPI extern bsgfx_Type _bsgfx_types_[BSGFX_TYPE_COUNT];
-BSGFXAPI extern int _bsgfx_subtypes_[BSGFX_SUBTYPE_COUNT];
 BSGFXAPI extern const char* _bsgfx_material_categories_[BSGFX_MATERIAL_CATEGORY_COUNT];
 BSGFXAPI extern bs_List _bsgfx_materials_;
 BSGFXAPI extern bs_mat4* _bsgfx_shader_joints_;

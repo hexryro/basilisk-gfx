@@ -61,6 +61,7 @@ static bs_mat4 bsgfx_primitiveOrigin(bsgfx_RawPrimitive* primitive, bs_vec3 orig
 }
 
 BSMODAPI void _bsmod_snapPrimitive() {
+	/*
 	static bs_vec2 cursor_start;
 
 	bs_vec2 cursor = bs_cursorPosition();
@@ -132,7 +133,7 @@ BSMODAPI void _bsmod_snapPrimitive() {
 			bs_m4Rotate(&transform, &primitive->rotation, &transform);
 			bs_m4Scale(&transform, &primitive->scale, &transform);
 
-			bsgfx_instance(bsgfx_subtypes()[BSGFX_SUBTYPE_PRIMITIVE_BOX], &transform, sizeof(bs_mat4), BSGFX_ID_SELECTED | BSGFX_ID_INSTANCE_TYPE_MESH | BSGFX_ID_HIGHLIGHT | BSGFX_ID_IS_PRIMITIVE, 0, 0, 0);
+			bsgfx_instantiate(bsgfx_subtypes()[BSGFX_SUBTYPE_PRIMITIVE_BOX], &transform, sizeof(bs_mat4), BSGFX_ID_SELECTED | BSGFX_ID_INSTANCE_TYPE_MESH | BSGFX_ID_HIGHLIGHT | BSGFX_ID_IS_PRIMITIVE, 0, 0, 0);
 
 			if (bs_keyDown(BS_KEY_LEFT_CONTROL)) {
 				if (!bs_leftClickOnce()) {
@@ -151,6 +152,7 @@ BSMODAPI void _bsmod_snapPrimitive() {
 
 	//if (edited)
 	//	bs_io.left_clicked = false;
+	*/
 }
 
 

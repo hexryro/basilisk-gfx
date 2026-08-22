@@ -47,6 +47,15 @@
 	</typedefs>
 
 	<enums>
+		<enum name="bsmod_RenderMode">
+			<line><name>BSMOD_RENDER_MODE_NORMAL</name></line>
+			<line><name>BSMOD_RENDER_MODE_LIGHT</name></line>
+			<line><name>BSMOD_RENDER_MODE_MONO</name></line>
+			<line><name>BSMOD_RENDER_MODE_LCD</name></line>
+			<line><name>BSMOD_RENDER_MODE_LCD_V</name></line>
+			<line><name>BSMOD_RENDER_MODE_SDF</name></line>
+			<line><name>BSMOD_RENDER_MODE_MSDF</name></line>
+		</enum>
 		<enum name="bsmod_EditType">
 			<line><name>BSMOD_EDIT_UNDEFINED</name></line>
 			<line><name>BSMOD_EDIT_POSITION</name></line>
@@ -569,7 +578,10 @@
 	<functions>
 		<validationTemplate/>
 
-		<function name="bsmod_subtypes"><return>const int*</return></function>
+		<function name="bsmod_subtypes">
+			<return>bsgfx_InstanceSubtype*</return>
+		</function>
+		
 		<function name="bsmod_callbacks">
 			<return>bsmod_Callbacks*</return>
 		</function>
@@ -647,6 +659,7 @@
 
 		<function name="bsmod_packFont">
 			<return>bs_Result</return>
+			<param><type>bsmod_RenderMode</type><name>render_mode</name><size></size></param>
 			<param><type>char*</type><name>package_name</name></param>
 			<param><type>char*</type><name>ttf_path</name></param>
 			<param><type>bsmod_UnicodeBlockRange</type><name>blocks</name><size></size></param>
@@ -730,6 +743,12 @@
 			<param><type>bs_ResourceType</type><name>type</name></param>
 			<param><type>const char*</type><name>name</name></param>
 		</function>
+		<function name="bsmod_loadResource">
+			<return>bs_Result</return>
+			<param><type>int</type><name>type</name></param>
+			<param><type>int</type><name>package_id</name></param>
+			<param><type>char*</type><name>name</name></param>
+		</function>
 		<function name="bsmod_iniPackage">
 			<return>bs_Result</return>
 			<param><type>int</type><name>package_id</name></param>
@@ -782,8 +801,9 @@
 			<return>bs_Result</return>
 			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>bs_PipelineHash</type><name>pipeline_hash</name></param>
-			<param><type>int</type><name>subtype</name></param>
-			<param><type>int</type><name>instance_id</name></param>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
+			<param><type>int</type><name>instance_offset</name></param>
+			<param><type>int</type><name>instance_count</name></param>
 			<param><type>int</type><name>category</name></param>
 			<param><type>char*</type><name>name</name></param>
 			<param><type>int</type><name>width</name></param>

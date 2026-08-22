@@ -62,7 +62,7 @@ bsgfx_Material* _bsgfx_materialF(
 }
 
 void _bsgfx_instanceASCIIText(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
@@ -72,7 +72,7 @@ void _bsgfx_instanceASCIIText(
 }
 
 void _bsgfx_instanceASCIITextV(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
@@ -86,7 +86,7 @@ void _bsgfx_instanceASCIITextV(
 }
 
 void _bsgfx_instanceASCIITextF(
-    int subtype, 
+    bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 

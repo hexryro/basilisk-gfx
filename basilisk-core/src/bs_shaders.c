@@ -60,14 +60,11 @@ static VkDescriptorSetLayout _bs_pushDescriptorLayout(bs_BindSet* bind_set) {
             continue;
         }
 
-        printf("%d: %d, %d\n", i, bind_set->slot, binding->slot);
-        
         layout_binding->binding = binding->slot;
         layout_binding->descriptorCount = binding->descriptors_count; // == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE) ? _bs_num_objects.images : 1;
         layout_binding->descriptorType = (VkDescriptorType)binding->type;
         layout_binding->stageFlags = binding->stages;
     }
-    printf("\n");
 
     VkDescriptorSetLayoutCreateInfo layout_i = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,

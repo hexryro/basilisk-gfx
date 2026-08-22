@@ -78,6 +78,7 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_queryPackage = (PFN_bsmod_queryPackage)GetProcAddress(module, "_preval_bsmod_queryPackage");
     functions.bsmod_ensurePackage = (PFN_bsmod_ensurePackage)GetProcAddress(module, "_preval_bsmod_ensurePackage");
     functions.bsmod_queryResource = (PFN_bsmod_queryResource)GetProcAddress(module, "_preval_bsmod_queryResource");
+    functions.bsmod_loadResource = (PFN_bsmod_loadResource)GetProcAddress(module, "_preval_bsmod_loadResource");
     functions.bsmod_iniPackage = (PFN_bsmod_iniPackage)GetProcAddress(module, "_preval_bsmod_iniPackage");
     functions.bsmod_packResource = (PFN_bsmod_packResource)GetProcAddress(module, "_preval_bsmod_packResource");
     functions.bsmod_savePackage = (PFN_bsmod_savePackage)GetProcAddress(module, "_preval_bsmod_savePackage");

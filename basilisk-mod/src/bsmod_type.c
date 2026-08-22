@@ -575,6 +575,7 @@ BSMODAPI void _bsmod_copyHoveringDataToBuffer() {
 }
 
 BSMODAPI void _bsmod_readHoveringInstanceData() {
+	/*
 	_bsmod_.hovering.instance_type = -1;
 	_bsmod_.hovering.subtype = -1;
 
@@ -591,7 +592,7 @@ BSMODAPI void _bsmod_readHoveringInstanceData() {
 		_bsmod_.hovering.instance_id = instance->header.id;
 
 		bs_Buffer* metadata_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_METADATA)->buffer;
-		bsgfx_InstanceMetadata* metadata = bs_bufferMap(metadata_buffer);
+		bsgfx_Instantiator* metadata = bs_bufferMap(metadata_buffer);
 
 		for (int j = 0; j < metadata->subtypes_count; j++) {
 			if (metadata->instance_subtypes[j].instance_type != _bsmod_.hovering.instance_type) continue;
@@ -606,6 +607,7 @@ BSMODAPI void _bsmod_readHoveringInstanceData() {
 			}
 		}
 	}
+	*/
 }
 
  /**
@@ -618,6 +620,7 @@ BSMODAPI void _val_bsmod_readHoveringVertex() {
 }
 
 BSMODAPI void _bsmod_readHoveringVertex() {
+	/*
 	if (_bsmod_.hovering.instance_type < 0)
 		return;
 
@@ -639,6 +642,7 @@ BSMODAPI void _bsmod_readHoveringVertex() {
 
 	if (is_unselected_primitive)
 		_bsmod_.hovering.closest_vertex = normal;
+		*/
 }
 
  /**
@@ -652,6 +656,7 @@ BSMODAPI void _val_bsmod_readHoveringOutputs() {
 }
 
 BSMODAPI void _bsmod_readHoveringOutputs() {
+	/*
 	_bsmod_.hovering.color = BS_RGBA(0, 0, 0, 0);
 	_bsmod_.hovering.normal = BS_V3(0.0, 0.0, 0.0);
 	_bsmod_.hovering.flags = _bsmod_.hovering.index = 0;
@@ -665,6 +670,7 @@ BSMODAPI void _bsmod_readHoveringOutputs() {
 	_bsmod_.hovering.color = *(bs_RGBA*)(data + BSGFX_LO_SUBPASS_0_OUT_COLOR);
 	_bsmod_.hovering.index = data[BSGFX_LO_SUBPASS_0_OUT_INDEX];
 	_bsmod_.hovering.flags = data[BSGFX_LO_SUBPASS_0_OUT_FLAGS];
+	*/
 }
 
 BSMODAPI void _bsmod_editSelectedType() {
@@ -679,6 +685,7 @@ BSMODAPI void _bsmod_editSelectedType() {
 }
 
 BSMODAPI void _bsmod_selectHoveringTypes() {
+	/*
 	if (_bsmod_.hovering.billboard) {
 		return;
 	}
@@ -780,10 +787,12 @@ BSMODAPI void _bsmod_selectHoveringTypes() {
 			}
 		}
 	}
-
+	*/
 	 /**
 	  For each selected tile, get its primitive and select all tiles on that primitive
 	  */
+
+/*
 	if (_bsmod_.selected_type == BSGFX_TYPE_TILE && bs_keyDown(BS_KEY_LEFT_CONTROL) && bs_keyDownOnce(BS_KEY_A)) {
 		static bs_List primitives_to_select = { .unit_size = sizeof(int) , .increment = 256 };
 		bs_seekList(&primitives_to_select, 0);
@@ -822,6 +831,6 @@ BSMODAPI void _bsmod_selectHoveringTypes() {
 	if (bs_leftClickOnce()) {
 		_bsmod_.ui_blocked = true;
 	}
-
+	*/
 	//printf("%d, prim %d, tile %d\n", _bsmod_.hovering.index, _bsmod_.hovering.primitive, _bsmod_.hovering.tile);
 }

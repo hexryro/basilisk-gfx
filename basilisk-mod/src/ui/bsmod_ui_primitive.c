@@ -38,7 +38,7 @@ BSMODAPI bool _bsmod_instancePrimitivePreview(bsgfx_Widget* widget, bs_vec2* pos
     bs_m4Rotate(&transform, &rotation, &transform);
     bs_m4Scale(&transform, &BS_V3(s, s, s), &transform);
 
-    int subtype = bsgfx_primitiveSubtype(id);
+    bsgfx_InstanceSubtype* subtype = bsgfx_primitiveSubtype(id);
     bsgfx_instancePrimitive(subtype, transform, 0, 0, 0);
 
     return true;
@@ -51,6 +51,8 @@ BSMODAPI bool _bsmod_instancePrimitivePreview(bsgfx_Widget* widget, bs_vec2* pos
    *============================================================================*/
 
 BSMODAPI void _bsmod_onDragPrimitive(bsmod_DraggingParams params) {
+    BS_WARN("Not implemented");
+    /*
     if (_bsmod_.hovering.tile < 0 || _bsmod_.hovering.primitive < 0)
         return;
 
@@ -74,7 +76,7 @@ BSMODAPI void _bsmod_onDragPrimitive(bsmod_DraggingParams params) {
     bs_m4Translate(&matrix, &tile_position, &matrix);
     bs_m4Rotate(&matrix, &rotation, &matrix);
 
-    int subtype = bsgfx_primitiveSubtype(_bsmod_.dragging_id);
+    bsgfx_InstanceSubtype* subtype = bsgfx_primitiveSubtype(_bsmod_.dragging_id);
     bsgfx_instancePrimitive(subtype, matrix, 0, 0, $bsmod_light_blue()->id);
 
     if (bs_leftClickUpOnce()) {
@@ -87,6 +89,7 @@ BSMODAPI void _bsmod_onDragPrimitive(bsmod_DraggingParams params) {
         });
         _bsmod_saveTypeN(BSGFX_TYPE_PRIMITIVE, BS_CONSTANT_STRING("Created primitive"));
     }
+    */
 }
 
 
@@ -139,7 +142,7 @@ BSMODAPI void _bsmod_rasterizePrimitiveIcons() {
         bs_eulToQ(&BS_V3_TO_RADIANS(BS_V3(15.0, 30.0, -15.0)), &rotation);
 
         for (int i = 0; i < BSGFX_PRIMITIVE_TYPE_COUNT; i++) {
-            int subtype = bsgfx_primitiveSubtype(i);
+            bsgfx_InstanceSubtype* subtype = bsgfx_primitiveSubtype(i);
 
             bs_Aabb aabb = { .min = { -1, -1, -1 }, .max = { 1, 1, 1 },};
 
@@ -161,7 +164,7 @@ BSMODAPI void _bsmod_rasterizePrimitiveIcons() {
             push_const.model = bs_m4x3(&transform);
 
             instance = bsgfx_instancePrimitive(subtype, transform, 0, 0, 0);
-            _bsmod_rasterizeInstance(queue, hash, subtype, instance, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
+            _bsmod_rasterizeInstance(queue, hash, subtype, instance, 1, material->category, material->name, render_size.x, render_size.y, sizeof(push_const), &push_const);
         }
 
         _bsmod_endRasterize(queue);
