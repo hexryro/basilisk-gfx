@@ -5,7 +5,7 @@
         "package": "content/bsgfx.bpak",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-08-18 18:07:58",
+        "lastModified": "2026-08-23 11:53:37",
         "entries": [
             "project/basilisk-gfx/shaders/bsgfx.glsl",
             "project/basilisk-gfx/shaders/bsgfx_atlas.glsl",
@@ -93,7 +93,7 @@
         "package": "content/bsmod.bpak",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-08-16 16:25:22",
+        "lastModified": "2026-08-23 11:43:44",
         "entries": [
             "project/basilisk-mod/shaders/frag/fs_bsmod_billboard.frag",
             "project/basilisk-mod/shaders/frag/fs_bsmod_material_icon.frag",
@@ -109,7 +109,7 @@
         "package": "content/bsgfx.bpak",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-08-18 20:26:25"
+        "lastModified": "2026-08-22 18:48:29"
     },
     {
         "path": "project/basilisk-mod/atlas/ui",
@@ -117,7 +117,7 @@
         "package": "content/bsmod.bpak",
         "prefix": "",
         "callOnce": true,
-        "lastModified": "2026-08-05 18:50:24",
+        "lastModified": "2026-08-23 11:42:32",
         "entries": [
             "project/basilisk-mod/atlas/ui/circle.png",
             "project/basilisk-mod/atlas/ui/expand.png",
@@ -257,7 +257,7 @@
         "package": "content/basilisk-fonts.bpak",
         "prefix": "fonts/",
         "callOnce": false,
-        "lastModified": "2026-08-18 18:08:11",
+        "lastModified": "2026-08-23 18:08:11",
         "entries": [
             "project/fonts/notonaskharabic.ttf",
             "project/fonts/segoeui.ttf"

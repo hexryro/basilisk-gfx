@@ -8,12 +8,12 @@ struct bsgfx_PrefabInstance {
     mat4 transform;
 };
 
-layout(set = BSGFX_SET_MESH_INSTANCES, binding = BSGFX_BINDING_MESH_INSTANCES) readonly uniform bsgfx_mesh_instance_uniform {
-    bsgfx_PrefabInstance bsgfx_mesh_instances[BSGFX_MESH_INSTANCE_COUNT];
+layout(set = BSGFX_SET_MESH_INSTANCES, binding = BSGFX_BINDING_MESH_INSTANCES) readonly buffer bsgfx_mesh_instance_uniform {
+    bsgfx_PrefabInstance bsgfx_mesh_instances[];
 };
 
-layout(set = BSGFX_SET_MESH_STATIC_INSTANCES, binding = BSGFX_BINDING_MESH_STATIC_INSTANCES) readonly uniform bsgfx_static_mesh_instance_uniform {
-    bsgfx_PrefabInstance bsgfx_static_mesh_instances[BSGFX_MESH_STATIC_INSTANCE_COUNT];
+layout(set = BSGFX_SET_MESH_STATIC_INSTANCES, binding = BSGFX_BINDING_MESH_STATIC_INSTANCES) readonly buffer bsgfx_static_mesh_instance_uniform {
+    bsgfx_PrefabInstance bsgfx_static_mesh_instances[];
 };
 
 vec4 bsgfx_translateMesh(uint instance, vec3 pos) {

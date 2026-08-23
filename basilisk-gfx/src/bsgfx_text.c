@@ -230,13 +230,13 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
 
     unsigned char* data = bfnt->data->value;
 
-    bs_U32 magic = bs_getLittleEndian32(data + BFNT_MAGIC_OFFSET);
+    bs_U32 magic = bs_getLittleEndian32(data + BFNT_OFFSET_MAGIC);
     if (magic != BFNT_MAGIC) {
         BS_WARN_INVALID_MAGIC("font", name);
         return BS_RESULT_CORRUPTED;
     }
 
-    bs_U32 version = bs_getLittleEndian32(data + BFNT_VERSION_OFFSET);
+    bs_U32 version = bs_getLittleEndian32(data + BFNT_OFFSET_VERSION);
     if (version != 1) {
         BS_WARN_UNSUPPORTED_VERSION("font", name);
         return BS_RESULT_NOT_SUPPORTED;
@@ -246,11 +246,11 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     font->atlas_object = atlas_object;
     bfnt->model = font;
 
-    bs_U16 blocks_count = bs_getLittleEndian16(data + BFNT_BLOCKS_COUNT_OFFSET);
-    bs_U16 pt_sizes_count = bs_getLittleEndian16(data + BFNT_PT_SIZES_COUNT_OFFSET);
-    bs_U32 glyphs_count = bs_getLittleEndian32(data + BFNT_GLYPHS_COUNT_OFFSET);
-    bs_U16 kerning_pairs_count = bs_getLittleEndian16(data + BFNT_KERNING_PAIRS_COUNT_OFFSET);
-    bs_U16 units_per_em = bs_getLittleEndian16(data + BFNT_UNITS_PER_EM);
+    bs_U16 blocks_count = bs_getLittleEndian16(data + BFNT_OFFSET_BLOCKS_COUNT);
+    bs_U16 pt_sizes_count = bs_getLittleEndian16(data + BFNT_OFFSET_PT_SIZES_COUNT);
+    bs_U32 glyphs_count = bs_getLittleEndian32(data + BFNT_OFFSET_GLYPHS_COUNT);
+    bs_U16 kerning_pairs_count = bs_getLittleEndian16(data + BFNT_OFFSET_KERNING_PAIRS_COUNT);
+    bs_U16 units_per_em = bs_getLittleEndian16(data + BFNT_OFFSET_UNITS_PER_EM);
     //bs_U32 glyphs_count = atlas_object->atlas->count;
 
     font->blocks_count = blocks_count;
@@ -267,9 +267,9 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
    /**
     Pt sizes
     */
-    unsigned char* pt_size_offset = data + BFNT_POINTS_OFFSET;
+    unsigned char* pt_size_offset = data + BFNT_OFFSET_POINTS;
     for (int i = 0; i < pt_sizes_count; i++) {
-        font->pt_sizes[i] = bs_getLittleEndian32(pt_size_offset + BFNT_POINT_SIZE_OFFSET);
+        font->pt_sizes[i] = bs_getLittleEndian32(pt_size_offset + BFNT_OFFSET_POINT_SIZE);
         pt_size_offset += BFNT_POINT_SIZE;
     }
 
@@ -278,9 +278,9 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     */
     unsigned char* blocks_offset = pt_size_offset;
     for (int i = 0; i < blocks_count; i++) {
-        bs_U32 code_start = bs_getLittleEndian32(blocks_offset + BFNT_BLOCK_START);
-        bs_U16 code_count = bs_getLittleEndian16(blocks_offset + BFNT_BLOCK_LENGTH);
-        bs_U32 glyphs_offset = bs_getLittleEndian32(blocks_offset + BFNT_BLOCK_GLYPHS);
+        bs_U32 code_start = bs_getLittleEndian32(blocks_offset + BFNT_OFFSET_BLOCK_START);
+        bs_U16 code_count = bs_getLittleEndian16(blocks_offset + BFNT_OFFSET_BLOCK_LENGTH);
+        bs_U32 glyphs_offset = bs_getLittleEndian32(blocks_offset + BFNT_OFFSET_BLOCK_GLYPHS);
 
         font->blocks[i] = (bsgfx_UnicodeBlock2) {
             .offset = code_start,
@@ -296,15 +296,15 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     */
     unsigned char* glyphs_offset = blocks_offset;
     for (int i = 0; i < glyphs_count; i++) {
-        bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_PAGE);
-        bs_U16 atlas_index = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_ATLAS_INDEX);
-        bs_U16 glyph_index = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_GLYPH_INDEX);
-        bs_U32 codepoint = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_CODEPOINT);
-        bs_I32 y_offset = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_Y_OFFSET);
-        bs_I32 x_advance = bs_getLittleEndian32(glyphs_offset + BFNT_GLYPH_X_ADVANCE);
+        bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_PAGE);
+        bs_U16 atlas_index = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_ATLAS_INDEX);
+        bs_U16 glyph_index = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_GLYPH_INDEX);
+        bs_U32 codepoint = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_CODEPOINT);
+        bs_I32 y_offset = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_Y_OFFSET);
+        bs_I32 x_advance = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_X_ADVANCE);
         
-        bs_U16 kern_start_pair = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_KERNING_START);
-        bs_U16 kern_count_pair = bs_getLittleEndian16(glyphs_offset + BFNT_GLYPH_KERNING_COUNT);
+        bs_U16 kern_start_pair = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_KERNING_START);
+        bs_U16 kern_count_pair = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_KERNING_COUNT);
 
         assert(atlas_index < atlas_object->atlas->count);
 
@@ -327,17 +327,17 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     */
     unsigned char* kerning_pairs_offset = glyphs_offset;
     for (int i = 0; i < kerning_pairs_count; i++) {
-        bs_U32 right = bs_getLittleEndian32(kerning_pairs_offset + BFNT_KERNING_PAIR_RIGHT);
+        bs_U32 right = bs_getLittleEndian32(kerning_pairs_offset + BFNT_OFFSET_KERNING_PAIR_RIGHT);
 
-        bs_I16 left_x_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_X_PLACEMENT);
-        bs_I16 left_y_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_Y_PLACEMENT);
-        bs_I16 left_x_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_X_ADVANCE);
-        bs_I16 left_y_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_LEFT_Y_ADVANCE);
+        bs_I16 left_x_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_X_PLACEMENT);
+        bs_I16 left_y_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_Y_PLACEMENT);
+        bs_I16 left_x_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_X_ADVANCE);
+        bs_I16 left_y_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_Y_ADVANCE);
 
-        bs_I16 right_x_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_X_PLACEMENT);
-        bs_I16 right_y_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_Y_PLACEMENT);
-        bs_I16 right_x_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_X_ADVANCE);
-        bs_I16 right_y_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_KERN_RIGHT_Y_ADVANCE);
+        bs_I16 right_x_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_X_PLACEMENT);
+        bs_I16 right_y_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_Y_PLACEMENT);
+        bs_I16 right_x_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_X_ADVANCE);
+        bs_I16 right_y_advance = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_Y_ADVANCE);
 
         font->kerning_pairs[i] = (bsgfx_KerningPair) {
             .right = right,

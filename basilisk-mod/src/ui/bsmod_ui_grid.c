@@ -504,7 +504,7 @@ BSMODAPI void _bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
         if (atlas_object) {
             widget.grid.count = atlas_object->atlas->count;
             widget.grid.action = _bsmod_instanceAtlasPreview;
-            params.subtype = _bsmod_subtypes_[BSMOD_SUBTYPE_MATERIAL_ICON];
+            params.subtype2 = _bsmod_subtypes_[BSMOD_SUBTYPE_MATERIAL_ICON];
             params.tab_id = BSMOD_TAB_MATERIAL;
             params.object_id = BSMOD_ATLAS_MATERIAL_ICONS;
         }

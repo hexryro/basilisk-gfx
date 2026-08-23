@@ -57,6 +57,10 @@ BSGFXAPI bsgfx_InstanceSubtype** _preval_bsgfx_subtypes() {
     return next.bsgfx_subtypes();
 }
 
+BSGFXAPI bsgfx_InstanceType** _preval_bsgfx_instanceTypes() {
+    return next.bsgfx_instanceTypes();
+}
+
 BSGFXAPI void _preval_bsgfx_textDimensions(bsgfx_Font* font, bs_vec2* out, char* name, int length) {
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(out != NULL, ,);
@@ -327,11 +331,6 @@ BSGFXAPI void _preval_bsgfx_resetInstanceType(bsgfx_InstanceType* instance_type)
     next.bsgfx_resetInstanceType(instance_type);
 }
 
-BSGFXAPI void _preval_bsgfx_resetSubtype(bsgfx_InstanceSubtype* instance_subtype) {
-    BSGFX_VALIDATE(instance_subtype != NULL, ,);
-    next.bsgfx_resetSubtype(instance_subtype);
-}
-
 BSGFXAPI void _preval_bsgfx_instanceHiResMesh(bs_Mesh* mesh, const bs_vec3* position, const bs_vec4* rotation, float scale, int subtype_offset, bool origin_at_center) {
     BSGFX_VALIDATE(mesh != NULL, ,);
     BSGFX_VALIDATE(position != NULL, ,);
@@ -568,9 +567,10 @@ BSGFXAPI void _preval_bsgfx_renderPrefabs(bs_Queue* queue, bs_Pipeline* pipeline
     next.bsgfx_renderPrefabs(queue, pipeline, key_start);
 }
 
-BSGFXAPI void _preval_bsgfx_renderPrefabPrimitives(bs_Pipeline* pipeline, int key_start) {
+BSGFXAPI void _preval_bsgfx_renderPrefabPrimitives(bs_Queue* queue, bs_Pipeline* pipeline, int key_start) {
+    BSGFX_VALIDATE(queue != NULL, ,);
     BSGFX_VALIDATE(pipeline != NULL, ,);
-    next.bsgfx_renderPrefabPrimitives(pipeline, key_start);
+    next.bsgfx_renderPrefabPrimitives(queue, pipeline, key_start);
 }
 
 BSGFXAPI int _preval_bsgfx_queryPrefabId(const bs_GUID* guid) {
@@ -711,6 +711,7 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
 
     functions.bsgfx_test = _preval_bsgfx_test;
     functions.bsgfx_subtypes = _preval_bsgfx_subtypes;
+    functions.bsgfx_instanceTypes = _preval_bsgfx_instanceTypes;
     functions.bsgfx_textDimensions = _preval_bsgfx_textDimensions;
     functions.bsgfx_defaultPipelineHash = _preval_bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _preval_bsgfx_renderTileIcons;
@@ -762,7 +763,6 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_tickInstanceType = _preval_bsgfx_tickInstanceType;
     functions.bsgfx_renderSubtype = _preval_bsgfx_renderSubtype;
     functions.bsgfx_resetInstanceType = _preval_bsgfx_resetInstanceType;
-    functions.bsgfx_resetSubtype = _preval_bsgfx_resetSubtype;
     functions.bsgfx_instanceHiResMesh = _preval_bsgfx_instanceHiResMesh;
     functions.bsgfx_instanceMesh = _preval_bsgfx_instanceMesh;
     functions.bsgfx_instanceBoneMesh = _preval_bsgfx_instanceBoneMesh;

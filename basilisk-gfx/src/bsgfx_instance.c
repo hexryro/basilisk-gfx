@@ -38,19 +38,14 @@ static bs_List _bsgfx_instance_types = { .unit_size = sizeof(bsgfx_InstanceType)
    * Instance Types
    =============================================================================*/
 
-BSGFXAPI bs_Result _val_bsgfx_ensureInstanceCount(bs_U32 instance_type_id, bs_U32 instances_count, bs_U32 overhead_count) {
-	bsgfx_InstanceType* instance_type = bs_fetchUnit(&_bsgfx_instance_types, instance_type_id);
-
-	BSGFX_VALIDATE(instance_type != NULL, BS_RESULT_VALIDATION_ERROR,);
+BSGFXAPI bs_Result _val_bsgfx_ensureInstanceCount(bsgfx_InstanceType* instance_type, bs_U32 instances_count, bs_U32 overhead_count) {
 	BSGFX_VALIDATE(instance_type->device_instances != NULL, BS_RESULT_VALIDATION_ERROR,);
 
 	return _bsgfx_ensureInstanceCount(instance_type, instances_count, overhead_count);
 }
 
-BSGFXAPI bs_Result _bsgfx_ensureInstanceCount(bs_U32 instance_type_id, bs_U32 instances_count, bs_U32 overhead_count) {
+BSGFXAPI bs_Result _bsgfx_ensureInstanceCount(bsgfx_InstanceType* instance_type, bs_U32 instances_count, bs_U32 overhead_count) {
 	bs_Result result = BS_RESULT_OK;
-
-	bsgfx_InstanceType* instance_type = bs_fetchUnit(&_bsgfx_instance_types, instance_type_id);
 
 	size_t existing_capacity = instance_type->device_instances->num_bytes;
 	size_t existing_size = instance_type->instance_count * (size_t)instance_type->instance_size;
@@ -85,8 +80,7 @@ BSGFXAPI bs_Result _bsgfx_ensureInstanceCount(bs_U32 instance_type_id, bs_U32 in
 	return result;
 }
 
-BSGFXAPI bool _bsgfx_validateInstanceType(const char* library_name, int instance_type) { // TODO: use library_name
-	BSGFX_VALIDATE(instance_type >= 0, false,);
+BSGFXAPI bool _bsgfx_validateInstanceType(const char* library_name, bsgfx_InstanceType* instance_type) { // TODO: use library_name
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_TYPES), false, );
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_SUBTYPES), false,);
 //	BSGFX_VALIDATE(instance_type < BSGFX_INSTANCE_TYPE_COUNT, false,);
@@ -103,14 +97,16 @@ BSGFXAPI bs_Result _val_bsgfx_instanceType(size_t instance_size, int bind_set, i
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_TYPES),, );
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_SUBTYPES),,);
 	bs_BindSet* bind_set_query = bs_queryBindSet(bind_set);
-	BSGFX_VALIDATE(bind_set_query != NULL,,);
-	BSGFX_VALIDATE(bs_queryBinding(bind_set_query, point) != NULL,,);
+	BSGFX_VALIDATE(bind_set_query != NULL, BS_RESULT_VALIDATION_ERROR,);
+	BSGFX_VALIDATE(bs_queryBinding(bind_set_query, point) != NULL, BS_RESULT_VALIDATION_ERROR,);
 
 	return _bsgfx_instanceType(instance_size, bind_set, point, out);
 }
 
 BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int point, bsgfx_InstanceType** out) {
 	bs_Result result;
+
+	instance_size += sizeof(bsgfx_InstanceHeader);
 
 	//bs_Buffer* instance_types = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_TYPES)->buffer;
 	
@@ -119,7 +115,7 @@ BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int p
 
 	bs_Binding* binding = bs_queryBinding(bs_queryBindSet(bind_set), point);
 	if (!binding)
-		return;
+		return BS_RESULT_FAILED_TO_QUERY;
 
 	if (binding->type == BS_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
 		usage_flags |= BS_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
@@ -127,7 +123,7 @@ BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int p
 		usage_flags |= BS_BUFFER_USAGE_STORAGE_BUFFER_BIT | BS_BUFFER_USAGE_TRANSFER_DST_BIT | BS_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	else {
 		bs_warnF("Invalid bind type %d\n", binding->type); // TODO: _bsgfx_warn
-		return;
+		return BS_RESULT_INVALID_TYPE;
 	}
 
 	// TODO: remove
@@ -141,11 +137,11 @@ BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int p
 	bs_Object* object = BS_BUFFER(-1, 0, 0);
 	result = bs_buffer(object, aligned_size, usage_flags, memory_flags, 0);
 	if (result != BS_RESULT_OK)
-		return;
+		return result;
 
 	result = bs_mapBuffer(object->buffer, BS_U32_MAX);
 	if (result != BS_RESULT_OK)
-		return;
+		return result;
 
 	result = bs_bindBuffer(bind_set, point, object->buffer);
 
@@ -160,6 +156,8 @@ BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int p
 //		bsgfx_InstanceTypeHeader* instance_type_header = instance_types->_[i].data;
 //		instance_type_header->instance_types[instance_type_id].allocated = max_instance_count;
 //	}
+
+	return BS_RESULT_OK;
 }
 
 
@@ -208,6 +206,7 @@ BSGFXAPI bs_Result _bsgfx_subtype(bsgfx_InstanceType* instance_type, bs_Batch* b
 		.batch_source_id = batch->head.source_id,
 		.batch_id = batch->head.id,
 		.flags = flags,
+		.host_instances = bs_list(instance_type->instance_size, 64),
 	});
 
 	//int existing = -1;
@@ -299,8 +298,12 @@ BSGFXAPI void _bsgfx_resetSubtype(int subtype_id) {
   Create instance
   */
 BSGFXAPI int _val_bsgfx_instantiate(bsgfx_InstanceSubtype* subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
-	BSGFX_VALIDATE(flags <= 65536, 0,);
-	BSGFX_VALIDATE(material <= 65536, 0,);
+	const int max_tick_count = 1000;
+
+	BSGFX_VALIDATE(flags <= BS_U16_MAX, 0,);
+	BSGFX_VALIDATE(material <= BS_U16_MAX, 0, );
+	BSGFX_VALIDATE((data_size + sizeof(bsgfx_InstanceHeader)) <= subtype->instance_type2->instance_size, 0, );
+	BSGFX_VALIDATE(subtype->instance_type2->tick_count < max_tick_count, 0, "Infinite loop detected");
 
 	return _bsgfx_instantiate(subtype, data, data_size, flags, bone_index, id, material);
 }
@@ -328,6 +331,7 @@ BSGFXAPI int _bsgfx_instantiate(bsgfx_InstanceSubtype* subtype, const char* data
   Tick instances
   */
 BSGFXAPI void _val_bsgfx_tickInstancesType(bsgfx_InstanceType* type) {
+	BSGFX_VALIDATE(type->device_instances != NULL,,);
 	_bsgfx_tickInstanceType(type);
 }
 
@@ -352,6 +356,7 @@ BSGFXAPI void _bsgfx_tickInstanceType(bsgfx_InstanceType* type) {
 	}
 
 	bs_bindBuffer(type->device_instances->bind_set, type->device_instances->binding, type->device_instances);
+	type->tick_count++;
 }
 
  /**
@@ -369,6 +374,7 @@ BSGFXAPI void _bsgfx_resetInstanceType(bsgfx_InstanceType* type) {
 		bsgfx_InstanceSubtype* instance_subtype = bs_fetchUnit(&type->subtypes, i);
 		instance_subtype->host_instances.count = 0;
 	}
+	type->tick_count = 0;
 }
 
 BSGFXAPI void _bsgfx_instanceHiResMesh(bs_Mesh* mesh, const bs_vec3* position, const bs_vec4* rotation, float scale, int subtype_offset, bool origin_at_center) {
@@ -420,11 +426,11 @@ static inline int _bsgfx_instanceLineSubtype(bs_vec3 start, bs_vec3 end, bs_RGBA
  /**
   Push constants
   */
-BSGFXAPI int _bsgfx_instanceMesh(int subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material) {
+BSGFXAPI int _bsgfx_instanceMesh(bsgfx_InstanceSubtype* subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material) {
 	return bsgfx_instantiate(subtype, data, sizeof(bsgfx_MeshInstance), flags, 0, id, material);
 }
 
-BSGFXAPI int _bsgfx_instanceBoneMesh(int subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material) {
+BSGFXAPI int _bsgfx_instanceBoneMesh(bsgfx_InstanceSubtype* subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material) {
 	return bsgfx_instantiate(subtype, data, sizeof(bsgfx_BoneInstance), flags, 0, id, material);
 }
 

@@ -579,7 +579,7 @@ BSAPI void* _bs_pushBackUnsafe(bs_List* list, char* data) {
     return dest;
 }
 
-BSAPI void* _bs_pushBack(bs_List* list, char* data) {
+BSAPI void* _bs_pushBack(bs_List* list, void* data) {
     _bs_ensureSize(list, 1);
 
     char* dest = _bs_fetchUnit(list, list->count);
@@ -984,12 +984,14 @@ static bs_String* _bs_loadFileFromHandle(FILE* file) {
     return string;
 }
 
-bs_Result _bs_openFileN(const char* mode, bs_File* out, const char* path, int path_length) {
+bs_Result _bs_openFileN(const char* mode, bs_File* out, char* path, int path_length) {
     FILE* file = fopen(path, mode);
     if (!file) {
         BS_WARN_ERRNO_PATH("fopen", path);
         return _bs_convertErrno();
     }
+
+    return BS_RESULT_OK;
 }
 
 void _bs_closeFile(bs_File* file) {

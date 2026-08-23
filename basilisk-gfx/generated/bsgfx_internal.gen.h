@@ -38,6 +38,7 @@
 
 typedef void(__stdcall* PFN_bsgfx_test)();
 typedef bsgfx_InstanceSubtype**(__stdcall* PFN_bsgfx_subtypes)();
+typedef bsgfx_InstanceType**(__stdcall* PFN_bsgfx_instanceTypes)();
 typedef void(__stdcall* PFN_bsgfx_textDimensions)(bsgfx_Font* font, bs_vec2* out, char* name, int length);
 typedef bs_PipelineHash(__stdcall* PFN_bsgfx_defaultPipelineHash)();
 typedef void(__stdcall* PFN_bsgfx_renderTileIcons)(bs_RendererScope* scope, bs_Queue* queue);
@@ -90,7 +91,6 @@ typedef int(__stdcall* PFN_bsgfx_instantiate)(bsgfx_InstanceSubtype* instance_su
 typedef void(__stdcall* PFN_bsgfx_tickInstanceType)(bsgfx_InstanceType* instance_type);
 typedef void(__stdcall* PFN_bsgfx_renderSubtype)(bs_Queue* queue, bsgfx_InstanceSubtype* instance_subtype, bs_Pipeline* pipeline);
 typedef void(__stdcall* PFN_bsgfx_resetInstanceType)(bsgfx_InstanceType* instance_type);
-typedef void(__stdcall* PFN_bsgfx_resetSubtype)(bsgfx_InstanceSubtype* instance_subtype);
 typedef void(__stdcall* PFN_bsgfx_instanceHiResMesh)(bs_Mesh* mesh, const bs_vec3* position, const bs_vec4* rotation, float scale, int subtype_offset, bool origin_at_center);
 typedef int(__stdcall* PFN_bsgfx_instanceMesh)(bsgfx_InstanceSubtype* subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material);
 typedef int(__stdcall* PFN_bsgfx_instanceBoneMesh)(bsgfx_InstanceSubtype* subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material);
@@ -141,7 +141,7 @@ typedef int(__stdcall* PFN_bsgfx_instancePrefabModel)(int mesh_id, bs_mat4 trans
 typedef int(__stdcall* PFN_bsgfx_instancePrefab)(int id, bsgfx_PrefabSubtype prefab_subtype);
 typedef void(__stdcall* PFN_bsgfx_instancePrefabs)();
 typedef void(__stdcall* PFN_bsgfx_renderPrefabs)(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
-typedef void(__stdcall* PFN_bsgfx_renderPrefabPrimitives)(bs_Pipeline* pipeline, int key_start);
+typedef void(__stdcall* PFN_bsgfx_renderPrefabPrimitives)(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
 typedef int(__stdcall* PFN_bsgfx_queryPrefabId)(const bs_GUID* guid);
 typedef int(__stdcall* PFN_bsgfx_closestPrefab)(bs_U64 mesh_name_hash, bs_vec3 position, float radius);
 typedef void(__stdcall* PFN_bsgfx_primitivePosition)(const bsgfx_RawPrimitive* primitive, bs_vec3* out);
@@ -172,6 +172,7 @@ typedef void(__stdcall* PFN_bsgfx_renderColorPickers)(bs_RendererScope* scope, b
 typedef struct {
     PFN_bsgfx_test bsgfx_test;
     PFN_bsgfx_subtypes bsgfx_subtypes;
+    PFN_bsgfx_instanceTypes bsgfx_instanceTypes;
     PFN_bsgfx_textDimensions bsgfx_textDimensions;
     PFN_bsgfx_defaultPipelineHash bsgfx_defaultPipelineHash;
     PFN_bsgfx_renderTileIcons bsgfx_renderTileIcons;
@@ -224,7 +225,6 @@ typedef struct {
     PFN_bsgfx_tickInstanceType bsgfx_tickInstanceType;
     PFN_bsgfx_renderSubtype bsgfx_renderSubtype;
     PFN_bsgfx_resetInstanceType bsgfx_resetInstanceType;
-    PFN_bsgfx_resetSubtype bsgfx_resetSubtype;
     PFN_bsgfx_instanceHiResMesh bsgfx_instanceHiResMesh;
     PFN_bsgfx_instanceMesh bsgfx_instanceMesh;
     PFN_bsgfx_instanceBoneMesh bsgfx_instanceBoneMesh;
@@ -306,6 +306,7 @@ typedef struct {
 
 BSGFXAPI void _bsgfx_test();
 BSGFXAPI bsgfx_InstanceSubtype** _bsgfx_subtypes();
+BSGFXAPI bsgfx_InstanceType** _bsgfx_instanceTypes();
 BSGFXAPI void _bsgfx_textDimensions(bsgfx_Font* font, bs_vec2* out, char* name, int length);
 BSGFXAPI bs_PipelineHash _bsgfx_defaultPipelineHash();
 BSGFXAPI void _bsgfx_renderTileIcons(bs_RendererScope* scope, bs_Queue* queue);
@@ -358,7 +359,6 @@ BSGFXAPI int _bsgfx_instantiate(bsgfx_InstanceSubtype* instance_subtype, const c
 BSGFXAPI void _bsgfx_tickInstanceType(bsgfx_InstanceType* instance_type);
 BSGFXAPI void _bsgfx_renderSubtype(bs_Queue* queue, bsgfx_InstanceSubtype* instance_subtype, bs_Pipeline* pipeline);
 BSGFXAPI void _bsgfx_resetInstanceType(bsgfx_InstanceType* instance_type);
-BSGFXAPI void _bsgfx_resetSubtype(bsgfx_InstanceSubtype* instance_subtype);
 BSGFXAPI void _bsgfx_instanceHiResMesh(bs_Mesh* mesh, const bs_vec3* position, const bs_vec4* rotation, float scale, int subtype_offset, bool origin_at_center);
 BSGFXAPI int _bsgfx_instanceMesh(bsgfx_InstanceSubtype* subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material);
 BSGFXAPI int _bsgfx_instanceBoneMesh(bsgfx_InstanceSubtype* subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material);
@@ -409,7 +409,7 @@ BSGFXAPI int _bsgfx_instancePrefabModel(int mesh_id, bs_mat4 transform, bsgfx_Pr
 BSGFXAPI int _bsgfx_instancePrefab(int id, bsgfx_PrefabSubtype prefab_subtype);
 BSGFXAPI void _bsgfx_instancePrefabs();
 BSGFXAPI void _bsgfx_renderPrefabs(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
-BSGFXAPI void _bsgfx_renderPrefabPrimitives(bs_Pipeline* pipeline, int key_start);
+BSGFXAPI void _bsgfx_renderPrefabPrimitives(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
 BSGFXAPI int _bsgfx_queryPrefabId(const bs_GUID* guid);
 BSGFXAPI int _bsgfx_closestPrefab(bs_U64 mesh_name_hash, bs_vec3 position, float radius);
 BSGFXAPI void _bsgfx_primitivePosition(const bsgfx_RawPrimitive* primitive, bs_vec3* out);
@@ -442,6 +442,7 @@ static inline bsgfx_FunctionTable* _bsgfx_getFunctions() {
 
     functions.bsgfx_test = _bsgfx_test;
     functions.bsgfx_subtypes = _bsgfx_subtypes;
+    functions.bsgfx_instanceTypes = _bsgfx_instanceTypes;
     functions.bsgfx_textDimensions = _bsgfx_textDimensions;
     functions.bsgfx_defaultPipelineHash = _bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _bsgfx_renderTileIcons;
@@ -494,7 +495,6 @@ static inline bsgfx_FunctionTable* _bsgfx_getFunctions() {
     functions.bsgfx_tickInstanceType = _bsgfx_tickInstanceType;
     functions.bsgfx_renderSubtype = _bsgfx_renderSubtype;
     functions.bsgfx_resetInstanceType = _bsgfx_resetInstanceType;
-    functions.bsgfx_resetSubtype = _bsgfx_resetSubtype;
     functions.bsgfx_instanceHiResMesh = _bsgfx_instanceHiResMesh;
     functions.bsgfx_instanceMesh = _bsgfx_instanceMesh;
     functions.bsgfx_instanceBoneMesh = _bsgfx_instanceBoneMesh;

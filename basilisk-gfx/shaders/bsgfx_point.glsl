@@ -11,8 +11,8 @@ struct bsgfx_PointInstance {
     vec4 a, b;
 };
 
-layout(set = BSGFX_SET_POINT_INSTANCES, binding = BSGFX_BINDING_POINT_INSTANCES) readonly uniform bsgfx_point_instance_uniform {
-    bsgfx_PointInstance bsgfx_point_instances[BSGFX_POINT_INSTANCE_COUNT];
+layout(set = BSGFX_SET_POINT_INSTANCES, binding = BSGFX_BINDING_POINT_INSTANCES) readonly buffer bsgfx_point_instance_uniform {
+    bsgfx_PointInstance bsgfx_point_instances[];
 };
 
 float bsgfx_pointSize(uint instance) {

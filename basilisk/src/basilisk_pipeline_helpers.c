@@ -151,6 +151,7 @@ void basilisk_renderUIPost(bs_RendererScope* scope, bs_Queue* queue) {
 }
 
 void basilisk_renderSelectedTile(bs_RendererScope* scope, bs_Queue* queue) {
+    return; // TODO: $fs_bsgfx_tile_selected needs to compile
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 
@@ -178,6 +179,7 @@ void basilisk_renderSelectedTile(bs_RendererScope* scope, bs_Queue* queue) {
 }
 
 void basilisk_renderTiles(bs_RendererScope* scope, bs_Queue* queue) {
+    return; // TODO: $fs_bsgfx_tile_screen needs to compile
     bs_PipelineHash hash;
     bs_Pipeline* pipeline;
 

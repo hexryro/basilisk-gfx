@@ -76,7 +76,7 @@ BSMODAPI void _bsmod_instanceLightBillboards() {
 
         bool hovering = bs_rectangleVsPoint(&p, &BS_V2(scaled_size, scaled_size), &cursor);
         if (hovering) {
-            _bsmod_.hovering.billboard = true;
+            //_bsmod_.hovering.billboard = true;
 
             if (bs_leftClickOnce()) {
                 if (!bs_keyDown(BS_KEY_ALT))

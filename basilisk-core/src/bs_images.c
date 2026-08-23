@@ -764,12 +764,13 @@ static inline bs_Format _bs_getFormat(bs_Format base_format, int channels_count)
     }
 
     _bs_warnF("Failed to get image format, base format %d has no support for %d channels", bs_serializeFormat(base_format), channels_count);
+    return BS_FORMAT_UNDEFINED;
 }
 
 BSAPI bs_Result _val_bs_loadImage(bs_Queue* queue, bs_Object* object, int package_id, bs_ImageBits flags, char* resource_name, char* resource_name_length) {
    // BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_IMAGE, BS_RESULT_OK);
 
-    BS_VALIDATE(queue->flags & BS_QUEUE_SINGLE_TIMES_BIT,,); // TODO: document this
+    BS_VALIDATE(queue->flags & BS_QUEUE_SINGLE_TIMES_BIT, BS_RESULT_VALIDATION_ERROR,); // TODO: document this
 
     return _bs_loadImageN(queue, object, package_id, flags, resource_name, resource_name_length);
 }

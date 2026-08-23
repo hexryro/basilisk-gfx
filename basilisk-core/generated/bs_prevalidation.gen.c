@@ -1037,12 +1037,14 @@ BSAPI void _preval_bs_copyImageToBufferAsync(bs_Queue* queue, bs_Image* image, b
     next.bs_copyImageToBufferAsync(queue, image, buffer, image_index, layout, buffer_offset, offset, resolution);
 }
 
-BSAPI void _preval_bs_copyBufferToImage(bs_Buffer* buffer, bs_Image* image, int index, bs_ImageLayout layout) {
+BSAPI void _preval_bs_copyBufferToImage(bs_Queue* queue, bs_Buffer* buffer, bs_Image* image, int index, bs_ImageLayout layout) {
+    BS_VALIDATE(queue != NULL, ,);
+    BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, ,);
     BS_VALIDATE(buffer != NULL, ,);
     BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, ,);
     BS_VALIDATE(image != NULL, ,);
     BS_VALIDATE(image->head.type == BS_OBJECT_IMAGE, ,);
-    next.bs_copyBufferToImage(buffer, image, index, layout);
+    next.bs_copyBufferToImage(queue, buffer, image, index, layout);
 }
 
 BSAPI void _preval_bs_blit(bs_Queue* queue, bs_BlitOperation operation) {
@@ -1785,7 +1787,7 @@ BSAPI void _preval_bs_erase(bs_List* list, int index, bs_U32 count) {
     next.bs_erase(list, index, count);
 }
 
-BSAPI void* _preval_bs_pushBack(bs_List* list, char* data) {
+BSAPI void* _preval_bs_pushBack(bs_List* list, void* data) {
     BS_VALIDATE(list != NULL, NULL,);
     BS_VALIDATE(list->unit_size > 0, NULL,);
     BS_VALIDATE(data != NULL, NULL,);
@@ -2301,9 +2303,11 @@ BSAPI void _preval_bs_loadBindings() {
     next.bs_loadBindings();
 }
 
-BSAPI bs_Result _preval_bs_binding(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Descriptor* descriptors, int descriptors_count) {
+BSAPI bs_Result _preval_bs_binding(bs_BindSet* bind_set, bs_Binding* bind_point, bs_Descriptor* descriptors, int descriptors_count) {
+    BS_VALIDATE(bind_set != NULL, BS_RESULT_VALIDATION_ERROR,);
+    BS_VALIDATE(bind_point != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(descriptors != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_binding(bind_set_slot, bind_point_slot, descriptors, descriptors_count);
+    return next.bs_binding(bind_set, bind_point, descriptors, descriptors_count);
 }
 
 BSAPI bs_Result _preval_bs_bindImage(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_Image* image, bs_Sampler* sampler, bs_ImageLayout layout) {

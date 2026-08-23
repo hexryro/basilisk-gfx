@@ -579,7 +579,7 @@
 		<validationTemplate/>
 
 		<function name="bsmod_subtypes">
-			<return>bsgfx_InstanceSubtype*</return>
+			<return>bsgfx_InstanceSubtype**</return>
 		</function>
 		
 		<function name="bsmod_callbacks">
@@ -659,7 +659,7 @@
 
 		<function name="bsmod_packFont">
 			<return>bs_Result</return>
-			<param><type>bsmod_RenderMode</type><name>render_mode</name><size></size></param>
+			<param><type>bsmod_RenderMode</type><name>render_mode</name></param>
 			<param><type>char*</type><name>package_name</name></param>
 			<param><type>char*</type><name>ttf_path</name></param>
 			<param><type>bsmod_UnicodeBlockRange</type><name>blocks</name><size></size></param>

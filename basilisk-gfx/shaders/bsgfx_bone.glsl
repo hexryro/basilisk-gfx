@@ -14,8 +14,8 @@ struct bsgfx_BoneInstance {
     mat4 transform;
 };
 
-layout(set = BSGFX_SET_BONE_INSTANCES, binding = BSGFX_BINDING_BONE_INSTANCES) readonly uniform bsgfx_bone_instance_uniform {
-    bsgfx_BoneInstance bsgfx_bone_instances[BSGFX_BONE_INSTANCE_COUNT];
+layout(set = BSGFX_SET_BONE_INSTANCES, binding = BSGFX_BINDING_BONE_INSTANCES) readonly buffer bsgfx_bone_instance_uniform {
+    bsgfx_BoneInstance bsgfx_bone_instances[];
 };
 
 // - functions -

@@ -1984,12 +1984,13 @@ void bs_copyImageToBufferAsync(
 }
 
 void bs_copyBufferToImage(
+    bs_Queue* queue, 
     bs_Buffer* buffer, 
     bs_Image* image, 
     int index, 
     bs_ImageLayout layout)
 {
-    next.bs_copyBufferToImage(buffer, image, index, layout);
+    next.bs_copyBufferToImage(queue, buffer, image, index, layout);
 }
 
 void bs_blit(
@@ -3175,7 +3176,7 @@ void bs_erase(
 
 void* bs_pushBack(
     bs_List* list, 
-    char* data)
+    void* data)
 {
     return next.bs_pushBack(list, data);
 }
@@ -3983,12 +3984,12 @@ void bs_loadBindings()
 }
 
 bs_Result bs_binding(
-    bs_U32 bind_set_slot, 
-    bs_U32 bind_point_slot, 
+    bs_BindSet* bind_set, 
+    bs_Binding* bind_point, 
     bs_Descriptor* descriptors, 
     int descriptors_count)
 {
-    return next.bs_binding(bind_set_slot, bind_point_slot, descriptors, descriptors_count);
+    return next.bs_binding(bind_set, bind_point, descriptors, descriptors_count);
 }
 
 bs_Result bs_bindImage(

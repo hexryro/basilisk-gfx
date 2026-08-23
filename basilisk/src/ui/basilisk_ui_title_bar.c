@@ -85,13 +85,13 @@ void basilisk_instanceTitleBarUI() {
 
     position.z += 10;
 
-    static bool active_tab;
+    static int active_tab;
     bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
         .position = position,
         //.text_subtype = bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF],// TODO: text rewrite
         //.font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16)->head,// TODO: text rewrite
         .spacing = 8.0,
-        .widgets = widgets.data,
+        .widgets = (bsgfx_Widget*)widgets.data,
         .widgets_count = widgets.count,
         .untextured = {
             .dimensions = dimensions,
@@ -118,7 +118,7 @@ void basilisk_instanceTitleBarUI() {
     //}, 
     &(bsgfx_MenuTabBar) {
         .tabs_count = tabs.count,
-        .tabs = tabs.data,
+        .tabs = (bsgfx_MenuTab*)tabs.data,
         .active_tab = &active_tab,
         .material_id = $bsmod_grey_61()->id,
         .outline_material_id = $bsmod_grey_61()->id,
@@ -132,7 +132,7 @@ void basilisk_instanceTitleBarUI() {
         bs_Resource* resource = NULL;
         bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
         if (resource && resource->model) {
-            bsgfx_Font* font = resource->model;
+            bsgfx_Font* font = (bsgfx_Font*)resource->model;
             bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(32, 32, 0), 16, BS_CONSTANT_STRING("M Hamburgevons AV, VA A,V V,A - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!~"));
         }
     }

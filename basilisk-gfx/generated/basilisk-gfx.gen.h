@@ -1270,6 +1270,7 @@ struct bsgfx_TypeHeader {
 };
 
 struct bsgfx_InstanceType {
+    int tick_count;
     int instance_count;
     int instance_size;
     bs_List subtypes;
@@ -1781,6 +1782,12 @@ bsgfx_test();
   */
 BSGFXAPI bsgfx_InstanceSubtype**
 bsgfx_subtypes();
+
+ /**
+  @return bsgfx_InstanceType**
+  */
+BSGFXAPI bsgfx_InstanceType**
+bsgfx_instanceTypes();
 
  /**
   @param font
@@ -2301,14 +2308,6 @@ bsgfx_renderSubtype(
 BSGFXAPI void
 bsgfx_resetInstanceType(
     bsgfx_InstanceType* instance_type);
-
- /**
-  @param instance_subtype
-  @return void
-  */
-BSGFXAPI void
-bsgfx_resetSubtype(
-    bsgfx_InstanceSubtype* instance_subtype);
 
  /**
   @param mesh
@@ -2885,12 +2884,14 @@ bsgfx_renderPrefabs(
     int key_start);
 
  /**
+  @param queue
   @param pipeline
   @param key_start
   @return void
   */
 BSGFXAPI void
 bsgfx_renderPrefabPrimitives(
+    bs_Queue* queue,
     bs_Pipeline* pipeline,
     int key_start);
 

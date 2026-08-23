@@ -54,7 +54,7 @@ BSMODAPI void _bsmod_beginRasterize(bs_ivec2 _render_size, bs_ivec2 _output_size
     output_size = _output_size;
 
     bs_pushDescriptors();
-    bsgfx_resetInstances();
+    bsgfx_resetInstanceType(BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD);
     _bsmod_rasterizations.count = 0;
 }
 

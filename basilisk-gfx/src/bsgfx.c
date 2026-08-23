@@ -63,6 +63,10 @@ int bsgfx_fetchSource(bs_ObjectType type) {
     return _bsgfx_sources_[type];
 }
 
+BSGFXAPI bsgfx_InstanceType** _bsgfx_instanceTypes() {
+    return _bsgfx_instance_types_;
+}
+
 BSGFXAPI bsgfx_InstanceSubtype** _bsgfx_subtypes() {
     return _bsgfx_subtypes_;
 }
@@ -174,13 +178,13 @@ static void _bsgfx_tick() {
     int to_reset_count = sizeof(to_reset) / sizeof(*to_reset);
 
     for (int i = 0; i < to_reset_count; i++)
-        bsgfx_tickInstanceType(_bsgfx_subtypes_[to_reset[i]]);
+        bsgfx_tickInstanceType(_bsgfx_instance_types_[to_reset[i]]);
 
     if (_bsgfx_callbacks_.pipeline)
         _bsgfx_callbacks_.pipeline();
 
     for (int i = 0; i < to_reset_count; i++)
-        bsgfx_resetInstanceType(_bsgfx_subtypes_[to_reset[i]]);
+        bsgfx_resetInstanceType(_bsgfx_instance_types_[to_reset[i]]);
 
     //_bsgfx_pipeline();
     _bsgfx_tickMaterials();

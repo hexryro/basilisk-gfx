@@ -303,9 +303,9 @@ static bool _bsgfx_instanceRange(bsgfx_Menu* menu, bsgfx_Widget* widget, bool al
 		.scale = BSGFX_PIXEL_SCALE,
 	};
 
-	bs_vec2 text_size;
+	//bs_vec2 text_size;
 	//_bsgfx_instanceTextF(font, &text, "%d/%d", &text_size, *widget->range.value, widget->range.max);
-	copy_position.x += text_size.x;
+	//copy_position.x += text_size.x;
 
 	if (bs_rectangleVsPoint(&copy_position.xy, &copy_dimensions, &cursor) && bs_leftClickOnce()) {
 		(*widget->range.value)++;

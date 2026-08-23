@@ -69,7 +69,7 @@ void bsmod_disableValidation()
     _bsmod_setFunctions(definitions, NULL);
 }
 
-const int* bsmod_subtypes()
+bsgfx_InstanceSubtype** bsmod_subtypes()
 {
     return next.bsmod_subtypes();
 }
@@ -184,7 +184,7 @@ void bsmod_onPackTextureArray(
 }
 
 bs_Result bsmod_packFont(
-    bsmod_RenderMode render_mode[], 
+    bsmod_RenderMode render_mode, 
     char* package_name, 
     char* ttf_path, 
     bsmod_UnicodeBlockRange blocks[], 

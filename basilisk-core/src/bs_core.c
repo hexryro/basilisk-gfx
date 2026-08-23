@@ -475,7 +475,7 @@ BSAPI bs_Result _bs_bufferView(bs_Buffer* buffer, bs_Format format, bs_U64 start
 
     VkBufferViewCreateInfo info = {
         .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
-        .format = format,
+        .format = (VkFormat)format,
         .offset = start,
         .range = count,
     };
@@ -1726,7 +1726,7 @@ BSAPI void _val_bs_output(bs_Renderer* renderer, bs_Output output) {
     BS_VALIDATE(renderer->num_outputs < BS_MAX_ATTACHMENTS_COUNT, , );
     BS_VALIDATE(output.image->head.type == BS_OBJECT_IMAGE, , );
 
-    return _bs_output(renderer, output);
+    _bs_output(renderer, output);
 }
 
 BSAPI void _bs_output(bs_Renderer* renderer, bs_Output output) {
@@ -1739,7 +1739,7 @@ BSAPI void _bs_output(bs_Renderer* renderer, bs_Output output) {
 BSAPI void _val_bs_input(bs_Renderer* renderer, bs_Input input) {
     BS_VALIDATE(renderer->num_inputs < BS_MAX_ATTACHMENTS_COUNT,,);
 
-    return _bs_input(renderer, input);
+    _bs_input(renderer, input);
 }
 
 BSAPI void _bs_input(bs_Renderer* renderer, bs_Input input) {
@@ -1752,7 +1752,7 @@ BSAPI void _bs_input(bs_Renderer* renderer, bs_Input input) {
 BSAPI void _val_bs_dependency(bs_Renderer* renderer, bs_U32 src_subpass, bs_U32 dst_subpass, bs_DependencyFlags flags, bs_PipelineStage src_stage, bs_PipelineStage dst_stage, bs_AccessMask src_access, bs_AccessMask dst_access) {
     BS_VALIDATE(renderer->num_dependencies < BS_MAX_NUM_SUBPASS_DEPENDENCIES,,);
 
-    return _bs_dependency(renderer, src_subpass, dst_subpass, flags, src_stage, dst_stage, src_access, dst_access);
+    _bs_dependency(renderer, src_subpass, dst_subpass, flags, src_stage, dst_stage, src_access, dst_access);
 }
 
 BSAPI void _bs_dependency(bs_Renderer* renderer, bs_U32 src_subpass, bs_U32 dst_subpass, bs_DependencyFlags flags, bs_PipelineStage src_stage, bs_PipelineStage dst_stage, bs_AccessMask src_access, bs_AccessMask dst_access) {
@@ -1935,8 +1935,8 @@ BSAPI bool _bs_rendererIsDynamic(bs_Renderer* renderer) {
 
 BSAPI bs_RendererScope _val_bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
     if (renderer->render_pass) {
-        BS_VALIDATE(_bs_procs_.vkCmdBeginRenderingKHR != NULL, , );
-        BS_VALIDATE(_bs_procs_.vkCmdEndRenderingKHR != NULL, , );
+        BS_VALIDATE(_bs_procs_.vkCmdBeginRenderingKHR != NULL, (bs_RendererScope) { 0 },);
+        BS_VALIDATE(_bs_procs_.vkCmdEndRenderingKHR != NULL, (bs_RendererScope) { 0 },);
     }
 
     return _bs_beginRender(queue, renderer);
@@ -2054,7 +2054,7 @@ BSAPI void _bs_endRender(bs_Queue* queue, bs_Renderer* renderer) {
     //_bs_scope_.subpass = 0;
 }
 
-BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_Callback subpasses[], int subpasses_count) {
+BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassCallbackFunction subpasses[], int subpasses_count) {
     BS_VALIDATE(subpasses_count <= renderer->num_subpasses,,);
 
     for (int i = 0; i < subpasses_count; i++) {

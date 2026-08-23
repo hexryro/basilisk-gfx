@@ -74,7 +74,7 @@ static inline bs_vec4 _bsgfx_convertColor(bs_RGBA color) {
     inline bsgfx_AtlasCache* $##atlas_id##_##n() {                                  \
         static bsgfx_AtlasCache cache = {.id = -1};                                 \
         if (cache.id == -1) {                                                       \
-            bs_Atlas* atlas = bs_fetch(source_id, atlas_id)->head;                  \
+            bs_Atlas* atlas = (bs_Atlas*)bs_fetch(source_id, atlas_id)->head;       \
             cache.name = #n;                                                        \
             cache.id = bs_queryAtlas(atlas, #n);                                    \
             cache.coords = bs_atlasCoordinates(atlas, cache.id);                    \

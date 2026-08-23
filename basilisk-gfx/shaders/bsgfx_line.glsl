@@ -10,8 +10,8 @@ struct bsgfx_LineInstance {
     vec4 a;
 };
 
-layout(set = BSGFX_SET_LINE_INSTANCES, binding = BSGFX_BINDING_LINE_INSTANCES) readonly uniform bsgfx_line_instance_uniform {
-    bsgfx_LineInstance bsgfx_line_instances[BSGFX_LINE_INSTANCE_COUNT];
+layout(set = BSGFX_SET_LINE_INSTANCES, binding = BSGFX_BINDING_LINE_INSTANCES) readonly buffer bsgfx_line_instance_uniform {
+    bsgfx_LineInstance bsgfx_line_instances[];
 };
 
 vec4 bsgfx_translateLine(uint instance, int vertex_id) {

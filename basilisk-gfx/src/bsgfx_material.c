@@ -98,7 +98,7 @@ void _bsgfx_allocateMaterials() {
     bs_Result result;
     
     result = bs_buffer(BS_BUFFER(BSGFX_BUFFERS, BSGFX_BUFFER_MATERIALS, false), BSGFX_MAX_MATERIALS_COUNT * sizeof(bsgfx_MaterialContract),
-        BS_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        BS_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         0);
 

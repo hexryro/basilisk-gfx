@@ -8,8 +8,8 @@ struct bsgfx_PrefabColorInstance {
     mat4 transform;
 };
 
-layout(set = BSGFX_SET_MESH_COLOR_INSTANCES, binding = BSGFX_BINDING_MESH_COLOR_INSTANCES) readonly uniform bsgfx_mesh_color_instance_uniform {
-    mat4 bsgfx_mesh_color_instances[BSGFX_MESH_COLOR_INSTANCE_COUNT];
+layout(set = BSGFX_SET_MESH_COLOR_INSTANCES, binding = BSGFX_BINDING_MESH_COLOR_INSTANCES) readonly buffer bsgfx_mesh_color_instance_uniform {
+    mat4 bsgfx_mesh_color_instances[];
 };
 
 vec4 bsgfx_translateMeshColor(uint instance, vec3 pos) {

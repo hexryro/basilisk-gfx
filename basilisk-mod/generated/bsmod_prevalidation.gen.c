@@ -49,7 +49,7 @@ const bsmod_FunctionTable* _preval_bsmod_setFunctions(const bsmod_FunctionTable*
     return &next;
 }
 
-BSMODAPI const int* _preval_bsmod_subtypes() {
+BSMODAPI bsgfx_InstanceSubtype** _preval_bsmod_subtypes() {
     return next.bsmod_subtypes();
 }
 
@@ -133,7 +133,7 @@ BSMODAPI void _preval_bsmod_onPackTextureArray(bsmod_TrackParams params) {
     next.bsmod_onPackTextureArray(params);
 }
 
-BSMODAPI bs_Result _preval_bsmod_packFont(bsmod_RenderMode render_mode[], char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length) {
+BSMODAPI bs_Result _preval_bsmod_packFont(bsmod_RenderMode render_mode, char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length) {
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(ttf_path != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);

@@ -112,6 +112,6 @@ typedef enum {
     BSMOD_SUBTYPE_COUNT,
 } bsmod_Subtypes;
 
-BSMODAPI extern int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT];
+BSMODAPI extern bsgfx_InstanceSubtype* _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT];
 
 #endif

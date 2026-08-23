@@ -2951,6 +2951,7 @@
         </function>
         <function name="bs_copyBufferToImage">
             <return>void</return>
+			<param><type>bs_Queue*</type><name>queue</name></param>
             <param><type>bs_Buffer*</type><name>buffer</name></param>
             <param><type>bs_Image*</type><name>image</name></param>
             <param><assert>index &gt;= 0</assert><type>int</type><name>index</name></param>
@@ -3448,7 +3449,7 @@
         <function name="bs_pushBack">
             <return>void*</return>
             <param><type>bs_List*</type><name>list</name></param>
-            <param><type>char*</type><name>data</name></param>
+            <param><type>void*</type><name>data</name></param>
         </function>
         <function name="bs_pushBackList">
             <return>void*</return>
@@ -3816,8 +3817,8 @@
         </function>
         <function name="bs_binding">
             <return>bs_Result</return>
-            <param><type>bs_U32</type><name>bind_set_slot</name></param>
-            <param><type>bs_U32</type><name>bind_point_slot</name></param>
+            <param><type>bs_BindSet*</type><name>bind_set</name></param>
+            <param><type>bs_Binding*</type><name>bind_point</name></param>
             <param><type>bs_Descriptor*</type><name>descriptors</name></param>
             <param><type>int</type><name>descriptors_count</name></param>
         </function>

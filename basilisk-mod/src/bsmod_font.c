@@ -517,17 +517,17 @@ static inline void _bsmod_setKerningPairs(unsigned char* kerning_pairs_offset, i
 	int end = start + count;
 	for (int i = start; i < end; i++) {
 		bsmod_KerningPair* pair = bs_fetchUnit(list, i);
-		bs_setLittleEndian32(pair->right, kerning_pairs_offset + BFNT_KERNING_PAIR_RIGHT);
+		bs_setLittleEndian32(pair->right, kerning_pairs_offset + BFNT_OFFSET_KERNING_PAIR_RIGHT);
 
-		bs_setLittleEndian16(pair->left_x_placement, kerning_pairs_offset + BFNT_KERN_LEFT_X_PLACEMENT);
-		bs_setLittleEndian16(pair->left_y_placement, kerning_pairs_offset + BFNT_KERN_LEFT_Y_PLACEMENT);
-		bs_setLittleEndian16(pair->left_x_advance, kerning_pairs_offset + BFNT_KERN_LEFT_X_ADVANCE);
-		bs_setLittleEndian16(pair->left_y_advance, kerning_pairs_offset + BFNT_KERN_LEFT_Y_ADVANCE);
+		bs_setLittleEndian16(pair->left_x_placement, kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_X_PLACEMENT);
+		bs_setLittleEndian16(pair->left_y_placement, kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_Y_PLACEMENT);
+		bs_setLittleEndian16(pair->left_x_advance, kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_X_ADVANCE);
+		bs_setLittleEndian16(pair->left_y_advance, kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_Y_ADVANCE);
 
-		bs_setLittleEndian16(pair->right_x_placement, kerning_pairs_offset + BFNT_KERN_RIGHT_X_PLACEMENT);
-		bs_setLittleEndian16(pair->right_y_placement, kerning_pairs_offset + BFNT_KERN_RIGHT_Y_PLACEMENT);
-		bs_setLittleEndian16(pair->right_x_advance, kerning_pairs_offset + BFNT_KERN_RIGHT_X_ADVANCE);
-		bs_setLittleEndian16(pair->right_y_advance, kerning_pairs_offset + BFNT_KERN_RIGHT_Y_ADVANCE);
+		bs_setLittleEndian16(pair->right_x_placement, kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_X_PLACEMENT);
+		bs_setLittleEndian16(pair->right_y_placement, kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_Y_PLACEMENT);
+		bs_setLittleEndian16(pair->right_x_advance, kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_X_ADVANCE);
+		bs_setLittleEndian16(pair->right_y_advance, kerning_pairs_offset + BFNT_OFFSET_KERN_RIGHT_Y_ADVANCE);
 
 		kerning_pairs_offset += BFNT_KERNING_PAIR_SIZE;
 	}
@@ -794,7 +794,7 @@ BSMODAPI bs_Result _bsmod_packFont(
 	int blocks_count, 
 	int pt_sizes[], 
 	int pt_sizes_count,
-	const char* resource_name,
+	char* resource_name,
 	int resource_name_length)
 {
 
@@ -961,23 +961,23 @@ BSMODAPI bs_Result _bsmod_packFont(
 
 	unsigned char* data = bs_calloc(1, total_size);
 
-	bs_setLittleEndian32(BFNT_MAGIC, data + BFNT_MAGIC_OFFSET);
-	bs_setLittleEndian32(1, data + BFNT_VERSION_OFFSET);
-	bs_setLittleEndian16(blocks_count, data + BFNT_BLOCKS_COUNT_OFFSET);
-	bs_setLittleEndian16(pt_sizes_count, data + BFNT_PT_SIZES_COUNT_OFFSET);
-	bs_setLittleEndian16(kerning_pairs_count, data + BFNT_KERNING_PAIRS_COUNT_OFFSET);
-	bs_setLittleEndian32(total_glyphs_count, data + BFNT_GLYPHS_COUNT_OFFSET);
-	bs_setLittleEndian16(face->units_per_EM, data + BFNT_UNITS_PER_EM);
+	bs_setLittleEndian32(BFNT_MAGIC, data + BFNT_OFFSET_MAGIC);
+	bs_setLittleEndian32(1, data + BFNT_OFFSET_VERSION);
+	bs_setLittleEndian16(blocks_count, data + BFNT_OFFSET_BLOCKS_COUNT);
+	bs_setLittleEndian16(pt_sizes_count, data + BFNT_OFFSET_PT_SIZES_COUNT);
+	bs_setLittleEndian16(kerning_pairs_count, data + BFNT_OFFSET_KERNING_PAIRS_COUNT);
+	bs_setLittleEndian32(total_glyphs_count, data + BFNT_OFFSET_GLYPHS_COUNT);
+	bs_setLittleEndian16(face->units_per_EM, data + BFNT_OFFSET_UNITS_PER_EM);
 
    /**
     Point sizes
     */
-	unsigned char* pt_sizes_offset = data + BFNT_POINTS_OFFSET;
+	unsigned char* pt_sizes_offset = data + BFNT_OFFSET_POINTS;
 
 	for (int i = 0; i < pt_sizes_count; i++) {
 		unsigned char* offset = pt_sizes_offset + i * BFNT_POINT_SIZE;
 
-		bs_setLittleEndian32(pt_sizes[i], offset + BFNT_POINT_SIZE_OFFSET);
+		bs_setLittleEndian32(pt_sizes[i], offset + BFNT_OFFSET_POINT_SIZE);
 	}
 
    /**
@@ -989,12 +989,12 @@ BSMODAPI bs_Result _bsmod_packFont(
 		unsigned char* offset = unicode_blocks_offset + i * BFNT_BLOCK_SIZE;
 		//bs_setLittleEndian16(i, data + BFNT_BLOCK_LOOKUP_OFFSET + blocks[i].block * sizeof(bs_U16));
 
-		bs_setLittleEndian32(blocks[i].offset, offset + BFNT_BLOCK_START);
-		bs_setLittleEndian16(blocks[i].count, offset + BFNT_BLOCK_LENGTH);
-		bs_setLittleEndian16(blocks[i].size, offset + BFNT_BLOCK_SIZE);
+		bs_setLittleEndian32(blocks[i].offset, offset + BFNT_OFFSET_BLOCK_START);
+		bs_setLittleEndian16(blocks[i].count, offset + BFNT_OFFSET_BLOCK_LENGTH);
+		bs_setLittleEndian16(blocks[i].size, offset + BFNT_OFFSET_BLOCK_SIZE);
 
 		if (blocks[i].rasterize) {
-			bs_setLittleEndian32(glyphs_block_offset, offset + BFNT_BLOCK_GLYPHS);
+			bs_setLittleEndian32(glyphs_block_offset, offset + BFNT_OFFSET_BLOCK_GLYPHS);
 			glyphs_block_offset += blocks[i].count * pt_sizes_count;
 		}
 	}
@@ -1012,13 +1012,13 @@ BSMODAPI bs_Result _bsmod_packFont(
 
 		unsigned char* offset = glyphs_offset + glyph->glyph_offset;
 
-		bs_setLittleEndian16(info->page, offset + BFNT_GLYPH_PAGE);
-		bs_setLittleEndian16(i, offset + BFNT_GLYPH_ATLAS_INDEX);
-		bs_setLittleEndian16(glyph->glyph_id, offset + BFNT_GLYPH_GLYPH_INDEX);
-		bs_setLittleEndian32(glyph->codepoint, offset + BFNT_GLYPH_CODEPOINT);
-		bs_setLittleEndian32(glyph->y_offset, offset + BFNT_GLYPH_Y_OFFSET);
-		bs_setLittleEndian32(glyph->x_advance, offset + BFNT_GLYPH_X_ADVANCE);
-		bs_setLittleEndian32(glyph->y_advance, offset + BFNT_GLYPH_Y_ADVANCE);
+		bs_setLittleEndian16(info->page, offset + BFNT_OFFSET_GLYPH_PAGE);
+		bs_setLittleEndian16(i, offset + BFNT_OFFSET_GLYPH_ATLAS_INDEX);
+		bs_setLittleEndian16(glyph->glyph_id, offset + BFNT_OFFSET_GLYPH_GLYPH_INDEX);
+		bs_setLittleEndian32(glyph->codepoint, offset + BFNT_OFFSET_GLYPH_CODEPOINT);
+		bs_setLittleEndian32(glyph->y_offset, offset + BFNT_OFFSET_GLYPH_Y_OFFSET);
+		bs_setLittleEndian32(glyph->x_advance, offset + BFNT_OFFSET_GLYPH_X_ADVANCE);
+		bs_setLittleEndian32(glyph->y_advance, offset + BFNT_OFFSET_GLYPH_Y_ADVANCE);
 	}
 	
    /**
@@ -1036,12 +1036,12 @@ BSMODAPI bs_Result _bsmod_packFont(
 		unsigned char* offset = glyphs_offset + glyph->glyph_offset;
 
 		int start = kern_id;
-		bs_setLittleEndian16(start, offset + BFNT_GLYPH_KERNING_START);
+		bs_setLittleEndian16(start, offset + BFNT_OFFSET_GLYPH_KERNING_START);
 
 		_bsmod_setKerningPairs(kerning_pairs_offset, &kern_id, &kerning_pairs, glyph->kern_pair_start, glyph->kern_pair_count);
 		_bsmod_setKerningPairs(kerning_pairs_offset, &kern_id, &kerning_pairs_extended, glyph->kern_pair_extended_start, glyph->kern_pair_extended_count);
 
-		bs_setLittleEndian16(kern_id - start, offset + BFNT_GLYPH_KERNING_COUNT);
+		bs_setLittleEndian16(kern_id - start, offset + BFNT_OFFSET_GLYPH_KERNING_COUNT);
 	}
 
 	assert(kern_id == kerning_pairs_count);

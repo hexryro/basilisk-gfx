@@ -71,8 +71,8 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
         bs_Resource* resource = NULL;
         bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
         if (resource && resource->model) {
-            bsgfx_Font* font = resource->model;
-            basilisk_renderFontSubtype(scope, queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
+            bsgfx_Font* font = (bsgfx_Font*)resource->model;
+            basilisk_renderFontSubtype(scope, queue, bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
         }
     }
     basilisk_renderUIStencil(scope, queue);

@@ -1161,6 +1161,7 @@
 		</structure>
 
 		<structure name="bsgfx_InstanceType">
+			<field><type>int</type><name>tick_count</name></field>
 			<field><type>int</type><name>instance_count</name></field>
 			<field comment="Byte size of one instance of this type (including bsgfx_InstanceHeader)"><type>int</type><name>instance_size</name></field>
 			<field><type>bs_List</type><name>subtypes</name></field>
@@ -1662,7 +1663,11 @@
 		<function name="bsgfx_subtypes">
 			<return>bsgfx_InstanceSubtype**</return>
 		</function>
-		
+
+		<function name="bsgfx_instanceTypes">
+			<return>bsgfx_InstanceType**</return>
+		</function>
+
 		<function name="bsgfx_textDimensions">
 			<return>void</return>
 			<param><type>bsgfx_Font*</type><name>font</name></param>
@@ -1911,11 +1916,6 @@
 			<return>void</return>
 			<param><type>bsgfx_InstanceType*</type><name>instance_type</name></param>
 		</function>
-		<function name="bsgfx_resetSubtype">
-			<return>void</return>
-			<param><type>bsgfx_InstanceSubtype*</type><name>instance_subtype</name></param>
-		</function>
-		
 		<function name="bsgfx_instanceHiResMesh">
 			<return>void</return>
 			<param><type>bs_Mesh*</type><name>mesh</name></param>
@@ -2166,6 +2166,7 @@
 		-->
 		<function name="bsgfx_renderPrefabPrimitives">
 			<return>void</return>
+			<param><type>bs_Queue*</type><name>queue</name></param>
 			<param><type>bs_Pipeline*</type><name>pipeline</name></param>
 			<param><type>int</type><name>key_start</name></param>
 		</function>

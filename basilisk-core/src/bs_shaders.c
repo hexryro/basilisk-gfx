@@ -580,47 +580,49 @@ static int _bs_compareBindSets(const bs_BindSet* a, const bs_BindSet* b) {
     return 0;
 }
 
-BSAPI void _bs_loadBinding(bs_Binding* binding, int bind_set, int bind_point, int package_id, char* path) {
+static bs_Result _bs_loadBinding(bs_Binding* binding, int bind_set, int bind_point, int package_id, char* path) {
     bs_Result result;
 
     bs_Resource* resource;
     result = _bs_loadResource(package_id, 0, BS_RESOURCE_BINDING, &resource, path);
     if (result != BS_RESULT_OK) {
-        return;
+        return result;
     }
 
     unsigned char* bbnd = resource->data->value;
 
-    bs_U32 magic = bs_getLittleEndian32(bbnd + BBND_MAGIC_OFFSET);
+    bs_U32 magic = bs_getLittleEndian32(bbnd + BBND_OFFSET_MAGIC);
 
     if (magic != BS_BBND_MAGIC) {
         BS_WARN_INVALID_MAGIC("bindings", path);
         return BS_RESULT_CORRUPTED;
     }
 
-    bs_U32 version = bs_getLittleEndian32(bbnd + BBND_VERSION_OFFSET);
+    bs_U32 version = bs_getLittleEndian32(bbnd + BBND_OFFSET_VERSION);
 
     if (version != 1) {
         BS_WARN_UNSUPPORTED_VERSION("bindings", path);
         return BS_RESULT_NOT_SUPPORTED;
     }
 
-    int actual_bind_set = bs_getLittleEndian32(bbnd + BBND_BIND_SET_OFFSET);
-    int actual_binding = bs_getLittleEndian32(bbnd + BBND_BIND_POINT_OFFSET);
+    int actual_bind_set = bs_getLittleEndian32(bbnd + BBND_OFFSET_BIND_SET);
+    int actual_binding = bs_getLittleEndian32(bbnd + BBND_OFFSET_BIND_POINT);
     if (actual_bind_set != bind_set || actual_binding != bind_point) {
         BS_WARN("Binding \"%s\" has mismatching bindings (%d, %d) != (%d, %d)", 
             path, bind_set, bind_point, actual_bind_set, actual_binding);
         return BS_RESULT_CORRUPTED;
     }
 
-    binding->descriptors_count = bs_getLittleEndian32(bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
+    binding->descriptors_count = bs_getLittleEndian32(bbnd + BBND_OFFSET_DESCRIPTOR_COUNT);
     binding->slot = bind_point;
     binding->set = bind_set;
-    binding->stages = bs_getLittleEndian32(bbnd + BBND_SHADER_STAGES_OFFSET);
-    binding->type_index = bs_getLittleEndian32(bbnd + BBND_DESCRIPTOR_TYPE_OFFSET);
+    binding->stages = bs_getLittleEndian32(bbnd + BBND_OFFSET_SHADER_STAGES);
+    binding->type_index = bs_getLittleEndian32(bbnd + BBND_OFFSET_DESCRIPTOR_TYPE);
     binding->type = bs_indexDescriptorType(binding->type_index);
 
     assert(binding->descriptors_count >= 0);
+
+    return BS_RESULT_OK;
 }
 
 static void _bs_loadPackageBindings(bs_Package* package, int package_id) {
@@ -810,8 +812,6 @@ BSAPI void _bs_loadBindings() {
 
     */
     _bs_pushDescriptorPools();
-
-    return BS_RESULT_OK;
 }
 
 

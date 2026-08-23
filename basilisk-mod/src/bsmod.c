@@ -56,9 +56,9 @@ int bsmod_fetchSource(bs_ObjectType type) {
     return _bsmod_sources_[type];
 }
 
-int _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT] = { 0 };
+bsgfx_InstanceSubtype* _bsmod_subtypes_[BSMOD_SUBTYPE_COUNT] = { 0 };
 
-BSMODAPI const int* _bsmod_subtypes() {
+BSMODAPI bsgfx_InstanceSubtype** _bsmod_subtypes() {
     return _bsmod_subtypes_;
 }
 
@@ -463,11 +463,11 @@ BSMODAPI void _bsmod_onIni() {
     bs_quad(&(bs_vec3) { 0 }, & (bs_vec2) { 1.0, 1.0 }, & quad);
 
     if (quad_instance_batch && bs_canPushBatch(quad_instance_batch->batch)) {
-        bsgfx_instanceType(sizeof(bsgfx_QuadInstance), BSMOD_SET_TRACKER_QUAD_INSTANCES, BSMOD_BINDING_TRACKER_QUAD_INSTANCES, & _bsgfx_instance_types_[BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD]);
+        bsgfx_instanceType(sizeof(bsgfx_QuadInstance), BSMOD_SET_TRACKER_QUAD_INSTANCES, BSMOD_BINDING_TRACKER_QUAD_INSTANCES, &bsgfx_instanceTypes()[BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD]);
 
         bs_Range range = bs_pushQuad(quad_instance_batch->batch, &quad, BS_WHITE);
 
-        bsgfx_InstanceType* tracker_quad_instance_type = _bsgfx_instance_types_[BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD];
+        bsgfx_InstanceType* tracker_quad_instance_type = bsgfx_instanceTypes()[BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD];
 
         bsgfx_subtype(tracker_quad_instance_type, quad_instance_batch->batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_TRACKER_QUAD_MSDF]);
 
@@ -499,7 +499,7 @@ BSMODAPI void _bsmod_onLateIni() { // ugly, called after first track
 }
 
 BSMODAPI void _bsmod_onCreateQuadSubtypes(bs_Range range) {
-    bsgfx_InstanceType* quad_instance_type = _bsgfx_instance_types_[BSGFX_INSTANCE_TYPE_2_QUAD];
+    bsgfx_InstanceType* quad_instance_type = bsgfx_instanceTypes()[BSGFX_INSTANCE_TYPE_2_QUAD];
     bs_Batch* batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_QUAD_INSTANCED)->batch;
     bsgfx_subtype(quad_instance_type, batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_MATERIAL_ICON]);
     bsgfx_subtype(quad_instance_type, batch, 0, range, &_bsmod_subtypes_[BSMOD_SUBTYPE_PRIMITIVE_ICON]);

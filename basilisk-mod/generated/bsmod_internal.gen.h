@@ -36,7 +36,7 @@
 #include <basilisk-mod.h>
 #include <windows.h>
 
-typedef const int*(__stdcall* PFN_bsmod_subtypes)();
+typedef bsgfx_InstanceSubtype**(__stdcall* PFN_bsmod_subtypes)();
 typedef bsmod_Callbacks*(__stdcall* PFN_bsmod_callbacks)();
 typedef void(__stdcall* PFN_bsmod_copyHoveringDataToBuffer)();
 typedef bs_Queue*(__stdcall* PFN_bsmod_onQueue)();
@@ -57,7 +57,7 @@ typedef void(__stdcall* PFN_bsmod_onPackAtlas)(bsmod_TrackParams params);
 typedef void(__stdcall* PFN_bsmod_onPackModels)(bsmod_TrackParams params);
 typedef void(__stdcall* PFN_bsmod_onPackBinary)(bsmod_TrackParams params);
 typedef void(__stdcall* PFN_bsmod_onPackTextureArray)(bsmod_TrackParams params);
-typedef bs_Result(__stdcall* PFN_bsmod_packFont)(bsmod_RenderMode render_mode[], char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length);
+typedef bs_Result(__stdcall* PFN_bsmod_packFont)(bsmod_RenderMode render_mode, char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length);
 typedef bsmod_TextureInfo*(__stdcall* PFN_bsmod_packAtlasTexture)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, char* name);
 typedef bsmod_TextureInfo*(__stdcall* PFN_bsmod_packAtlasTextureN)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, char* name, int name_length);
 typedef bsmod_TextureInfo*(__stdcall* PFN_bsmod_packAtlasTextureV)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, char* format, va_list args);
@@ -252,7 +252,7 @@ typedef struct {
     PFN_bsmod_onDragTile bsmod_onDragTile;
 } bsmod_FunctionTable;
 
-BSMODAPI const int* _bsmod_subtypes();
+BSMODAPI bsgfx_InstanceSubtype** _bsmod_subtypes();
 BSMODAPI bsmod_Callbacks* _bsmod_callbacks();
 BSMODAPI void _bsmod_copyHoveringDataToBuffer();
 BSMODAPI bs_Queue* _bsmod_onQueue();
@@ -273,7 +273,7 @@ BSMODAPI void _bsmod_onPackAtlas(bsmod_TrackParams params);
 BSMODAPI void _bsmod_onPackModels(bsmod_TrackParams params);
 BSMODAPI void _bsmod_onPackBinary(bsmod_TrackParams params);
 BSMODAPI void _bsmod_onPackTextureArray(bsmod_TrackParams params);
-BSMODAPI bs_Result _bsmod_packFont(bsmod_RenderMode render_mode[], char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length);
+BSMODAPI bs_Result _bsmod_packFont(bsmod_RenderMode render_mode, char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length);
 BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTexture(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, char* name);
 BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, char* name, int name_length);
 BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureV(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, char* format, va_list args);

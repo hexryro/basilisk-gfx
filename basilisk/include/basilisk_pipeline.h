@@ -32,7 +32,7 @@ void basilisk_renderUISolid(bs_RendererScope* scope, bs_Queue* queue);
 void basilisk_renderUI(bs_RendererScope* scope, bs_Queue* queue);
 void basilisk_renderRoundedQuads(bs_RendererScope* scope, bs_Queue* queue);
 void basilisk_renderPrefabOutlines(bs_RendererScope* scope, bs_Queue* queue);
-void basilisk_renderFontSubtype(bs_RendererScope* scope, bs_Queue* queue, int subtype, bsgfx_Id font_id, bs_Shader* fragment_shader);
+void basilisk_renderFontSubtype(bs_RendererScope* scope, bs_Queue* queue, bsgfx_InstanceSubtype* subtype, bsgfx_Id font_id, bs_Shader* fragment_shader);
 void basilisk_renderTiles(bs_RendererScope* scope, bs_Queue* queue);
 void basilisk_renderSelectedTile(bs_RendererScope* scope, bs_Queue* queue);
 void basilisk_renderUIPost(bs_RendererScope* scope, bs_Queue* queue);

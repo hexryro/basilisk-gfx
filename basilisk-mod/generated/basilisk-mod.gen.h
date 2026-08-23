@@ -618,9 +618,9 @@ BSMODAPI void
 bsmod_disableValidation();
 
  /**
-  @return const int*
+  @return bsgfx_InstanceSubtype**
   */
-BSMODAPI const int*
+BSMODAPI bsgfx_InstanceSubtype**
 bsmod_subtypes();
 
  /**
@@ -775,7 +775,7 @@ bsmod_onPackTextureArray(
   */
 BSMODAPI bs_Result
 bsmod_packFont(
-    bsmod_RenderMode render_mode[],
+    bsmod_RenderMode render_mode,
     char* package_name,
     char* ttf_path,
     bsmod_UnicodeBlockRange blocks[],

@@ -68,7 +68,7 @@ BSMODAPI void _bsmod_iconWidget(const bsgfx_AtlasCache* cache, float align_heigh
         .type = BSGFX_WIDGET_ICON,
         .icon = {
             .atlas = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_UI)->atlas,
-            .atlas_subtype = _bsgfx_subtypes_[BSGFX_SUBTYPE_UI],
+            .atlas_subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
             .type = BSGFX_ICON_ATLAS,
             .name = cache->name, // todo skip query
             .material_id = $white_material()->id,
@@ -335,7 +335,7 @@ BSMODAPI void _bsmod_renderBillboards(bs_RendererScope* scope, bs_Queue* queue) 
 }
 
 static void _bsmod_instanceBillboards() {
-    _bsmod_.hovering.billboard = false;
+    //_bsmod_.hovering.billboard = false;
     _bsmod_instanceLightBillboards();
 }
 

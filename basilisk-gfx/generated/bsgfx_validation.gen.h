@@ -47,6 +47,7 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
 
     functions.bsgfx_test = (PFN_bsgfx_test)GetProcAddress(module, "_val_bsgfx_test");
     functions.bsgfx_subtypes = (PFN_bsgfx_subtypes)GetProcAddress(module, "_val_bsgfx_subtypes");
+    functions.bsgfx_instanceTypes = (PFN_bsgfx_instanceTypes)GetProcAddress(module, "_val_bsgfx_instanceTypes");
     functions.bsgfx_textDimensions = (PFN_bsgfx_textDimensions)GetProcAddress(module, "_val_bsgfx_textDimensions");
     functions.bsgfx_defaultPipelineHash = (PFN_bsgfx_defaultPipelineHash)GetProcAddress(module, "_val_bsgfx_defaultPipelineHash");
     functions.bsgfx_renderTileIcons = (PFN_bsgfx_renderTileIcons)GetProcAddress(module, "_val_bsgfx_renderTileIcons");
@@ -96,7 +97,6 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
     functions.bsgfx_tickInstanceType = (PFN_bsgfx_tickInstanceType)GetProcAddress(module, "_val_bsgfx_tickInstanceType");
     functions.bsgfx_renderSubtype = (PFN_bsgfx_renderSubtype)GetProcAddress(module, "_val_bsgfx_renderSubtype");
     functions.bsgfx_resetInstanceType = (PFN_bsgfx_resetInstanceType)GetProcAddress(module, "_val_bsgfx_resetInstanceType");
-    functions.bsgfx_resetSubtype = (PFN_bsgfx_resetSubtype)GetProcAddress(module, "_val_bsgfx_resetSubtype");
     functions.bsgfx_instanceHiResMesh = (PFN_bsgfx_instanceHiResMesh)GetProcAddress(module, "_val_bsgfx_instanceHiResMesh");
     functions.bsgfx_instanceMesh = (PFN_bsgfx_instanceMesh)GetProcAddress(module, "_val_bsgfx_instanceMesh");
     functions.bsgfx_instanceBoneMesh = (PFN_bsgfx_instanceBoneMesh)GetProcAddress(module, "_val_bsgfx_instanceBoneMesh");

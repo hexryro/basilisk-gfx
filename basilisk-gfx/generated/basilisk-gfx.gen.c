@@ -79,6 +79,11 @@ bsgfx_InstanceSubtype** bsgfx_subtypes()
     return next.bsgfx_subtypes();
 }
 
+bsgfx_InstanceType** bsgfx_instanceTypes()
+{
+    return next.bsgfx_instanceTypes();
+}
+
 void bsgfx_textDimensions(
     bsgfx_Font* font, 
     bs_vec2* out, 
@@ -445,12 +450,6 @@ void bsgfx_resetInstanceType(
     bsgfx_InstanceType* instance_type)
 {
     next.bsgfx_resetInstanceType(instance_type);
-}
-
-void bsgfx_resetSubtype(
-    bsgfx_InstanceSubtype* instance_subtype)
-{
-    next.bsgfx_resetSubtype(instance_subtype);
 }
 
 void bsgfx_instanceHiResMesh(
@@ -844,10 +843,11 @@ void bsgfx_renderPrefabs(
 }
 
 void bsgfx_renderPrefabPrimitives(
+    bs_Queue* queue, 
     bs_Pipeline* pipeline, 
     int key_start)
 {
-    next.bsgfx_renderPrefabPrimitives(pipeline, key_start);
+    next.bsgfx_renderPrefabPrimitives(queue, pipeline, key_start);
 }
 
 int bsgfx_queryPrefabId(

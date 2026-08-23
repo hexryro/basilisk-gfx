@@ -32,7 +32,7 @@ struct bsgfx_QuadInstance {
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
 
 layout(set = QUAD_INSTANCES_SET, binding = QUAD_INSTANCES_BINDING) readonly buffer bsgfx_quad_instance_buffer {
-    bsgfx_QuadInstance bsgfx_quad_instances[QUAD_INSTANCES_COUNT];
+    bsgfx_QuadInstance bsgfx_quad_instances[];
 };
 
 vec2 bsgfx_quadSize(uint instance) {

@@ -3,8 +3,8 @@
 
 #include "project/basilisk-gfx/shaders/bsgfx.glsl"
 
-layout(set = BSGFX_SET_MATERIALS, binding = BSGFX_BINDING_MATERIALS) readonly uniform bsgfx_materials_uniform {
-    bsgfx_MaterialContract bsgfx_materials[BSGFX_MAX_MATERIALS_COUNT];
+layout(set = BSGFX_SET_MATERIALS, binding = BSGFX_BINDING_MATERIALS) readonly buffer bsgfx_materials_uniform {
+    bsgfx_MaterialContract bsgfx_materials[];
 };
 
 bsgfx_MaterialContract bsgfx_material(uint index) {

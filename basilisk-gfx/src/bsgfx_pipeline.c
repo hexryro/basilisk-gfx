@@ -182,7 +182,7 @@ BSGFXAPI void _bsgfx_renderPoints(bs_RendererScope* scope, bs_Queue* queue) {
     }
 }
 
-BSGFXAPI void _bsgfx_renderLines(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, int subtype, bool skip_depth_test) {
+BSGFXAPI void _bsgfx_renderLines(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test) {
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     hash.shaders[0] = $vs_bsgfx_line_instanced();
     hash.shaders[1] = $fs_bsgfx_color();
@@ -252,6 +252,7 @@ BSGFXAPI void _bsgfx_renderAtlasIcons(bs_RendererScope* scope, bs_Queue* queue) 
 }
 
 BSGFXAPI void _bsgfx_renderTileIcons(bs_RendererScope* scope, bs_Queue* queue) {
+    return; // TODO: $fs_bsgfx_tile_screen needs to compile
     bs_PipelineHash hash = _bsgfx_defaultPipelineHash();
     _bsgfx_requiredForTransparency(&hash);
     hash.shaders[0] = $vs_bsgfx_quad_instanced();

@@ -5942,6 +5942,7 @@ bs_copyImageToBufferAsync(
     bs_ivec2 resolution);
 
  /**
+  @param queue
   @param buffer
   @param image
   @param index
@@ -5950,6 +5951,7 @@ bs_copyImageToBufferAsync(
   */
 BSAPI void
 bs_copyBufferToImage(
+    bs_Queue* queue,
     bs_Buffer* buffer,
     bs_Image* image,
     int index,
@@ -7575,7 +7577,7 @@ bs_erase(
 BSAPI void*
 bs_pushBack(
     bs_List* list,
-    char* data);
+    void* data);
 
  /**
   @param source
@@ -8692,16 +8694,16 @@ BSAPI void
 bs_loadBindings();
 
  /**
-  @param bind_set_slot
-  @param bind_point_slot
+  @param bind_set
+  @param bind_point
   @param descriptors
   @param descriptors_count
   @return bs_Result
   */
 BSAPI bs_Result
 bs_binding(
-    bs_U32 bind_set_slot,
-    bs_U32 bind_point_slot,
+    bs_BindSet* bind_set,
+    bs_Binding* bind_point,
     bs_Descriptor* descriptors,
     int descriptors_count);
 

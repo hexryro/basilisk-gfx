@@ -164,17 +164,17 @@ static bs_DescriptorTypeIndex bsmod_convertBindType(spvc_compiler compiler, spvc
 
 		if (dim == SpvDimBuffer) {
 			if (spvc_type_get_image_is_storage(type))
-				return BS_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+				return BS_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER_INDEX;
 			else
-				return BS_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+				return BS_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER_INDEX;
 		}
 
 		return BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER_INDEX;
 		//	case SPVC_RESOURCE_TYPE_ACCELERATION_STRUCTURE: return BS_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_INDEX;
 	case SPVC_RESOURCE_TYPE_STORAGE_IMAGE: return BS_DESCRIPTOR_TYPE_STORAGE_IMAGE_INDEX;
 	default:
-		bs_warnF("SPVC buffer type (%d) not supported\n", type);
-		return SPVC_RESOURCE_TYPE_UNKNOWN;
+		bs_warnF("SPVC buffer type (%d) not supported\n", resource_type);
+		return -1; // scuffed
 	}
 }
 
@@ -200,25 +200,25 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 	const size_t total_size = BBND_HEADER_SIZE;
 	unsigned char* bbnd = bs_malloc(total_size);
 
-	bs_setLittleEndian32(BS_BBND_MAGIC, bbnd + BBND_MAGIC_OFFSET);
-	bs_setLittleEndian32(version, bbnd + BBND_VERSION_OFFSET);
-	bs_setLittleEndian32(bind_set, bbnd + BBND_BIND_SET_OFFSET);
-	bs_setLittleEndian32(bind_point, bbnd + BBND_BIND_POINT_OFFSET);
+	bs_setLittleEndian32(BS_BBND_MAGIC, bbnd + BBND_OFFSET_MAGIC);
+	bs_setLittleEndian32(version, bbnd + BBND_OFFSET_VERSION);
+	bs_setLittleEndian32(bind_set, bbnd + BBND_OFFSET_BIND_SET);
+	bs_setLittleEndian32(bind_point, bbnd + BBND_OFFSET_BIND_POINT);
 
    /**
     Set descriptors count
     */
-	bs_setLittleEndian32(1, bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
+	bs_setLittleEndian32(1, bbnd + BBND_OFFSET_DESCRIPTOR_COUNT);
 
 	if (spvc_type_array_dimension_is_literal(spirv_type, 0)) {
 		int array_dimensions_count = spvc_type_get_num_array_dimensions(spirv_type);
 		if (array_dimensions_count == 1) {
 			int descriptors_count = spvc_type_get_array_dimension(spirv_type, 0);
-			bs_setLittleEndian32(descriptors_count, bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
+			bs_setLittleEndian32(descriptors_count, bbnd + BBND_OFFSET_DESCRIPTOR_COUNT);
 		}
 		else if (array_dimensions_count > 0) {
 			bs_warnN(BS_CONSTANT_STRING("Nested arrays are not supported"));
-			bs_setLittleEndian32(0, bbnd + BBND_DESCRIPTOR_COUNT_OFFSET);
+			bs_setLittleEndian32(0, bbnd + BBND_OFFSET_DESCRIPTOR_COUNT);
 		}
 	}
 
@@ -231,9 +231,9 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 		bsmod_Chunk* chunk = bs_fetchUnit(&package->chunks, existing->chunk);
 		unsigned char* existing_data = chunk->bin.data + existing->offset;
 
-		bs_U32 existing_magic = bs_getLittleEndian32(existing_data + BBND_MAGIC_OFFSET);
-		bs_U32 existing_version = bs_getLittleEndian32(existing_data + BBND_VERSION_OFFSET);
-		bs_U32 existing_shader_stages = bs_getLittleEndian32(existing_data + BBND_SHADER_STAGES_OFFSET);
+		bs_U32 existing_magic = bs_getLittleEndian32(existing_data + BBND_OFFSET_MAGIC);
+		bs_U32 existing_version = bs_getLittleEndian32(existing_data + BBND_OFFSET_VERSION);
+		bs_U32 existing_shader_stages = bs_getLittleEndian32(existing_data + BBND_OFFSET_SHADER_STAGES);
 
 		if (existing_magic != BS_BBND_MAGIC)
 			bs_warnF("Found existing binding \"%s\" with invalid magic, overwriting.", name);
@@ -243,8 +243,8 @@ static bs_Result _bsmod_packBinding(spvc_compiler compiler, spvc_reflected_resou
 			shader_stages |= existing_shader_stages;
 	}
 
-	bs_setLittleEndian32(shader_stages, bbnd + BBND_SHADER_STAGES_OFFSET);
-	bs_setLittleEndian32(resource_type, bbnd + BBND_DESCRIPTOR_TYPE_OFFSET);
+	bs_setLittleEndian32(shader_stages, bbnd + BBND_OFFSET_SHADER_STAGES);
+	bs_setLittleEndian32(resource_type, bbnd + BBND_OFFSET_DESCRIPTOR_TYPE);
 
    /**
     Pack resource
@@ -393,7 +393,7 @@ static bool _bsmod_queryShaderType(char* path, glslang_stage_t* out_stage, bs_Sh
 	}
 	else if (strcmp(ext, "tese") == 0) {
 		*out_stage = GLSLANG_STAGE_TESSEVALUATION;
-		*out_type = GLSLANG_STAGE_TESSEVALUATION;
+		*out_type = BS_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
 	}
 	else if (strcmp(ext, "vert") == 0) {
 		*out_stage = GLSLANG_STAGE_VERTEX;
@@ -419,7 +419,7 @@ static void _bsmod_packBindings(spvc_compiler compiler, spvc_resources resources
 
 	if (result != SPVC_SUCCESS) {
 		BSMOD_WARN_SPVC_ERROR("spvc_resources_get_resource_list_for_type", result,);
-		return BS_RESULT_GENERAL_ERROR;
+		return;
 	}
 
 	for (int i = 0; i < bindings_count; i++) {
