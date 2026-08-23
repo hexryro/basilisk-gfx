@@ -35,6 +35,7 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 	int width, 
 	int height, 
 	int category, 
+	int id,
 	char* name, 
 	int name_length) 
 {
@@ -46,6 +47,7 @@ BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
 		.param = param,
 		.page = -1,
 		.category = category,
+		.id = id,
 	};
 
 	stbrp_rect rect = {

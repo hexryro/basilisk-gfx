@@ -161,12 +161,12 @@ BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 	int ranges_count = sizeof(ranges) / sizeof(*ranges);
 
 	//int pt_sizes[] = { 4, 6, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 56, 64, 72, 144 };
-	int pt_sizes[] = { 16 };
+	int pt_sizes[] = { 96 };
 
 	int pt_sizes_count = sizeof(pt_sizes) / sizeof(*pt_sizes);
 
 	bsmod_packFont(
-		BSMOD_RENDER_MODE_SDF,
+		BSMOD_RENDER_MODE_NORMAL,
 		params.package, 
 		params.path, 
 		ranges, 
@@ -195,6 +195,7 @@ static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* 
 			NULL, 
 			png_data.width, 
 			png_data.height, 
+			0,
 			0,
 			name
 		);

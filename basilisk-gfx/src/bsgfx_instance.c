@@ -345,14 +345,13 @@ BSGFXAPI void _bsgfx_tickInstanceType(bsgfx_InstanceType* type) {
 		bsgfx_InstanceSubtype* subtype = bs_fetchUnit(&type->subtypes, j);
 
 		bsgfx_InstanceHeader* src_instance = subtype->host_instances.data;
-		bsgfx_InstanceHeader* dst_instance = destination + offset;
+		bsgfx_InstanceHeader* dst_instance = destination + offset * type->instance_size;
 
 		memcpy(dst_instance, src_instance, subtype->host_instances.count * type->instance_size);
-		subtype->host_instances.count = 0;
 
 		subtype->instance_offset = offset;
 
-		offset += subtype->host_instances.count * type->instance_size;
+		offset += subtype->host_instances.count;
 	}
 
 	bs_bindBuffer(type->device_instances->bind_set, type->device_instances->binding, type->device_instances);

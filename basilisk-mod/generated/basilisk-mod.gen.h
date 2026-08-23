@@ -558,6 +558,7 @@ struct bsmod_TextureInfo {
     int name_length;
     int category;
     int page;
+    int id;
 };
 
 struct bsmod_Chunk {
@@ -793,6 +794,7 @@ bsmod_packFont(
   @param width
   @param height
   @param category
+  @param id
   @param name
   @return bsmod_TextureInfo*
   */
@@ -805,6 +807,7 @@ bsmod_packAtlasTexture(
     int width,
     int height,
     int category,
+    int id,
     char* name);
 
  /**
@@ -815,6 +818,7 @@ bsmod_packAtlasTexture(
   @param width
   @param height
   @param category
+  @param id
   @param name
   @param name_length
   @return bsmod_TextureInfo*
@@ -828,6 +832,7 @@ bsmod_packAtlasTextureN(
     int width,
     int height,
     int category,
+    int id,
     char* name,
     int name_length);
 
@@ -839,6 +844,7 @@ bsmod_packAtlasTextureN(
   @param width
   @param height
   @param category
+  @param id
   @param format
   @param args
   @return bsmod_TextureInfo*
@@ -852,6 +858,7 @@ bsmod_packAtlasTextureV(
     int width,
     int height,
     int category,
+    int id,
     char* format,
     va_list args);
 
@@ -863,6 +870,7 @@ bsmod_packAtlasTextureV(
   @param width
   @param height
   @param category
+  @param id
   @param format
   @param ...
   @return bsmod_TextureInfo*
@@ -876,6 +884,7 @@ bsmod_packAtlasTextureF(
     int width,
     int height,
     int category,
+    int id,
     char* format,
      ...);
 

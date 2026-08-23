@@ -121,7 +121,6 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Fo
     bs_vec2 next_glyph_advance = { 0 };
 
     const float spacing = 8.0;
-    const float temp_scale = 8.0;
 
     for (int i = 0; i < text_length; i++) {
         char c = text[i];
@@ -145,9 +144,9 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Fo
         next_glyph_advance = BS_V2(0, 0);
 
         bs_vec3 p = position;
-        p.x += placement.x;
-        p.y += placement.y;
-        p.y += glyph->y_offset;
+        float mul = 1.0 / 64.0;
+        p.x += placement.x + glyph->x_offset;
+        p.y += placement.y + glyph->y_offset;
 
         if (i < (text_length - 1)) {
             char next = text[i + 1];
@@ -179,18 +178,20 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Fo
             }
         }
 
-        bs_mat4 transform = BS_MAT4_IDENTITY;
+        if (!(glyph->flags & BFNT_GLYPH_FLAG_SKIP_RENDER)) {
+            bs_mat4 transform = BS_MAT4_IDENTITY;
 
-        bs_m4Translate(&transform, &p, &transform);
-        bs_m4Scale(&transform, &BS_V3(size.x * temp_scale, size.y * temp_scale, 0), &transform);
+            bs_m4Translate(&transform, &p, &transform);
+            bs_m4Scale(&transform, &BS_V3(size.x, size.y, 0), &transform);
 
-        bsgfx_instanceQuad(subtype, bs_m4x3(&transform), coords, 0, glyph->atlas_page, 0);
+            bsgfx_instanceQuad(subtype, bs_m4x3(&transform), coords, 0, glyph->atlas_page, 0);
+        }
 
         // instanceAtlasTexture(glyph->atlas_page, glyph->atlas_index)
 
-        position.x += ((float)glyph->x_advance / 64.0) * temp_scale;
+        position.x += (float)glyph->x_advance * mul;
 
-        position.x += advance.x * temp_scale;
+        position.x += advance.x;
         position.y += advance.y;
         position.z += 0.01;
     }
@@ -296,10 +297,12 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     */
     unsigned char* glyphs_offset = blocks_offset;
     for (int i = 0; i < glyphs_count; i++) {
+        bs_U32 flags = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_FLAGS);
         bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_PAGE);
         bs_U16 atlas_index = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_ATLAS_INDEX);
         bs_U16 glyph_index = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_GLYPH_INDEX);
         bs_U32 codepoint = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_CODEPOINT);
+        bs_I32 x_offset = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_X_OFFSET);
         bs_I32 y_offset = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_Y_OFFSET);
         bs_I32 x_advance = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_X_ADVANCE);
         
@@ -309,6 +312,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
         assert(atlas_index < atlas_object->atlas->count);
 
         font->glyphs[i] = (bsgfx_Glyph) {
+            .flags = flags,
             .atlas_page = page,
             .atlas_index = atlas_index,
             .glyph_index = glyph_index,
@@ -316,6 +320,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
             .y_advance = 16.0, // temp
             .kerning_pair_start = kern_start_pair,
             .kerning_pair_count = kern_count_pair,
+            .x_offset = x_offset,
             .y_offset = y_offset,
         };
 

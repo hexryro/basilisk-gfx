@@ -21,8 +21,6 @@ layout(location = 8) in float in_depth;
 layout(set = BSGFX_SET_FONTS, binding = BSGFX_BINDING_FONTS) uniform sampler2DArray font_atlas;
 
 void main() {
-    out_color = vec4(in_normal, 1.0);
-
     int atlas_page = bsgfx_quad_instances[in_instance].header.id;
 
     vec3 uv = vec3(in_texture.x, 1.0 - in_texture.y, float(atlas_page));
@@ -41,7 +39,7 @@ void main() {
    // if (sdf < 0.2)
    //     discard;
 
-    out_color = vec4(1.0, 1.0, 1.0, sdf);
+   // out_color = vec4(1.0, 1.0, 1.0, sdf);
 
 
 }

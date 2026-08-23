@@ -1504,11 +1504,13 @@ struct bsgfx_GridParams {
 };
 
 struct bsgfx_Glyph {
+    bs_U32 flags;
     int atlas_page;
     int atlas_index;
     int glyph_index;
     int x_advance;
     int y_advance;
+    int x_offset;
     int y_offset;
     bs_U16 kerning_pair_start;
     bs_U16 kerning_pair_count;

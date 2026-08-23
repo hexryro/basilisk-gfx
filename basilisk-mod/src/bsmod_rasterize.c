@@ -273,6 +273,7 @@ BSMODAPI void _bsmod_pollRasterizer() {
                     rasterization->scaled_image->dim.x,
                     rasterization->scaled_image->dim.y,
                     rasterization->category,
+                    0,
                     rasterization->name
                 );
                 bs_savePngF(map, BS_IV2(rasterization->scaled_image->dim.x, rasterization->scaled_image->dim.y), BS_PNG_RGBA, "test%d.png", i);

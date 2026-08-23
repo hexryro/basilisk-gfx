@@ -1395,11 +1395,13 @@
 		</structure>
 
 		<structure name="bsgfx_Glyph">
+            <field><type>bs_U32</type><name>flags</name></field>
             <field><type>int</type><name>atlas_page</name></field>
             <field><type>int</type><name>atlas_index</name></field>
             <field><type>int</type><name>glyph_index</name></field>
             <field><type>int</type><name>x_advance</name></field>
             <field><type>int</type><name>y_advance</name></field>
+            <field><type>int</type><name>x_offset</name></field>
             <field><type>int</type><name>y_offset</name></field>
             <field><type>bs_U16</type><name>kerning_pair_start</name></field>
             <field><type>bs_U16</type><name>kerning_pair_count</name></field>

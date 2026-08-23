@@ -5,7 +5,7 @@
         "package": "content/bsgfx.bpak",
         "prefix": "",
         "callOnce": false,
-        "lastModified": "2026-08-23 11:53:37",
+        "lastModified": "2026-08-23 19:29:20",
         "entries": [
             "project/basilisk-gfx/shaders/bsgfx.glsl",
             "project/basilisk-gfx/shaders/bsgfx_atlas.glsl",
@@ -257,7 +257,7 @@
         "package": "content/basilisk-fonts.bpak",
         "prefix": "fonts/",
         "callOnce": false,
-        "lastModified": "2026-08-23 18:08:11",
+        "lastModified": "2026-08-23 20:25:26",
         "entries": [
             "project/fonts/notonaskharabic.ttf",
             "project/fonts/segoeui.ttf"
