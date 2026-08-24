@@ -133,7 +133,8 @@ void basilisk_instanceTitleBarUI() {
         bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
         if (resource && resource->model) {
             bsgfx_Font* font = (bsgfx_Font*)resource->model;
-            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(32, 32, 0), 96, BS_CONSTANT_STRING("M Hamburgevons AV, VA A,V V,A - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!~"));
+            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(32, 100, 0), 11, BS_CONSTANT_STRING("M Hamburgevons AV, VA A,V V,A - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!~"));
+            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(32, 2, 0), 96, BS_CONSTANT_STRING("M Hamburgevons AV, VA A,V V,A - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!~"));
         }
     }
 

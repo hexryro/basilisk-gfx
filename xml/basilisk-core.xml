@@ -2331,6 +2331,36 @@
             <body>    return glm_clamp(v, min, max);</body>
         </function>
 		
+        <function name="bs_linearTosRGB">
+            <return>float</return>
+            <param><type>float</type><name>value</name></param>
+        </function>
+
+		<function name="bs_sRGBToLinear">
+            <return>float</return>
+            <param><type>float</type><name>value</name></param>
+        </function>
+		
+		<function name="bs_linearV3TosRGB">
+            <return>bs_vec3</return>
+            <param><type>const bs_vec3*</type><name>value</name></param>
+        </function>
+
+		<function name="bs_sRGBToLinearV3">
+            <return>bs_vec3</return>
+            <param><type>const bs_vec3*</type><name>value</name></param>
+        </function>
+		
+		<function name="bs_rgbV4ToUChar">
+            <return>bs_RGBA</return>
+            <param><type>const bs_vec4*</type><name>value</name></param>
+        </function>
+		
+	    <function name="bs_rgbUCharToV4">
+            <return>bs_vec4</return>
+            <param><type>bs_RGBA</type><name>value</name></param>
+        </function>
+		
         <function name="bs_hsvToRgb">
             <return>bs_vec3</return>
             <param><type>const bs_vec3*</type><name>hsv</name></param>
@@ -2470,7 +2500,7 @@
 			<param><type>bs_Queue*</type><name>queue</name></param>
             <param><type>bs_U32</type><name>index</name></param>
             <param><type>bs_ivec2</type><name>dim</name></param>
-            <param><type>bs_RGBA</type><name>color</name></param>
+            <param><type>const bs_vec4*</type><name>color</name></param>
         </function>
         <function name="bs_stencilReference">
             <return>void</return>

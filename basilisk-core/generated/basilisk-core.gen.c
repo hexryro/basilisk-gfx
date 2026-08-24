@@ -874,6 +874,42 @@ float bs_clamp(
     return glm_clamp(v, min, max);
 }
 
+float bs_linearTosRGB(
+    float value)
+{
+    return next.bs_linearTosRGB(value);
+}
+
+float bs_sRGBToLinear(
+    float value)
+{
+    return next.bs_sRGBToLinear(value);
+}
+
+bs_vec3 bs_linearV3TosRGB(
+    const bs_vec3* value)
+{
+    return next.bs_linearV3TosRGB(value);
+}
+
+bs_vec3 bs_sRGBToLinearV3(
+    const bs_vec3* value)
+{
+    return next.bs_sRGBToLinearV3(value);
+}
+
+bs_RGBA bs_rgbV4ToUChar(
+    const bs_vec4* value)
+{
+    return next.bs_rgbV4ToUChar(value);
+}
+
+bs_vec4 bs_rgbUCharToV4(
+    bs_RGBA value)
+{
+    return next.bs_rgbUCharToV4(value);
+}
+
 bs_vec3 bs_hsvToRgb(
     const bs_vec3* hsv)
 {
@@ -1082,7 +1118,7 @@ void bs_clearColor(
     bs_Queue* queue, 
     bs_U32 index, 
     bs_ivec2 dim, 
-    bs_RGBA color)
+    const bs_vec4* color)
 {
     next.bs_clearColor(queue, index, dim, color);
 }

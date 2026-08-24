@@ -26,20 +26,9 @@ void main() {
     vec3 uv = vec3(in_texture.x, 1.0 - in_texture.y, float(atlas_page));
     float r = texture(font_atlas, uv).r;
     out_color = vec4(r, r, r, 1.0);
-    //out_color = vec4(in_texture.x, in_texture.y, 0.0, 1.0);
 
-    float sdf = texture(font_atlas, uv).r;
-    out_color = vec4(1.0, 1.0, 1.0, sdf);
+    float alpha_scale = 0.6;
+    float coverage = pow(r, alpha_scale);
 
-    float thickness = 0.791;
-    float softness = 0.035;
-
-    sdf = smoothstep(1.0 - thickness - softness, 1.0 - thickness + softness, sdf);
-
-   // if (sdf < 0.2)
-   //     discard;
-
-   // out_color = vec4(1.0, 1.0, 1.0, sdf);
-
-
+    out_color = vec4(1.0, 1.0, 1.0, coverage);
 }

@@ -802,7 +802,7 @@ BSAPI bs_Result _bs_loadImageN(bs_Queue* queue, bs_Object* object, int package_i
         return BS_RESULT_NOT_IMPLEMENTED;
     }
 
-    bs_Format format = _bs_getFormat(BS_FORMAT_R8_UNORM, header->channels_count);
+    bs_Format format = _bs_getFormat(BS_FORMAT_R8_SRGB, header->channels_count);
     result = _bs_image(object, (bs_ivec2) { header->width, header->height }, header->images_count, format, flags);
     if (result != BS_RESULT_OK) {
        // _bs_destroyResource(resource); // TODO: try uncomment
@@ -998,7 +998,7 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Queue* queue, bs_Object* object, int pack
     if (header->pages_count > 1)
         atlas->image->num_indices = header->pages_count;
     atlas->image->flags = flags;
-    atlas->image->format = _bs_getFormat(BS_FORMAT_R8_UNORM, header->channels_count);
+    atlas->image->format = _bs_getFormat(BS_FORMAT_R8_SRGB, header->channels_count);
     atlas->image->dim = BS_IV2(header->width, header->height);
 
     result = _bs_prepareImage(atlas->image->head.source_id, atlas->image->head.id, atlas->image,

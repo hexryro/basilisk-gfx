@@ -97,6 +97,8 @@ static inline float _bsgfx_convertDesignUnits(bsgfx_Font* font, float pt_size, f
 BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
     // TODO: check if basic latin block is available
     int pt_size_id = _bsgfx_queryPtSize(font, pt_size);
+    pt_size = font->pt_sizes[pt_size_id];
+
     assert(pt_size_id != -1);
 
     bsgfx_UnicodeBlock2* block = font->blocks;
@@ -126,11 +128,6 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Fo
         char c = text[i];
         if (c < 0)
             continue;
-
-        if (c == ' ') {
-            position.x += spacing;
-            continue;
-        }
 
         bsgfx_Glyph* glyph = _bsgfx_getGlyph(font, block, c, pt_size_id);
 
@@ -297,7 +294,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     */
     unsigned char* glyphs_offset = blocks_offset;
     for (int i = 0; i < glyphs_count; i++) {
-        bs_U32 flags = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_FLAGS);
+        bs_U32 flags = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_FLAGS);
         bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_PAGE);
         bs_U16 atlas_index = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_ATLAS_INDEX);
         bs_U16 glyph_index = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_GLYPH_INDEX);

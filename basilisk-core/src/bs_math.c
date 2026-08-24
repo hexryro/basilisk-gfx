@@ -155,6 +155,39 @@ BSAPI void bs_m3ToM4(const bs_mat3* m, bs_mat4* out) {
    * Color
    =============================================================================*/
 
+BSAPI float _bs_linearTosRGB(float value) {
+    return value < 0.0031308 ? value * 12.92 : (1.055 * powf(value, 0.41666) - 0.055);
+}
+
+BSAPI float _bs_sRGBToLinear(float value) {
+    return value < 0.04045 ? value * 0.0773993808 : pow(value * 0.9478672986 + 0.0521327014, 2.4);
+}
+
+BSAPI bs_vec3 _bs_linearV3TosRGB(const bs_vec3* value) {
+    return BS_V3(
+        _bs_linearTosRGB(value->x),
+        _bs_linearTosRGB(value->y),
+        _bs_linearTosRGB(value->z)
+    );
+}
+
+BSAPI bs_vec3 _bs_sRGBToLinearV3(const bs_vec3* value) {
+    return BS_V3(
+        _bs_sRGBToLinear(value->x),
+        _bs_sRGBToLinear(value->y),
+        _bs_sRGBToLinear(value->z)
+    );
+}
+
+BSAPI bs_RGBA _bs_rgbV4ToUChar(const bs_vec4* value) {
+    return BS_RGBA(value->x * 255.0, value->y * 255.0, value->z * 255.0, value->z * 255.0);
+}
+
+BSAPI bs_vec4 _bs_rgbUCharToV4(bs_RGBA value) {
+    const float m = 1.0 / 255.0;
+    return BS_V4(value.r * m, value.g * m, value.b * m, value.a * m);
+}
+
  /**
   Taken from https://github.com/Inseckto/HSV-to-RGB/blob/master/HSV2RGB.c
   */

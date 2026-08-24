@@ -228,14 +228,14 @@
 
 #define BFNT_GLYPH_FLAG_SKIP_RENDER            (1 << 0) // Don't render certain characters like spaces ' '
 
-#define BFNT_OFFSET_GLYPH_FLAGS                0 // U32
-#define BFNT_OFFSET_GLYPH_PAGE                 4 // U16
-#define BFNT_OFFSET_GLYPH_KERNING_START        6 // U16
-#define BFNT_OFFSET_GLYPH_KERNING_COUNT        8 // U16
-#define BFNT_OFFSET_GLYPH_GLYPH_INDEX         10 // U16
-#define BFNT_OFFSET_GLYPH_ATLAS_INDEX         12 // U16
-#define BFNT_OFFSET_GLYPH_CODEPOINT           14 // U32
-#define BFNT_OFFSET_GLYPH_X_OFFSET            18 // U16
+#define BFNT_OFFSET_GLYPH_FLAGS                0 // U16
+#define BFNT_OFFSET_GLYPH_PAGE                 2 // U16
+#define BFNT_OFFSET_GLYPH_KERNING_START        4 // U16
+#define BFNT_OFFSET_GLYPH_KERNING_COUNT        6 // U16
+#define BFNT_OFFSET_GLYPH_GLYPH_INDEX          8 // U16
+#define BFNT_OFFSET_GLYPH_ATLAS_INDEX         10 // U16
+#define BFNT_OFFSET_GLYPH_CODEPOINT           12 // U32
+#define BFNT_OFFSET_GLYPH_X_OFFSET            16 // I32
 #define BFNT_OFFSET_GLYPH_Y_OFFSET            20 // I32
 #define BFNT_OFFSET_GLYPH_X_ADVANCE           24 // I32
 #define BFNT_OFFSET_GLYPH_Y_ADVANCE           28 // I32

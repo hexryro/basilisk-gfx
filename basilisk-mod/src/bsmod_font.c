@@ -31,6 +31,8 @@
 #include FT_FREETYPE_H
 #include <freetype/tttables.h>
 #include <freetype/ftoutln.h>
+#include <freetype/ftmodapi.h>
+#include <freetype/ftdriver.h>
  
 FT_Library _freetype_library = NULL;
 
@@ -200,6 +202,7 @@ typedef struct {
 	bs_I32 y_bearing;
 	bs_I32 x_offset;
 	bs_I32 y_offset;
+	int info_id;
 } bsmod_RasterizedGlyph;
 
 
@@ -561,11 +564,6 @@ static void _bsmod_renderGlyphsFreeType(
 			const int dpi = 100;
 			int pt_size = pt_sizes[j];
 			FT_Set_Pixel_Sizes(face, 0, pt_size);
-			//error = FT_Set_Char_Size(face, pt_size * 64, 0, dpi, 0);
-			//if (error) {
-			//	BSMOD_WARN_FREETYPE_ERROR("FT_Set_Char_Size", error, );
-			//	continue;
-			//}
 
 			for (int k = 0; k < blocks[i].count; k++) {
 				int glyph_offset = glyphs_pt_offset + k * BFNT_GLYPH_SIZE;
@@ -576,7 +574,7 @@ static void _bsmod_renderGlyphsFreeType(
 				if (glyph_id == 0)
 					continue;
 
-				if (FT_Load_Glyph(face, glyph_id, FT_LOAD_DEFAULT))
+				if (FT_Load_Glyph(face, glyph_id, FT_LOAD_PEDANTIC | FT_LOAD_NO_AUTOHINT))
 					continue;
 
 				if (FT_Render_Glyph(face->glyph, render_mode))
@@ -584,18 +582,19 @@ static void _bsmod_renderGlyphsFreeType(
 
 				int rasterized_glyph_id = get_data_param->rasterized_glyphs->count;
 
-				if (face->glyph->bitmap.width == 0 || face->glyph->bitmap.rows == 0) {
-					//rasterized_glyph->flags |= BFNT_GLYPH_FLAG_SKIP_RENDER;
-					continue;
-				}
 				bsmod_RasterizedGlyph* rasterized_glyph = bs_pushBack(get_data_param->rasterized_glyphs, &(bsmod_RasterizedGlyph) {
 					.glyph_offset = glyph_offset,
-						.glyph_id = glyph_id,
-						.codepoint = codepoint,
-						.x_advance = face->glyph->advance.x,
-						.y_advance = face->glyph->advance.y,
-						.x_offset = face->glyph->bitmap_left,
+					.glyph_id = glyph_id,
+					.codepoint = codepoint,
+					.x_advance = face->glyph->advance.x,
+					.y_advance = face->glyph->advance.y,
+					.x_offset = face->glyph->bitmap_left,
 				});
+
+				if (face->glyph->bitmap.width == 0 || face->glyph->bitmap.rows == 0) {
+					rasterized_glyph->flags |= BFNT_GLYPH_FLAG_SKIP_RENDER;
+					continue;
+				}
 
 				FT_Bitmap* bmp = &face->glyph->bitmap;
 				bs_ensureSize(get_data_param->bitmap, bmp->rows * bmp->width * channels_count);
@@ -609,6 +608,7 @@ static void _bsmod_renderGlyphsFreeType(
 
 				rasterized_glyph->bitmap_offset = get_data_param->bitmap->count,
 				rasterized_glyph->y_offset = face->glyph->bitmap_top - bmp->rows;
+				rasterized_glyph->info_id = packer->info.count;
 
 				//FT_BBox box;
 				//FT_Outline_Get_CBox(&face->glyph->outline, &box);
@@ -924,7 +924,7 @@ BSMODAPI bs_Result _bsmod_packFont(
 		}
 	}
 
-	const int glyphs_count = packer.rects.count;
+	const int glyphs_count = rasterized_glyphs.count;
 
    /**
     Read Kernings
@@ -1009,16 +1009,17 @@ BSMODAPI bs_Result _bsmod_packFont(
 	unsigned char* glyphs_offset = unicode_blocks_offset + blocks_count * BFNT_BLOCK_SIZE;
 
 	for (int i = 0; i < glyphs_count; i++) {
-		stbrp_rect* rect = bs_fetchUnit(&packer.rects, i);
-
-		bsmod_TextureInfo* info = bs_fetchUnit(&packer.info, rect->id);
-		bsmod_RasterizedGlyph* glyph = bs_fetchUnit(&rasterized_glyphs, info->id);
+		bsmod_RasterizedGlyph* glyph = bs_fetchUnit(&rasterized_glyphs, i);
 
 		unsigned char* offset = glyphs_offset + glyph->glyph_offset;
 
+		if (!(glyph->flags & BFNT_GLYPH_FLAG_SKIP_RENDER)) {
+			bsmod_TextureInfo* info = bs_fetchUnit(&packer.info, glyph->info_id);
+			bs_setLittleEndian16(info->page, offset + BFNT_OFFSET_GLYPH_PAGE);
+		}
+
 		bs_setLittleEndian16(glyph->flags, offset + BFNT_OFFSET_GLYPH_FLAGS);
-		bs_setLittleEndian16(info->page, offset + BFNT_OFFSET_GLYPH_PAGE);
-		bs_setLittleEndian16(i, offset + BFNT_OFFSET_GLYPH_ATLAS_INDEX);
+		bs_setLittleEndian16(glyph->info_id, offset + BFNT_OFFSET_GLYPH_ATLAS_INDEX);
 		bs_setLittleEndian16(glyph->glyph_id, offset + BFNT_OFFSET_GLYPH_GLYPH_INDEX);
 		bs_setLittleEndian32(glyph->codepoint, offset + BFNT_OFFSET_GLYPH_CODEPOINT);
 		bs_setLittleEndian32(glyph->x_offset, offset + BFNT_OFFSET_GLYPH_X_OFFSET);
@@ -1034,11 +1035,8 @@ BSMODAPI bs_Result _bsmod_packFont(
 
 	int kern_id = 0;
 	for (int i = 0; i < glyphs_count; i++) {
-		stbrp_rect* rect = bs_fetchUnit(&packer.rects, i);
+		bsmod_RasterizedGlyph* glyph = bs_fetchUnit(&rasterized_glyphs, i);
 
-		bsmod_TextureInfo* info = bs_fetchUnit(&packer.info, rect->id);
-		bsmod_RasterizedGlyph* glyph = bs_fetchUnit(&rasterized_glyphs, info->id);
-		
 		unsigned char* offset = glyphs_offset + glyph->glyph_offset;
 
 		int start = kern_id;

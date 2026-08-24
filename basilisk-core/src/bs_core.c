@@ -420,11 +420,11 @@ BSAPI void _bs_clearDepthStencil(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, fl
     });
 }
 
-BSAPI void _bs_clearColor(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, bs_RGBA color) {
+BSAPI void _bs_clearColor(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, const bs_vec4* color) {
     // TODO: union needs to match the attachment format
     _bs_clearAttachment(queue, index, dim, VK_IMAGE_ASPECT_COLOR_BIT, (VkClearValue) {
         .color.float32 = { 
-            [0] = color.r / 255.0, [1] = color.g / 255.0, [2] = color.b / 255.0, [3] = color.a / 255.0,
+            [0] = color->x, [1] = color->y, [2] = color->z, [3] = color->w,
         } 
     });
 }

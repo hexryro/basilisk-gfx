@@ -186,6 +186,33 @@ BSAPI void _preval_bs_quad(const bs_vec3* position, const bs_vec2* dimensions, b
     next.bs_quad(position, dimensions, out);
 }
 
+BSAPI float _preval_bs_linearTosRGB(float value) {
+    return next.bs_linearTosRGB(value);
+}
+
+BSAPI float _preval_bs_sRGBToLinear(float value) {
+    return next.bs_sRGBToLinear(value);
+}
+
+BSAPI bs_vec3 _preval_bs_linearV3TosRGB(const bs_vec3* value) {
+    BS_VALIDATE(value != NULL, (bs_vec3) { 0 },);
+    return next.bs_linearV3TosRGB(value);
+}
+
+BSAPI bs_vec3 _preval_bs_sRGBToLinearV3(const bs_vec3* value) {
+    BS_VALIDATE(value != NULL, (bs_vec3) { 0 },);
+    return next.bs_sRGBToLinearV3(value);
+}
+
+BSAPI bs_RGBA _preval_bs_rgbV4ToUChar(const bs_vec4* value) {
+    BS_VALIDATE(value != NULL, (bs_RGBA) { 0 },);
+    return next.bs_rgbV4ToUChar(value);
+}
+
+BSAPI bs_vec4 _preval_bs_rgbUCharToV4(bs_RGBA value) {
+    return next.bs_rgbUCharToV4(value);
+}
+
 BSAPI bs_vec3 _preval_bs_hsvToRgb(const bs_vec3* hsv) {
     BS_VALIDATE(hsv != NULL, (bs_vec3) { 0 },);
     return next.bs_hsvToRgb(hsv);
@@ -338,9 +365,10 @@ BSAPI void _preval_bs_clearDepthStencil(bs_Queue* queue, bs_U32 index, bs_ivec2 
     next.bs_clearDepthStencil(queue, index, dim, depth_value, stencil_value);
 }
 
-BSAPI void _preval_bs_clearColor(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, bs_RGBA color) {
+BSAPI void _preval_bs_clearColor(bs_Queue* queue, bs_U32 index, bs_ivec2 dim, const bs_vec4* color) {
     BS_VALIDATE(queue != NULL, ,);
     BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, ,);
+    BS_VALIDATE(color != NULL, ,);
     next.bs_clearColor(queue, index, dim, color);
 }
 
@@ -2792,6 +2820,12 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_rotateAabb = _preval_bs_rotateAabb;
     functions.bs_fitAabb = _preval_bs_fitAabb;
     functions.bs_quad = _preval_bs_quad;
+    functions.bs_linearTosRGB = _preval_bs_linearTosRGB;
+    functions.bs_sRGBToLinear = _preval_bs_sRGBToLinear;
+    functions.bs_linearV3TosRGB = _preval_bs_linearV3TosRGB;
+    functions.bs_sRGBToLinearV3 = _preval_bs_sRGBToLinearV3;
+    functions.bs_rgbV4ToUChar = _preval_bs_rgbV4ToUChar;
+    functions.bs_rgbUCharToV4 = _preval_bs_rgbUCharToV4;
     functions.bs_hsvToRgb = _preval_bs_hsvToRgb;
     functions.bs_rgbToHsv = _preval_bs_rgbToHsv;
     functions.bs_convertYyjsonResult = _preval_bs_convertYyjsonResult;

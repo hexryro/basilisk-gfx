@@ -140,10 +140,10 @@ BSMODAPI bs_Result _bsmod_rasterizeInstance(
     result = bs_renderer(renderer_object, 0);
     if (result != BS_RESULT_OK) goto fail;
 
-    result = bs_image(image_object, render_size, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
+    result = bs_image(image_object, render_size, 0, BS_FORMAT_R8G8B8A8_SRGB, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
     if (result != BS_RESULT_OK) goto fail;
 
-    result = bs_image(scaled_image_object, output_size, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT | BS_IMAGE_USAGE_TRANSFER_DST_BIT);
+    result = bs_image(scaled_image_object, output_size, 0, BS_FORMAT_R8G8B8A8_SRGB, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT | BS_IMAGE_USAGE_TRANSFER_DST_BIT);
     if (result != BS_RESULT_OK) goto fail;
 
     result = bs_image(depth_image_object, render_size, 0, BS_FORMAT_D32_SFLOAT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);

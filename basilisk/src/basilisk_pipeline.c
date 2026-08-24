@@ -43,7 +43,7 @@ static void _bsgfx_loResSubpass0() {
 
  /**
   High Resolution Subpass 0
-  Writes to the swapchain (or whatever)
+  Writes to the swapchain
   */
 static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     bs_Queue* queue = scope->queue;
@@ -54,7 +54,11 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     bs_beginCommentN(queue, BS_CONSTANT_STRING("High Resolution Subpass 0"));
 
     bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
-    bs_clearColor(queue, 0, bs_resolution(), BS_RGBA(75, 75, 75, 255));
+
+    bs_vec4 clear_color = bs_rgbUCharToV4(BS_RGBA(75, 75, 75, 255));
+    clear_color.xyz = bs_sRGBToLinearV3(&clear_color.xyz);
+
+    bs_clearColor(queue, 0, bs_resolution(), &clear_color);
 
     basilisk_renderDepthlessLines(scope, queue);
     basilisk_renderPoints(scope, queue);

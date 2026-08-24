@@ -4306,6 +4306,54 @@ bs_clamp(
     float max);
 
  /**
+  @param value
+  @return float
+  */
+BSAPI float
+bs_linearTosRGB(
+    float value);
+
+ /**
+  @param value
+  @return float
+  */
+BSAPI float
+bs_sRGBToLinear(
+    float value);
+
+ /**
+  @param value
+  @return bs_vec3
+  */
+BSAPI bs_vec3
+bs_linearV3TosRGB(
+    const bs_vec3* value);
+
+ /**
+  @param value
+  @return bs_vec3
+  */
+BSAPI bs_vec3
+bs_sRGBToLinearV3(
+    const bs_vec3* value);
+
+ /**
+  @param value
+  @return bs_RGBA
+  */
+BSAPI bs_RGBA
+bs_rgbV4ToUChar(
+    const bs_vec4* value);
+
+ /**
+  @param value
+  @return bs_vec4
+  */
+BSAPI bs_vec4
+bs_rgbUCharToV4(
+    bs_RGBA value);
+
+ /**
   @param hsv
   @return bs_vec3
   */
@@ -4611,7 +4659,7 @@ bs_clearColor(
     bs_Queue* queue,
     bs_U32 index,
     bs_ivec2 dim,
-    bs_RGBA color);
+    const bs_vec4* color);
 
  /**
   @param queue

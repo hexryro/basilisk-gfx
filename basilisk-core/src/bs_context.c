@@ -490,10 +490,10 @@ static void _bs_prepareSwapchain() {
     };
 
     const VkFormat formats[] = {
-        VK_FORMAT_R8G8B8A8_UNORM,
-        VK_FORMAT_B8G8R8A8_UNORM,
         VK_FORMAT_R8G8B8A8_SRGB,
         VK_FORMAT_B8G8R8A8_SRGB,
+        VK_FORMAT_R8G8B8A8_UNORM,
+        VK_FORMAT_B8G8R8A8_UNORM,
     };
 
     _bs_querySwapchainMode(modes, sizeof(modes) / sizeof(*modes));

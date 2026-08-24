@@ -64,6 +64,12 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_rotateAabb = (PFN_bs_rotateAabb)GetProcAddress(module, "_val_bs_rotateAabb");
     functions.bs_fitAabb = (PFN_bs_fitAabb)GetProcAddress(module, "_val_bs_fitAabb");
     functions.bs_quad = (PFN_bs_quad)GetProcAddress(module, "_val_bs_quad");
+    functions.bs_linearTosRGB = (PFN_bs_linearTosRGB)GetProcAddress(module, "_val_bs_linearTosRGB");
+    functions.bs_sRGBToLinear = (PFN_bs_sRGBToLinear)GetProcAddress(module, "_val_bs_sRGBToLinear");
+    functions.bs_linearV3TosRGB = (PFN_bs_linearV3TosRGB)GetProcAddress(module, "_val_bs_linearV3TosRGB");
+    functions.bs_sRGBToLinearV3 = (PFN_bs_sRGBToLinearV3)GetProcAddress(module, "_val_bs_sRGBToLinearV3");
+    functions.bs_rgbV4ToUChar = (PFN_bs_rgbV4ToUChar)GetProcAddress(module, "_val_bs_rgbV4ToUChar");
+    functions.bs_rgbUCharToV4 = (PFN_bs_rgbUCharToV4)GetProcAddress(module, "_val_bs_rgbUCharToV4");
     functions.bs_hsvToRgb = (PFN_bs_hsvToRgb)GetProcAddress(module, "_val_bs_hsvToRgb");
     functions.bs_rgbToHsv = (PFN_bs_rgbToHsv)GetProcAddress(module, "_val_bs_rgbToHsv");
     functions.bs_convertYyjsonResult = (PFN_bs_convertYyjsonResult)GetProcAddress(module, "_val_bs_convertYyjsonResult");

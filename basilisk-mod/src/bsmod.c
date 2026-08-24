@@ -382,7 +382,7 @@ void _bsmod_loadMsdfResources() {
         bs_Object* color = BS_IMAGE(-1, 0, 0);
         bs_Object* depth = BS_IMAGE(-1, 0, 0);
 
-        bs_image(color, resolution, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
+        bs_image(color, resolution, 0, BS_FORMAT_R8G8B8A8_SRGB, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
         bs_image(depth, resolution, 0, BS_FORMAT_D32_SFLOAT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
         bs_output(renderer->renderer, (bs_Output) {
@@ -577,7 +577,7 @@ BSMODAPI void _bsmod_onLoad() {
         bs_Object* color = BS_IMAGE(BSMOD_IMAGES, BSMOD_IMAGE_COLOR, 0);
 
         result = bs_image(depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT);
-        result = bs_image(color, resolution, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
+        result = bs_image(color, resolution, 0, BS_FORMAT_R8G8B8A8_SRGB, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
         // bs_U32 subpass, bs_Image* image, bs_ImageLayout old_layout, bs_ImageLayout new_layout, bs_OutputFlags flags
         bs_output(renderer_object->renderer, (bs_Output) {
