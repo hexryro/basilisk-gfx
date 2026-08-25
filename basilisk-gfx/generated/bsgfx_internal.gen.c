@@ -61,17 +61,17 @@ bsgfx_Material* _bsgfx_materialF(
     return _return;
 }
 
-void _bsgfx_instanceASCIIText(
+float _bsgfx_instanceASCIIText(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     char* text)
 {
-    _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, strlen(text));
+    return _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, strlen(text));
 }
 
-void _bsgfx_instanceASCIITextV(
+float _bsgfx_instanceASCIITextV(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
@@ -82,10 +82,10 @@ void _bsgfx_instanceASCIITextV(
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, _formatted, _length);
+    return _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, _formatted, _length);
 }
 
-void _bsgfx_instanceASCIITextF(
+float _bsgfx_instanceASCIITextF(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
@@ -95,7 +95,8 @@ void _bsgfx_instanceASCIITextF(
 {
     va_list args;
     va_start(args, format);
-    _bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    float _return = _bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
     va_end(args);
+    return _return;
 }
 

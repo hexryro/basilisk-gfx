@@ -85,7 +85,7 @@ static void onTick() {
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
 
-	basilisk_instanceTitleBarUI();
+	basilisk_instantiateTitleBarUI();
 }
 
 static void onModTick() {

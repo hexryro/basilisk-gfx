@@ -42,6 +42,10 @@
 #include <string.h>
 #include <stdbool.h>
 
+typedef struct bsgfx_UIElement bsgfx_UIElement;
+typedef struct bsgfx_UIIcon bsgfx_UIIcon;
+typedef struct bsgfx_UISolid bsgfx_UISolid;
+typedef struct bsgfx_UIText bsgfx_UIText;
 typedef struct bsgfx_Text bsgfx_Text;
 typedef struct bsgfx_MeshInstance bsgfx_MeshInstance;
 typedef struct bsgfx_BoneInstance bsgfx_BoneInstance;
@@ -424,6 +428,7 @@ enum bsgfx_WidgetAdvanceType {
     BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Y = (1 << 5),
     BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Z = (1 << 6),
     BSGFX_WIDGET_ADVANCE_APPLY_OFFSET = (BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_X | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Y | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Z),
+    BSGFX_WIDGET_PLACEMENT_RIGHT = (1 << 7),
 };
 
 enum bsgfx_Language {
@@ -1113,6 +1118,39 @@ enum bsgfx_Language {
     BS_LANGUAGE_ZULU = BSGFX_FOURCC('Z', 'U', 'L', ' '),
 };
 
+struct bsgfx_UIElement {
+    bs_vec2 size;
+    bs_vec3 position;
+};
+
+struct bsgfx_UIIcon {
+    bs_vec2 size;
+    bs_vec3 position;
+    float align_height;
+    bsgfx_AtlasCache* cache;
+    bsgfx_InstanceSubtype* subtype;
+    int material_id;
+    bool flip;
+    bool mirror;
+};
+
+struct bsgfx_UISolid {
+    bs_vec2 size;
+    bs_vec3 position;
+    float align_height;
+    int material_id;
+};
+
+struct bsgfx_UIText {
+    bs_vec3 position;
+    float align_height;
+    int px_size;
+    bsgfx_Font* font;
+    struct {
+        char* as_ascii;
+    };
+};
+
 struct bsgfx_Text {
     bs_vec4 position;
     float scale;
@@ -1540,6 +1578,7 @@ struct bsgfx_Font {
     int pt_sizes_count;
     int glyphs_count;
     int kerning_pairs_count;
+    int du_height;
     bs_U16 units_per_em;
     bs_Object* atlas_object;
     bsgfx_UnicodeBlock2* blocks;
@@ -1566,6 +1605,7 @@ struct bsgfx_Widget {
     union {
         struct {
             char* value;
+            int px_size;
             void (*on_hover)(struct bsgfx_Widget*);
         } string;
         struct {
@@ -2516,14 +2556,24 @@ bsgfx_instanceAtlasFlipped(
     int material);
 
  /**
+  @param font
+  @param px_size
+  @return float
+  */
+BSGFXAPI float
+bsgfx_fontHeight(
+    bsgfx_Font* font,
+    int px_size);
+
+ /**
   @param subtype
   @param font
   @param position
   @param pt_size
   @param text
-  @return void
+  @return float
   */
-BSGFXAPI void
+BSGFXAPI float
 bsgfx_instanceASCIIText(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
@@ -2538,9 +2588,9 @@ bsgfx_instanceASCIIText(
   @param pt_size
   @param text
   @param text_length
-  @return void
+  @return float
   */
-BSGFXAPI void
+BSGFXAPI float
 bsgfx_instanceASCIITextN(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
@@ -2556,9 +2606,9 @@ bsgfx_instanceASCIITextN(
   @param pt_size
   @param format
   @param args
-  @return void
+  @return float
   */
-BSGFXAPI void
+BSGFXAPI float
 bsgfx_instanceASCIITextV(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
@@ -2574,9 +2624,9 @@ bsgfx_instanceASCIITextV(
   @param pt_size
   @param format
   @param ...
-  @return void
+  @return float
   */
-BSGFXAPI void
+BSGFXAPI float
 bsgfx_instanceASCIITextF(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
@@ -3178,6 +3228,84 @@ bsgfx_instanceWidgets(
     bsgfx_Menu menu,
     bsgfx_TitleBar* title_bar,
     bsgfx_MenuTabBar* tab_bar);
+
+ /**
+  @param text
+  @param element
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instantiateTextUI(
+    bsgfx_UIText text,
+    bsgfx_UIElement* element);
+
+ /**
+  @param solid
+  @param element
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instantiateSolidUI(
+    bsgfx_UISolid solid,
+    bsgfx_UIElement* element);
+
+ /**
+  @param solid
+  @param element
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instantiateSolidUIElement(
+    bsgfx_UISolid solid,
+    const bsgfx_UIElement* element);
+
+ /**
+  @param solid
+  @param element
+  @return void
+  */
+BSGFXAPI void
+bsgfx_solidUIElement(
+    bsgfx_UISolid solid,
+    bsgfx_UIElement* element);
+
+ /**
+  @param icon
+  @param element
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instantiateAtlasIconUI(
+    bsgfx_UIIcon icon,
+    bsgfx_UIElement* element);
+
+ /**
+  @param icon
+  @param element
+  @return void
+  */
+BSGFXAPI void
+bsgfx_instantiateAtlasIconUIElement(
+    bsgfx_UIIcon icon,
+    const bsgfx_UIElement* element);
+
+ /**
+  @param icon
+  @param element
+  @return void
+  */
+BSGFXAPI void
+bsgfx_atlasIconUIElement(
+    bsgfx_UIIcon icon,
+    bsgfx_UIElement* element);
+
+ /**
+  @param element
+  @return bool
+  */
+BSGFXAPI bool
+bsgfx_hoveringUIElement(
+    const bsgfx_UIElement* element);
 
  /**
   @param scope

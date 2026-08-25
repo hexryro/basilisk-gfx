@@ -27,115 +27,134 @@
 #include <bsmod_cache.h>
 #include <basilisk.h>
 
-static void basilisk_addTitleBarUIWidgets(bs_List* widgets) {
-    bs_pushBack(widgets, &(bsgfx_Widget) {
-        .offset = { 0, 0, 0 },
-        .type = BSGFX_WIDGET_ICON,
-        .icon = {
-            .atlas = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_UI)->atlas,
-            .atlas_subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
-            .type = BSGFX_ICON_ATLAS,
-            .name = "icon",
-            .material_id = $bsmod_grey_120()->id,
-        },
-        .advance_flags = BSGFX_WIDGET_ADVANCE_RIGHT,
-    });
+#define BASILISK_TITLE_BAR_HEIGHT 32
 
-    bs_pushBack(widgets, &(bsgfx_Widget) {
-        .offset = { 0, -24, 5 },
-        .type = BSGFX_WIDGET_BUTTON,
-        .button = {
-            .size = { 80.0, 80.0 },
-            .name = "test 123 abcdefghijklmnoprqsrutv",
-            .material = $bsmod_light_blue()->id,
-            .selected_material = $bsmod_light_blue()->id,
-        },
-        .advance_flags = BSGFX_WIDGET_ADVANCE_APPLY_OFFSET,
-    });
-}
+BSGFX_CACHE_ATLAS_QUERY(BSMOD_ATLASES, BSMOD_ATLAS_UI, icon)
+BSGFX_CACHE_COLOR_MATERIAL(title_bar_background, BS_RGBA(83, 83, 83, 255))
+BSGFX_CACHE_COLOR_MATERIAL(test_color, BS_RGBA(255, 83, 83, 255))
 
-void basilisk_instanceTitleBarUI() {
-    //if (!bs_exists(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16))// TODO: text rewrite
-    //    return;
-
-    const bs_ivec2 resolution = bs_resolution();
-
-    bs_vec3 position = { 0 };
-    bs_vec2 dimensions = { resolution.x, 32 };
-
-    position.y = resolution.y;
-
-	const int width = 64;
-    static int scroll;
-    static bs_List tabs = {.unit_size = sizeof(bsgfx_MenuTab), .increment = 16 };
-    static bs_List widgets = { .unit_size = sizeof(bsgfx_Widget), .increment = 16 };
-
-    tabs.count = 0;
-    widgets.count = 0;
-
-    const int padding = 4;
-    bs_vec2 background_size = { dimensions.x - padding * 2, dimensions.y - padding * 2 };
-
-    bs_pushBack(&widgets, &(bsgfx_Widget) {
-        .offset = { padding, -padding, 0 },
-        .advance_flags = BSGFX_WIDGET_ADVANCE_APPLY_OFFSET,
-    });
-
-    basilisk_addTitleBarUIWidgets(&widgets);
-
-    position.z += 10;
-
-    static int active_tab;
-    bool hovering = bsgfx_instanceWidgets((bsgfx_Menu) {
-        .position = position,
-        //.text_subtype = bsmod_subtypes()[BSMOD_SUBTYPE_FONT_SANS_SERIF],// TODO: text rewrite
-        //.font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16)->head,// TODO: text rewrite
-        .spacing = 8.0,
-        .widgets = (bsgfx_Widget*)widgets.data,
-        .widgets_count = widgets.count,
-        .untextured = {
-            .dimensions = dimensions,
-            .auto_scale_width = true,
-            .border_id = -1,
-            // .has_shadow = true,
-        },
-        .blocked = false,
-        .border_radius = BSMOD_DEFAULT_RADIUS,
-        .background_material_id_0 = $bsmod_grey_91()->id,
-       // .shadow_material_id = $bsmod_grey_61()->id,
-       // .outline_material_id = $bsmod_grey_148()->id,
-    }, NULL,
-    // &(bsgfx_TitleBar) {
-    //    .name = "",
-    //    .border_radius = BSMOD_DEFAULT_RADIUS,
-    //    .font = bs_fetch(BSGFX_FONTS, BSGFX_FONT_ARIAL_16),
-    //    .material_id = $bsmod_grey_120()->id,
-    //    .button_hovering_material_id = $bsmod_red()->id,
-    //    .button_icon_material_id = $bsmod_grey_120()->id,
-    //    .button_unavailable_material_id = $bsmod_grey_148()->id,
-    //    .button_material_id = $bsmod_grey_61()->id,
-    //    .button_shadow_material_id = $bsmod_grey_112()->id,
-    //}, 
-    &(bsgfx_MenuTabBar) {
-        .tabs_count = tabs.count,
-        .tabs = (bsgfx_MenuTab*)tabs.data,
-        .active_tab = &active_tab,
-        .material_id = $bsmod_grey_61()->id,
-        .outline_material_id = $bsmod_grey_61()->id,
-        .shadow_material_id = $bsmod_grey_30()->id,
-        .height = BSMOD_TAB_BAR_HEIGHT,
-    });
-
+static bsgfx_Font* basilisk_querySegoeUI() {
     int package = bs_queryPackage("content/basilisk-fonts.bpak");
-
     if (package >= 0) {
         bs_Resource* resource = NULL;
         bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
+
         if (resource && resource->model) {
-            bsgfx_Font* font = (bsgfx_Font*)resource->model;
-            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(32, 100, 0), 11, BS_CONSTANT_STRING("M Hamburgevons AV, VA A,V V,A - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!~"));
-            bsgfx_instanceASCIITextN(bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], font, BS_V3(32, 2, 0), 96, BS_CONSTANT_STRING("M Hamburgevons AV, VA A,V V,A - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*!~"));
+            return (bsgfx_Font*)resource->model;
         }
     }
 
+    return NULL;
+}
+
+void basilisk_instantiateTitleBarUI() {
+    bs_ivec2 resolution = bs_resolution();
+    bs_vec2 title_bar_size = { resolution.x, BASILISK_TITLE_BAR_HEIGHT };
+
+    bsgfx_AtlasCache* icon_atlas_cache = $BSMOD_ATLAS_UI_icon();
+    bsgfx_Font* segoe_ui = basilisk_querySegoeUI();
+
+    bs_vec3 position;
+    bsgfx_UIElement element_v;
+    bsgfx_UIElement* element = &element_v;
+
+    // title icon
+    //position = bsgfx_seekTopLeftUI(title_bar_size);
+    position = BS_V3(0, resolution.y - title_bar_size.y, 0);
+
+   /**
+    Background
+    */
+    bsgfx_instantiateSolidUI((bsgfx_UISolid) {
+        .position = position,
+        .size = title_bar_size,
+        .material_id = $title_bar_background()->id,
+    }, element);
+    position.z++;
+    
+   /**
+    Icon
+    */
+    position.x += 4.0;
+    bsgfx_instantiateAtlasIconUI((bsgfx_UIIcon) {
+        .position = position,
+        .cache = icon_atlas_cache,
+        .subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
+        .align_height = BASILISK_TITLE_BAR_HEIGHT,
+    }, element);
+
+   /**
+    Title text
+    */
+    position.x += element->size.x;
+    position.x += 4.0;
+
+    bsgfx_instantiateTextUI((bsgfx_UIText) {
+        .position = position,
+        .font = segoe_ui,
+        .as_ascii = "Basilisk",
+        .px_size = 16,
+        .align_height = BASILISK_TITLE_BAR_HEIGHT,
+    }, element);
+
+   /**
+    */
+    const int close_button_width = 48;
+    position.x = title_bar_size.x;
+    bsgfx_UISolid close_button = {
+        .position = position,
+        .size = { close_button_width, BASILISK_TITLE_BAR_HEIGHT },
+        .material_id = $test_color()->id,
+    };
+
+    bsgfx_solidUIElement(close_button, element);
+    element->position.x -= element->size.x;
+    if (bsgfx_hoveringUIElement(element)) {
+
+    }
+    bsgfx_instantiateSolidUIElement(close_button, element);
+
+
+    /*
+
+    // close button
+    const int button_width = 40;
+    position = bsgfx_seekTopRightUI();
+    position.x -= button_width;
+
+    element = bsgfx_instantiateSolidUI((bsgfx_UISolid) {
+        .position = position,
+        // .color = 
+    });
+    position = bsgfx_seekUIElementCenter(element, close_button_icon->size);
+    element = bsgfx_instantiateIconUI((bsgfx_UIIcon) {
+        .position = position,
+        //.cache = 
+    });
+
+    position.x -= element.width.x;
+
+    // maximize button
+    position.x -= button_width;
+
+    element = bsgfx_instantiateIconUI((bsgfx_UIIcon) {
+        .position = position,
+            //.cache = 
+    });
+
+    position.x -= element.width.x;
+
+    // minimize button
+    position.x -= button_width;
+
+    element = bsgfx_instantiateIconUI((bsgfx_UIIcon) {
+        .position = position,
+            //.cache = 
+    });
+
+    position.x -= element.width.x;
+    */
+   /**
+    Engine icon
+    */
 }

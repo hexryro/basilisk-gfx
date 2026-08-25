@@ -916,7 +916,7 @@ BSMODAPI bs_Result _bsmod_packFont(
 			&packer, 
 			channels_count
 		);
-
+		
 		result = _bsmod_packAtlas(&packer, 2048, 2048, 1, package_path, resource_name, true);
 		if (result != BS_RESULT_OK) {
 			// TODO: free
@@ -972,6 +972,7 @@ BSMODAPI bs_Result _bsmod_packFont(
 	bs_setLittleEndian16(kerning_pairs_count, data + BFNT_OFFSET_KERNING_PAIRS_COUNT);
 	bs_setLittleEndian32(total_glyphs_count, data + BFNT_OFFSET_GLYPHS_COUNT);
 	bs_setLittleEndian16(face->units_per_EM, data + BFNT_OFFSET_UNITS_PER_EM);
+	bs_setLittleEndian16(face->height, data + BFNT_OFFSET_DU_HEIGHT);
 
    /**
     Point sizes

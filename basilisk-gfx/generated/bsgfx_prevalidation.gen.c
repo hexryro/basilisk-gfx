@@ -402,25 +402,30 @@ BSGFXAPI int _preval_bsgfx_instanceAtlasFlipped(bsgfx_InstanceSubtype* subtype, 
     return next.bsgfx_instanceAtlasFlipped(subtype, transform, texture, flags, id, material);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceASCIIText(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text) {
-    BSGFX_VALIDATE(subtype != NULL, ,);
-    BSGFX_VALIDATE(font != NULL, ,);
-    BSGFX_VALIDATE(text != NULL, ,);
-    next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
+BSGFXAPI float _preval_bsgfx_fontHeight(bsgfx_Font* font, int px_size) {
+    BSGFX_VALIDATE(font != NULL, 0,);
+    return next.bsgfx_fontHeight(font, px_size);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
-    BSGFX_VALIDATE(subtype != NULL, ,);
-    BSGFX_VALIDATE(font != NULL, ,);
-    BSGFX_VALIDATE(text != NULL, ,);
-    next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
+BSGFXAPI float _preval_bsgfx_instanceASCIIText(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
+    BSGFX_VALIDATE(font != NULL, 0,);
+    BSGFX_VALIDATE(text != NULL, 0,);
+    return next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
 }
 
-BSGFXAPI void _preval_bsgfx_instanceASCIITextV(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args) {
-    BSGFX_VALIDATE(subtype != NULL, ,);
-    BSGFX_VALIDATE(font != NULL, ,);
-    BSGFX_VALIDATE(format != NULL, ,);
-    next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+BSGFXAPI float _preval_bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
+    BSGFX_VALIDATE(font != NULL, 0,);
+    BSGFX_VALIDATE(text != NULL, 0,);
+    return next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
+}
+
+BSGFXAPI float _preval_bsgfx_instanceASCIITextV(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args) {
+    BSGFX_VALIDATE(subtype != NULL, 0,);
+    BSGFX_VALIDATE(font != NULL, 0,);
+    BSGFX_VALIDATE(format != NULL, 0,);
+    return next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
 }
 
 BSGFXAPI bs_mat4x3 _preval_bsgfx_matrix(bs_vec3 position, bs_vec3 scale) {
@@ -700,6 +705,46 @@ BSGFXAPI bool _preval_bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* tit
     return next.bsgfx_instanceWidgets(menu, title_bar, tab_bar);
 }
 
+BSGFXAPI void _preval_bsgfx_instantiateTextUI(bsgfx_UIText text, bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, ,);
+    next.bsgfx_instantiateTextUI(text, element);
+}
+
+BSGFXAPI void _preval_bsgfx_instantiateSolidUI(bsgfx_UISolid solid, bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, ,);
+    next.bsgfx_instantiateSolidUI(solid, element);
+}
+
+BSGFXAPI void _preval_bsgfx_instantiateSolidUIElement(bsgfx_UISolid solid, const bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, ,);
+    next.bsgfx_instantiateSolidUIElement(solid, element);
+}
+
+BSGFXAPI void _preval_bsgfx_solidUIElement(bsgfx_UISolid solid, bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, ,);
+    next.bsgfx_solidUIElement(solid, element);
+}
+
+BSGFXAPI void _preval_bsgfx_instantiateAtlasIconUI(bsgfx_UIIcon icon, bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, ,);
+    next.bsgfx_instantiateAtlasIconUI(icon, element);
+}
+
+BSGFXAPI void _preval_bsgfx_instantiateAtlasIconUIElement(bsgfx_UIIcon icon, const bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, ,);
+    next.bsgfx_instantiateAtlasIconUIElement(icon, element);
+}
+
+BSGFXAPI void _preval_bsgfx_atlasIconUIElement(bsgfx_UIIcon icon, bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, ,);
+    next.bsgfx_atlasIconUIElement(icon, element);
+}
+
+BSGFXAPI bool _preval_bsgfx_hoveringUIElement(const bsgfx_UIElement* element) {
+    BSGFX_VALIDATE(element != NULL, false,);
+    return next.bsgfx_hoveringUIElement(element);
+}
+
 BSGFXAPI void _preval_bsgfx_renderColorPickers(bs_RendererScope* scope, bs_Queue* queue) {
     BSGFX_VALIDATE(scope != NULL, ,);
     BSGFX_VALIDATE(queue != NULL, ,);
@@ -777,6 +822,7 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_instanceDepthlessCircle = _preval_bsgfx_instanceDepthlessCircle;
     functions.bsgfx_instanceAtlas = _preval_bsgfx_instanceAtlas;
     functions.bsgfx_instanceAtlasFlipped = _preval_bsgfx_instanceAtlasFlipped;
+    functions.bsgfx_fontHeight = _preval_bsgfx_fontHeight;
     functions.bsgfx_instanceASCIIText = _preval_bsgfx_instanceASCIIText;
     functions.bsgfx_instanceASCIITextN = _preval_bsgfx_instanceASCIITextN;
     functions.bsgfx_instanceASCIITextV = _preval_bsgfx_instanceASCIITextV;
@@ -838,6 +884,14 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_tileAxis = _preval_bsgfx_tileAxis;
     functions.bsgfx_tileIndex = _preval_bsgfx_tileIndex;
     functions.bsgfx_instanceWidgets = _preval_bsgfx_instanceWidgets;
+    functions.bsgfx_instantiateTextUI = _preval_bsgfx_instantiateTextUI;
+    functions.bsgfx_instantiateSolidUI = _preval_bsgfx_instantiateSolidUI;
+    functions.bsgfx_instantiateSolidUIElement = _preval_bsgfx_instantiateSolidUIElement;
+    functions.bsgfx_solidUIElement = _preval_bsgfx_solidUIElement;
+    functions.bsgfx_instantiateAtlasIconUI = _preval_bsgfx_instantiateAtlasIconUI;
+    functions.bsgfx_instantiateAtlasIconUIElement = _preval_bsgfx_instantiateAtlasIconUIElement;
+    functions.bsgfx_atlasIconUIElement = _preval_bsgfx_atlasIconUIElement;
+    functions.bsgfx_hoveringUIElement = _preval_bsgfx_hoveringUIElement;
     functions.bsgfx_renderColorPickers = _preval_bsgfx_renderColorPickers;
 
     return &functions;

@@ -37,7 +37,6 @@
 
 unsigned char image[HEIGHT][WIDTH];
 
-
 BSAPI bs_vec2 _bsgfx_textDimensions(bsgfx_Font* font, char* name, int length) {
     /*
     float width = 0.0;
@@ -90,14 +89,20 @@ static inline bsgfx_Glyph* _bsgfx_getGlyph(const bsgfx_Font* font, const bsgfx_U
     return font->glyphs + glyph_offset;
 }
 
-static inline float _bsgfx_convertDesignUnits(bsgfx_Font* font, float pt_size, float units) {
-    return (units / (float)font->units_per_em) * pt_size;
+static inline float _bsgfx_convertDesignUnits(bsgfx_Font* font, float px_size, float units) {
+    return (units / (float)font->units_per_em) * px_size;
 }
 
-BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+BSAPI float _bsgfx_fontHeight(bsgfx_Font* font, int px_size) {
+    return _bsgfx_convertDesignUnits(font, px_size, font->du_height);
+}
+
+BSGFXAPI float _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int px_size, char* text, int text_length) {
     // TODO: check if basic latin block is available
-    int pt_size_id = _bsgfx_queryPtSize(font, pt_size);
-    pt_size = font->pt_sizes[pt_size_id];
+    int pt_size_id = _bsgfx_queryPtSize(font, px_size);
+    px_size = font->pt_sizes[pt_size_id];
+
+    float start_x = position.x;
 
     assert(pt_size_id != -1);
 
@@ -113,9 +118,9 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Fo
 
   //  bsgfx_instanceQuad(subtype, bs_m4x3(&test_transform), BS_V4(0, 0, 1, 1), 0, 0, 0);
     if (block->offset != 0)
-        return;
+        return 0.0;
     if (block->count != 127)
-        return;
+        return 0.0;
 
     int glyph_pt_offset = pt_size_id * block->count;
 
@@ -158,17 +163,17 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Fo
                 bsgfx_KerningPair* pair = font->kerning_pairs + j;
 
                 if (next == pair->right) {
-                    p.x += _bsgfx_convertDesignUnits(font, pt_size, pair->left_x_placement);
-                    p.y += _bsgfx_convertDesignUnits(font, pt_size, pair->left_y_placement);
+                    p.x += _bsgfx_convertDesignUnits(font, px_size, pair->left_x_placement);
+                    p.y += _bsgfx_convertDesignUnits(font, px_size, pair->left_y_placement);
 
-                    advance.x += _bsgfx_convertDesignUnits(font, pt_size, pair->left_x_advance);
-                    advance.y += _bsgfx_convertDesignUnits(font, pt_size, pair->left_y_advance);
+                    advance.x += _bsgfx_convertDesignUnits(font, px_size, pair->left_x_advance);
+                    advance.y += _bsgfx_convertDesignUnits(font, px_size, pair->left_y_advance);
 
-                    next_glyph_placement.x = _bsgfx_convertDesignUnits(font, pt_size, pair->right_x_placement);
-                    next_glyph_placement.y = _bsgfx_convertDesignUnits(font, pt_size, pair->right_y_placement);
+                    next_glyph_placement.x = _bsgfx_convertDesignUnits(font, px_size, pair->right_x_placement);
+                    next_glyph_placement.y = _bsgfx_convertDesignUnits(font, px_size, pair->right_y_placement);
 
-                    next_glyph_advance.x = _bsgfx_convertDesignUnits(font, pt_size, pair->right_x_advance);
-                    next_glyph_advance.y = _bsgfx_convertDesignUnits(font, pt_size, pair->right_y_advance);
+                    next_glyph_advance.x = _bsgfx_convertDesignUnits(font, px_size, pair->right_x_advance);
+                    next_glyph_advance.y = _bsgfx_convertDesignUnits(font, px_size, pair->right_y_advance);
 
                     break;
                 }
@@ -192,6 +197,8 @@ BSGFXAPI void _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Fo
         position.y += advance.y;
         position.z += 0.01;
     }
+
+    return position.x - start_x;
 }
 
 BSGFXAPI void _bsgfx_instanceUnicodeTextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char32_t* text, int text_length) {
@@ -244,29 +251,24 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     font->atlas_object = atlas_object;
     bfnt->model = font;
 
-    bs_U16 blocks_count = bs_getLittleEndian16(data + BFNT_OFFSET_BLOCKS_COUNT);
-    bs_U16 pt_sizes_count = bs_getLittleEndian16(data + BFNT_OFFSET_PT_SIZES_COUNT);
-    bs_U32 glyphs_count = bs_getLittleEndian32(data + BFNT_OFFSET_GLYPHS_COUNT);
-    bs_U16 kerning_pairs_count = bs_getLittleEndian16(data + BFNT_OFFSET_KERNING_PAIRS_COUNT);
-    bs_U16 units_per_em = bs_getLittleEndian16(data + BFNT_OFFSET_UNITS_PER_EM);
+    font->blocks_count = bs_getLittleEndian16(data + BFNT_OFFSET_BLOCKS_COUNT);
+    font->pt_sizes_count = bs_getLittleEndian16(data + BFNT_OFFSET_PT_SIZES_COUNT);
+    font->glyphs_count = bs_getLittleEndian32(data + BFNT_OFFSET_GLYPHS_COUNT);
+    font->kerning_pairs_count = bs_getLittleEndian16(data + BFNT_OFFSET_KERNING_PAIRS_COUNT);
+    font->units_per_em = bs_getLittleEndian16(data + BFNT_OFFSET_UNITS_PER_EM);
+    font->du_height = bs_getLittleEndian16(data + BFNT_OFFSET_DU_HEIGHT);
     //bs_U32 glyphs_count = atlas_object->atlas->count;
 
-    font->blocks_count = blocks_count;
-    font->pt_sizes_count = pt_sizes_count;
-    font->glyphs_count = glyphs_count;
-    font->kerning_pairs_count = kerning_pairs_count;
-    font->units_per_em = units_per_em;
-
-    if (blocks_count > 0) font->blocks = bs_malloc(blocks_count * sizeof(bsgfx_UnicodeBlock2));
-    if (pt_sizes_count > 0) font->pt_sizes = bs_malloc(pt_sizes_count * sizeof(int));
-    if (glyphs_count > 0) font->glyphs = bs_malloc(glyphs_count * sizeof(bsgfx_Glyph));
-    if (kerning_pairs_count > 0) font->kerning_pairs = bs_malloc(kerning_pairs_count * sizeof(bsgfx_KerningPair));
+    if (font->blocks_count > 0) font->blocks = bs_malloc(font->blocks_count * sizeof(bsgfx_UnicodeBlock2));
+    if (font->pt_sizes_count > 0) font->pt_sizes = bs_malloc(font->pt_sizes_count * sizeof(int));
+    if (font->glyphs_count > 0) font->glyphs = bs_malloc(font->glyphs_count * sizeof(bsgfx_Glyph));
+    if (font->kerning_pairs_count > 0) font->kerning_pairs = bs_malloc(font->kerning_pairs_count * sizeof(bsgfx_KerningPair));
 
    /**
     Pt sizes
     */
     unsigned char* pt_size_offset = data + BFNT_OFFSET_POINTS;
-    for (int i = 0; i < pt_sizes_count; i++) {
+    for (int i = 0; i < font->pt_sizes_count; i++) {
         font->pt_sizes[i] = bs_getLittleEndian32(pt_size_offset + BFNT_OFFSET_POINT_SIZE);
         pt_size_offset += BFNT_POINT_SIZE;
     }
@@ -275,7 +277,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     Unicode blocks
     */
     unsigned char* blocks_offset = pt_size_offset;
-    for (int i = 0; i < blocks_count; i++) {
+    for (int i = 0; i < font->blocks_count; i++) {
         bs_U32 code_start = bs_getLittleEndian32(blocks_offset + BFNT_OFFSET_BLOCK_START);
         bs_U16 code_count = bs_getLittleEndian16(blocks_offset + BFNT_OFFSET_BLOCK_LENGTH);
         bs_U32 glyphs_offset = bs_getLittleEndian32(blocks_offset + BFNT_OFFSET_BLOCK_GLYPHS);
@@ -293,7 +295,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     Glyphs
     */
     unsigned char* glyphs_offset = blocks_offset;
-    for (int i = 0; i < glyphs_count; i++) {
+    for (int i = 0; i < font->glyphs_count; i++) {
         bs_U32 flags = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_FLAGS);
         bs_U16 page = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_PAGE);
         bs_U16 atlas_index = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_ATLAS_INDEX);
@@ -328,7 +330,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
     Kerning pairs
     */
     unsigned char* kerning_pairs_offset = glyphs_offset;
-    for (int i = 0; i < kerning_pairs_count; i++) {
+    for (int i = 0; i < font->kerning_pairs_count; i++) {
         bs_U32 right = bs_getLittleEndian32(kerning_pairs_offset + BFNT_OFFSET_KERNING_PAIR_RIGHT);
 
         bs_I16 left_x_placement = bs_getLittleEndian16(kerning_pairs_offset + BFNT_OFFSET_KERN_LEFT_X_PLACEMENT);

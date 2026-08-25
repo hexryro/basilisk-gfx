@@ -193,6 +193,8 @@
 #define BFNT_OFFSET_PT_SIZES_COUNT                 14 // U16
 #define BFNT_OFFSET_KERNING_PAIRS_COUNT            16 // U16
 #define BFNT_OFFSET_UNITS_PER_EM                   18 // U16
+#define BFNT_OFFSET_DU_HEIGHT                      20 // I16
+#define BFNT_OFFSET_RESERVED                       22 // U16
 
  /**
   Mapping all 355 codepoint blocks found in Unicode 18.0.0 to an 
@@ -203,7 +205,7 @@
 //
 //#define BFNT_HEADER_SIZE (BFNT_BLOCK_LOOKUP_OFFSET + BFNT_BLOCK_LOOKUP_LENGTH)
 
-#define BFNT_HEADER_SIZE                20
+#define BFNT_HEADER_SIZE                24
 
  /**
   Rasterized pt sizes

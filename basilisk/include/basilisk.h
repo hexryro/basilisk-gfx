@@ -89,6 +89,6 @@ BS_GENERATE_ENUM(BASILISK_FONT_IDS);
 
 void basilisk_createRenderers();
 
-void basilisk_instanceTitleBarUI();
+void basilisk_instantiateTitleBarUI();
 
 #endif

@@ -65,7 +65,7 @@ static inline bs_vec4 _bsgfx_convertColor(bs_RGBA color) {
             bsgfx_Material* material = bs_fetchUnit(bsgfx_materials(), id);         \
             bs_vec4 c = bs_rgbUCharToV4(_color);                                    \
             c.xyz = bs_sRGBToLinearV3(&c.xyz);                                      \
-            material->category = BSGFX_CATEGORY;                                    \
+            material->category = 0;                                                 \
             material->contract->color = c;                                          \
         }                                                                           \
         bsgfx_Material* material = bs_fetchUnit(bsgfx_materials(), id);             \

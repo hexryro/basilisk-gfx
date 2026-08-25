@@ -111,6 +111,7 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
     functions.bsgfx_instanceDepthlessCircle = (PFN_bsgfx_instanceDepthlessCircle)GetProcAddress(module, "_val_bsgfx_instanceDepthlessCircle");
     functions.bsgfx_instanceAtlas = (PFN_bsgfx_instanceAtlas)GetProcAddress(module, "_val_bsgfx_instanceAtlas");
     functions.bsgfx_instanceAtlasFlipped = (PFN_bsgfx_instanceAtlasFlipped)GetProcAddress(module, "_val_bsgfx_instanceAtlasFlipped");
+    functions.bsgfx_fontHeight = (PFN_bsgfx_fontHeight)GetProcAddress(module, "_val_bsgfx_fontHeight");
     functions.bsgfx_instanceASCIIText = (PFN_bsgfx_instanceASCIIText)GetProcAddress(module, "_val_bsgfx_instanceASCIIText");
     functions.bsgfx_matrix = (PFN_bsgfx_matrix)GetProcAddress(module, "_val_bsgfx_matrix");
     functions.bsgfx_renderFineShadowVolumes = (PFN_bsgfx_renderFineShadowVolumes)GetProcAddress(module, "_val_bsgfx_renderFineShadowVolumes");
@@ -170,6 +171,14 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
     functions.bsgfx_tileAxis = (PFN_bsgfx_tileAxis)GetProcAddress(module, "_val_bsgfx_tileAxis");
     functions.bsgfx_tileIndex = (PFN_bsgfx_tileIndex)GetProcAddress(module, "_val_bsgfx_tileIndex");
     functions.bsgfx_instanceWidgets = (PFN_bsgfx_instanceWidgets)GetProcAddress(module, "_val_bsgfx_instanceWidgets");
+    functions.bsgfx_instantiateTextUI = (PFN_bsgfx_instantiateTextUI)GetProcAddress(module, "_val_bsgfx_instantiateTextUI");
+    functions.bsgfx_instantiateSolidUI = (PFN_bsgfx_instantiateSolidUI)GetProcAddress(module, "_val_bsgfx_instantiateSolidUI");
+    functions.bsgfx_instantiateSolidUIElement = (PFN_bsgfx_instantiateSolidUIElement)GetProcAddress(module, "_val_bsgfx_instantiateSolidUIElement");
+    functions.bsgfx_solidUIElement = (PFN_bsgfx_solidUIElement)GetProcAddress(module, "_val_bsgfx_solidUIElement");
+    functions.bsgfx_instantiateAtlasIconUI = (PFN_bsgfx_instantiateAtlasIconUI)GetProcAddress(module, "_val_bsgfx_instantiateAtlasIconUI");
+    functions.bsgfx_instantiateAtlasIconUIElement = (PFN_bsgfx_instantiateAtlasIconUIElement)GetProcAddress(module, "_val_bsgfx_instantiateAtlasIconUIElement");
+    functions.bsgfx_atlasIconUIElement = (PFN_bsgfx_atlasIconUIElement)GetProcAddress(module, "_val_bsgfx_atlasIconUIElement");
+    functions.bsgfx_hoveringUIElement = (PFN_bsgfx_hoveringUIElement)GetProcAddress(module, "_val_bsgfx_hoveringUIElement");
     functions.bsgfx_renderColorPickers = (PFN_bsgfx_renderColorPickers)GetProcAddress(module, "_val_bsgfx_renderColorPickers");
 
     return &functions;

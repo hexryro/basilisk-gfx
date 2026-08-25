@@ -1092,7 +1092,7 @@ BSAPI void _bs_overrideTitleBar(int height) {
     BOOL SET_CAPTION_COLOR = SUCCEEDED(DwmSetWindowAttribute(
         context->hwnd, DWMWA_CAPTION_COLOR,
         &DARK_COLOR, sizeof(DARK_COLOR)));
-    SetWindowLong(context->hwnd, GWL_EXSTYLE, WS_EX_TOOLWINDOW);
+    SetWindowLong(context->hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT);
 
     RECT rect;
     GetWindowRect(context->hwnd, &rect);

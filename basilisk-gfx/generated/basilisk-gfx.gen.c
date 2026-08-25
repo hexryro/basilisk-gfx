@@ -582,17 +582,24 @@ int bsgfx_instanceAtlasFlipped(
     return next.bsgfx_instanceAtlasFlipped(subtype, transform, texture, flags, id, material);
 }
 
-void bsgfx_instanceASCIIText(
+float bsgfx_fontHeight(
+    bsgfx_Font* font, 
+    int px_size)
+{
+    return next.bsgfx_fontHeight(font, px_size);
+}
+
+float bsgfx_instanceASCIIText(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     char* text)
 {
-    next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
+    return next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
 }
 
-void bsgfx_instanceASCIITextN(
+float bsgfx_instanceASCIITextN(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
@@ -600,10 +607,10 @@ void bsgfx_instanceASCIITextN(
     char* text, 
     int text_length)
 {
-    next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
+    return next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
 }
 
-void bsgfx_instanceASCIITextV(
+float bsgfx_instanceASCIITextV(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
@@ -611,10 +618,10 @@ void bsgfx_instanceASCIITextV(
     char* format, 
     va_list args)
 {
-    next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    return next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
 }
 
-void bsgfx_instanceASCIITextF(
+float bsgfx_instanceASCIITextF(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
@@ -624,8 +631,9 @@ void bsgfx_instanceASCIITextF(
 {
     va_list args;
     va_start(args, format);
-    next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    float _return = next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
     va_end(args);
+    return _return;
 }
 
 bs_mat4x3 bsgfx_matrix(
@@ -1039,6 +1047,61 @@ bool bsgfx_instanceWidgets(
     bsgfx_MenuTabBar* tab_bar)
 {
     return next.bsgfx_instanceWidgets(menu, title_bar, tab_bar);
+}
+
+void bsgfx_instantiateTextUI(
+    bsgfx_UIText text, 
+    bsgfx_UIElement* element)
+{
+    next.bsgfx_instantiateTextUI(text, element);
+}
+
+void bsgfx_instantiateSolidUI(
+    bsgfx_UISolid solid, 
+    bsgfx_UIElement* element)
+{
+    next.bsgfx_instantiateSolidUI(solid, element);
+}
+
+void bsgfx_instantiateSolidUIElement(
+    bsgfx_UISolid solid, 
+    const bsgfx_UIElement* element)
+{
+    next.bsgfx_instantiateSolidUIElement(solid, element);
+}
+
+void bsgfx_solidUIElement(
+    bsgfx_UISolid solid, 
+    bsgfx_UIElement* element)
+{
+    next.bsgfx_solidUIElement(solid, element);
+}
+
+void bsgfx_instantiateAtlasIconUI(
+    bsgfx_UIIcon icon, 
+    bsgfx_UIElement* element)
+{
+    next.bsgfx_instantiateAtlasIconUI(icon, element);
+}
+
+void bsgfx_instantiateAtlasIconUIElement(
+    bsgfx_UIIcon icon, 
+    const bsgfx_UIElement* element)
+{
+    next.bsgfx_instantiateAtlasIconUIElement(icon, element);
+}
+
+void bsgfx_atlasIconUIElement(
+    bsgfx_UIIcon icon, 
+    bsgfx_UIElement* element)
+{
+    next.bsgfx_atlasIconUIElement(icon, element);
+}
+
+bool bsgfx_hoveringUIElement(
+    const bsgfx_UIElement* element)
+{
+    return next.bsgfx_hoveringUIElement(element);
 }
 
 void bsgfx_renderColorPickers(

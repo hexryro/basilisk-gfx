@@ -212,6 +212,7 @@
 			<line><name>BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Y</name><value>(1 &lt;&lt; 5)</value></line>
 			<line><name>BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Z</name><value>(1 &lt;&lt; 6)</value></line>
 			<line><name>BSGFX_WIDGET_ADVANCE_APPLY_OFFSET</name><value>(BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_X | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Y | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Z)</value></line>
+			<line><name>BSGFX_WIDGET_PLACEMENT_RIGHT</name><value>(1 &lt;&lt; 7)</value></line>
 		</enum>
 		
 		<enum name="bsgfx_Language">
@@ -1004,6 +1005,39 @@
     </macros>
 
 	<structures>
+		<structure name="bsgfx_UIElement">
+			<field><type>bs_vec2</type><name>size</name></field>
+			<field><type>bs_vec3</type><name>position</name></field>
+		</structure>
+		
+		<structure name="bsgfx_UIIcon">
+			<field><type>bs_vec2</type><name>size</name></field>
+			<field><type>bs_vec3</type><name>position</name></field>
+			<field><type>float</type><name>align_height</name></field>
+			<field><type>bsgfx_AtlasCache*</type><name>cache</name></field>
+			<field><type>bsgfx_InstanceSubtype*</type><name>subtype</name></field>
+			<field><type>int</type><name>material_id</name></field>
+			<field><type>bool</type><name>flip</name></field>
+			<field><type>bool</type><name>mirror</name></field>
+		</structure>
+
+		<structure name="bsgfx_UISolid">
+			<field><type>bs_vec2</type><name>size</name></field>
+			<field><type>bs_vec3</type><name>position</name></field>
+			<field><type>float</type><name>align_height</name></field>
+			<field><type>int</type><name>material_id</name></field>
+		</structure>
+
+		<structure name="bsgfx_UIText">
+			<field><type>bs_vec3</type><name>position</name></field>
+			<field><type>float</type><name>align_height</name></field>
+			<field><type>int</type><name>px_size</name></field>
+			<field><type>bsgfx_Font*</type><name>font</name></field>
+			<structure>
+				<field><type>char*</type><name>as_ascii</name></field>
+			</structure>
+		</structure>
+		
 		<structure name="bsgfx_Text">
 			<field><type>bs_vec4</type><name>position</name></field>
 			<field><type>float</type><name>scale</name></field>
@@ -1433,6 +1467,7 @@
             <field><type>int</type><name>pt_sizes_count</name></field>
             <field><type>int</type><name>glyphs_count</name></field>
             <field><type>int</type><name>kerning_pairs_count</name></field>
+            <field><type>int</type><name>du_height</name></field>
             <field><type>bs_U16</type><name>units_per_em</name></field>
             <field><type>bs_Object*</type><name>atlas_object</name></field>
             <field><type>bsgfx_UnicodeBlock2*</type><name>blocks</name></field>
@@ -1459,6 +1494,7 @@
 			<structure type="union">
 				<structure instance=" string">
 					<field><type>char*</type><name>value</name></field>
+					<field><type>int</type><name>px_size</name></field>
 					<field><type>void</type><name>(*on_hover)(struct bsgfx_Widget*)</name></field>
 				</structure>
 				<structure instance=" input">
@@ -2020,8 +2056,13 @@
 			<param><type>int</type><name>id</name></param>
 			<param><type>int</type><name>material</name></param>
 		</function>
+		<function name="bsgfx_fontHeight">
+			<return>float</return>
+			<param><type>bsgfx_Font*</type><name>font</name></param>
+			<param><type>int</type><name>px_size</name></param>
+		</function>
 		<variadicStringTemplate name="bsgfx_instanceASCIIText" string="text">
-			<return>void</return>
+			<return>float</return>
 			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bsgfx_Font*</type><name>font</name></param>
 			<param><type>bs_vec3</type><name>position</name></param>
@@ -2310,7 +2351,50 @@
 			<param nullable="true"><type>bsgfx_TitleBar*</type><name>title_bar</name></param>
 			<param nullable="true"><type>bsgfx_MenuTabBar*</type><name>tab_bar</name></param>
 		</function>
+
+		<function name="bsgfx_instantiateTextUI">
+			<return>void</return>
+			<param><type>bsgfx_UIText</type><name>text</name></param>
+			<param><type>bsgfx_UIElement*</type><name>element</name></param>
+		</function>
+
+		<function name="bsgfx_instantiateSolidUI">
+			<return>void</return>
+			<param><type>bsgfx_UISolid</type><name>solid</name></param>
+			<param><type>bsgfx_UIElement*</type><name>element</name></param>
+		</function>
+		<function name="bsgfx_instantiateSolidUIElement">
+			<return>void</return>
+			<param><type>bsgfx_UISolid</type><name>solid</name></param>
+			<param><type>const bsgfx_UIElement*</type><name>element</name></param>
+		</function>
+		<function name="bsgfx_solidUIElement">
+			<return>void</return>
+			<param><type>bsgfx_UISolid</type><name>solid</name></param>
+			<param><type>bsgfx_UIElement*</type><name>element</name></param>
+		</function>
 		
+		<function name="bsgfx_instantiateAtlasIconUI">
+			<return>void</return>
+			<param><type>bsgfx_UIIcon</type><name>icon</name></param>
+			<param><type>bsgfx_UIElement*</type><name>element</name></param>
+		</function>
+		<function name="bsgfx_instantiateAtlasIconUIElement">
+			<return>void</return>
+			<param><type>bsgfx_UIIcon</type><name>icon</name></param>
+			<param><type>const bsgfx_UIElement*</type><name>element</name></param>
+		</function>
+		<function name="bsgfx_atlasIconUIElement">
+			<return>void</return>
+			<param><type>bsgfx_UIIcon</type><name>icon</name></param>
+			<param><type>bsgfx_UIElement*</type><name>element</name></param>
+		</function>
+		
+		<function name="bsgfx_hoveringUIElement">
+			<return>bool</return>
+			<param><type>const bsgfx_UIElement*</type><name>element</name></param>
+		</function>
+
 		<function name="bsgfx_renderColorPickers">
 			<return>void</return>
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
