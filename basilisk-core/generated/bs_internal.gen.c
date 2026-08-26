@@ -976,28 +976,31 @@ bs_Result _bs_loadPackageF(
 }
 
 void _bs_titleWindow(
+    bs_Context* context, 
     char* name)
 {
-    _bs_titleWindowN(name, strlen(name));
+    _bs_titleWindowN(context, name, strlen(name));
 }
 
 void _bs_titleWindowV(
+    bs_Context* context, 
     char* format, 
     va_list args)
 {
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    _bs_titleWindowN(_formatted, _length);
+    _bs_titleWindowN(context, _formatted, _length);
 }
 
 void _bs_titleWindowF(
+    bs_Context* context, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    _bs_titleWindowV(format, args);
+    _bs_titleWindowV(context, format, args);
     va_end(args);
 }
 

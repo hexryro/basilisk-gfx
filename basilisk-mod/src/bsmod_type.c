@@ -523,11 +523,11 @@ BSMODAPI void _val_bsmod_copyHoveringDataToBuffer() {
 BSMODAPI void _bsmod_copyHoveringDataToBuffer() {
 	bs_Queue* single_times_queue = bs_fetch(BSMOD_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
 
-	bs_vec2 cursor = bs_cursorPosition();
+	bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 
 	bs_Renderer* renderer = bs_fetch(BSGFX_RENDERERS, BSGFX_RENDERER_LO_RES)->renderer;
 
-	bs_ivec2 resolution = bs_resolution();
+	bs_ivec2 resolution = bs_resolution(bs_scope()->context);
 	bs_ivec2 pixel_resolution = BS_IV2(resolution.x / BSGFX_PIXEL_SCALE, resolution.y / BSGFX_PIXEL_SCALE);
 
 	bs_vec2 p;

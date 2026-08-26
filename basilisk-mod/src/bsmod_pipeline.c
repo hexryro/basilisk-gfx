@@ -63,7 +63,7 @@ static void _bsmod_renderGradients() {
         } push_const = {
             .camera = poser()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
-            .resolution = BS_IV2_TO_V2(bs_resolution()),
+            .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
 
         bs_beginCommentN(BS_CONSTANT_STRING("Gradients"));

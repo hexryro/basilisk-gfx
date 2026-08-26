@@ -54,34 +54,8 @@ BSAPI bs_Callbacks* _preval_bs_callbacks() {
     return next.bs_callbacks();
 }
 
-BSAPI int _preval_bs_imageSwapsCount(bs_Image* image) {
-    BS_VALIDATE(image != NULL, 0,);
-    BS_VALIDATE(image->head.type == BS_OBJECT_IMAGE, 0,);
-    return next.bs_imageSwapsCount(image);
-}
-
-BSAPI int _preval_bs_samplerSwapsCount(bs_Sampler* sampler) {
-    BS_VALIDATE(sampler != NULL, 0,);
-    BS_VALIDATE(sampler->head.type == BS_OBJECT_SAMPLER, 0,);
-    return next.bs_samplerSwapsCount(sampler);
-}
-
-BSAPI int _preval_bs_bufferSwapsCount(bs_Buffer* buffer) {
-    BS_VALIDATE(buffer != NULL, 0,);
-    BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, 0,);
-    return next.bs_bufferSwapsCount(buffer);
-}
-
-BSAPI int _preval_bs_queueSwapsCount(bs_Queue* queue) {
-    BS_VALIDATE(queue != NULL, 0,);
-    BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, 0,);
-    return next.bs_queueSwapsCount(queue);
-}
-
-BSAPI int _preval_bs_rendererSwapsCount(bs_Renderer* renderer) {
-    BS_VALIDATE(renderer != NULL, 0,);
-    BS_VALIDATE(renderer->head.type == BS_OBJECT_RENDERER, 0,);
-    return next.bs_rendererSwapsCount(renderer);
+BSAPI bs_Scope* _preval_bs_scope() {
+    return next.bs_scope();
 }
 
 BSAPI void _preval_bs_writeLogFile(char* value) {
@@ -1558,14 +1532,6 @@ BSAPI bs_Config* _preval_bs_config() {
     return next.bs_config();
 }
 
-BSAPI bs_Context* _preval_bs_context() {
-    return next.bs_context();
-}
-
-BSAPI bs_IO* _preval_bs_io() {
-    return next.bs_io();
-}
-
 BSAPI void _preval_bs_system(char* value) {
     BS_VALIDATE(value != NULL, ,);
     next.bs_system(value);
@@ -2415,8 +2381,9 @@ BSAPI bool _preval_bs_isLaterThan(const bs_DateTime* a, const bs_DateTime* b) {
     return next.bs_isLaterThan(a, b);
 }
 
-BSAPI bs_vec2 _preval_bs_cursorPosition() {
-    return next.bs_cursorPosition();
+BSAPI bs_vec2 _preval_bs_windowCursorPosition(bs_Context* context) {
+    BS_VALIDATE(context != NULL, (bs_vec2) { 0 },);
+    return next.bs_windowCursorPosition(context);
 }
 
 BSAPI bs_ivec2 _preval_bs_windowPosition() {
@@ -2425,14 +2392,6 @@ BSAPI bs_ivec2 _preval_bs_windowPosition() {
 
 BSAPI bs_vec2 _preval_bs_screenCursorPosition() {
     return next.bs_screenCursorPosition();
-}
-
-BSAPI void _preval_bs_lockCursorPosition(bool value) {
-    next.bs_lockCursorPosition(value);
-}
-
-BSAPI void _preval_bs_disableUserInputs(bool value) {
-    next.bs_disableUserInputs(value);
 }
 
 BSAPI bool _preval_bs_middleClick() {
@@ -2503,22 +2462,24 @@ BSAPI int _preval_bs_scroll() {
     return next.bs_scroll();
 }
 
-BSAPI void _preval_bs_resizeWindow(bs_U32 width, bs_U32 height) {
-    next.bs_resizeWindow(width, height);
+BSAPI void _preval_bs_resizeWindow(bs_Context* context, bs_U32 width, bs_U32 height) {
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_resizeWindow(context, width, height);
 }
 
-BSAPI void _preval_bs_moveWindow(int x, int y) {
-    next.bs_moveWindow(x, y);
+BSAPI void _preval_bs_moveWindow(bs_Context* context, int x, int y) {
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_moveWindow(context, x, y);
 }
 
 BSAPI void _preval_bs_overrideTitleBar(int height) {
     next.bs_overrideTitleBar(height);
 }
 
-BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_U32 width, bs_U32 height, const char* title) {
+BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title) {
     BS_VALIDATE(context != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(title != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_window(context, width, height, title);
+    return next.bs_window(context, tick, width, height, title);
 }
 
 BSAPI void _preval_bs_device(bs_Context* context, bs_PhysicalDevice* device) {
@@ -2526,8 +2487,13 @@ BSAPI void _preval_bs_device(bs_Context* context, bs_PhysicalDevice* device) {
     next.bs_device(context, device);
 }
 
-BSAPI void _preval_bs_tick(bs_Callback tick, bs_Callback fixed_tick) {
-    next.bs_tick(tick, fixed_tick);
+BSAPI void _preval_bs_tickContext(bs_Context* context) {
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_tickContext(context);
+}
+
+BSAPI void _preval_bs_tick(bs_Callback fixed_tick) {
+    next.bs_tick(fixed_tick);
 }
 
 BSAPI void _preval_bs_exit() {
@@ -2554,23 +2520,27 @@ BSAPI double _preval_bs_elapsedTime() {
     return next.bs_elapsedTime();
 }
 
-BSAPI bs_ivec2 _preval_bs_resolution() {
-    return next.bs_resolution();
+BSAPI bs_ivec2 _preval_bs_resolution(bs_Context* context) {
+    BS_VALIDATE(context != NULL, (bs_ivec2) { 0 },);
+    return next.bs_resolution(context);
 }
 
-BSAPI void _preval_bs_titleWindow(char* name) {
+BSAPI void _preval_bs_titleWindow(bs_Context* context, char* name) {
+    BS_VALIDATE(context != NULL, ,);
     BS_VALIDATE(name != NULL, ,);
-    next.bs_titleWindow(name);
+    next.bs_titleWindow(context, name);
 }
 
-BSAPI void _preval_bs_titleWindowN(char* name, int name_length) {
+BSAPI void _preval_bs_titleWindowN(bs_Context* context, char* name, int name_length) {
+    BS_VALIDATE(context != NULL, ,);
     BS_VALIDATE(name != NULL, ,);
-    next.bs_titleWindowN(name, name_length);
+    next.bs_titleWindowN(context, name, name_length);
 }
 
-BSAPI void _preval_bs_titleWindowV(char* format, va_list args) {
+BSAPI void _preval_bs_titleWindowV(bs_Context* context, char* format, va_list args) {
+    BS_VALIDATE(context != NULL, ,);
     BS_VALIDATE(format != NULL, ,);
-    next.bs_titleWindowV(format, args);
+    next.bs_titleWindowV(context, format, args);
 }
 
 BSAPI bool _preval_bs_inFixedTick() {
@@ -2800,11 +2770,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     static bs_FunctionTable functions = { 0 };
 
     functions.bs_callbacks = _preval_bs_callbacks;
-    functions.bs_imageSwapsCount = _preval_bs_imageSwapsCount;
-    functions.bs_samplerSwapsCount = _preval_bs_samplerSwapsCount;
-    functions.bs_bufferSwapsCount = _preval_bs_bufferSwapsCount;
-    functions.bs_queueSwapsCount = _preval_bs_queueSwapsCount;
-    functions.bs_rendererSwapsCount = _preval_bs_rendererSwapsCount;
+    functions.bs_scope = _preval_bs_scope;
     functions.bs_writeLogFile = _preval_bs_writeLogFile;
     functions.bs_writeLogFileN = _preval_bs_writeLogFileN;
     functions.bs_writeLogFileV = _preval_bs_writeLogFileV;
@@ -3052,8 +3018,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_features = _preval_bs_features;
     functions.bs_props = _preval_bs_props;
     functions.bs_config = _preval_bs_config;
-    functions.bs_context = _preval_bs_context;
-    functions.bs_io = _preval_bs_io;
     functions.bs_system = _preval_bs_system;
     functions.bs_systemN = _preval_bs_systemN;
     functions.bs_systemV = _preval_bs_systemV;
@@ -3212,11 +3176,9 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_dateTime = _preval_bs_dateTime;
     functions.bs_totalSeconds = _preval_bs_totalSeconds;
     functions.bs_isLaterThan = _preval_bs_isLaterThan;
-    functions.bs_cursorPosition = _preval_bs_cursorPosition;
+    functions.bs_windowCursorPosition = _preval_bs_windowCursorPosition;
     functions.bs_windowPosition = _preval_bs_windowPosition;
     functions.bs_screenCursorPosition = _preval_bs_screenCursorPosition;
-    functions.bs_lockCursorPosition = _preval_bs_lockCursorPosition;
-    functions.bs_disableUserInputs = _preval_bs_disableUserInputs;
     functions.bs_middleClick = _preval_bs_middleClick;
     functions.bs_middleClickOnce = _preval_bs_middleClickOnce;
     functions.bs_middleClickUpOnce = _preval_bs_middleClickUpOnce;
@@ -3239,6 +3201,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_overrideTitleBar = _preval_bs_overrideTitleBar;
     functions.bs_window = _preval_bs_window;
     functions.bs_device = _preval_bs_device;
+    functions.bs_tickContext = _preval_bs_tickContext;
     functions.bs_tick = _preval_bs_tick;
     functions.bs_exit = _preval_bs_exit;
     functions.bs_setCursor = _preval_bs_setCursor;

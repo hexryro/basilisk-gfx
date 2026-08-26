@@ -244,7 +244,7 @@ BSGFXAPI void _bsgfx_renderAtlasIcons(bs_RendererScope* scope, bs_Queue* queue) 
     } push_const = {
         .camera = _poser_->screen_camera.result,
         .elapsed = bs_elapsedTime(),
-        .resolution = BS_IV2_TO_V2(bs_resolution()),
+        .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
     };
 
     bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
@@ -287,7 +287,7 @@ static void _bsgfx_rayTrace() {
     if (bs_rayTracingPipeline(&hash, &ray_trace_pipeline))
         return;
 
-    bs_ivec2 resolution = bs_resolution();
+    bs_ivec2 resolution = bs_resolution(bs_scope()->context);
     resolution.x /= BSGFX_PIXEL_SCALE;
     resolution.y /= BSGFX_PIXEL_SCALE;
     bs_rayTrace(tracer, ray_trace_pipeline, resolution.x, resolution.y, 1);

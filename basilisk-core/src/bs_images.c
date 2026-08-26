@@ -67,10 +67,6 @@ BSAPI bool _bs_hasAlpha(bs_Format format) {
         format == BS_FORMAT_B8G8R8A8_SRGB;
 }
 
-BSAPI int _bs_imageSwapsCount(bs_Image* image) {
-    return image->flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
-}
-
 BSAPI void _val_bs_transition(bs_Queue* queue, bs_Image* image, int index, bs_ImageLayout old_layout, bs_ImageLayout new_layout) {
     BS_VALIDATE(old_layout != new_layout,,);
     BS_VALIDATE(index == 0 || index < image->num_indices,,);
@@ -227,7 +223,7 @@ BSAPI void _bs_transition(bs_Queue* queue, bs_Image* image, int index, bs_ImageL
 
 static inline bs_Result _bs_queryMemoryType(bs_U32 filter, VkMemoryPropertyFlags props, bs_U32* out) {
     VkPhysicalDeviceMemoryProperties mem_props;
-    vkGetPhysicalDeviceMemoryProperties(_bs_context_->physical_device->vk_device, &mem_props);
+    vkGetPhysicalDeviceMemoryProperties(_bs_instance_->physical_device->vk_device, &mem_props);
 
     for (bs_U32 i = 0; i < mem_props.memoryTypeCount; i++) {
         if ((filter & (1 << i)) && (mem_props.memoryTypes[i].propertyFlags & props) == props) {
@@ -336,7 +332,7 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
 static bs_Result _bs_depthImage(bs_Object* object, bs_ivec2 dim, int num_indices, bs_Format format, bs_U32 flags) {
     bs_Image* image = object->image;
 
-    bs_U32 num_swaps = flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
+    bs_U32 num_swaps = flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
 
     _bs_prepareImage(image->head.source_id, image->head.id, image,
         (flags & BS_IMAGE_ATTACHMENT_BIT       ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : 0) |
@@ -377,7 +373,7 @@ BSAPI bs_Result _bs_image(bs_Object* object, bs_ivec2 dim, int num_indices, bs_F
     if (_bs_isDepthFormat(format)) 
         return _bs_depthImage(object, dim, num_indices, format, flags);
 
-    int num_swaps = flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
+    int num_swaps = flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
     _bs_prepareImage(image->head.source_id, image->head.id, image,
         (flags & BS_IMAGE_ATTACHMENT_BIT            ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0) |
         (flags & BS_IMAGE_INPUT_ATTACHMENT_BIT      ? VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT : 0) |
@@ -521,7 +517,7 @@ BSAPI bs_Result _bs_loadPng(const char* path, int channels_count, bs_PngData* ou
 
 
 BSAPI void _bs_destroyImage(bs_Image* image) {
-    bs_U32 num_swaps = image->flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
+    bs_U32 num_swaps = image->flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
     for (int i = 0; i < num_swaps; i++) {
         vkDestroyImageView(_bs_instance_->device, image->_[i].vk_image_view, NULL);
         vkDestroyImage(_bs_instance_->device, image->_[i].vk_image, NULL);
@@ -562,10 +558,6 @@ BSAPI bs_Result _bs_queryImageIndex(bs_Image* image, char* name, int* out) {
    * Sampler
    *============================================================================*/
 
-BSAPI int _bs_samplerSwapsCount(bs_Sampler* sampler) {
-    return sampler->flags & BS_SAMPLER_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
-}
-
 BSAPI void _bs_destroySampler(bs_Sampler* sampler) {
     vkDestroySampler(_bs_instance_->device, sampler->_->vk_sampler, NULL);
 
@@ -593,7 +585,7 @@ BSAPI bs_Result _bs_sampler(bs_Object* object, bs_ImageFilter filter, bs_Sampler
     sampler->flags = flags;
 
     VkPhysicalDeviceProperties properties = { 0 };
-    vkGetPhysicalDeviceProperties(_bs_context_->physical_device->vk_device, &properties);
+    vkGetPhysicalDeviceProperties(_bs_instance_->physical_device->vk_device, &properties);
 
     VkSamplerCreateInfo sampler_i = {
         .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
@@ -632,8 +624,8 @@ BSAPI void _val_bs_copyImageToBufferAsync(bs_Queue* queue, bs_Image* image, bs_B
 
 BSAPI void _bs_copyImageToBufferAsync(bs_Queue* queue, bs_Image* image, bs_Buffer* buffer, int image_index, bs_ImageLayout layout, bs_U64 buffer_offset, bs_ivec2 offset, bs_ivec2 dim) {
     VkCommandBuffer commands = _bsi_fetchCommands(queue);
-    int image_swap = (image->flags & BS_IMAGE_SWAPS_BIT) ? _bs_context_->frame : 0;
-    int buffer_swap = (buffer->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_context_->frame : 0;
+    int image_swap = (image->flags & BS_IMAGE_SWAPS_BIT) ? _bs_scope_.context->frame : 0;
+    int buffer_swap = (buffer->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_scope_.context->frame : 0;
 
     VkBufferImageCopy copy = {
         .bufferOffset = buffer_offset,
@@ -680,8 +672,8 @@ BSAPI void _bs_copyBufferToImage(bs_Queue* queue, bs_Buffer* buffer, bs_Image* i
 
     vkCmdCopyBufferToImage(
         commands,
-        buffer->flags & BSI_BUFFER_SWAPS_BIT ? buffer->_[_bs_context_->frame].vk_buffer : buffer->_->vk_buffer,
-        image->flags & BS_IMAGE_SWAPS_BIT ? image->_[_bs_context_->frame].vk_image : image->_->vk_image,
+        buffer->flags & BSI_BUFFER_SWAPS_BIT ? buffer->_[_bs_scope_.context->frame].vk_buffer : buffer->_->vk_buffer,
+        image->flags & BS_IMAGE_SWAPS_BIT ? image->_[_bs_scope_.context->frame].vk_image : image->_->vk_image,
         layout,
         1,
         &region);
@@ -728,9 +720,9 @@ BSAPI void _bs_blit(bs_Queue* queue, bs_BlitOperation operation)  {
 
     vkCmdBlitImage(
         commands,
-        operation.source->flags & BS_IMAGE_SWAPS_BIT ? operation.source->_[_bs_context_->frame].vk_image : operation.source->_->vk_image,
+        operation.source->flags & BS_IMAGE_SWAPS_BIT ? operation.source->_[_bs_scope_.context->frame].vk_image : operation.source->_->vk_image,
         operation.source_layout,
-        operation.destination->flags & BS_IMAGE_SWAPS_BIT ? operation.destination->_[_bs_context_->frame].vk_image : operation.destination->_->vk_image,
+        operation.destination->flags & BS_IMAGE_SWAPS_BIT ? operation.destination->_[_bs_scope_.context->frame].vk_image : operation.destination->_->vk_image,
         operation.destination_layout,
         1, &region,
         VK_FILTER_NEAREST
@@ -993,7 +985,7 @@ BSAPI bs_Result _bs_loadAtlasMemory(bs_Queue* queue, bs_Object* object, int pack
     Create image
     */
     bs_Object* image_object = BS_IMAGE(-1, 0, flags & BS_ATLAS_FORCE_CREATE);
-    bs_U32 swaps_count = flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frames_in_flight : 1;
+    bs_U32 swaps_count = flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
     atlas->image = image_object->image;
     if (header->pages_count > 1)
         atlas->image->num_indices = header->pages_count;

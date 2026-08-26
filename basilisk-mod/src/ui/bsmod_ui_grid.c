@@ -290,7 +290,7 @@ static void _bsmod_instanceDirectoryMenu(bs_vec3 center, bs_vec2 dimensions) {
 }
 
 static bool _bsmod_instanceGridPreview(bsgfx_Widget* widget, bsgfx_GridParams grid) {
-    bs_vec2 cursor = bs_cursorPosition();
+    bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
     bool hovering = bs_rectangleVsPoint(grid.position, &widget->grid.size, &cursor);
 
     switch (_bsmod_selected_directory) {
@@ -329,7 +329,7 @@ typedef struct {
 } bsmod_GridPreviewParams;
 
 static void _bsmod_checkHoverGrid(bsgfx_Widget* widget, bsgfx_GridParams* grid) {
-    bs_vec2 cursor = bs_cursorPosition();
+    bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 
     bsmod_GridPreviewParams* params = widget->params;
     bool hovering = bs_rectangleVsPoint(grid->position, &widget->grid.size, &cursor);

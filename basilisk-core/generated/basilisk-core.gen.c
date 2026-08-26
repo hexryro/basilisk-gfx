@@ -81,34 +81,9 @@ bs_Callbacks* bs_callbacks()
     return next.bs_callbacks();
 }
 
-int bs_imageSwapsCount(
-    bs_Image* image)
+bs_Scope* bs_scope()
 {
-    return next.bs_imageSwapsCount(image);
-}
-
-int bs_samplerSwapsCount(
-    bs_Sampler* sampler)
-{
-    return next.bs_samplerSwapsCount(sampler);
-}
-
-int bs_bufferSwapsCount(
-    bs_Buffer* buffer)
-{
-    return next.bs_bufferSwapsCount(buffer);
-}
-
-int bs_queueSwapsCount(
-    bs_Queue* queue)
-{
-    return next.bs_queueSwapsCount(queue);
-}
-
-int bs_rendererSwapsCount(
-    bs_Renderer* renderer)
-{
-    return next.bs_rendererSwapsCount(renderer);
+    return next.bs_scope();
 }
 
 void bs_writeLogFile(
@@ -2821,16 +2796,6 @@ bs_Config* bs_config()
     return next.bs_config();
 }
 
-bs_Context* bs_context()
-{
-    return next.bs_context();
-}
-
-bs_IO* bs_io()
-{
-    return next.bs_io();
-}
-
 void bs_system(
     char* value)
 {
@@ -4135,9 +4100,10 @@ bool bs_isLaterThan(
     return next.bs_isLaterThan(a, b);
 }
 
-bs_vec2 bs_cursorPosition()
+bs_vec2 bs_windowCursorPosition(
+    bs_Context* context)
 {
-    return next.bs_cursorPosition();
+    return next.bs_windowCursorPosition(context);
 }
 
 bs_ivec2 bs_windowPosition()
@@ -4148,18 +4114,6 @@ bs_ivec2 bs_windowPosition()
 bs_vec2 bs_screenCursorPosition()
 {
     return next.bs_screenCursorPosition();
-}
-
-void bs_lockCursorPosition(
-    bool value)
-{
-    next.bs_lockCursorPosition(value);
-}
-
-void bs_disableUserInputs(
-    bool value)
-{
-    next.bs_disableUserInputs(value);
 }
 
 bool bs_middleClick()
@@ -4255,17 +4209,19 @@ int bs_scroll()
 }
 
 void bs_resizeWindow(
+    bs_Context* context, 
     bs_U32 width, 
     bs_U32 height)
 {
-    next.bs_resizeWindow(width, height);
+    next.bs_resizeWindow(context, width, height);
 }
 
 void bs_moveWindow(
+    bs_Context* context, 
     int x, 
     int y)
 {
-    next.bs_moveWindow(x, y);
+    next.bs_moveWindow(context, x, y);
 }
 
 void bs_overrideTitleBar(
@@ -4276,11 +4232,12 @@ void bs_overrideTitleBar(
 
 bs_Result bs_window(
     bs_Context* context, 
+    bs_Callback tick, 
     bs_U32 width, 
     bs_U32 height, 
     const char* title)
 {
-    return next.bs_window(context, width, height, title);
+    return next.bs_window(context, tick, width, height, title);
 }
 
 void bs_device(
@@ -4290,11 +4247,16 @@ void bs_device(
     next.bs_device(context, device);
 }
 
+void bs_tickContext(
+    bs_Context* context)
+{
+    next.bs_tickContext(context);
+}
+
 void bs_tick(
-    bs_Callback tick, 
     bs_Callback fixed_tick)
 {
-    next.bs_tick(tick, fixed_tick);
+    next.bs_tick(fixed_tick);
 }
 
 void bs_exit()
@@ -4328,38 +4290,43 @@ double bs_elapsedTime()
     return next.bs_elapsedTime();
 }
 
-bs_ivec2 bs_resolution()
+bs_ivec2 bs_resolution(
+    bs_Context* context)
 {
-    return next.bs_resolution();
+    return next.bs_resolution(context);
 }
 
 void bs_titleWindow(
+    bs_Context* context, 
     char* name)
 {
-    next.bs_titleWindow(name);
+    next.bs_titleWindow(context, name);
 }
 
 void bs_titleWindowN(
+    bs_Context* context, 
     char* name, 
     int name_length)
 {
-    next.bs_titleWindowN(name, name_length);
+    next.bs_titleWindowN(context, name, name_length);
 }
 
 void bs_titleWindowV(
+    bs_Context* context, 
     char* format, 
     va_list args)
 {
-    next.bs_titleWindowV(format, args);
+    next.bs_titleWindowV(context, format, args);
 }
 
 void bs_titleWindowF(
+    bs_Context* context, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    next.bs_titleWindowV(format, args);
+    next.bs_titleWindowV(context, format, args);
     va_end(args);
 }
 

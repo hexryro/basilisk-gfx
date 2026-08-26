@@ -139,7 +139,7 @@ void basilisk_renderUIPost(bs_RendererScope* scope, bs_Queue* queue) {
             .selected_color = BS_V3(1.0, 1.0, 1.0),
             .elapsed = bs_elapsedTime(),
             .light_direction = poser()->sun_direction,
-            .resolution = BS_V2_MUL_S(BS_IV2_TO_V2(bs_resolution()), 0.5),
+            .resolution = BS_V2_MUL_S(BS_IV2_TO_V2(bs_resolution(bs_scope()->context)), 0.5),
         };
         bs_m4Inverse(&poser()->camera.proj, &push_const.inv_proj);
 
@@ -274,7 +274,7 @@ void basilisk_renderRoundedQuads(bs_RendererScope* scope, bs_Queue* queue) {
         } push_const = {
             .camera = poser()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
-            .resolution = BS_IV2_TO_V2(bs_resolution()),
+            .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
             .border_radius = 5.0,
         };
 
@@ -306,7 +306,7 @@ void basilisk_renderUI(bs_RendererScope* scope, bs_Queue* queue) {
         } push_const = {
             .camera = poser()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
-            .resolution = BS_IV2_TO_V2(bs_resolution()),
+            .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
 
         bs_beginCommentN(queue, BS_CONSTANT_STRING("UI"));
@@ -355,7 +355,7 @@ void basilisk_renderUISolid(bs_RendererScope* scope, bs_Queue* queue) {
         } push_const = {
             .camera = poser()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
-            .resolution = BS_IV2_TO_V2(bs_resolution()),
+            .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
 
         bs_beginCommentN(queue, BS_CONSTANT_STRING("UI (Color only)"));
@@ -396,7 +396,7 @@ void basilisk_renderUIStencil(bs_RendererScope* scope, bs_Queue* queue) {
         } push_const = {
             .camera = poser()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
-            .resolution = BS_IV2_TO_V2(bs_resolution()),
+            .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
 
         bs_beginCommentN(queue, BS_CONSTANT_STRING("UI Stencil"));
@@ -427,7 +427,7 @@ void basilisk_renderDither(bs_RendererScope* scope, bs_Queue* queue) {
         } push_const = {
             .camera = poser()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
-            .resolution = BS_IV2_TO_V2(bs_resolution()),
+            .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
 
         bs_beginCommentN(queue, BS_CONSTANT_STRING("Dither"));

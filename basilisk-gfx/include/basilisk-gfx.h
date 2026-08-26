@@ -47,6 +47,11 @@ typedef struct {
 } bsgfx_Procedures;
 BSGFXAPI extern bsgfx_Procedures _bsgfx_procs_;
 */
+#define BSGFX_EMPTY_LIST(X)
+
+#define BSGFX_CONTEXT_IDS(X)                                           \
+    X(BSGFX_CONTEXT_MAIN)                                            \
+    X(BSGFX_CONTEXTS_COUNT)
 
 #define BSGFX_IMAGE_IDS(X)                                           \
     X(BSGFX_IMAGE_TILE)                                              \
@@ -111,6 +116,7 @@ BSGFXAPI extern bsgfx_Procedures _bsgfx_procs_;
 #define BSGFX_FONT_IDS(X)                                            \
     X(BSGFX_FONTS_COUNT)
 
+BS_GENERATE_ENUM(BSGFX_CONTEXT_IDS);
 BS_GENERATE_ENUM(BSGFX_IMAGE_IDS);
 BS_GENERATE_ENUM(BSGFX_SAMPLER_IDS);
 BS_GENERATE_ENUM(BSGFX_BUFFER_IDS);

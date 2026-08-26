@@ -150,7 +150,7 @@ void _bsgfx_instanceSpawners() {
         
         if (hovering && !_poser_->menu_blocked) {
             //if (!_bsgfx_quickMenuEnabled())
-            //    _bsgfx_instanceHint(bs_cursorPosition(), name);
+            //    _bsgfx_instanceHint(bs_windowCursorPosition(bs_scope()->context), name);
 
             if (bs_leftClickOnce()) {
                 bsmod_select(BSGFX_TYPE_SPAWNER, i);

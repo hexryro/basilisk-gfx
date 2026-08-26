@@ -58,7 +58,7 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     bs_vec4 clear_color = bs_rgbUCharToV4(BS_RGBA(75, 75, 75, 255));
     clear_color.xyz = bs_sRGBToLinearV3(&clear_color.xyz);
 
-    bs_clearColor(queue, 0, bs_resolution(), &clear_color);
+    bs_clearColor(queue, 0, bs_resolution(bs_scope()->context), &clear_color);
 
     basilisk_renderDepthlessLines(scope, queue);
     basilisk_renderPoints(scope, queue);
@@ -97,7 +97,7 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
         if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
             bs_beginCommentN(BS_CONSTANT_STRING("Post processing"));
 
-            bs_ivec2 resolution = bs_resolution();
+            bs_ivec2 resolution = bs_resolution(bs_scope()->context);
             struct {
                 bs_mat4 inv_proj;
                 bs_vec3 selected_color;
@@ -185,12 +185,12 @@ void basilisk_pipeline() {
 void basilisk_createRenderers() {
     bs_Object* hi_res = BS_RENDERER(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN, BS_OBJECT_HAS_SWAPS_BIT);
     if (bs_renderer(hi_res, BS_RENDERER_AUTO_RESIZE_BIT) == BS_RESULT_OK) {
-
-        bs_ivec2 resolution = bs_resolution();
+        
+        bs_ivec2 resolution = bs_resolution(basilisk.context);
         bs_Object* hi_res_0_depth = BS_IMAGE(BASILISK_IMAGES, BASILISK_IMAGE_MAIN_OUTPUT_DEPTH, 0);
         if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT) == BS_RESULT_OK) {
 
-             bs_output(hi_res->renderer, (bs_Output) {
+            bs_output(hi_res->renderer, (bs_Output) {
                 .subpass = 0,
                 .image = hi_res_0_depth->image,
                 .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
@@ -201,7 +201,7 @@ void basilisk_createRenderers() {
 
             bs_output(hi_res->renderer, (bs_Output) {
                 .subpass = 0,
-                .image = bs_context()->swapchain_image->image,
+                .image = basilisk.context->swapchain_image->image,
                 .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
                 .store_op = BS_ATTACHMENT_STORE_OP_STORE,
                 .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
@@ -215,7 +215,7 @@ void basilisk_createRenderers() {
                 BS_ACCESS_COLOR_ATTACHMENT_READ_BIT | BS_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | BS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
 
             bs_renderPass(hi_res->renderer);
-            bs_framebuffer(hi_res->renderer, bs_resolution());
+            bs_framebuffer(hi_res->renderer, bs_resolution(basilisk.context));
         }
     }
 }

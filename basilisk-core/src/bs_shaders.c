@@ -370,7 +370,7 @@ BSAPI bs_Result _bs_bindImages(bs_U32 bind_set_slot, bs_U32 bind_point_slot, bs_
         descriptors[i] = (bs_Descriptor) {
             .as_image = {
                 .vk_image_layout = (VkImageLayout)descriptor->layout,
-                .vk_image_view = descriptor->image->_[descriptor->image->flags & BS_IMAGE_SWAPS_BIT ? _bs_context_->frame : 0].vk_image_view,
+                .vk_image_view = descriptor->image->_[descriptor->image->flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frame : 0].vk_image_view,
                 .vk_sampler = descriptor->sampler ? descriptor->sampler->_->vk_sampler : VK_NULL_HANDLE,
                 .image = descriptor->image,
                 .sampler = descriptor->sampler,
@@ -425,7 +425,7 @@ BSAPI bs_Result _bs_bindBuffers(bs_U32 bind_set_slot, bs_U32 slot, bs_Buffer** b
         if (binding->type == BS_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER || binding->type == BS_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER) {
             descriptors[i] = (bs_Descriptor){
                 .as_texel_buffer = {
-                    .vk_buffer_view = buffer->_[buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frame : 0].vk_buffer_view,
+                    .vk_buffer_view = buffer->_[buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_scope_.context->frame : 0].vk_buffer_view,
                     .buffer = buffer,
                 },
                 .bind_set = bind_set_slot,
@@ -436,7 +436,7 @@ BSAPI bs_Result _bs_bindBuffers(bs_U32 bind_set_slot, bs_U32 slot, bs_Buffer** b
 
             descriptors[i] = (bs_Descriptor){
                 .as_buffer = {
-                    .vk_buffer = buffer->_[buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_context_->frame : 0].vk_buffer,
+                    .vk_buffer = buffer->_[buffer->flags & BSI_BUFFER_SWAPS_BIT ? _bs_scope_.context->frame : 0].vk_buffer,
                     .vk_range = buffer->num_bytes,
                     .buffer = buffer,
                 },
@@ -1179,11 +1179,7 @@ BSAPI bs_Result _bs_computePipeline(bs_Shader* compute_shader, bs_PipelineFlags 
         return _bs_convertVulkanResult(vk_result);
     }
 
-    const char* blue = (_bs_args_.color_log ? BS_PRINT_BLUE_BRIGHT : "");
-    const char* cyan = (_bs_args_.color_log ? BS_PRINT_CYAN : "");
-    const char* reset = (_bs_args_.color_log ? BS_PRINT_RESET : "");
-
-    _bs_infoF("%s%" PRIx64 "%s %s", blue, pipeline->hash, reset, reset);
+    _bs_infoF(PRIx64, pipeline->hash);
 
     return BS_RESULT_OK;
 }
@@ -1347,7 +1343,7 @@ BSAPI bs_Result _bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_Pipeli
     pipeline_ci.pDynamicState = &dynamic_state_i;
 
     // add attributes
-    attributes = _alloca(vs->num_attributes * sizeof(VkVertexInputAttributeDescription));
+    attributes = bs_alloca(vs->num_attributes * sizeof(VkVertexInputAttributeDescription));
     if (vs != NULL) {
         memset(attributes, vs->num_attributes * sizeof(VkVertexInputAttributeDescription), 0);
 
@@ -1388,7 +1384,7 @@ BSAPI bs_Result _bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_Pipeli
         pipeline_ci.pInputAssemblyState = &assembly_ci;
     }
     
-    bs_ivec2 resolution = _bs_resolution();
+    bs_ivec2 resolution = _bs_resolution(_bs_scope_.context);
     viewport.width = resolution.x;
     viewport.height = resolution.y;
     viewport.minDepth = 0.0;
@@ -1568,11 +1564,7 @@ BSAPI bs_Result _bs_rayTracingPipeline(bs_Queue* queue, bs_RayTracePipelineHash*
         return bs_result;
     }
 
-    const char* blue = (_bs_args_.color_log ? BS_PRINT_BLUE_BRIGHT : "");
-    const char* cyan = (_bs_args_.color_log ? BS_PRINT_CYAN : "");
-    const char* reset = (_bs_args_.color_log ? BS_PRINT_RESET : "");
-
-    _bs_infoF("%s%" PRIx64 "%s", blue, pipeline->hash, reset);
+    _bs_infoF(PRIx64, pipeline->hash);
 
     /**
      Binding table

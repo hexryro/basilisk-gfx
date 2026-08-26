@@ -100,7 +100,7 @@ BSGFXAPI struct Poser* _poser() {
 }
 
 static void _bsgfx_configure() {
-  //  BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_CONTEXT, BSGFX_CONTEXTS_COUNT, BSGFX_CONTEXT_IDS);
+    BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_CONTEXT, BSGFX_CONTEXTS_COUNT, BSGFX_CONTEXT_IDS);
     BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_IMAGE, BSGFX_IMAGES_COUNT, BSGFX_IMAGE_IDS);
     BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_SAMPLER, BSGFX_SAMPLERS_COUNT, BSGFX_SAMPLER_IDS);
     BS_CONFIGURE_SOURCE(_bsgfx_sources_, BS_OBJECT_BUFFER, BSGFX_BUFFERS_COUNT, BSGFX_BUFFER_IDS);
@@ -140,7 +140,8 @@ static void _bsgfx_tick() {
     //bssteam_tickSteam();
     //bsgfx_instanceItems();
 
-    bs_vec2 resolution = { .x = (float)bs_resolution().x, .y = (float)bs_resolution().y };
+    bs_Context* ctx = bs_scope()->context;
+    bs_vec2 resolution = { .x = (float)bs_resolution(ctx).x, .y = (float)bs_resolution(ctx).y };
 
     bs_mat4 screen_camera_proj;
     bs_mat4 screen_camera_view;
@@ -289,8 +290,8 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
     _bsgfx_configure();
     bs_ini();
 
-    bs_Object* context_object = BS_CONTEXT(-1, 0, 0);
-    bs_window(context_object->context, width, height, name);
+    bs_Object* context_object = BS_CONTEXT(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN, 0);
+    bs_window(context_object->context, _bsgfx_tick, width, height, name);
     bs_device(context_object->context, NULL);
 
     /*
@@ -336,7 +337,7 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
     if (_bsgfx_callbacks_.lateIni)
         _bsgfx_callbacks_.lateIni();
 
-    bs_tick(_bsgfx_tick, _bsgfx_fixedTick);// TODO
+    bs_tick(_bsgfx_fixedTick);// TODO
 
     if (bs_exists(BSGFX_RAY_TRACERS, BSGFX_RAY_TRACER_MAIN))
         bs_destroyRayTracer(bs_fetch(BSGFX_RAY_TRACERS, BSGFX_RAY_TRACER_MAIN)->ray_tracer);

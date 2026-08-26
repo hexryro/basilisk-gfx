@@ -206,11 +206,11 @@ BSAPI void _bs_criticalN(char* message, int message_len) {
     printf(BS_PRINT_COLOR("[CRITICAL ERROR]", BS_PRINT_RED) "%s", message);
 
 #ifdef _WIN32
-    if (_bs_context_ && _bs_context_->hwnd) {
+    if (_bs_scope_.context && _bs_scope_.context->hwnd) {
         int report_bug = MessageBox(
-            _bs_context_->hwnd,
+            _bs_scope_.context->hwnd,
             message,
-            _bs_context_->title,
+            _bs_scope_.context->title,
             MB_ICONERROR | MB_OK
         );
     }
@@ -229,7 +229,7 @@ BSAPI void _bs_criticalN(char* message, int message_len) {
         if (report_bug == IDYES) {
             _bs_except(BS_U64_MAX);
             bs_Json json = _bs_emptyJson();
-            _bs_ensureJson(&json, _bs_jsonValue(_bs_io_.log->value), "$.Log");
+            _bs_ensureJson(&json, _bs_jsonValue(_bs_scope_.context->io.log->value), "$.Log");
             char* result = _bs_saveJson(&json, 0);
 
             bs_Json response = _bs_post("http://basilisk-gfx.com/reportbug", 5000, &json);

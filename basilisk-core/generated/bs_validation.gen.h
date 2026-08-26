@@ -46,11 +46,7 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
         &module);
 
     functions.bs_callbacks = (PFN_bs_callbacks)GetProcAddress(module, "_val_bs_callbacks");
-    functions.bs_imageSwapsCount = (PFN_bs_imageSwapsCount)GetProcAddress(module, "_val_bs_imageSwapsCount");
-    functions.bs_samplerSwapsCount = (PFN_bs_samplerSwapsCount)GetProcAddress(module, "_val_bs_samplerSwapsCount");
-    functions.bs_bufferSwapsCount = (PFN_bs_bufferSwapsCount)GetProcAddress(module, "_val_bs_bufferSwapsCount");
-    functions.bs_queueSwapsCount = (PFN_bs_queueSwapsCount)GetProcAddress(module, "_val_bs_queueSwapsCount");
-    functions.bs_rendererSwapsCount = (PFN_bs_rendererSwapsCount)GetProcAddress(module, "_val_bs_rendererSwapsCount");
+    functions.bs_scope = (PFN_bs_scope)GetProcAddress(module, "_val_bs_scope");
     functions.bs_writeLogFile = (PFN_bs_writeLogFile)GetProcAddress(module, "_val_bs_writeLogFile");
     functions.bs_v2Mid = (PFN_bs_v2Mid)GetProcAddress(module, "_val_bs_v2Mid");
     functions.bs_v3Mid = (PFN_bs_v3Mid)GetProcAddress(module, "_val_bs_v3Mid");
@@ -262,8 +258,6 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_features = (PFN_bs_features)GetProcAddress(module, "_val_bs_features");
     functions.bs_props = (PFN_bs_props)GetProcAddress(module, "_val_bs_props");
     functions.bs_config = (PFN_bs_config)GetProcAddress(module, "_val_bs_config");
-    functions.bs_context = (PFN_bs_context)GetProcAddress(module, "_val_bs_context");
-    functions.bs_io = (PFN_bs_io)GetProcAddress(module, "_val_bs_io");
     functions.bs_system = (PFN_bs_system)GetProcAddress(module, "_val_bs_system");
     functions.bs_createThread = (PFN_bs_createThread)GetProcAddress(module, "_val_bs_createThread");
     functions.bs_formatStringLength = (PFN_bs_formatStringLength)GetProcAddress(module, "_val_bs_formatStringLength");
@@ -396,11 +390,9 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_dateTime = (PFN_bs_dateTime)GetProcAddress(module, "_val_bs_dateTime");
     functions.bs_totalSeconds = (PFN_bs_totalSeconds)GetProcAddress(module, "_val_bs_totalSeconds");
     functions.bs_isLaterThan = (PFN_bs_isLaterThan)GetProcAddress(module, "_val_bs_isLaterThan");
-    functions.bs_cursorPosition = (PFN_bs_cursorPosition)GetProcAddress(module, "_val_bs_cursorPosition");
+    functions.bs_windowCursorPosition = (PFN_bs_windowCursorPosition)GetProcAddress(module, "_val_bs_windowCursorPosition");
     functions.bs_windowPosition = (PFN_bs_windowPosition)GetProcAddress(module, "_val_bs_windowPosition");
     functions.bs_screenCursorPosition = (PFN_bs_screenCursorPosition)GetProcAddress(module, "_val_bs_screenCursorPosition");
-    functions.bs_lockCursorPosition = (PFN_bs_lockCursorPosition)GetProcAddress(module, "_val_bs_lockCursorPosition");
-    functions.bs_disableUserInputs = (PFN_bs_disableUserInputs)GetProcAddress(module, "_val_bs_disableUserInputs");
     functions.bs_middleClick = (PFN_bs_middleClick)GetProcAddress(module, "_val_bs_middleClick");
     functions.bs_middleClickOnce = (PFN_bs_middleClickOnce)GetProcAddress(module, "_val_bs_middleClickOnce");
     functions.bs_middleClickUpOnce = (PFN_bs_middleClickUpOnce)GetProcAddress(module, "_val_bs_middleClickUpOnce");
@@ -423,6 +415,7 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_overrideTitleBar = (PFN_bs_overrideTitleBar)GetProcAddress(module, "_val_bs_overrideTitleBar");
     functions.bs_window = (PFN_bs_window)GetProcAddress(module, "_val_bs_window");
     functions.bs_device = (PFN_bs_device)GetProcAddress(module, "_val_bs_device");
+    functions.bs_tickContext = (PFN_bs_tickContext)GetProcAddress(module, "_val_bs_tickContext");
     functions.bs_tick = (PFN_bs_tick)GetProcAddress(module, "_val_bs_tick");
     functions.bs_exit = (PFN_bs_exit)GetProcAddress(module, "_val_bs_exit");
     functions.bs_setCursor = (PFN_bs_setCursor)GetProcAddress(module, "_val_bs_setCursor");

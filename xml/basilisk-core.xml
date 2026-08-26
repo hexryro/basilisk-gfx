@@ -724,7 +724,7 @@
             <line>    { .capacity = c, .data = bs_alloca(c * sizeof(type)), .unit_size = sizeof(type) }</line>
         </macro>
         <macro><name>#define BS_SWAP_SIZE(type)</name><line>(sizeof(*((type*)NULL)-&gt;_))</line></macro>
-        <macro><name>#define BS_SWAPS_COUNT(flags)</name><line>((flags &amp; BS_OBJECT_HAS_SWAPS_BIT) ? bs_context()-&gt;frames_in_flight : 1)</line></macro>
+        <macro><name>#define BS_SWAPS_COUNT(flags)</name><line>((flags &amp; BS_OBJECT_HAS_SWAPS_BIT) ? (bs_scope()->context ? bs_scope()->context-&gt;frames_in_flight : bs_instance()-&gt;max_frames_in_flight) : 1)</line></macro>
         <macro>
             <name>#define BS_OBJECT(type, source_id, id, swaps_count, flags, object_type)</name>
             <line>    bs_object(source_id, id, sizeof(type), BS_SWAP_SIZE(type), swaps_count, flags, object_type)</line>
@@ -1158,6 +1158,7 @@
         <structure name="bs_Header">
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>source_id</name></field>
+            <field><type>bs_U32</type><name>swaps_count</name></field>
             <field><type>bs_ObjectType</type><name>type</name></field>
             <field><type>const char*</type><name>name</name></field>
         </structure>
@@ -1754,17 +1755,12 @@
             <field><type>bool</type><name>left_clicked_last</name></field>
             <field><type>bool</type><name>right_clicked_last</name></field>
             <field><type>bool</type><name>middle_clicked_last</name></field>
-            <field><type>bool</type><name>disable_inputs</name></field>
             <field><type>bs_U8</type><name>hold_keys</name><size>BS_KEY_BYTES_COUNT</size></field>
             <field><type>bs_U8</type><name>keys</name><size>BS_KEY_BYTES_COUNT</size></field>
             <field><type>bs_U8</type><name>keys_old</name><size>BS_KEY_BYTES_COUNT</size></field>
             <field><type>bs_U8</type><name>chars</name><size>BS_KEY_BYTES_COUNT</size></field>
             <field><type>bs_U8</type><name>chars_old</name><size>BS_KEY_BYTES_COUNT</size></field>
             <field><type>bs_I8 scroll,</type><name>scroll_old</name></field>
-            <field><type>bs_String*</type><name>executable</name></field>
-            <field><type>bs_String*</type><name>cwd</name></field>
-            <field><type>bs_String*</type><name>appdata</name></field>
-            <field><type>bs_String*</type><name>log</name></field>
         </structure>
         <structure name="bs_Instance">
             <field><type>int</type><name>bind_sets_count</name></field>
@@ -1778,55 +1774,7 @@
             <field><type>bool</type><name>alive</name></field>
             <field><type>bs_vec2</type><name>screen_cursor</name></field>
 
-            <structure instance="* descriptor_lookup">
-                <field><type>int*</type><name>bindings</name></field>
-                <field><type>int</type><name>bind_set</name></field>
-            </structure>
-
-            <structure instance=" extensions">
-                <field><type>bs_SurfaceType</type><name>surface_type</name></field>
-            </structure>
-
-            <field><type>struct VkDescriptorSet_T*</type><name>sets</name><size>BS_MAX_NUM_BIND_SETS</size></field>
-			<field><type>struct VkDescriptorSetLayout_T*</type><name>layouts</name><size>BS_MAX_NUM_BIND_SETS</size></field>
-			<field><type>struct VkInstance_T*</type><name>instance</name></field>
-			<field><type>struct VkDevice_T*</type><name>device</name></field>
-			<field><type>struct VkCommandPool_T*</type><name>command_pool</name></field>
-		</structure>
-        <structure name="bs_Bindings">
-            <field><type>bs_BindSet*</type><name>bs_bind_sets</name></field>
-            <field><type>int</type><name>bs_bind_sets_count</name></field>
-        </structure>
-        <structure name="bs_Config">
-            <field><type>bs_List</type><name>attributes</name></field>
-        </structure>
-		<structure name="bs_QueueFamily">
-            <field><type>bool</type><name>supports_present</name></field>
-            <field><type>bs_U32</type><name>queue_flags</name></field>
-            <field><type>bs_U32</type><name>queue_count</name></field>
-        </structure>
-		<structure name="bs_SurfaceFormat">
-            <field><type>bs_Format</type><name>format</name></field>
-            <field><type>bs_ColorSpace</type><name>color_space</name></field>
-        </structure>
-		<structure name="bs_PhysicalDevice">
-            <field><type>struct VkPhysicalDevice_T*</type><name>vk_device</name></field>
-            <field><type>bool</type><name>supports_present</name></field>
-            <field><type>bs_U32</type><name>api_version</name></field>
-            <field><type>int</type><name>type</name></field>
-            <field><type>bs_List</type><name>queue_families</name></field>
-            <field><type>bs_List</type><name>surface_formats</name></field>
-            <field><type>const char</type><name>name</name><size>BS_MAX_PHYSICAL_DEVICE_NAME_SIZE</size></field>
-        </structure>
-		<structure name="bs_Context">
-            <field><type>bs_Header</type><name>head</name></field>
-            <field><type>const char*</type><name>title</name></field>
-            <field><type>void*</type><name>hwnd</name></field>
             <field><type>bs_Timer</type><name>timer</name></field>
-            <field><type>bs_ivec2</type><name>dimensions</name></field>
-            <field><type>bs_Callback</type><name>resize</name></field>
-            <field><type>bs_Callback</type><name>destroy</name></field>
-            <field><type>bs_vec2</type><name>cursor</name></field>
             <field><type>double</type><name>time, time_old</name></field>
             <field><type>double</type><name>delta_time</name></field>
             <field><type>double</type><name>fixed_time</name></field>
@@ -1836,36 +1784,100 @@
             <field><type>int</type><name>last_fixed_update_times</name><size>2</size></field>
             <field><type>int</type><name>new_time_index</name></field>
             <field><type>bool</type><name>in_fixed</name></field>
-            <field><type>bool</type><name>lock_cursor_position</name></field>
-            <field><type>bool</type><name>active</name></field>
-            <field><type>bs_CursorIcon</type><name>cursor_icon</name></field>
-            <field comment="For applications with a custom title bar"><type>int</type><name>title_bar_height</name></field>
-
             <field><type>bool</type><name>paused</name></field>
             <field><type>bool</type><name>advance</name></field>
 
-			<field><type>struct VkSurfaceKHR_T*</type><name>surface</name></field>
+			<field><type>bs_String*</type><name>executable</name></field>
+            <field><type>bs_String*</type><name>cwd</name></field>
+            <field><type>bs_String*</type><name>appdata</name></field>
+            <field><type>bs_String*</type><name>log</name></field>
+			
+            <structure instance="* descriptor_lookup">
+                <field><type>int*</type><name>bindings</name></field>
+                <field><type>int</type><name>bind_set</name></field>
+            </structure>
+
+            <structure instance=" extensions">
+                <field><type>bs_SurfaceType</type><name>surface_type</name></field>
+            </structure>
+
+            <field><type>int</type><name>max_frames_in_flight</name></field>
+
             <field><type>bs_PhysicalDevice*</type><name>physical_device</name></field>
             <field><type>bs_QueueFamily*</type><name>queue_family</name></field>
+
+            <field><type>struct VkDescriptorSet_T*</type><name>sets</name><size>BS_MAX_NUM_BIND_SETS</size></field>
+            <field><type>struct VkDescriptorSetLayout_T*</type><name>layouts</name><size>BS_MAX_NUM_BIND_SETS</size></field>
+            <field><type>struct VkInstance_T*</type><name>instance</name></field>
+            <field><type>struct VkDevice_T*</type><name>device</name></field>
+        </structure>
+        <structure name="bs_Bindings">
+            <field><type>bs_BindSet*</type><name>bs_bind_sets</name></field>
+            <field><type>int</type><name>bs_bind_sets_count</name></field>
+        </structure>
+        <structure name="bs_Config">
+            <field><type>bs_List</type><name>attributes</name></field>
+        </structure>
+        <structure name="bs_QueueFamily">
+            <field><type>bool</type><name>supports_present</name></field>
+            <field><type>bs_U32</type><name>queue_flags</name></field>
+            <field><type>bs_U32</type><name>queue_count</name></field>
+            <field><type>bs_U32</type><name>index</name></field>
+        </structure>
+        <structure name="bs_SurfaceFormat">
+            <field><type>bs_Format</type><name>format</name></field>
+            <field><type>bs_ColorSpace</type><name>color_space</name></field>
+        </structure>
+        <structure name="bs_PhysicalDevice">
+            <field><type>struct VkPhysicalDevice_T*</type><name>vk_device</name></field>
+            <field><type>bool</type><name>supports_present</name></field>
+            <field><type>bs_U32</type><name>api_version</name></field>
+            <field><type>int</type><name>type</name></field>
+            <field><type>bs_List</type><name>queue_families</name></field>
+            <field><type>bs_List</type><name>surface_formats</name></field>
+            <field><type>const char</type><name>name</name><size>BS_MAX_PHYSICAL_DEVICE_NAME_SIZE</size></field>
+        </structure>
+         <structure name="bs_Context">
+            <field><type>bs_Header</type><name>head</name></field>
+            <field><type>const char*</type><name>title</name></field>
+            <field><type>void*</type><name>hwnd</name></field>
+            <field><type>bs_Timer</type><name>timer</name></field>
+            <field><type>bs_ivec2</type><name>dimensions</name></field>
+            <field><type>bs_Callback</type><name>resize</name></field>
+            <field><type>bs_Callback</type><name>destroy</name></field>
+            <field><type>bs_Callback</type><name>tick</name></field>
+            <field><type>bs_vec2</type><name>cursor</name></field>
+			
+            <field><type>bs_CursorIcon</type><name>cursor_icon</name></field>
+            <field comment="For applications with a custom title bar"><type>int</type><name>title_bar_height</name></field>
+
+			<field><type>struct VkSurfaceKHR_T*</type><name>surface</name></field>
             <field><type>bs_SurfaceFormat</type><name>surface_format</name></field>
             <field><type>bs_PresentMode</type><name>present_mode</name></field>
 			
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>frames_in_flight</name></field>
             <field><type>int</type><name>frame</name></field>
+            <field><type>bool</type><name>active</name></field>
             <field><type>bool</type><name>resized</name></field>
             <field><type>bool</type><name>image_acquired</name></field>
             <field><type>bs_Object*</type><name>swapchain_image</name></field>
             <field><type>struct VkSwapchainKHR_T*</type><name>swapchain</name></field>
 
+            <field><type>bs_IO</type><name>io</name></field>
+			 
             <structure instance="_[]">
                 <field><type>struct VkSemaphore_T*</type><name>semaphore</name></field>
             </structure>
         </structure>
+		<structure name="bs_Scope">
+            <field><type>bs_Context*</type><name>context</name></field>
+			<field><type>bs_Queue*</type><name>queue</name></field>
+			<field><type>bs_Renderer*</type><name>renderer</name></field>
+			<field><type>int</type><name>subpass</name></field>
+        </structure>
+		
         <structure name="bs_Args">
-            <field><type>bool</type><name>send_bugs</name></field>
-            <field><type>bool</type><name>color_log</name></field>
-            <field><type>bool</type><name>use_lisk</name></field>
             <field><type>bool</type><name>use_validation_layers</name></field>
             <field><type>bool</type><name>track_changes</name></field>
         </structure>
@@ -1900,14 +1912,12 @@
     </structures>
 
 	<externs>
-		<extern><type>bs_IO</type><name>bs_io</name></extern>
 		<extern><type>bs_Instance*</type><name>bs_instance</name></extern>
 		<extern><type>bs_Bindings</type><name>bs_bind</name></extern>
 		<extern><type>bs_Config</type><name>bs_config</name></extern>
 		<extern><type>bs_Args</type><name>bs_args</name></extern>
 		<extern><type>bs_Features</type><name>bs_features</name></extern>
 		<extern><type>bs_Props</type><name>bs_props</name></extern>
-		<extern><type>bs_Context*</type><name>bs_context</name></extern>
 		<extern><type>int</type><name>bs_image_index</name></extern>
 		<extern><type>bs_List</type><name>bs_physical_devices</name></extern>
 		<extern><type>bs_Callbacks</type><name>bs_callbacks</name></extern>
@@ -1919,35 +1929,11 @@
 		<function name="bs_callbacks">
 			<return>bs_Callbacks*</return>
 		</function>
-
-		<!-- Swaps count -->
-		<function name="bs_imageSwapsCount">
-            <return>int</return>
-            <param><type>bs_Image*</type><name>image</name></param>
-        </function>
 		
-		<function name="bs_samplerSwapsCount">
-            <return>int</return>
-            <param><type>bs_Sampler*</type><name>sampler</name></param>
-        </function>
+		<function name="bs_scope">
+			<return>bs_Scope*</return>
+		</function>
 		
-		<function name="bs_bufferSwapsCount">
-            <return>int</return>
-            <param><type>bs_Buffer*</type><name>buffer</name></param>
-        </function>
-		
-		<function name="bs_queueSwapsCount">
-            <return>int</return>
-            <param><type>bs_Queue*</type><name>queue</name></param>
-        </function>
-				
-		<function name="bs_rendererSwapsCount">
-			<return>int</return>
-			<param><type>bs_Renderer*</type><name>renderer</name></param>
-        </function>
-
-		<!-- -->
-
 		<variadicStringTemplate name="bs_writeLogFile">
 			<return>void</return>
 		</variadicStringTemplate>
@@ -3259,8 +3245,6 @@
         <function name="bs_features"><return>bs_Features*</return></function>
         <function name="bs_props"><return>bs_Props*</return></function>
         <function name="bs_config"><return>bs_Config*</return></function>
-		<function name="bs_context"><return>bs_Context*</return></function>
-		<function name="bs_io"><return>bs_IO*</return></function>
         <variadicStringTemplate name="bs_system">
             <return>void</return>
         </variadicStringTemplate>
@@ -3929,22 +3913,15 @@
             <param><type>const bs_DateTime*</type><name>a</name></param>
             <param><type>const bs_DateTime*</type><name>b</name></param>
         </function>
-        <function name="bs_cursorPosition">
+        <function name="bs_windowCursorPosition">
             <return>bs_vec2</return>
+            <param><type>bs_Context*</type><name>context</name></param>
         </function>
         <function name="bs_windowPosition">
             <return>bs_ivec2</return>
         </function>
         <function name="bs_screenCursorPosition">
             <return>bs_vec2</return>
-        </function>
-        <function name="bs_lockCursorPosition">
-            <return>void</return>
-            <param><type>bool</type><name>value</name></param>
-        </function>
-        <function name="bs_disableUserInputs">
-            <return>void</return>
-            <param><type>bool</type><name>value</name></param>
         </function>
         <function name="bs_middleClick">
             <return>bool</return>
@@ -4006,11 +3983,13 @@
         </function>
         <function name="bs_resizeWindow">
             <return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
             <param><type>bs_U32</type><name>width</name></param>
             <param><type>bs_U32</type><name>height</name></param>
         </function>
         <function name="bs_moveWindow">
             <return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
             <param><type>int</type><name>x</name></param>
             <param><type>int</type><name>y</name></param>
         </function>
@@ -4021,6 +4000,7 @@
         <function name="bs_window">
             <return>bs_Result</return>
             <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>bs_Callback</type><name>tick</name></param>
             <param><type>bs_U32</type><name>width</name></param>
             <param><type>bs_U32</type><name>height</name></param>
             <param><type>const char*</type><name>title</name></param>
@@ -4030,9 +4010,12 @@
             <param><type>bs_Context*</type><name>context</name></param>
             <param nullable="true"><type>bs_PhysicalDevice*</type><name>device</name></param>
         </function>
+		<function name="bs_tickContext">
+            <return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
         <function name="bs_tick">
             <return>void</return>
-            <param><type>bs_Callback</type><name>tick</name></param>
             <param><type>bs_Callback</type><name>fixed_tick</name></param>
         </function>
         <function name="bs_exit">
@@ -4056,9 +4039,11 @@
         </function>
         <function name="bs_resolution">
             <return>bs_ivec2</return>
+            <param><type>bs_Context*</type><name>context</name></param>
         </function>
         <variadicStringTemplate name="bs_titleWindow" string="name">
             <return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
         </variadicStringTemplate>
         <function name="bs_inFixedTick">
             <return>bool</return>

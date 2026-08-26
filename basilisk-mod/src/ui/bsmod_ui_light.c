@@ -33,8 +33,8 @@
    *============================================================================*/
 
 BSMODAPI void _bsmod_instanceLightBillboards() {
-    bs_vec2 resolution = BS_IV2_TO_V2(bs_resolution());
-    bs_vec2 cursor = bs_cursorPosition();
+    bs_vec2 resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context));
+    bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
     const bs_mat4 identity = BS_MAT4_IDENTITY;
 
     for (int i = 0; i < bsgfx_count(BSGFX_TYPE_LIGHT); i++) {
@@ -143,7 +143,7 @@ BSMODAPI bool _bsmod_onAddLightTick(const bsgfx_ButtonParams* params) {
     bs_vec2 size = BS_V2(125.0, 175.0);
 
     if (!hovering && was_hovering) {
-        bs_vec2 cursor = bs_cursorPosition();
+        bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
         bs_vec2 p = { position.x - (BSMOD_CONTEXT_MENU_PADDING + 2), position.y - size.y };
 
         if (bs_rectangleVsPoint(&p, &size, &cursor)) {

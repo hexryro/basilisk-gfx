@@ -48,7 +48,7 @@ static bsgfx_Font* basilisk_querySegoeUI() {
 }
 
 void basilisk_instantiateTitleBarUI() {
-    bs_ivec2 resolution = bs_resolution();
+    bs_ivec2 resolution = bs_resolution(bs_scope()->context);
     bs_vec2 title_bar_size = { resolution.x, BASILISK_TITLE_BAR_HEIGHT };
 
     bsgfx_AtlasCache* icon_atlas_cache = $BSMOD_ATLAS_UI_icon();

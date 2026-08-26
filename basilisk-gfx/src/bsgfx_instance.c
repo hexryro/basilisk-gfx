@@ -151,7 +151,7 @@ BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int p
 		.subtypes = bs_list(sizeof(bsgfx_InstanceSubtype), 256)
 	});
 
-//	int num_swaps = (instance_types->flags & BSI_BUFFER_SWAPS_BIT) ? bs_context()->frames_in_flight : 1;
+//	int num_swaps = (instance_types->flags & BSI_BUFFER_SWAPS_BIT) ? bs_scope()->context->frames_in_flight : 1;
 //	for (int i = 0; i < num_swaps; i++) {
 //		bsgfx_InstanceTypeHeader* instance_type_header = instance_types->_[i].data;
 //		instance_type_header->instance_types[instance_type_id].allocated = max_instance_count;

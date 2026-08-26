@@ -231,8 +231,8 @@ BSMODAPI void _bsmod_onMap(bsgfx_TypeId type_id, int id) {
 
 static void _bsmod_computeFlyCamera() {
     bs_vec2 resolution = {
-        .x = (float)bs_resolution().x,
-        .y = (float)bs_resolution().y
+        .x = (float)bs_resolution(bs_scope()->context).x,
+        .y = (float)bs_resolution(bs_scope()->context).y
     };
 
     float move_speed = 0.15;
@@ -244,7 +244,7 @@ static void _bsmod_computeFlyCamera() {
     static bool rotating = false;
     static bs_vec2 last_cursor;
 
-    bs_vec2 cursor = bs_cursorPosition();
+    bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 
     if (bs_keyDown(BS_KEY_LEFT_SHIFT))
         move_speed = 0.5;
@@ -332,22 +332,7 @@ static void _bsmod_computeFlyCamera() {
 }
 
 BSMODAPI void _bsmod_onGfxRender() {
-    static bool override_camera;
-
-    if (BS_GET_BIT(bs_io()->keys, BS_KEY_TAB) && !BS_GET_BIT(bs_io()->keys_old, BS_KEY_TAB)) {
-        bs_disableUserInputs(false);
-        override_camera = !override_camera;
-
-    }
-
-    if (_bsmod_.ui_blocked)
-        bs_lockCursorPosition(false);
-
-    if (override_camera) {
-        bs_lockCursorPosition(false);
-        _bsmod_computeFlyCamera();
-        bs_disableUserInputs(true);
-    }
+    _bsmod_computeFlyCamera();
 }
 
 static void _bsmod_onLoadVariables() {
@@ -377,7 +362,7 @@ void _bsmod_loadMsdfResources() {
     result = bs_renderer(renderer, 0);
 
     if (result == BS_RESULT_OK) {
-        bs_ivec2 resolution = bs_resolution();
+        bs_ivec2 resolution = bs_resolution(bs_scope()->context);
 
         bs_Object* color = BS_IMAGE(-1, 0, 0);
         bs_Object* depth = BS_IMAGE(-1, 0, 0);
@@ -553,6 +538,8 @@ void _bsmod_loadMsdfResources();
 BSMODAPI void _bsmod_onLoad() {
     bs_Result result;
 
+    bs_Context* context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
+
     bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
 
     bs_Object* tile_batch_object = BS_BATCH(BSMOD_BATCHES, BSMOD_BATCH_TILE, 0);
@@ -571,7 +558,7 @@ BSMODAPI void _bsmod_onLoad() {
     bs_Object* renderer_object = BS_RENDERER(BSMOD_RENDERERS, BSMOD_RENDERER, BS_OBJECT_HAS_SWAPS_BIT);
     result = bs_renderer(renderer_object, 0);
 
-    bs_ivec2 resolution = bs_resolution();
+    bs_ivec2 resolution = bs_resolution(context);
     if (result == BS_RESULT_OK) {
         bs_Object* depth = BS_IMAGE(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH, 0);
         bs_Object* color = BS_IMAGE(BSMOD_IMAGES, BSMOD_IMAGE_COLOR, 0);
@@ -582,7 +569,7 @@ BSMODAPI void _bsmod_onLoad() {
         // bs_U32 subpass, bs_Image* image, bs_ImageLayout old_layout, bs_ImageLayout new_layout, bs_OutputFlags flags
         bs_output(renderer_object->renderer, (bs_Output) {
             .subpass = 0, 
-            .image = bs_context()->swapchain_image->image,
+            .image = context->swapchain_image->image,
             .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
             .store_op = BS_ATTACHMENT_STORE_OP_STORE,
             .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
@@ -623,7 +610,7 @@ BSMODAPI void _bsmod_onLoad() {
 
         bs_output(renderer_3d->renderer, (bs_Output) {
             .subpass = 0, 
-            .image = bs_context()->swapchain_image->image,
+            .image = context->swapchain_image->image,
             .load_op = BS_ATTACHMENT_LOAD_OP_LOAD,
             .store_op = BS_ATTACHMENT_STORE_OP_STORE,
             .old_layout = BS_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,

@@ -940,11 +940,11 @@ BSAPI bool _bs_fileExistsN(char* path, int path_length) {
 #endif
 }
 
-BSAPI bs_String* _bs_executablePath() { return _bs_io_.executable; }
+BSAPI bs_String* _bs_executablePath() { return _bs_instance_->executable; }
 BSAPI void _bs_findRelativePath();
 BSAPI bs_String* _bs_workingDirectory() {
-    if (!_bs_io_.cwd) _bs_findRelativePath();
-    return _bs_io_.cwd;
+    if (!_bs_instance_->cwd) _bs_findRelativePath();
+    return _bs_instance_->cwd;
 }
 
 BSAPI bs_Result _bs_setWorkingDirectoryN(char* path, int path_length) {
@@ -1357,8 +1357,8 @@ void _bs_findExecutablePaths() {
     char executable_path[MAX_PATH];
     int len = GetModuleFileName(NULL, executable_path, MAX_PATH);
 
-    _bs_io_.executable = _bs_stringN(NULL, executable_path, len);
-    char* exe_path = _bs_io_.executable->value;
+    _bs_instance_->executable = _bs_stringN(NULL, executable_path, len);
+    char* exe_path = _bs_instance_->executable->value;
 
     int i = 0;
     for (; i < len; i++) {
@@ -1374,7 +1374,7 @@ void _bs_findExecutablePaths() {
     }
 
     len -= len - i - 1;
-    _bs_io_.executable->len = len;
+    _bs_instance_->executable->len = len;
     _bs_infoF("Executable path = (\"%s\")", exe_path);
 }
 
@@ -1386,16 +1386,16 @@ BSAPI void _bs_findRelativePath() {
         return;
     }
 
-    _bs_io_.cwd = _bs_stringN(NULL, path, len);
+    _bs_instance_->cwd = _bs_stringN(NULL, path, len);
     for (int i = 0; i < len; i++) {
-        char c = _bs_io_.cwd->value[i];
-        _bs_io_.cwd->value[i] = c == '\\' ? '/' : c;
+        char c = _bs_instance_->cwd->value[i];
+        _bs_instance_->cwd->value[i] = c == '\\' ? '/' : c;
     }
 }
 
 BSAPI char* _bs_appdataPath() {
-    if (_bs_io_.appdata)
-        return _bs_io_.appdata->value;
+    if (_bs_instance_->appdata)
+        return _bs_instance_->appdata->value;
 
     PWSTR wpath = NULL;
     HRESULT result = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &wpath);
@@ -1406,13 +1406,13 @@ BSAPI char* _bs_appdataPath() {
     }
 
     int len = lstrlenW(wpath);
-    _bs_io_.appdata = _bs_stringN(_bs_io_.appdata, NULL, len);
-    _bs_unwiden(wpath, _bs_io_.appdata->value, len + 1);
-    _bs_io_.appdata->len = len;
+    _bs_instance_->appdata = _bs_stringN(_bs_instance_->appdata, NULL, len);
+    _bs_unwiden(wpath, _bs_instance_->appdata->value, len + 1);
+    _bs_instance_->appdata->len = len;
 
-    _bs_replaceCharOccurrences(_bs_io_.appdata->value, len, '\\', '/');
+    _bs_replaceCharOccurrences(_bs_instance_->appdata->value, len, '\\', '/');
 
-    return _bs_io_.appdata->value;
+    return _bs_instance_->appdata->value;
 }
 
 #endif _WIN32

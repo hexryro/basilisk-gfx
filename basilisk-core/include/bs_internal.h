@@ -90,4 +90,7 @@ BSAPI void _bs_writeLogger(
 
 BSAPI struct VkCommandBuffer_T* _bsi_fetchCommands(bs_Queue* queue);
 
+extern _Thread_local bs_Scope _bs_scope_;
+
+
 #endif

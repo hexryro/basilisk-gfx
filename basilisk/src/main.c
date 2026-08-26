@@ -93,6 +93,8 @@ static void onModTick() {
 }
 
 static void onIni() {
+	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
+
 	bsmod_onIni();
 }
 

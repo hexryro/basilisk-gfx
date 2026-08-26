@@ -323,12 +323,9 @@ BSAPI bs_Result _bs_loadPackageN(int* out, char* path, int path_length) {
     BS_VALIDATE(id < ((bs_ObjectSource*)_bs_fetchUnit(_bs_objectSources(), source_id))->ids_count, _return,)
 
 BSAPI int _bs_configureSource(bs_ObjectType type, int count, const char** names) {
-    if (count == 0)
-        return -1;
-
     bs_ObjectSource source = {
         .type = type,
-        .ids = _bs_calloc(count, sizeof(struct bs_ObjectId)),
+        .ids = count > 0 ? _bs_calloc(count, sizeof(struct bs_ObjectId)) : NULL,
         .ids_count = count,
     };
 
@@ -423,10 +420,10 @@ static inline void _bs_logObjectCreated(bs_U32 source_id, bs_U32 id) {
     bs_Object* object = source->ids[id].object;
     const char* object_type_name = _bs_objectTypeName(source->type);
 
-    if (_bs_args_.color_log)
+    //if (_bs_args_.color_log)
         _bs_infoF(BS_PRINT_GREEN "+" BS_PRINT_RESET " (%d) %s " BS_PRINT_CYAN "%s" BS_PRINT_RESET, id, object_type_name, source->ids[id].name);
-    else
-        _bs_infoF("+ (%d) %s %s", id, object_type_name, source->ids[id].name);
+    //else
+    //    _bs_infoF("+ (%d) %s %s", id, object_type_name, source->ids[id].name);
 }
 
 static inline void _bs_logObjectUpdated(bs_U32 source_id, bs_U32 id) {
@@ -435,10 +432,10 @@ static inline void _bs_logObjectUpdated(bs_U32 source_id, bs_U32 id) {
     bs_Object* object = source->ids[id].object;
     const char* object_type_name = _bs_objectTypeName(source->type);
 
-    if (_bs_args_.color_log)
+    //if (_bs_args_.color_log)
         _bs_infoF(BS_PRINT_YELLOW "/" BS_PRINT_RESET  " (%d) %s " BS_PRINT_CYAN "%s" BS_PRINT_RESET, id, object_type_name, source->ids[id].name);
-    else
-        _bs_infoF("/ (%d) %s %s", id, object_type_name, source->ids[id].name);
+    //else
+    //    _bs_infoF("/ (%d) %s %s", id, object_type_name, source->ids[id].name);
 }
 
 static inline void _bs_logObjectUnchanged(bs_U32 source_id, bs_U32 id) {
@@ -529,10 +526,12 @@ BSAPI bs_Object* _val_bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t
 
 BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t flexible_array_size, int flexible_count, bs_U32 flags, bs_ObjectType object_type) {
     bs_Object* result;
+
     if (source_id == BS_U32_MAX) {
         result = _bs_allocateObject(size, flexible_array_size, flexible_count, flags);
         result->head->type = object_type;
         result->head->source_id = source_id;
+        result->head->swaps_count = flexible_count;
         return result;
     }
 
@@ -556,6 +555,7 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
         result->head->type = object_type;
         result->head->id = id;
         result->head->source_id = source_id;
+        result->head->swaps_count = flexible_count;
 
         _bs_logObjectCreated(source_id, id);
 
@@ -568,11 +568,13 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
 BSAPI void _bs_resetObject(bs_Header* head, size_t size) {
     int id = head->id;
     int source_id = head->source_id;
+    bs_U32 swaps_count = head->swaps_count;
     bs_ObjectType type = head->type;
     memset(head, 0, size);
     head->source_id = source_id;
     head->id = id;
     head->type = type;
+    head->swaps_count = swaps_count;
 }
 
  /**
@@ -580,7 +582,7 @@ BSAPI void _bs_resetObject(bs_Header* head, size_t size) {
   */
 
 BSAPI void _bs_nameImage(bs_Object* object, const char* name) {
-    for (int i = 0; i < _bs_imageSwapsCount(object->image); i++) {
+    for (int i = 0; i < object->image->head.swaps_count; i++) {
         bsi_nameHandleF(object->image->_[i].vk_image, VK_OBJECT_TYPE_IMAGE, BS_PRINT_COLOR("%s", BS_PRINT_BLUE_BRIGHT), name);
         bsi_nameHandleF(object->image->_[i].vk_image_view, VK_OBJECT_TYPE_IMAGE_VIEW, BS_PRINT_COLOR("%s (View)", BS_PRINT_BLUE_BRIGHT), name);
         bsi_nameHandleF(object->image->_[i].vk_memory, VK_OBJECT_TYPE_DEVICE_MEMORY, BS_PRINT_COLOR("%s (Memory)", BS_PRINT_BLUE_BRIGHT), name);
@@ -589,7 +591,7 @@ BSAPI void _bs_nameImage(bs_Object* object, const char* name) {
 
 BSAPI void _bs_nameSampler(bs_Object* object, const char* name) {
     int name_length = strlen(name);
-    for (int i = 0; i < _bs_samplerSwapsCount(object->sampler); i++) {
+    for (int i = 0; i < object->sampler->head.swaps_count; i++) {
         bsi_nameHandleN(object->sampler->_[i].vk_sampler, VK_OBJECT_TYPE_SAMPLER, name, name_length);
     }
 }

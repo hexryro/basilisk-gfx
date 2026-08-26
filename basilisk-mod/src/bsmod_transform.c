@@ -64,7 +64,7 @@ BSMODAPI void _bsmod_snapPrimitive() {
 	/*
 	static bs_vec2 cursor_start;
 
-	bs_vec2 cursor = bs_cursorPosition();
+	bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 	bs_vec2 temp;
 	bs_v2MulS(&poser()->world_camera.position, 4.0, &temp); // what is 4 pixel scale maybe?
 	bs_v2Add(&temp, &cursor, &cursor);
@@ -178,7 +178,7 @@ static inline bs_vec3 _bsmod_axisScreenPosition(bs_vec3 position) {
 }
 
 static inline bs_vec3 _bsmod_worldToScreenCoords(bs_vec3 world_coords, float width) {
-	bs_ivec2 resolution = bs_resolution();
+	bs_ivec2 resolution = bs_resolution(bs_scope()->context);
 	bs_mat4 camera = poser()->camera.result;
 
 	bs_vec4 px;
@@ -336,7 +336,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 
 	static int last_axis = -1;
 	static bs_vec2 last_cursor, pressed_cursor;
-	bs_vec2 cursor = bs_cursorPosition();
+	bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 
 	static struct {
 		float rotation;
@@ -351,7 +351,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 		allocated_rotations = _bsmod_.selected_ids.capacity;
 	}
 
-	bs_ivec2 resolution = bs_resolution();
+	bs_ivec2 resolution = bs_resolution(bs_scope()->context);
 
    /**
     Detect clicked axis

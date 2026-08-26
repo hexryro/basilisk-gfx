@@ -274,7 +274,7 @@ BSMODAPI void _bsmod_instanceBackgroundMenu(bs_vec3 position, bs_vec2 dimensions
 
 static void _bsmod_instanceDraggingIcon() {
     bsmod_DraggingParams params = { 0 };
-    bs_vec2 cursor = bs_cursorPosition();
+    bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 
     bs_Atlas* atlas_ui = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_UI)->atlas;
     bsgfx_AtlasCache* cache = $BSMOD_ATLAS_UI_prohibition();
@@ -346,7 +346,7 @@ BSMODAPI void _bsmod_instanceUI() {
 
     if (bs_rightClickUpOnce()) {
         right_clicked = true;
-        position = bs_cursorPosition();
+        position = bs_windowCursorPosition(bs_scope()->context);
     }
 
     if (bs_leftClickUpOnce() || bs_middleClickOnce())
@@ -374,7 +374,7 @@ BSMODAPI void _bsmod_instanceUI() {
         for (int i = BS_KEY_2; i < BS_KEY_9; i++) {
             if (bs_keyDownOnce(i)) {
                 _bsmod_instance_grid_menu_ = false;
-                bs_disableUserInputs(false);
+                //bs_disableUserInputs(false);
             }
         }
     }
@@ -383,10 +383,10 @@ BSMODAPI void _bsmod_instanceUI() {
         _bsmod_instance_grid_menu_ = false;
 
     if (_bsmod_instance_grid_menu_) {
-        bs_disableUserInputs(true);
+       // bs_disableUserInputs(true);
 
         bs_vec2 dimensions = { 1600.0, 900.0 };
-        bs_ivec2 resolution = bs_resolution();
+        bs_ivec2 resolution = bs_resolution(bs_scope()->context);
         bs_vec3 center = {
             (int)((resolution.x - dimensions.x) / 2.0),
             (int)((resolution.y + dimensions.y) / 2.0),

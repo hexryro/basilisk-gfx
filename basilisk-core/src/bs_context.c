@@ -49,24 +49,24 @@ static void _bs_createSurface() {
         VkWin32SurfaceCreateInfoKHR ci = {
             .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
             .hinstance = GetModuleHandle(0),
-            .hwnd = _bs_context_->hwnd,
+            .hwnd = _bs_scope_.context->hwnd,
         };
 
-        result = vkCreateWin32SurfaceKHR(_bs_instance_->instance, &ci, NULL, &_bs_context_->surface);
+        result = vkCreateWin32SurfaceKHR(_bs_instance_->instance, &ci, NULL, &_bs_scope_.context->surface);
     }
     else if (_bs_instance_->extensions.surface_type == BS_SURFACE_TYPE_HEADLESS) {
         VkHeadlessSurfaceCreateInfoEXT ci = {
             .sType = VK_STRUCTURE_TYPE_HEADLESS_SURFACE_CREATE_INFO_EXT,
         };
 
-        result = vkCreateHeadlessSurfaceEXT(_bs_instance_->instance, &ci, NULL, &_bs_context_->surface);
+        result = vkCreateHeadlessSurfaceEXT(_bs_instance_->instance, &ci, NULL, &_bs_scope_.context->surface);
     }
     else {
         _bs_warnF("Surface type %d is not supported", _bs_instance_->extensions.surface_type);
     }
 
     if (result != VK_SUCCESS) {
-        _bs_warnF("Failed to create surface for window \"%s\" (Vulkan result = %d)", _bs_context_->title, result);
+        _bs_warnF("Failed to create surface for window \"%s\" (Vulkan result = %d)", _bs_scope_.context->title, result);
     }
 }
 
@@ -80,9 +80,8 @@ BSAPI void _bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_ha
 
         if (data)
             memcpy(destination, &data, procedures[i].size);
-        else if (procedures[i].is_required) {
+        else if (procedures[i].is_required)
             _bs_warnF("Failed to query procedure \"%s\"", procedures[i].func);
-        }
 
         destination += procedures[i].size;
     }
@@ -135,7 +134,7 @@ static void _bs_logPhysicalDeviceInfo(bs_PhysicalDevice* physical_device) {
     }
 }
 
-static void _bs_readQueueFamilies(bs_PhysicalDevice* physical_device) {
+static void _bs_readQueueFamilies(bs_PhysicalDevice* physical_device, VkSurfaceKHR surface) {
     VkResult result;
 
     bs_U32 families_count = 0;
@@ -152,12 +151,15 @@ static void _bs_readQueueFamilies(bs_PhysicalDevice* physical_device) {
         bs_QueueFamily* queue_family = _bs_pushBack(&physical_device->queue_families, NULL);
 
         VkBool32 supports_present = false;
-        result = vkGetPhysicalDeviceSurfaceSupportKHR(physical_device->vk_device, i, _bs_context_->surface, &supports_present);
-        if (result != VK_SUCCESS) {
-            BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceSupportKHR", result, "");
-            continue;
+        if (surface != VK_NULL_HANDLE) {
+            result = vkGetPhysicalDeviceSurfaceSupportKHR(physical_device->vk_device, i, surface, &supports_present);
+            if (result != VK_SUCCESS) {
+                BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceSupportKHR", result, "");
+                continue;
+            }
         }
 
+        queue_family->index = i;
         queue_family->queue_flags = queue_families[i].queueFlags;
         queue_family->queue_count = queue_families[i].queueCount;
         queue_family->supports_present = supports_present;
@@ -167,11 +169,11 @@ static void _bs_readQueueFamilies(bs_PhysicalDevice* physical_device) {
     }
 }
 
-static void _bs_readSurfaceFormats(bs_PhysicalDevice* physical_device) {
+static void _bs_readSurfaceFormats(bs_PhysicalDevice* physical_device, VkSurfaceKHR surface) {
     VkResult result;
 
     bs_U32 surface_formats_count;
-    result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device->vk_device, _bs_context_->surface, &surface_formats_count, NULL);
+    result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device->vk_device, surface, &surface_formats_count, NULL);
     if (result != VK_SUCCESS) {
         BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR", result, "");
         return;
@@ -181,7 +183,7 @@ static void _bs_readSurfaceFormats(bs_PhysicalDevice* physical_device) {
         return;
 
     VkSurfaceFormatKHR* formats = bs_alloca(surface_formats_count * sizeof(VkSurfaceFormatKHR));
-    result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device->vk_device, _bs_context_->surface, &surface_formats_count, formats);
+    result = vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device->vk_device, surface, &surface_formats_count, formats);
     if (result != VK_SUCCESS) {
         BS_CRITICAL_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR", result, "");
         return;
@@ -203,7 +205,7 @@ static void _bs_readSurfaceFormats(bs_PhysicalDevice* physical_device) {
 // 
 // }
 
-static void _bs_preparePhysicalDevice() {
+static void _bs_preparePhysicalDevice(bs_Context* context) {
     VkResult result;
 
     bs_U32 num_devices = 0;
@@ -220,6 +222,8 @@ static void _bs_preparePhysicalDevice() {
 
     assert(BS_MAX_PHYSICAL_DEVICE_NAME_SIZE == VK_MAX_PHYSICAL_DEVICE_NAME_SIZE);
 
+    VkSurfaceKHR surface = context ? context->surface : VK_NULL_HANDLE;
+    
     int chosen = 0;
     for(int i = 0; i < num_devices; i++) {
         bs_PhysicalDevice* physical_device = _bs_pushBack(&_bs_physical_devices_, NULL);
@@ -233,11 +237,11 @@ static void _bs_preparePhysicalDevice() {
         physical_device->api_version = props.apiVersion;
         memcpy(physical_device->name, props.deviceName, BS_MAX_PHYSICAL_DEVICE_NAME_SIZE);
 
-        _bs_readQueueFamilies(physical_device);
-        _bs_readSurfaceFormats(physical_device);
+        _bs_readQueueFamilies(physical_device, surface);
+        _bs_readSurfaceFormats(physical_device, surface);
 
        // VkSurfaceCapabilitiesKHR capabilities;
-       // vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _bs_context_->surface, &capabilities);
+       // vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _bs_scope_.context->surface, &capabilities);
 
     }
 
@@ -268,8 +272,7 @@ static void _bs_queryPhysicalDevice(VkQueueFlags required_flags, bool supports_p
     _bs_criticalN(BS_CONSTANT_STRING("No GPU with graphics and present support was found"));
 }
 
-
-static void _bs_prepareLogicalDevice() {
+static void _bs_prepareLogicalDevice(bs_PhysicalDevice* physical_device) {
     VkResult vk_result;
 
     // todo shouldnt this all be in the physical device creation
@@ -284,7 +287,7 @@ static void _bs_prepareLogicalDevice() {
     VkPhysicalDeviceVulkan12Features features12 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, .pNext = &dynamic_rendering_features };
     VkPhysicalDeviceFeatures2 features2 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, .pNext = &features12 };
     VkPhysicalDeviceFeatures* features = &features2.features;
-    vkGetPhysicalDeviceFeatures2(_bs_context_->physical_device->vk_device, &features2);
+    vkGetPhysicalDeviceFeatures2(physical_device->vk_device, &features2);
 
    /**
     NVIDIA Aftermath
@@ -327,13 +330,13 @@ static void _bs_prepareLogicalDevice() {
     bool supported_extensions[sizeof(extensions) / sizeof(const char*)] = { 0 };
 
     bs_U32 total_extensions_count = 0;
-    vk_result = vkEnumerateDeviceExtensionProperties(_bs_context_->physical_device->vk_device, NULL, &total_extensions_count, NULL);
+    vk_result = vkEnumerateDeviceExtensionProperties(physical_device->vk_device, NULL, &total_extensions_count, NULL);
     if (vk_result != VK_SUCCESS) {
         BS_WARN_VULKAN_ERROR("vkEnumerateDeviceExtensionProperties", vk_result, "");
     }
 
     VkExtensionProperties* props = _bs_calloc(total_extensions_count, sizeof(VkExtensionProperties));
-    vk_result = vkEnumerateDeviceExtensionProperties(_bs_context_->physical_device->vk_device, NULL, &total_extensions_count, props);
+    vk_result = vkEnumerateDeviceExtensionProperties(physical_device->vk_device, NULL, &total_extensions_count, props);
     if (vk_result != VK_SUCCESS) {
         BS_WARN_VULKAN_ERROR("vkEnumerateDeviceExtensionProperties", vk_result, "");
     }
@@ -378,7 +381,7 @@ static void _bs_prepareLogicalDevice() {
        // .pNext = &ray_tracing_pipeline_properties
     };
 
-    vkGetPhysicalDeviceProperties2(_bs_context_->physical_device->vk_device, &device_properties);
+    vkGetPhysicalDeviceProperties2(physical_device->vk_device, &device_properties);
 
     _bs_props_.shader_group_handle_size = ray_tracing_pipeline_properties.shaderGroupHandleSize;
     _bs_props_.shader_group_base_alignment = ray_tracing_pipeline_properties.shaderGroupBaseAlignment;
@@ -389,7 +392,7 @@ static void _bs_prepareLogicalDevice() {
     float queue_priority = 1.0;
     VkDeviceQueueCreateInfo queue_ci = {
         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-        .queueFamilyIndex = _bs_queueFamily(BS_QUEUE_GRAPHICS_BIT),
+        .queueFamilyIndex = _bs_instance_->queue_family->index,
         .queueCount = 2,
         .pQueuePriorities = &queue_priority,
     };
@@ -406,26 +409,13 @@ static void _bs_prepareLogicalDevice() {
         //.enabledLayerCount = _bs_args_.use_validation_layers ? sizeof(validation_layers) / sizeof(const char*) : 0,
     };
 
-    vk_result = vkCreateDevice(_bs_context_->physical_device->vk_device, &ci, NULL, &_bs_instance_->device);
+    vk_result = vkCreateDevice(physical_device->vk_device, &ci, NULL, &_bs_instance_->device);
     if (vk_result != VK_SUCCESS) {
         BS_CRITICAL_VULKAN_ERROR("vkCreateDevice", vk_result, "");
     }
 
     //_bs_nameHandlef((bs_U64)_bs_instance->_.graphics_queue, VK_OBJECT_TYPE_QUEUE, "graphics queue");
     //_bs_nameHandlef((bs_U64)_bs_instance->_.compute_queue, VK_OBJECT_TYPE_QUEUE, "compute queue");
-}
-
-static void _bs_prepareCommands() {
-    VkCommandPoolCreateInfo pool_ci = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-        .queueFamilyIndex = _bs_queueFamily(BS_QUEUE_GRAPHICS_BIT),
-    };
-
-    VkResult result = vkCreateCommandPool(_bs_instance_->device, &pool_ci, NULL, &_bs_instance_->command_pool);
-    if (result != VK_SUCCESS) {
-        BS_CRITICAL_VULKAN_ERROR("vkCreateCommandPool", result, "");
-    }
 }
 
 
@@ -439,11 +429,11 @@ static void _bs_querySwapchainFormat(VkFormat candidates[], int candidates_count
     for (int i = 0; i < candidates_count; i++) {
         VkFormat candidate = candidates[i];
 
-        for (int j = 0; j < _bs_context_->physical_device->surface_formats.count; j++) {
-            bs_SurfaceFormat* surface_format = bs_fetchUnit(&_bs_context_->physical_device->surface_formats, j);
+        for (int j = 0; j < _bs_instance_->physical_device->surface_formats.count; j++) {
+            bs_SurfaceFormat* surface_format = bs_fetchUnit(&_bs_instance_->physical_device->surface_formats, j);
 
             if ((bs_Format)candidate == surface_format->format) {
-                _bs_context_->surface_format = *surface_format;
+                _bs_scope_.context->surface_format = *surface_format;
                 return;
             }
         }
@@ -455,9 +445,9 @@ static void _bs_querySwapchainFormat(VkFormat candidates[], int candidates_count
 static void _bs_querySwapchainMode(VkPresentModeKHR candidates[], int candidates_count) {
     bs_U32 num_modes = 0;
     VkPresentModeKHR result = 0;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(_bs_context_->physical_device->vk_device, _bs_context_->surface, &num_modes, NULL);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(_bs_instance_->physical_device->vk_device, _bs_scope_.context->surface, &num_modes, NULL);
     VkPresentModeKHR* modes = bs_alloca(num_modes * sizeof(VkPresentModeKHR));
-    vkGetPhysicalDeviceSurfacePresentModesKHR(_bs_context_->physical_device->vk_device, _bs_context_->surface, &num_modes, modes);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(_bs_instance_->physical_device->vk_device, _bs_scope_.context->surface, &num_modes, modes);
 
     for (int i = 0; i < candidates_count; i++) {
         VkPresentModeKHR candidate = candidates[i];
@@ -465,7 +455,7 @@ static void _bs_querySwapchainMode(VkPresentModeKHR candidates[], int candidates
         for (int j = 0; j < num_modes; j++) {
             VkPresentModeKHR mode = modes[j];
             if (candidate == mode) {
-                _bs_context_->present_mode = (bs_PresentMode)mode;
+                _bs_scope_.context->present_mode = (bs_PresentMode)mode;
                 return;
             }
         }
@@ -500,11 +490,11 @@ static void _bs_prepareSwapchain() {
     _bs_querySwapchainFormat(formats, sizeof(formats) / sizeof(*formats));
 
     VkSurfaceCapabilitiesKHR capabilities;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_bs_context_->physical_device->vk_device, _bs_context_->surface, &capabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_bs_instance_->physical_device->vk_device, _bs_scope_.context->surface, &capabilities);
 
     const bool same_family = true; // TODO: this shouldn't always be true
 
-    _bs_context_->swapchain_image = _bs_context_->swapchain_image ? _bs_context_->swapchain_image : NULL;
+    _bs_scope_.context->swapchain_image = _bs_scope_.context->swapchain_image ? _bs_scope_.context->swapchain_image : NULL;
 
     bs_ivec2 resolution = { capabilities.minImageExtent.width, capabilities.minImageExtent.height };
     bs_Image image = {
@@ -512,21 +502,23 @@ static void _bs_prepareSwapchain() {
             .type = BS_OBJECT_IMAGE
         },
         .flags = BS_IMAGE_SWAPS_BIT,
-        .format = _bs_context_->surface_format.format,
+        .format = _bs_scope_.context->surface_format.format,
         .dim = resolution,
     };
 
     const int frames_in_flight_target = 2;
     const int frames_in_flight_max = 3;
 
-    _bs_context_->frames_in_flight = bs_clamp(frames_in_flight_target, capabilities.minImageCount, frames_in_flight_max);
+    _bs_scope_.context->frames_in_flight = bs_clamp(frames_in_flight_target, capabilities.minImageCount, frames_in_flight_max);
+
+    _bs_instance_->max_frames_in_flight = BS_MAX(_bs_instance_->max_frames_in_flight, _bs_scope_.context->frames_in_flight);
 
     VkSwapchainCreateInfoKHR swapchain_ci = {
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-        .surface = _bs_context_->surface,
+        .surface = _bs_scope_.context->surface,
         .imageArrayLayers = 1,
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-        .minImageCount = _bs_context_->frames_in_flight,
+        .minImageCount = _bs_scope_.context->frames_in_flight,
         .imageExtent = { resolution.x, resolution.y },
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
         .imageSharingMode = same_family ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT,
@@ -535,14 +527,14 @@ static void _bs_prepareSwapchain() {
         .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
         .clipped = VK_TRUE,
         .preTransform = capabilities.currentTransform,
-        .presentMode = (VkPresentModeKHR)_bs_context_->present_mode,
-        .imageFormat = (VkFormat)_bs_context_->surface_format.format,
-        .imageColorSpace = (VkColorSpaceKHR)_bs_context_->surface_format.color_space,
+        .presentMode = (VkPresentModeKHR)_bs_scope_.context->present_mode,
+        .imageFormat = (VkFormat)_bs_scope_.context->surface_format.format,
+        .imageColorSpace = (VkColorSpaceKHR)_bs_scope_.context->surface_format.color_space,
     };
 
-    result = vkCreateSwapchainKHR(_bs_instance_->device, &swapchain_ci, NULL, &_bs_context_->swapchain);
+    result = vkCreateSwapchainKHR(_bs_instance_->device, &swapchain_ci, NULL, &_bs_scope_.context->swapchain);
     if (result != VK_SUCCESS) {
-        _bs_warnF("Failed to create swapchain for window \"%s\"", _bs_context_->title);
+        _bs_warnF("Failed to create swapchain for window \"%s\"", _bs_scope_.context->title);
         return;
     }
 
@@ -550,33 +542,33 @@ static void _bs_prepareSwapchain() {
      Swapchain images
      */
     VkImage images[3];
-    vkGetSwapchainImagesKHR(_bs_instance_->device, _bs_context_->swapchain, &_bs_context_->frames_in_flight, images);
-    _bs_infoF("Swapchain\n  Format: %d\n  Mode: %d\n  Images: %d", swapchain_ci.imageFormat, swapchain_ci.presentMode, _bs_context_->frames_in_flight);
+    vkGetSwapchainImagesKHR(_bs_instance_->device, _bs_scope_.context->swapchain, &_bs_scope_.context->frames_in_flight, images);
+    _bs_infoF("Swapchain\n  Format: %d\n  Mode: %d\n  Images: %d", swapchain_ci.imageFormat, swapchain_ci.presentMode, _bs_scope_.context->frames_in_flight);
 
-    if (_bs_context_->swapchain_image == NULL)
-        _bs_context_->swapchain_image = BS_OBJECT(bs_Image, -1, 0, _bs_context_->frames_in_flight, BS_OBJECT_HAS_SWAPS_BIT, BS_OBJECT_IMAGE);
+    if (_bs_scope_.context->swapchain_image == NULL)
+        _bs_scope_.context->swapchain_image = BS_OBJECT(bs_Image, -1, 0, _bs_scope_.context->frames_in_flight, BS_OBJECT_HAS_SWAPS_BIT, BS_OBJECT_IMAGE);
 
-    memcpy(_bs_context_->swapchain_image->image, &image, sizeof(image));
+    memcpy(_bs_scope_.context->swapchain_image->image, &image, sizeof(image));
 
     /**
      Swapchain image views
      */
-    for (int i = 0; i < _bs_context_->frames_in_flight; i++) {
-        _bs_context_->swapchain_image->image->_[i].vk_image = images[i];
+    for (int i = 0; i < _bs_scope_.context->frames_in_flight; i++) {
+        _bs_scope_.context->swapchain_image->image->_[i].vk_image = images[i];
 
         VkImageViewCreateInfo image_view_ci = {
             .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-            .image = _bs_context_->swapchain_image->image->_[i].vk_image,
+            .image = _bs_scope_.context->swapchain_image->image->_[i].vk_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
-            .format = (VkFormat)_bs_context_->surface_format.format,
+            .format = (VkFormat)_bs_scope_.context->surface_format.format,
             .subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .subresourceRange.levelCount = 1,
             .subresourceRange.layerCount = 1,
         };
 
-        result = vkCreateImageView(_bs_instance_->device, &image_view_ci, NULL, &_bs_context_->swapchain_image->image->_[i].vk_image_view);
+        result = vkCreateImageView(_bs_instance_->device, &image_view_ci, NULL, &_bs_scope_.context->swapchain_image->image->_[i].vk_image_view);
         if (result != VK_SUCCESS) {
-            _bs_warnF("Failed to create swapchain image view for window \"%s\"", _bs_context_->title);
+            _bs_warnF("Failed to create swapchain image view for window \"%s\"", _bs_scope_.context->title);
         }
     }
 
@@ -587,10 +579,10 @@ static void _bs_prepareSwapchain() {
         .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
     };
 
-    for (int i = 0; i < _bs_context_->frames_in_flight; i++) {
-        result = vkCreateSemaphore(_bs_instance_->device, &semaphore_ci, NULL, &_bs_context_->_[i].semaphore);
+    for (int i = 0; i < _bs_scope_.context->frames_in_flight; i++) {
+        result = vkCreateSemaphore(_bs_instance_->device, &semaphore_ci, NULL, &_bs_scope_.context->_[i].semaphore);
         if (result != VK_SUCCESS) {
-            _bs_warnF("Failed to create swapchain semaphore for window \"%s\"", _bs_context_->title);
+            _bs_warnF("Failed to create swapchain semaphore for window \"%s\"", _bs_scope_.context->title);
         }
     }
 }
@@ -674,8 +666,8 @@ BSAPI bool _bs_isLaterThan(const bs_DateTime* a, const bs_DateTime* b) {
 BSAPI void _bs_setCursor(bs_CursorIcon icon) {
 	_bs_warnF("_bs_setCursor has not been implemented yet");
 	/*
-	if (_bs_context_->cursor_icons[icon].handle == NULL)
-		_bs_context_->cursor_icons[icon].handle = LoadCursor(NULL, _bs_wnd.cursor_icons[icon].id);
+	if (_bs_scope_.context->cursor_icons[icon].handle == NULL)
+		_bs_scope_.context->cursor_icons[icon].handle = LoadCursor(NULL, _bs_wnd.cursor_icons[icon].id);
 
 	if (_bs_wnd.cursor_icon == icon)
 		return;
@@ -684,41 +676,43 @@ BSAPI void _bs_setCursor(bs_CursorIcon icon) {
 	*/
 }
 
-BSAPI void _bs_resizeWindow(bs_U32 width, bs_U32 height) {
+BSAPI void _bs_resizeWindow(bs_Context* context, bs_U32 width, bs_U32 height) {
 //	bsi_resizeObjects();
 }
 
-BSAPI void _bs_maximizeWindow() {
+/*
+BSAPI void _bs_maximizeWindow(bs_Context* context) {
 #ifdef _WIN32
-	ShowWindow(_bs_context_->hwnd, SW_SHOWMAXIMIZED);
+	ShowWindow(context->hwnd, SW_SHOWMAXIMIZED);
 #else
 	_bs_warnF("_bs_maximizeWindow has not been implemented for this OS yet");
 #endif
 }
 
-BSAPI void _bs_minimizeWindow() {
+BSAPI void _bs_minimizeWindow(bs_Context* context) {
 #ifdef _WIN32
-	ShowWindow(_bs_context_->hwnd, SW_SHOWMINIMIZED);
+	ShowWindow(context->hwnd, SW_SHOWMINIMIZED);
 #else
 	_bs_warnF("_bs_minimizeWindow has not been implemented for this OS yet");
 #endif
 }
+*/
 
 BSAPI void _bs_exit() {
     _bs_instance_->alive = false;
 }
 
 BSAPI void _bs_pause() {
-    _bs_context_->paused = !_bs_context_->paused;
+    _bs_instance_->paused = !_bs_instance_->paused;
 }
 
 BSAPI void _val_bs_advance() {
-    BS_VALIDATE(_bs_context_->paused == true,,);
+    BS_VALIDATE(_bs_instance_->paused == true,,);
     _bs_advance();
 }
 
 BSAPI void _bs_advance() {
-    _bs_context_->advance = true;
+    _bs_instance_->advance = true;
 }
 
 BSAPI double _bs_deltaTime() {
@@ -726,34 +720,34 @@ BSAPI double _bs_deltaTime() {
 //	if (_bs_wnd.delta_time == 0.0)
 //		_bs_throwBasiliskF(BSX_GENERAL, "Delta time is 0.0"); // some bug is ruining my life
 //#endif
-	return _bs_context_->delta_time;
+	return _bs_instance_->delta_time;
 }
 
 BSAPI double _bs_elapsedTime() {
-    return _bs_context_->time;
+    return _bs_instance_->time;
 }
 
-BSAPI bs_ivec2 _bs_resolution() {
-    return _bs_context_->swapchain_image->image->dim;
+BSAPI bs_ivec2 _bs_resolution(bs_Context* context) {
+    return context->swapchain_image->image->dim;
 }
 
-BSAPI bs_vec2 _bs_cursorPosition() {
-    bs_vec2 p = _bs_context_->cursor;
-    p.y = _bs_context_->swapchain_image->image->dim.y - p.y;
+BSAPI bs_vec2 _bs_windowCursorPosition(bs_Context* context) {
+    bs_vec2 p = context->cursor;
+    p.y = context->swapchain_image->image->dim.y - p.y;
 
     return p;
 
-    bs_vec2 dim = { _bs_context_->swapchain_image->image->dim.x, _bs_context_->swapchain_image->image->dim.y };
+    bs_vec2 dim = { context->swapchain_image->image->dim.x, context->swapchain_image->image->dim.y };
     bs_vec2 pos;
 
-    bs_v2Div(&_bs_context_->cursor, &dim, &pos);
+    bs_v2Div(&context->cursor, &dim, &pos);
 	return BS_V2(pos.x, 1.0 - pos.y);
 }
 
-BSAPI bs_ivec2 _bs_windowPosition() {
+BSAPI bs_ivec2 _bs_windowPosition(bs_Context* context) {
 #ifdef _WIN32
 	RECT rectangle = { 0 };
-	GetWindowRect(_bs_context_->hwnd, &rectangle);
+	GetWindowRect(context->hwnd, &rectangle);
 
 	int screen_height = GetSystemMetrics(SM_CYSCREEN);
 
@@ -766,9 +760,9 @@ BSAPI bs_ivec2 _bs_windowPosition() {
     Window child;
     int x, y;
     XTranslateCoordinates(
-        _bs_context_->display,
-        _bs_context_->window,
-        DefaultRootWindow(_bs_context_->display),
+        _bs_scope_.context->display,
+        _bs_scope_.context->window,
+        DefaultRootWindow(_bs_scope_.context->display),
         0, 0,
         &x, &y,
         &child
@@ -791,55 +785,46 @@ BSAPI bs_vec2 _bs_screenCursorPosition() {
 	return _bs_instance_->screen_cursor;
 }
 
-BSAPI void _bs_lockCursorPosition(bool value) {
-    _bs_context_->lock_cursor_position = value;
-}
-
-// TODO: could probably done without an additional boolean
-BSAPI void _bs_disableUserInputs(bool value) {
-	_bs_io_.disable_inputs = value;
-}
-
 BSAPI bool _bs_keyHeld(bs_U32 code) {
-	return !_bs_io_.disable_inputs && (code > BS_KEYS_COUNT ? false : BS_GET_BIT(_bs_io_.hold_keys, code));
+	return code > BS_KEYS_COUNT ? false : BS_GET_BIT(_bs_scope_.context->io.hold_keys, code);
 }
 
 BSAPI bool _bs_keyDown(bs_U32 code) {
-	return !_bs_io_.disable_inputs && (code > BS_KEYS_COUNT ? false : BS_GET_BIT(_bs_io_.keys, code));
+	return code > BS_KEYS_COUNT ? false : BS_GET_BIT(_bs_scope_.context->io.keys, code);
 }
 
 BSAPI bool _bs_keyDownOnce(bs_U32 code) {
-	return !_bs_io_.disable_inputs && (code > BS_KEYS_COUNT ? false : (BS_GET_BIT(_bs_io_.keys, code) && !BS_GET_BIT(_bs_io_.keys_old, code)));
+	return code > BS_KEYS_COUNT ? false : (BS_GET_BIT(_bs_scope_.context->io.keys, code) && !BS_GET_BIT(_bs_scope_.context->io.keys_old, code));
 }
 
 BSAPI bool _bs_keyUpOnce(bs_U32 code) {
-	return !_bs_io_.disable_inputs && (code > BS_KEYS_COUNT ? false : (!BS_GET_BIT(_bs_io_.keys, code) && BS_GET_BIT(_bs_io_.keys_old, code)));
+	return code > BS_KEYS_COUNT ? false : (!BS_GET_BIT(_bs_scope_.context->io.keys, code) && BS_GET_BIT(_bs_scope_.context->io.keys_old, code));
 }
 
 BSAPI bool _bs_charDown(unsigned char code) {
-	return !_bs_io_.disable_inputs && BS_GET_BIT(_bs_io_.chars, code);
+	return BS_GET_BIT(_bs_scope_.context->io.chars, code);
 }
 
 BSAPI bool _bs_charDownOnce(unsigned char code) {
-	return !_bs_io_.disable_inputs && (code > BS_KEY_BYTES_COUNT ? false : (BS_GET_BIT(_bs_io_.chars, code) && !BS_GET_BIT(_bs_io_.chars_old, code)));
+	return code > BS_KEY_BYTES_COUNT ? false : (BS_GET_BIT(_bs_scope_.context->io.chars, code) && !BS_GET_BIT(_bs_scope_.context->io.chars_old, code));
 }
 
 BSAPI bool _bs_charUpOnce(unsigned char code) {
-	return !_bs_io_.disable_inputs && (code > BS_KEY_BYTES_COUNT ? false : (!BS_GET_BIT(_bs_io_.chars, code) && BS_GET_BIT(_bs_io_.chars_old, code)));
+	return code > BS_KEY_BYTES_COUNT ? false : (!BS_GET_BIT(_bs_scope_.context->io.chars, code) && BS_GET_BIT(_bs_scope_.context->io.chars_old, code));
 }
 
-BSAPI bool _bs_middleClick() { return !_bs_io_.disable_inputs && _bs_io_.middle_clicked; }
-BSAPI bool _bs_middleClickOnce() { return !_bs_io_.disable_inputs && _bs_io_.middle_clicked && !_bs_io_.middle_clicked_last; }
-BSAPI bool _bs_middleClickUpOnce() { return !_bs_io_.disable_inputs && !_bs_io_.middle_clicked && _bs_io_.middle_clicked_last; }
-BSAPI bool _bs_leftClick() { return !_bs_io_.disable_inputs && _bs_io_.left_clicked; }
-BSAPI bool _bs_rightClick() { return !_bs_io_.disable_inputs && _bs_io_.right_clicked; }
-BSAPI bool _bs_rightClickOnce() { return !_bs_io_.disable_inputs && _bs_io_.right_clicked && !_bs_io_.right_clicked_last; }
-BSAPI bool _bs_leftClickOnce() { return !_bs_io_.disable_inputs && _bs_io_.left_clicked && !_bs_io_.left_clicked_last; }
-BSAPI bool _bs_rightClickUpOnce() { return !_bs_io_.disable_inputs && !_bs_io_.right_clicked && _bs_io_.right_clicked_last; }
-BSAPI bool _bs_leftClickUpOnce() { return !_bs_io_.disable_inputs && !_bs_io_.left_clicked && _bs_io_.left_clicked_last; }
+BSAPI bool _bs_middleClick() { return _bs_scope_.context->io.middle_clicked; }
+BSAPI bool _bs_middleClickOnce() { return _bs_scope_.context->io.middle_clicked && !_bs_scope_.context->io.middle_clicked_last; }
+BSAPI bool _bs_middleClickUpOnce() { return !_bs_scope_.context->io.middle_clicked && _bs_scope_.context->io.middle_clicked_last; }
+BSAPI bool _bs_leftClick() { return _bs_scope_.context->io.left_clicked; }
+BSAPI bool _bs_rightClick() { return _bs_scope_.context->io.right_clicked; }
+BSAPI bool _bs_rightClickOnce() { return _bs_scope_.context->io.right_clicked && !_bs_scope_.context->io.right_clicked_last; }
+BSAPI bool _bs_leftClickOnce() { return _bs_scope_.context->io.left_clicked && !_bs_scope_.context->io.left_clicked_last; }
+BSAPI bool _bs_rightClickUpOnce() { return !_bs_scope_.context->io.right_clicked && _bs_scope_.context->io.right_clicked_last; }
+BSAPI bool _bs_leftClickUpOnce() { return !_bs_scope_.context->io.left_clicked && _bs_scope_.context->io.left_clicked_last; }
 
 BSAPI int _bs_scroll() {
-	return _bs_io_.scroll;
+	return _bs_scope_.context->io.scroll;
 }
 
 BSAPI bs_Timer _bs_timer() {
@@ -886,63 +871,65 @@ BSAPI void _bs_checkTimer(bs_Timer* timer) {
     timer->seconds = timer->microseconds / 1000000.0;
 }
 
-BSAPI void _bs_titleWindowN(char* name, int name_length) {
-	_bs_context_->title = name; // todo
+BSAPI void _bs_titleWindowN(bs_Context* context, char* name, int name_length) {
+    context->title = name; // todo
 }
 
 BSAPI bool _bs_inFixedTick() {
-    return _bs_context_->in_fixed;
+    return _bs_instance_->in_fixed;
 }
 
 BSAPI void _bs_setTargetFramerate(int fps) {
-    _bs_context_->target_frame_time = 1.0 / (double)fps;
+    _bs_instance_->target_frame_time = 1.0 / (double)fps;
 }
 
-BSAPI void _bs_tickWindow(bs_Callback tick, bs_Callback fixed_tick) {
-   //  _bs_checkTimer(&_bs_context_->timer);
-    double frame_start = _bs_context_->timer.seconds;
+BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
+    context->io.scroll = 0;
+    memset(context->io.chars, 0, sizeof(context->io.chars));
 
-    _bs_io_.scroll = 0;
-    memset(_bs_io_.chars, 0, sizeof(_bs_io_.chars));
+    if (BS_GET_BIT(context->io.keys, BS_KEY_ALT) && BS_GET_BIT(context->io.keys, BS_KEY_F4))
+        _bs_exit();
 
 #ifdef _WIN32
+    context->active = context->hwnd == GetForegroundWindow();
+
     MSG msg;
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
         switch (msg.message) {
         case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
 
-        case WM_LBUTTONDOWN: _bs_io_.left_clicked = true; break;
-        case WM_LBUTTONUP: _bs_io_.left_clicked = false; break;
+        case WM_LBUTTONDOWN: context->io.left_clicked = true; break;
+        case WM_LBUTTONUP: context->io.left_clicked = false; break;
 
-        case WM_RBUTTONDOWN: _bs_io_.right_clicked = true; break;
-        case WM_RBUTTONUP: _bs_io_.right_clicked = false; break;
+        case WM_RBUTTONDOWN: context->io.right_clicked = true; break;
+        case WM_RBUTTONUP: context->io.right_clicked = false; break;
 
-        case WM_MBUTTONDOWN: _bs_io_.middle_clicked = true; break;
-        case WM_MBUTTONUP: _bs_io_.middle_clicked = false; break;
+        case WM_MBUTTONDOWN: context->io.middle_clicked = true; break;
+        case WM_MBUTTONUP: context->io.middle_clicked = false; break;
         case WM_MOUSEWHEEL: {
-            _bs_io_.scroll = (SHORT)HIWORD(msg.wParam) / 120.0;
+            context->io.scroll = (SHORT)HIWORD(msg.wParam) / 120.0;
         } break;
         case WM_CHAR: {
             if (msg.wParam < 256)
-                BS_SET_BIT(_bs_io_.chars, (bs_U32)msg.wParam);
+                BS_SET_BIT(context->io.chars, (bs_U32)msg.wParam);
         } break;
         case WM_KEYDOWN: {
             if (msg.wParam < 256) {
-                BS_SET_BIT(_bs_io_.keys, (bs_U32)msg.wParam);
-                BS_SET_BIT(_bs_io_.hold_keys, (bs_U32)msg.wParam);
+                BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
+                BS_SET_BIT(context->io.hold_keys, (bs_U32)msg.wParam);
             }
         } break;
         case WM_KEYUP: {
             if (msg.wParam < 256)
-                BS_CLEAR_BIT(_bs_io_.keys, (bs_U32)msg.wParam);
+                BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
         } break;
         case WM_SYSKEYDOWN: {
             if (msg.wParam < 256)
-                BS_SET_BIT(_bs_io_.keys, (bs_U32)msg.wParam);
+                BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
         } break;
         case WM_SYSKEYUP: {
             if (msg.wParam < 256)
-                BS_CLEAR_BIT(_bs_io_.keys, (bs_U32)msg.wParam);
+                BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
         } break;
         }
 
@@ -950,18 +937,18 @@ BSAPI void _bs_tickWindow(bs_Callback tick, bs_Callback fixed_tick) {
         DispatchMessage(&msg);
     }
 
-    if (_bs_context_->title_bar_height > 0 && _bs_io_.left_clicked) {
-        bs_ivec2 resolution = bs_resolution();
-        bs_vec2 title_bar_position = { 0, resolution.y - _bs_context_->title_bar_height };
-        bs_vec2 title_bar_dimensions = { resolution.x, _bs_context_->title_bar_height };
-        bs_vec2 cursor = bs_cursorPosition();
+    if (context->title_bar_height > 0 && context->io.left_clicked) {
+        bs_ivec2 resolution = bs_resolution(context);
+        bs_vec2 title_bar_position = { 0, resolution.y - context->title_bar_height };
+        bs_vec2 title_bar_dimensions = { resolution.x, context->title_bar_height };
+        bs_vec2 cursor = bs_windowCursorPosition(context);
 
         bool hovering_title_bar = _bs_rectangleVsPoint(&title_bar_position, &title_bar_dimensions, &cursor);
 
         if (hovering_title_bar) {
             ReleaseCapture();
             SendMessage(
-                bs_context()->hwnd,
+                context->hwnd,
                 WM_NCLBUTTONDOWN,
                 HTCAPTION,
                 0
@@ -970,85 +957,89 @@ BSAPI void _bs_tickWindow(bs_Callback tick, bs_Callback fixed_tick) {
     }
 
     if (_bs_leftClickOnce() || _bs_rightClickOnce() || _bs_middleClickOnce())
-        SetCapture(_bs_context_->hwnd);
+        SetCapture(context->hwnd);
     if (_bs_leftClickUpOnce() || _bs_rightClickUpOnce() || _bs_middleClickUpOnce())
         ReleaseCapture();
 
-    POINT p;
-    if (GetCursorPos(&p)) {
-        _bs_instance_->screen_cursor = BS_V2(p.x, p.y);
-        if (ScreenToClient(_bs_context_->hwnd, &p))
-            _bs_context_->cursor = BS_V2(p.x, p.y);
-    }
-
-    _bs_checkTimer(&_bs_context_->timer);
-    _bs_context_->time = _bs_context_->timer.seconds;
-    _bs_context_->active = _bs_context_->hwnd == GetForegroundWindow();
+    POINT p = { _bs_instance_->screen_cursor.x, _bs_instance_->screen_cursor.y };
+    if (ScreenToClient(context->hwnd, &p))
+        context->cursor = BS_V2(p.x, p.y);
 
 #endif
 
-    if (BS_GET_BIT(_bs_io_.keys, BS_KEY_ALT) && BS_GET_BIT(_bs_io_.keys, BS_KEY_F4))
-        _bs_exit();
-
-    if (fixed_tick) {
-        _bs_context_->in_fixed = true;
-        for (int i = 0; _bs_context_->advance || (_bs_context_->elapsed_time < _bs_context_->time && i < 200 && !_bs_context_->paused); i++) {
-            _bs_context_->new_time_index = !_bs_context_->new_time_index;
-            _bs_context_->last_fixed_update_times[_bs_context_->new_time_index] = _bs_context_->fixed_time;
-
-            _bs_context_->delta_time = _bs_context_->fixed_time;
-            fixed_tick();
-            _bs_context_->elapsed_time += _bs_context_->fixed_time;
-            _bs_context_->advance = false;
-        }
-    }
-    float newer_time = _bs_context_->last_fixed_update_times[_bs_context_->new_time_index];
-    float older_time = _bs_context_->last_fixed_update_times[!_bs_context_->new_time_index];
-
-    if (newer_time != older_time)
-        _bs_context_->fixed_interpolation =
-        (_bs_context_->time - newer_time) / (newer_time - older_time);
-    else
-        _bs_context_->fixed_interpolation = 1.0f;
-
-    _bs_context_->delta_time = _bs_context_->time - _bs_context_->time_old;
-    _bs_context_->in_fixed = false;
-
     tick();
 
-    /*
-    if (_bs_context_->active && !_bs_io_.disable_inputs && _bs_context_->lock_cursor_position) {
-        bs_ivec2 window_pos = _bs_windowPosition(window);
-
-        float center_x = (int)(window_pos.x + _bs_resolution(window).x * 0.5f);
-        float center_y = (int)(window_pos.y - _bs_resolution(window).y * 0.5f);
-        _bs_setCursorPosition(center_x, center_y);
-    }
-    */
-
-    _bs_io_.scroll_old = _bs_io_.scroll;
-    _bs_context_->time_old = _bs_context_->time;
-    _bs_io_.left_clicked_last = _bs_io_.left_clicked;
-    _bs_io_.right_clicked_last = _bs_io_.right_clicked;
-    _bs_io_.middle_clicked_last = _bs_io_.middle_clicked;
-    memset(_bs_io_.hold_keys, 0, sizeof(_bs_io_.hold_keys));
-    memcpy(_bs_io_.keys_old, _bs_io_.keys, sizeof(_bs_io_.keys_old));
-    memcpy(_bs_io_.chars_old, _bs_io_.chars, sizeof(_bs_io_.chars_old));
-
-    _bs_checkTimer(&_bs_context_->timer);
-
-    while ((_bs_context_->timer.seconds - frame_start) < _bs_context_->target_frame_time) {
-        Sleep(0);
-        _bs_checkTimer(&_bs_context_->timer);
-    }
+    context->io.scroll_old = context->io.scroll;
+    _bs_instance_->time_old = _bs_instance_->time;
+    context->io.left_clicked_last = context->io.left_clicked;
+    context->io.right_clicked_last = context->io.right_clicked;
+    context->io.middle_clicked_last = context->io.middle_clicked;
+    memset(context->io.hold_keys, 0, sizeof(context->io.hold_keys));
+    memcpy(context->io.keys_old, context->io.keys, sizeof(context->io.keys_old));
+    memcpy(context->io.chars_old, context->io.chars, sizeof(context->io.chars_old));
 }
 
-BSAPI void _bs_tick(bs_Callback tick, bs_Callback fixed_tick) {
+BSAPI void _bs_tick(bs_Callback fixed_tick) {
     _bs_instance_->alive = true;
-    _bs_context_->timer = _bs_timer();
+    _bs_instance_->timer = _bs_timer();
 
     while (_bs_instance_->alive) {
-        _bs_tickWindow(tick, fixed_tick);
+        //  _bs_checkTimer(&_bs_instance_->timer);
+        double frame_start = _bs_instance_->timer.seconds;
+
+        if (fixed_tick) {
+            _bs_instance_->in_fixed = true;
+            for (int i = 0; _bs_instance_->advance || (_bs_instance_->elapsed_time < _bs_instance_->time && i < 200 && !_bs_instance_->paused); i++) {
+                _bs_instance_->new_time_index = !_bs_instance_->new_time_index;
+                _bs_instance_->last_fixed_update_times[_bs_instance_->new_time_index] = _bs_instance_->fixed_time;
+
+                _bs_instance_->delta_time = _bs_instance_->fixed_time;
+                fixed_tick();
+                _bs_instance_->elapsed_time += _bs_instance_->fixed_time;
+                _bs_instance_->advance = false;
+            }
+        }
+
+        _bs_checkTimer(&_bs_instance_->timer);
+        _bs_instance_->time = _bs_instance_->timer.seconds;
+
+        float newer_time = _bs_instance_->last_fixed_update_times[_bs_instance_->new_time_index];
+        float older_time = _bs_instance_->last_fixed_update_times[!_bs_instance_->new_time_index];
+
+        if (newer_time != older_time)
+            _bs_instance_->fixed_interpolation = (_bs_instance_->time - newer_time) / (newer_time - older_time);
+        else
+            _bs_instance_->fixed_interpolation = 1.0f;
+
+        _bs_instance_->delta_time = _bs_instance_->time - _bs_instance_->time_old;
+        _bs_instance_->in_fixed = false;
+
+        POINT p;
+        if (GetCursorPos(&p)) {
+            _bs_instance_->screen_cursor = BS_V2(p.x, p.y);
+        }
+
+        // pretty shit
+        bs_List* object_sources = bs_objectSources();
+        for (int i = 0; i < object_sources->count; i++) {
+            bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
+            if (source->type != BS_OBJECT_CONTEXT)
+                continue;
+
+            for (int j = 0; j < source->ids_count; j++) {
+                bs_Context* context = source->ids[j].object->context;
+                _bs_scope_.context = context;
+                _bs_tickContext(context, context->tick);
+                _bs_scope_.context = NULL;
+            }
+        }
+
+        _bs_checkTimer(&_bs_instance_->timer);
+
+        while ((_bs_instance_->timer.seconds - frame_start) < _bs_instance_->target_frame_time) {
+            Sleep(0);
+            _bs_checkTimer(&_bs_instance_->timer);
+        }
     }
 }
 
@@ -1067,23 +1058,23 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
 	case WM_SYSCHAR:
 		return 0;
 //	case WM_SETCURSOR: {
-//		// SetCursor(_bs_context_->cursor_icons[_bs_wnd.cursor_icon].handle);
+//		// SetCursor(_bs_scope_.context->cursor_icons[_bs_wnd.cursor_icon].handle);
 //	} break;
 	default: return DefWindowProc(hwnd, msg, w_param, l_param);
     }
     return 0;
 }
 
-BSAPI void _bs_moveWindow(int x, int y) {
-    bs_ivec2 resolution = _bs_resolution();
-	SetWindowPos(_bs_context_->hwnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+BSAPI void _bs_moveWindow(bs_Context* context, int x, int y) {
+    bs_ivec2 resolution = _bs_resolution(context);
+	SetWindowPos(context->hwnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 }
 
  /**
   TODO: should probably build a system around this
   */
 BSAPI void _bs_overrideTitleBar(int height) {
-    bs_Context* context = _bs_context_;
+    bs_Context* context = _bs_scope_.context;
     context->title_bar_height = height;
 
     SetWindowLong(context->hwnd, GWL_STYLE, 0);
@@ -1117,11 +1108,11 @@ BSAPI void _bs_overrideTitleBar(int height) {
     );
 }
 
-BSAPI bs_Result _bs_window(bs_Context* context, bs_U32 width, bs_U32 height, const char* title) {
-    _bs_context_ = context;
+BSAPI bs_Result _bs_window(bs_Context* context, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title) {
+    _bs_scope_.context = context;
 
+    context->tick = callback;
     context->title = title;
-    context->fixed_time = 0.025;
     context->dimensions = (bs_ivec2) { width, height };
 
     bs_Timer timer = _bs_timer();
@@ -1205,22 +1196,21 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_U32 width, bs_U32 height, con
 
      _bs_createSurface();
 
+     _bs_scope_.context = NULL;
+
      return BS_RESULT_OK;
  }
 
 BSAPI void _bs_device(bs_Context* context, bs_PhysicalDevice* device) {
-    if (device) {
-        context->physical_device = device;
-    }
-    else {
-        _bs_preparePhysicalDevice();
-        _bs_queryPhysicalDevice(VK_QUEUE_GRAPHICS_BIT, true, &context->physical_device, &context->queue_family);
-        _bs_prepareLogicalDevice();
-        _bs_prepareCommands();
+    _bs_scope_.context = context;
 
-        bs_Procedure procedures[] = { BS_FOREACH_PROC(BS_STRING_GEN_2) };
-        _bs_queryProcedures(procedures, sizeof(procedures) / sizeof(*procedures), 0, &_bs_procs_);
-    }
+    _bs_preparePhysicalDevice(context);
+    _bs_queryPhysicalDevice(VK_QUEUE_GRAPHICS_BIT, true, &_bs_instance_->physical_device, &_bs_instance_->queue_family);
+    _bs_prepareLogicalDevice(_bs_instance_->physical_device);
+
+    bs_Procedure procedures[] = { BS_FOREACH_PROC(BS_STRING_GEN_2) };
+    _bs_queryProcedures(procedures, sizeof(procedures) / sizeof(*procedures), 0, &_bs_procs_);
 
     _bs_prepareSwapchain();
+    _bs_scope_.context = NULL;
 }
