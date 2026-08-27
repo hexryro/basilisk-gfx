@@ -3092,6 +3092,7 @@ struct bs_Context {
     int id;
     int frames_in_flight;
     int frame;
+    bool hidden;
     bool active;
     bool resized;
     bool image_acquired;
@@ -9053,6 +9054,7 @@ bs_overrideTitleBar(
 
  /**
   @param context
+  @param parent
   @param tick
   @param width
   @param height
@@ -9062,6 +9064,7 @@ bs_overrideTitleBar(
 BSAPI bs_Result
 bs_window(
     bs_Context* context,
+    bs_Context* parent,
     bs_Callback tick,
     bs_U32 width,
     bs_U32 height,

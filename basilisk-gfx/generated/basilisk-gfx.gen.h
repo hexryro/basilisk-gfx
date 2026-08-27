@@ -2677,12 +2677,6 @@ BSGFXAPI void
 bsgfx_tick();
 
  /**
-  @return void
-  */
-BSGFXAPI void
-bsgfx_show();
-
- /**
   @return bsgfx_Application*
   */
 BSGFXAPI bsgfx_Application*

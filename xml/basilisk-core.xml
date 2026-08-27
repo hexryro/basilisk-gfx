@@ -1860,6 +1860,7 @@
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>frames_in_flight</name></field>
             <field><type>int</type><name>frame</name></field>
+            <field><type>bool</type><name>hidden</name></field>
             <field><type>bool</type><name>active</name></field>
             <field><type>bool</type><name>resized</name></field>
             <field><type>bool</type><name>image_acquired</name></field>
@@ -4007,6 +4008,7 @@
         <function name="bs_window">
             <return>bs_Result</return>
             <param><type>bs_Context*</type><name>context</name></param>
+			<param nullable="true"><type>bs_Context*</type><name>parent</name></param>
             <param><type>bs_Callback</type><name>tick</name></param>
             <param><type>bs_U32</type><name>width</name></param>
             <param><type>bs_U32</type><name>height</name></param>

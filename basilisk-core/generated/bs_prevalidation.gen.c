@@ -2481,10 +2481,10 @@ BSAPI void _preval_bs_overrideTitleBar(bs_Context* context, int height) {
     next.bs_overrideTitleBar(context, height);
 }
 
-BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title) {
+BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Context* parent, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title) {
     BS_VALIDATE(context != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(title != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_window(context, tick, width, height, title);
+    return next.bs_window(context, parent, tick, width, height, title);
 }
 
 BSAPI void _preval_bs_showWindow(bs_Context* context) {

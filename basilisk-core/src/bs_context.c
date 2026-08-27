@@ -990,7 +990,27 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
         if (GetCursorPos(&p)) {
             _bs_instance_->screen_cursor = BS_V2(p.x, p.y);
         }
+
+       /**
+        Cache contexts
+        Should be improved maybe somehow
+        */
         bs_List* object_sources = bs_objectSources();
+        static bs_List contexts = { .unit_size = sizeof(bs_Context*), .increment = 4 };
+        contexts.count = 0;
+
+        for (int i = 0; i < object_sources->count; i++) {
+            bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
+            if (source->type != BS_OBJECT_CONTEXT)
+                continue;
+
+            for (int j = 0; j < source->ids_count; j++) {
+                if (!source->ids[j].object)
+                    continue;
+
+                bs_pushBack(&contexts, &source->ids[j].object->context);
+            }
+        }
 
        /**
         Message loop
@@ -998,18 +1018,12 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
         MSG msg;
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             bs_Context* context = NULL;
-            for (int i = 0; i < object_sources->count; i++) {
-                bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
-                if (source->type != BS_OBJECT_CONTEXT)
-                    continue;
+            for (int i = 0; i < contexts.count; i++) {
+                bs_Context* ctx = *(bs_Context**)bs_fetchUnit(&contexts, i);
 
-                for (int j = 0; j < source->ids_count; j++) {
-                    if (!source->ids[j].object)
-                        continue;
-
-                    bs_Context* ctx = source->ids[j].object->context;
-                    if (ctx->hwnd == msg.hwnd)
-                        context = ctx;
+                if (ctx->hwnd == msg.hwnd) {
+                    context = ctx;
+                    break;
                 }
             }
 
@@ -1067,24 +1081,25 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
        /**
         Tick all contexts
         */
-        for (int i = 0; i < object_sources->count; i++) {
-            bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
-            if (source->type != BS_OBJECT_CONTEXT)
-                continue;
+        for (int i = 0; i < contexts.count; i++) {
+            bs_Context* ctx = *(bs_Context**)bs_fetchUnit(&contexts, i);
 
-            for (int j = 0; j < source->ids_count; j++) {
-                if (!source->ids[j].object)
-                    continue;
+            _bs_scope_.context = ctx;
+            _bs_tickContext(ctx, ctx->tick);
+            _bs_scope_.context = NULL;
+        }
 
-                bs_Context* context = source->ids[j].object->context;
+       /**
+        Show all contexts
 
-             //   context->io.scroll = 0;
-             //   memset(context->io.chars, 0, sizeof(context->io.chars));
-
-
-                _bs_scope_.context = context;
-                _bs_tickContext(context, context->tick);
-                _bs_scope_.context = NULL;
+        Needs to be done after first paint but kinda 
+        aids to check it in the engine loop
+        */
+        for (int i = 0; i < contexts.count; i++) {
+            bs_Context* ctx = *(bs_Context**)bs_fetchUnit(&contexts, i);
+            if (ctx->hidden) {
+                ShowWindow(ctx->hwnd, SW_SHOWDEFAULT);
+                ctx->hidden = false;
             }
         }
 
@@ -1161,9 +1176,10 @@ BSAPI void _bs_overrideTitleBar(bs_Context* context, int height) {
     );
 }
 
-BSAPI bs_Result _bs_window(bs_Context* context, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title) {
+BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title) {
     _bs_scope_.context = context;
 
+    context->hidden = true;
     context->tick = callback;
     context->title = title;
     context->dimensions = (bs_ivec2) { width, height };
@@ -1203,15 +1219,26 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Callback callback, bs_U32 wid
         return _bs_convertWin32Error(GetLastError());
     }
 
+    DWORD style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
+    DWORD ex_style = 0;
+    HWND parent_hwnd = NULL;
+
+    if (parent) {
+        parent_hwnd = parent->hwnd;
+        style = WS_CHILD;
+        ex_style |= WS_EX_LTRREADING | WS_EX_LEFT;
+    }
+    else {
+        //SetWindowLong(context->hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT);
+    }
+
     context->hwnd = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-	//	WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR,
+        ex_style,
         class_name,
         title,
-		WS_OVERLAPPEDWINDOW,
-	//	WS_POPUP |WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+        style,
         CW_USEDEFAULT, CW_USEDEFAULT, width, height,
-        NULL, NULL, hinstance, NULL);
+        parent_hwnd, NULL, hinstance, NULL);
 
     if (!context->hwnd) {
         BS_WARN_WIN32_PATH("CreateWindowEx", title);
@@ -1252,11 +1279,6 @@ BSAPI void _bs_showWindow(bs_Context* context) {
     _bs_scope_.context = context;
 
     _bs_prepareSwapchain();
-
-    ShowWindow(context->hwnd, SW_SHOW);
-    UpdateWindow(context->hwnd);
-
-    _bs_setCursor(BS_CURSOR_DEFAULT);
 
     _bs_scope_.context = NULL;
 }

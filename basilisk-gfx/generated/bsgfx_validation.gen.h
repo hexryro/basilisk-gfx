@@ -121,7 +121,6 @@ static inline bsgfx_FunctionTable* _val_bsgfx_getFunctions() {
     functions.bsgfx_package = (PFN_bsgfx_package)GetProcAddress(module, "_val_bsgfx_package");
     functions.bsgfx_ini = (PFN_bsgfx_ini)GetProcAddress(module, "_val_bsgfx_ini");
     functions.bsgfx_tick = (PFN_bsgfx_tick)GetProcAddress(module, "_val_bsgfx_tick");
-    functions.bsgfx_show = (PFN_bsgfx_show)GetProcAddress(module, "_val_bsgfx_show");
     functions.bsgfx_app = (PFN_bsgfx_app)GetProcAddress(module, "_val_bsgfx_app");
     functions.bsgfx_callbacks = (PFN_bsgfx_callbacks)GetProcAddress(module, "_val_bsgfx_callbacks");
     functions.bsgfx_settings = (PFN_bsgfx_settings)GetProcAddress(module, "_val_bsgfx_settings");

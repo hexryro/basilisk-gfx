@@ -148,13 +148,11 @@ int main(int argc, char* argv[]) {
 	bs_configureQueuesCount(2); 
 	bsgfx_ini("Basilisk", 1920, 1080, argc, argv);
 
+	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
 	bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);
-	bs_window(title_bar_context->context, onTitleBarTick, 800, 600, "test");
+	bs_window(title_bar_context->context, basilisk.context, onTitleBarTick, 800, 600, "test");
 	bs_showWindow(title_bar_context->context);
 
-	bsgfx_show();
-
-	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
 	bsmod_onIni();
 	bsmod_onLateIni();
 	bsgfx_loadScene("engine");

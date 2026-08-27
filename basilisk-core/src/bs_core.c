@@ -2644,7 +2644,7 @@ static VkCommandPool _bs_ensureCommandPool() {
 }
 
 BSAPI bs_Result _val_bs_queue(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags) {
-    BS_VALIDATE(queue_index < _bs_config_.queues_count,,);
+    BS_VALIDATE(queue_index < _bs_config_.queues_count, BS_RESULT_VALIDATION_ERROR,);
 
     return _bs_queue(object, queue_index, flags);
 }

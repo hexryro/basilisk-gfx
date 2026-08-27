@@ -462,10 +462,6 @@ BSGFXAPI void _preval_bsgfx_tick() {
     next.bsgfx_tick();
 }
 
-BSGFXAPI void _preval_bsgfx_show() {
-    next.bsgfx_show();
-}
-
 BSGFXAPI bsgfx_Application* _preval_bsgfx_app() {
     return next.bsgfx_app();
 }
@@ -838,7 +834,6 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_package = _preval_bsgfx_package;
     functions.bsgfx_ini = _preval_bsgfx_ini;
     functions.bsgfx_tick = _preval_bsgfx_tick;
-    functions.bsgfx_show = _preval_bsgfx_show;
     functions.bsgfx_app = _preval_bsgfx_app;
     functions.bsgfx_callbacks = _preval_bsgfx_callbacks;
     functions.bsgfx_settings = _preval_bsgfx_settings;

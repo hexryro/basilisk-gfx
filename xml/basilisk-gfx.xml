@@ -2073,9 +2073,6 @@
 		<function name="bsgfx_tick">
 			<return>void</return>
 		</function>
-		<function name="bsgfx_show">
-			<return>void</return>
-		</function>
 		<function name="bsgfx_app"><return>bsgfx_Application*</return></function>
 		<function name="bsgfx_callbacks"><return>bsgfx_Callbacks*</return></function>
 		<function name="bsgfx_settings"><return>bsgfx_Settings*</return></function>

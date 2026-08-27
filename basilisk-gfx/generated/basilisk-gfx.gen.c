@@ -683,11 +683,6 @@ void bsgfx_tick()
     next.bsgfx_tick();
 }
 
-void bsgfx_show()
-{
-    next.bsgfx_show();
-}
-
 bsgfx_Application* bsgfx_app()
 {
     return next.bsgfx_app();
