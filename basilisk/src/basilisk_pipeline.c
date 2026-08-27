@@ -53,8 +53,6 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
 
     bs_beginCommentN(queue, BS_CONSTANT_STRING("High Resolution Subpass 0"));
 
-    bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
-
     bs_vec4 clear_color = bs_rgbUCharToV4(BS_RGBA(75, 75, 75, 255));
     clear_color.xyz = bs_sRGBToLinearV3(&clear_color.xyz);
 
@@ -86,41 +84,6 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     basilisk_renderTiles(scope, queue);
     bsgfx_renderPrimitives(scope, queue, bsgfx_app()->screen_camera.result);
 
-    /*
-   // Final post processing step on the BSGFX_IMAGE_LO_RES_RESULT
-    if (bs_exists(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)) {
-        hash = bsgfx_defaultPipelineHash();
-        bsgfx_requiredForTransparency(&hash);
-        hash.shaders[0] = $vs_bsgfx_color_percentage();
-        hash.shaders[1] = $fs_bsgfx_pixelation();
-
-        if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
-            bs_beginCommentN(BS_CONSTANT_STRING("Post processing"));
-
-            bs_ivec2 resolution = bs_resolution(bs_scope()->context);
-            struct {
-                bs_mat4 inv_proj;
-                bs_vec3 selected_color;
-                float elapsed;
-                bs_vec3 light_direction;
-                float pad;
-                bs_vec2 resolution;
-            } push_const = {
-                .selected_color = BS_V3(1.0, 1.0, 1.0),
-                .elapsed = bs_elapsedTime(),
-                .light_direction = bsgfx_app()->sun_direction,
-                .resolution = { resolution.x, resolution.y },
-            };
-            bs_m4Inverse(&bsgfx_app()->camera.proj, &push_const.inv_proj);
-
-            bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
-            bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)->batch, pipeline, 0, 6, 0, 1);
-
-            bs_endComment();
-        }
-    }
-    */
-
     bsgfx_renderColorPickers(scope, queue);
 
     /**
@@ -147,34 +110,44 @@ void basilisk_pipeline() {
     if (!bs_exists(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS))
         return;
 
-    bs_Queue* graphics_queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
+    bs_Queue* queue;
+    bs_Renderer* renderer;
+
+   /**
+    TODO: should have a callback instead
+    */
+    bs_Context* context = bs_scope()->context;
+    if (context == bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context) {
+        renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
+        queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
+    }
+    else if (context == bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context) {
+        renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_TITLE_BAR)->renderer;
+        queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_TITLE_BAR)->queue;
+    }
+    else return;
 
     bs_acquire();
 
-    if (bs_resetQueue(graphics_queue) == BS_RESULT_OK) {
-
-        if (bs_exists(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)) {
-            bs_Renderer* hi_res_renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
-            bs_SubpassFunction callbacks[] = {
-                basilisk_hiResSubpass0,
-            };
-            bs_runPass(graphics_queue, hi_res_renderer, callbacks, sizeof(callbacks) / sizeof(*callbacks));
-        }
+    if (bs_resetQueue(queue) == BS_RESULT_OK) {
+        bs_SubpassFunction callbacks[] = {
+            basilisk_hiResSubpass0,
+        };
+        bs_runPass(queue, renderer, callbacks, sizeof(callbacks) / sizeof(*callbacks));
 
         bs_WaitSemaphore wait_semaphores[] = {
             bs_acquisitionSemaphore(),
         };
         int wait_semaphores_count = sizeof(wait_semaphores) / sizeof(*wait_semaphores);
-        bs_pushQueue(graphics_queue, wait_semaphores_count, wait_semaphores);
+        bs_pushQueue(queue, wait_semaphores_count, wait_semaphores);
     }
-
-    bs_stall(graphics_queue);
+    bs_stall(queue);
 
     bs_Queue* user_queue = NULL;
     if (bsgfx_callbacks()->queue)
         user_queue = bsgfx_callbacks()->queue();
 
-    bs_Queue* last_queue = user_queue ? user_queue : graphics_queue;
+    bs_Queue* last_queue = user_queue ? user_queue : queue;
     bs_Queue* wait_queues[] = {
         last_queue
     };
@@ -182,11 +155,11 @@ void basilisk_pipeline() {
     bs_present(last_queue, wait_queues, sizeof(wait_queues) / sizeof(*wait_queues));
 }
 
-void basilisk_createRenderers() {
-    bs_Object* hi_res = BS_RENDERER(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN, BS_OBJECT_HAS_SWAPS_BIT);
+void basilisk_createHiResRenderer(bs_Context* context, int id) {
+    bs_Object* hi_res = BS_RENDERER(BASILISK_RENDERERS, id, BS_OBJECT_HAS_SWAPS_BIT);
     if (bs_renderer(hi_res, BS_RENDERER_AUTO_RESIZE_BIT) == BS_RESULT_OK) {
-        
-        bs_ivec2 resolution = bs_resolution(basilisk.context);
+
+        bs_ivec2 resolution = bs_resolution(context);
         bs_Object* hi_res_0_depth = BS_IMAGE(BASILISK_IMAGES, BASILISK_IMAGE_MAIN_OUTPUT_DEPTH, 0);
         if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT) == BS_RESULT_OK) {
 
@@ -201,7 +174,7 @@ void basilisk_createRenderers() {
 
             bs_output(hi_res->renderer, (bs_Output) {
                 .subpass = 0,
-                .image = basilisk.context->swapchain_image->image,
+                .image = context->swapchain_image->image,
                 .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
                 .store_op = BS_ATTACHMENT_STORE_OP_STORE,
                 .old_layout = BS_IMAGE_LAYOUT_UNDEFINED,
@@ -215,7 +188,12 @@ void basilisk_createRenderers() {
                 BS_ACCESS_COLOR_ATTACHMENT_READ_BIT | BS_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | BS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
             hi_res->renderer->_->framebuffer;
             bs_renderPass(hi_res->renderer);
-            bs_framebuffer(hi_res->renderer, bs_resolution(basilisk.context));
+            bs_framebuffer(hi_res->renderer, bs_resolution(context));
         }
     }
+}
+
+void basilisk_createRenderers() {
+    basilisk_createHiResRenderer(bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context, BASILISK_RENDERER_MAIN);
+    basilisk_createHiResRenderer(bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context, BASILISK_RENDERER_TITLE_BAR);
 }

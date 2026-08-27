@@ -87,9 +87,6 @@ static void _bsgfx_fixedTick() {
         _bsgfx_callbacks_.fixedTick();
 }
 
-static void _bsgfx_onWindowTick() {
-}
-
 static void _bsgfx_onTick(bs_VoidFunction tick) {
     bs_Context* ctx = bs_scope()->context;
     bs_vec2 resolution = { .x = (float)bs_resolution(ctx).x, .y = (float)bs_resolution(ctx).y };
@@ -148,7 +145,7 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
     bs_callbacks()->tick = _bsgfx_onTick;
 
     bs_Object* context_object = BS_CONTEXT(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN, 0);
-    bs_window(context_object->context, _bsgfx_onWindowTick, width, height, name);
+    bs_window(context_object->context, _bsgfx_callbacks_.tick, width, height, name);
     bs_device(context_object->context, NULL);
 }
 

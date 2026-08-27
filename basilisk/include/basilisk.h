@@ -37,11 +37,11 @@ extern Basilisk basilisk;
 
 #define BASILISK_TITLE_BAR_HEIGHT 32
 
-#define BASILISK_CONTEXT_IDS(X)								    \
+#define BASILISK_CONTEXT_IDS(X)                                 \
     X(BASILISK_CONTEXT_TITLE_BAR)                               \
     X(BASILISK_CONTEXTS_COUNT)
 
-#define BASILISK_IMAGE_IDS(X)								    \
+#define BASILISK_IMAGE_IDS(X)                                   \
     X(BASILISK_IMAGE_MAIN_OUTPUT_DEPTH)                         \
     X(BASILISK_IMAGE_MAIN_OUTPUT_COLOR)                         \
     X(BASILISK_IMAGES_COUNT)
@@ -52,14 +52,16 @@ extern Basilisk basilisk;
 #define BASILISK_BUFFER_IDS(X)                                  \
 	X(BASILISK_BUFFERS_COUNT)
 
-#define BASILISK_BATCH_IDS(X)									\
+#define BASILISK_BATCH_IDS(X)                                   \
     X(BASILISK_BATCHES_COUNT)
 
-#define BASILISK_RENDERER_IDS(X)							    \
+#define BASILISK_RENDERER_IDS(X)                                \
     X(BASILISK_RENDERER_MAIN)                                   \
+    X(BASILISK_RENDERER_TITLE_BAR)                              \
     X(BASILISK_RENDERERS_COUNT)
 
-#define BASILISK_QUEUE_IDS(X)									\
+#define BASILISK_QUEUE_IDS(X)                                   \
+    X(BASILISK_QUEUE_TITLE_BAR)                                 \
     X(BASILISK_QUEUES_COUNT)
 
 #define BASILISK_RAY_TRACER_IDS(X)                              \
@@ -96,5 +98,6 @@ BS_GENERATE_ENUM(BASILISK_FONT_IDS);
 void basilisk_createRenderers();
 
 void basilisk_instantiateTitleBarUI();
+void basilisk_instantiateBaseUI();
 
 #endif

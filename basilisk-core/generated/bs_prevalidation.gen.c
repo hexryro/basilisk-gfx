@@ -1179,6 +1179,10 @@ BSAPI void _preval_bs_parseArgs(int argc, char* argv[]) {
     next.bs_parseArgs(argc, argv);
 }
 
+BSAPI void _preval_bs_configureQueuesCount(bs_U32 count) {
+    next.bs_configureQueuesCount(count);
+}
+
 BSAPI void _preval_bs_ini() {
     next.bs_ini();
 }
@@ -2949,6 +2953,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_destroyAtlas = _preval_bs_destroyAtlas;
     functions.bs_loadAtlasMemory = _preval_bs_loadAtlasMemory;
     functions.bs_parseArgs = _preval_bs_parseArgs;
+    functions.bs_configureQueuesCount = _preval_bs_configureQueuesCount;
     functions.bs_ini = _preval_bs_ini;
     functions.bs_queryProcedures = _preval_bs_queryProcedures;
     functions.bs_queueSemaphore = _preval_bs_queueSemaphore;

@@ -3049,6 +3049,7 @@ struct bs_Bindings {
 
 struct bs_Config {
     bs_List attributes;
+    bs_U32 queues_count;
 };
 
 struct bs_QueueFamily {
@@ -6265,6 +6266,14 @@ BSAPI void
 bs_parseArgs(
     int argc,
     char* argv[]);
+
+ /**
+  @param count
+  @return void
+  */
+BSAPI void
+bs_configureQueuesCount(
+    bs_U32 count);
 
  /**
   @return void

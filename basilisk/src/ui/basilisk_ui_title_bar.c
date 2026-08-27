@@ -61,6 +61,7 @@ void basilisk_instantiateTitleBarUI() {
     // title icon
     //position = bsgfx_seekTopLeftUI(title_bar_size);
     position = BS_V3(0, resolution.y - title_bar_size.y, 0);
+    position.y = 0.0;
 
    /**
     Background

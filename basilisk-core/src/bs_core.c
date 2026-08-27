@@ -134,6 +134,10 @@ BSAPI void _bs_parseArgs(int argc, char* argv[]) {
     }
 }
 
+BSAPI void _bs_configureQueuesCount(bs_U32 count) {
+    _bs_config_.queues_count = count;
+}
+
 
 
   /*==============================================================================
@@ -2640,7 +2644,7 @@ static VkCommandPool _bs_ensureCommandPool() {
 }
 
 BSAPI bs_Result _val_bs_queue(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags) {
- //   BS_VALIDATE_OBJECT_TYPE(object, BS_OBJECT_QUEUE, BS_RESULT_VALIDATION_ERROR);
+    BS_VALIDATE(queue_index < _bs_config_.queues_count,,);
 
     return _bs_queue(object, queue_index, flags);
 }
@@ -2891,7 +2895,7 @@ BSAPI bs_Result _bs_pushQueue(bs_Queue* queue, int wait_semaphores_count, bs_Wai
         .pWaitSemaphores = semaphores
     };
 
-    result = vkQueueSubmit(queue->queue, 1, &submit_i, queue->_->fence ? queue->_[swap].fence : NULL);
+    result = vkQueueSubmit(queue->queue, 1, &submit_i, queue->_[swap].fence);
     if (result != VK_SUCCESS)
         return _bs_convertVulkanResult(result);
 

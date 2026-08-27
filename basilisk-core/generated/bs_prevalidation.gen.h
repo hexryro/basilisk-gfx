@@ -209,6 +209,7 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_destroyAtlas = (PFN_bs_destroyAtlas)GetProcAddress(module, "_preval_bs_destroyAtlas");
     functions.bs_loadAtlasMemory = (PFN_bs_loadAtlasMemory)GetProcAddress(module, "_preval_bs_loadAtlasMemory");
     functions.bs_parseArgs = (PFN_bs_parseArgs)GetProcAddress(module, "_preval_bs_parseArgs");
+    functions.bs_configureQueuesCount = (PFN_bs_configureQueuesCount)GetProcAddress(module, "_preval_bs_configureQueuesCount");
     functions.bs_ini = (PFN_bs_ini)GetProcAddress(module, "_preval_bs_ini");
     functions.bs_queryProcedures = (PFN_bs_queryProcedures)GetProcAddress(module, "_preval_bs_queryProcedures");
     functions.bs_queueSemaphore = (PFN_bs_queueSemaphore)GetProcAddress(module, "_preval_bs_queueSemaphore");

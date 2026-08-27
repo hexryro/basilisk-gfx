@@ -2201,6 +2201,12 @@ void bs_parseArgs(
     next.bs_parseArgs(argc, argv);
 }
 
+void bs_configureQueuesCount(
+    bs_U32 count)
+{
+    next.bs_configureQueuesCount(count);
+}
+
 void bs_ini()
 {
     next.bs_ini();

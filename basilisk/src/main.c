@@ -53,6 +53,9 @@ static void onLoadScene() {
 	bs_Object* atlas = BS_ATLAS(-1, -1, 0);
 	bs_loadAtlasN(queue, atlas, basilisk.package_id, 0, BS_CONSTANT_STRING("temp"));
 
+	bs_Object* title_bar_queue = BS_QUEUE(BASILISK_QUEUES, BASILISK_QUEUE_TITLE_BAR, BS_OBJECT_HAS_SWAPS_BIT);
+	bs_queue(title_bar_queue, 0, 0);
+
 	bsmod_onLoad();
 	bsmod_bindAtlases();
 }
@@ -63,10 +66,11 @@ static void onTick() {
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
 
-	basilisk_instantiateTitleBarUI();
+	basilisk_instantiateBaseUI();
 }
 
 static void onTitleBarTick() {
+	basilisk_instantiateTitleBarUI();
 	//bs_clearColor(queue, 0, bs_resolution(bs_scope()->context), &clear_color);
 }
 
@@ -114,7 +118,6 @@ int main(int argc, char* argv[]) {
 	bsmod_enableValidation();
 
 	basilisk.main_thread_id = thrd_current()._Tid;
-	//return 0;
 
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {
@@ -138,6 +141,11 @@ int main(int argc, char* argv[]) {
 	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_RAY_TRACER, BASILISK_RAY_TRACERS_COUNT, BASILISK_RAY_TRACER_IDS);
 	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_ATLAS, BASILISK_ATLASES_COUNT, BASILISK_ATLAS_IDS);
 
+   /**
+    1 for main thread, 1 for tracker thread
+	should probably be put in bsmod instead
+    */
+	bs_configureQueuesCount(2); 
 	bsgfx_ini("Basilisk", 1920, 1080, argc, argv);
 
 	bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);

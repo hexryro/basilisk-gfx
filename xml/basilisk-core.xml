@@ -1818,6 +1818,7 @@
         </structure>
         <structure name="bs_Config">
             <field><type>bs_List</type><name>attributes</name></field>
+            <field><type>bs_U32</type><name>queues_count</name></field>
         </structure>
         <structure name="bs_QueueFamily">
             <field><type>bool</type><name>supports_present</name></field>
@@ -3056,10 +3057,14 @@
             <param><type>char*</type><name>data</name></param>
             <param><type>bs_U32</type><name>flags</name></param>
         </function>
-        <function name="bs_parseArgs" section="bs_ini.h">
+        <function name="bs_parseArgs">
             <return>void</return>
             <param><type>int</type><name>argc</name></param>
             <param><type>char*</type><name>argv</name><size></size></param>
+        </function>
+		<function name="bs_configureQueuesCount">
+            <return>void</return>
+            <param><type>bs_U32</type><name>count</name></param>
         </function>
         <function name="bs_ini">
             <return>void</return>

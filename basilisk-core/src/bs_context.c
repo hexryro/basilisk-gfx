@@ -386,16 +386,26 @@ static void _bs_prepareLogicalDevice(bs_PhysicalDevice* physical_device) {
     _bs_props_.shader_group_handle_size = ray_tracing_pipeline_properties.shaderGroupHandleSize;
     _bs_props_.shader_group_base_alignment = ray_tracing_pipeline_properties.shaderGroupBaseAlignment;
     _bs_props_.min_acceleration_structure_scratch_offset_alignment = accel_struct_properties.minAccelerationStructureScratchOffsetAlignment;
-    /**
+
+   /**
     Creation
     */
-    float queue_priorities[] = { 1.0, 1.0 };
-    const int queue_priorities_count = sizeof(queue_priorities) / sizeof(*queue_priorities);
+    if (_bs_config_.queues_count == 0)
+        _bs_config_.queues_count = 1;
+    
+    if (_bs_config_.queues_count > _bs_instance_->queue_family->queue_count) {
+        bs_warnF("Requested %d queues, but queue family %d only has %d", _bs_config_.queues_count, _bs_instance_->queue_family->index, _bs_instance_->queue_family->queue_count);
+        _bs_config_.queues_count = _bs_instance_->queue_family->queue_count;
+    }
+
+    float* queue_priorities = bs_alloca(_bs_config_.queues_count * sizeof(float));
+    for (int i = 0; i < _bs_config_.queues_count; i++)
+        queue_priorities[i] = 1.0;
 
     VkDeviceQueueCreateInfo queue_ci = {
         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = _bs_instance_->queue_family->index,
-        .queueCount = queue_priorities_count,
+        .queueCount = _bs_config_.queues_count,
         .pQueuePriorities = queue_priorities,
     };
 
@@ -730,7 +740,7 @@ BSAPI double _bs_elapsedTime() {
 }
 
 BSAPI bs_ivec2 _val_bs_resolution(bs_Context* context) {
-    BS_VALIDATE(context->swapchain_image != NULL, , "");
+    BS_VALIDATE(context->swapchain_image != NULL, BS_IV2(0, 0),);
 
     return _bs_resolution(context);
 }
