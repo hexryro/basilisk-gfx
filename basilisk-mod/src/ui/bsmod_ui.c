@@ -321,8 +321,8 @@ BSMODAPI void _bsmod_renderBillboards(bs_RendererScope* scope, bs_Queue* queue) 
             bs_mat4 view;
 
         } push_const = {
-            .camera = poser()->camera.result,
-            .view = poser()->camera.view,
+            .camera = bsgfx_app()->camera.result,
+            .view = bsgfx_app()->camera.view,
         };
 
         bs_beginCommentN(queue, BS_CONSTANT_STRING("Billboards"));

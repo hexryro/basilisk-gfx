@@ -90,11 +90,11 @@ BSGFXAPI void _bsgfx_computeShadowVolumes() {
         int exclude_flag;
     } push_constant = { 0 };
 
-    push_constant.light_direction = _poser_->sun_direction;
+    push_constant.light_direction = _bsgfx_app_.sun_direction;
     push_constant.subtype_offset = 0;
     push_constant.subtype_count = -1;
 
-    if (_poser_->current_level != BSGFX_SCENE_MENU) {
+    if (_bsgfx_app_.current_level != BSGFX_SCENE_MENU) {
         bs_Pipeline* pipeline = bs_computePipeline($cs_mesh_volume(), 0);
 
         push_constant.id = BSGFX_SHADOW_COMPUTATION_MESH;
@@ -106,7 +106,7 @@ BSGFXAPI void _bsgfx_computeShadowVolumes() {
         bs_dispatchAsync(pipeline, 1, 1, 1);
     }
 
-    if (_poser_->current_level != BSGFX_SCENE_MENU) {
+    if (_bsgfx_app_.current_level != BSGFX_SCENE_MENU) {
         bs_Pipeline* pipeline = bs_computePipeline($cs_bone_volume(), 0);
 
         push_constant.id = BSGFX_SHADOW_COMPUTATION_MESH;
@@ -118,7 +118,7 @@ BSGFXAPI void _bsgfx_computeShadowVolumes() {
         bs_dispatchAsync(pipeline, 1, 1, 1);
     }
 
-    if (_poser_->current_level != BSGFX_SCENE_MENU) {
+    if (_bsgfx_app_.current_level != BSGFX_SCENE_MENU) {
         bs_Pipeline* pipeline = bs_computePipeline($cs_textured_volume(), 0);
 
         push_constant.id = BSGFX_SHADOW_COMPUTATION_MESH_TEXTURED;
@@ -202,7 +202,7 @@ BSGFXAPI void _bsgfx_renderShadowVolumes() {
     if (count > BSGFX_NUM_SHADOW_VERTICES)
         bs_throwBasiliskF(BSX_OUT_OF_BOUNDS, "Compute shader generated %d/%d vertices", count, BSGFX_NUM_SHADOW_VERTICES);
 
-    bs_pushConstant(volume_pipeline, 0, sizeof(_poser_->camera.result), &_poser_->camera.result);
+    bs_pushConstant(volume_pipeline, 0, sizeof(_bsgfx_app_.camera.result), &_bsgfx_app_.camera.result);
     bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_VOLUME_COMPUTED)->batch, volume_pipeline, 0, count, 0, 1);
 
     bs_barrier(0,
@@ -308,7 +308,7 @@ BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
 
     bs_clearStencil(0, bs_fetch(BSGFX_IMAGES, BSGFX_IMAGE_LO_RES_0_DEPTH)->image->dim, 0);
 
-    bsgfx_InstanceBuffer* first_instance = bs_bufferMap(_poser_->instance_buffers[BSGFX_INSTANCE_TYPE_MESH]);
+    bsgfx_InstanceBuffer* first_instance = bs_bufferMap(_bsgfx_app_.instance_buffers[BSGFX_INSTANCE_TYPE_MESH]);
     bsgfx_InstanceSubtypeMetadata* atlas_prefab_subtype = metadata->instance_subtypes + _bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT];
     bs_Batch* atlas_prefab_batch = bs_fetch(atlas_prefab_subtype->batch_source_id, atlas_prefab_subtype->batch_id)->batch;
 
@@ -321,9 +321,9 @@ BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
         unsigned write_flags;
         int reserved;
     } volume_texture_const = {
-        .camera = _poser_->camera.proj,
+        .camera = _bsgfx_app_.camera.proj,
         .color = BSGFX_RGBA(BSGFX_SHADOW_COLOR.r, BSGFX_SHADOW_COLOR.g, BSGFX_SHADOW_COLOR.b, BSGFX_SHADOW_COLOR.a),
-        .light_direction = _poser_->sun_direction,
+        .light_direction = _bsgfx_app_.sun_direction,
         .first_triangle = 0,
         .write_flags = BSGFX_ID_IN_SHADOW
     };
@@ -332,7 +332,7 @@ BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
         bs_mat4 camera;
         bs_vec4 uv;
     } mesh_push_const = {
-        .camera = _poser_->camera.result,
+        .camera = _bsgfx_app_.camera.result,
     };
 
     bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
@@ -380,7 +380,7 @@ BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
 
         bs_clearStencil(0, bs_fetch(BSGFX_IMAGES, BSGFX_IMAGE_LO_RES_0_DEPTH)->image->dim, 0);
 
-        bs_pushConstant(volume_pipeline, 0, sizeof(_poser_->camera.result), &_poser_->camera.result);
+        bs_pushConstant(volume_pipeline, 0, sizeof(_bsgfx_app_.camera.result), &_bsgfx_app_.camera.result);
         bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_VOLUME_COMPUTED)->batch, volume_pipeline, index, volume_index_count, 0, 1);
 
         bs_barrier(0,
@@ -421,7 +421,7 @@ BSGFXAPI void _bsgfx_renderFineShadowVolumes() {
 
         bs_clearStencil(0, bs_fetch(BSGFX_IMAGES, BSGFX_IMAGE_LO_RES_0_DEPTH)->image->dim, 0);
 
-        bs_pushConstant(volume_pipeline, 0, sizeof(_poser_->camera.result), &_poser_->camera.result);
+        bs_pushConstant(volume_pipeline, 0, sizeof(_bsgfx_app_.camera.result), &_bsgfx_app_.camera.result);
         bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_VOLUME_COMPUTED)->batch, volume_pipeline, index, volume_index_count, 0, 1);
 
         bs_barrier(0,

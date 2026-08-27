@@ -41,7 +41,7 @@ void basilisk_renderDepthlessLines(bs_RendererScope* scope, bs_Queue* queue) {
         bs_beginCommentN(queue, BS_CONSTANT_STRING("[BSMOD] Lines (Depthless)"));
 
         bs_setLineWidth(queue, 4.0);
-        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(bsgfx_app()->camera.result), &bsgfx_app()->camera.result);
         bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_LINE_DEPTHLESS], pipeline);
         bs_setLineWidth(queue, 1.0);
 
@@ -62,7 +62,7 @@ void basilisk_renderLines(bs_RendererScope* scope, bs_Queue* queue) {
         bs_beginCommentN(queue, BS_CONSTANT_STRING("[BSMOD] Lines"));
 
         bs_setLineWidth(queue, 4.0);
-        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(bsgfx_app()->camera.result), &bsgfx_app()->camera.result);
         bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_LINE], pipeline);
         bs_setLineWidth(queue, 1.0);
 
@@ -82,7 +82,7 @@ void basilisk_renderPoints(bs_RendererScope* scope, bs_Queue* queue) {
 
     if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->camera.result), &poser()->camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(bsgfx_app()->camera.result), &bsgfx_app()->camera.result);
         bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_POINT], pipeline);
     }
 }
@@ -102,7 +102,7 @@ void basilisk_renderCones(bs_RendererScope* scope, bs_Queue* queue) {
         bs_mat4 camera;
         bs_vec4 uv;
     } mesh_push_const = {
-        .camera = poser()->camera.result,
+        .camera = bsgfx_app()->camera.result,
         .uv = bs_atlasCoordinates(atlas_object->atlas, bs_queryAtlas(atlas_object->atlas, "white")),
     };
 
@@ -138,10 +138,10 @@ void basilisk_renderUIPost(bs_RendererScope* scope, bs_Queue* queue) {
         } push_const = {
             .selected_color = BS_V3(1.0, 1.0, 1.0),
             .elapsed = bs_elapsedTime(),
-            .light_direction = poser()->sun_direction,
+           // .light_direction = bsgfx_app()->sun_direction,
             .resolution = BS_V2_MUL_S(BS_IV2_TO_V2(bs_resolution(bs_scope()->context)), 0.5),
         };
-        bs_m4Inverse(&poser()->camera.proj, &push_const.inv_proj);
+        bs_m4Inverse(&bsgfx_app()->camera.proj, &push_const.inv_proj);
 
         bs_Batch* screen_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)->batch;
 
@@ -164,7 +164,7 @@ void basilisk_renderSelectedTile(bs_RendererScope* scope, bs_Queue* queue) {
         struct {
             bs_mat4 camera;
         } push_const = {
-            .camera = poser()->camera.result,
+            .camera = bsgfx_app()->camera.result,
         };
 
         bs_beginCommentN(queue, BS_CONSTANT_STRING("Selected Tiles"));
@@ -199,7 +199,7 @@ void basilisk_renderTiles(bs_RendererScope* scope, bs_Queue* queue) {
 
     if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(bsgfx_app()->screen_camera.result), &bsgfx_app()->screen_camera.result);
         bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_TILE_ICON], pipeline);
     }
 }
@@ -226,7 +226,7 @@ void basilisk_renderPrefabOutlines(bs_RendererScope* scope, bs_Queue* queue) {
             bs_mat4 camera;
             bs_vec4 uv;
         } mesh_push_const = {
-            .camera = poser()->camera.result,
+            .camera = bsgfx_app()->camera.result,
             .uv = $BSGFX_ATLAS_ANY_white()->coords,
         };
 
@@ -272,7 +272,7 @@ void basilisk_renderRoundedQuads(bs_RendererScope* scope, bs_Queue* queue) {
             bs_vec2 resolution;
             float border_radius;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
             .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
             .border_radius = 5.0,
@@ -304,7 +304,7 @@ void basilisk_renderUI(bs_RendererScope* scope, bs_Queue* queue) {
             bs_vec2 resolution;
             float border_radius;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
             .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
@@ -331,7 +331,7 @@ void basilisk_renderFontSubtype(bs_RendererScope* scope, bs_Queue* queue, bsgfx_
     bsgfx_requiredForTransparency(&hash);
 
     if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
-        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(bsgfx_app()->screen_camera.result), &bsgfx_app()->screen_camera.result);
         bsgfx_renderSubtype(queue, subtype, pipeline);
     }
 }
@@ -353,7 +353,7 @@ void basilisk_renderUISolid(bs_RendererScope* scope, bs_Queue* queue) {
             bs_vec2 resolution;
             float border_radius;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
             .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
@@ -394,7 +394,7 @@ void basilisk_renderUIStencil(bs_RendererScope* scope, bs_Queue* queue) {
             bs_vec2 resolution;
             float border_radius;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
             .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
@@ -425,7 +425,7 @@ void basilisk_renderDither(bs_RendererScope* scope, bs_Queue* queue) {
             bs_vec2 resolution;
             float border_radius;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
             .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };

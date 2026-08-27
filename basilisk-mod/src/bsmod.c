@@ -362,7 +362,9 @@ void _bsmod_loadMsdfResources() {
     result = bs_renderer(renderer, 0);
 
     if (result == BS_RESULT_OK) {
-        bs_ivec2 resolution = bs_resolution(bs_scope()->context);
+        bs_Context* context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
+
+        bs_ivec2 resolution = bs_resolution(context);
 
         bs_Object* color = BS_IMAGE(-1, 0, 0);
         bs_Object* depth = BS_IMAGE(-1, 0, 0);

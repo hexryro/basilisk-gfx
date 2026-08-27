@@ -84,7 +84,7 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
 
   //  bs_clearDepth(0, bs_fetch(BSMOD_IMAGES, BSMOD_IMAGE_DEPTH)->image->dim, 1.0);
     basilisk_renderTiles(scope, queue);
-    bsgfx_renderPrimitives(scope, queue, poser()->screen_camera.result);
+    bsgfx_renderPrimitives(scope, queue, bsgfx_app()->screen_camera.result);
 
     /*
    // Final post processing step on the BSGFX_IMAGE_LO_RES_RESULT
@@ -108,10 +108,10 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
             } push_const = {
                 .selected_color = BS_V3(1.0, 1.0, 1.0),
                 .elapsed = bs_elapsedTime(),
-                .light_direction = poser()->sun_direction,
+                .light_direction = bsgfx_app()->sun_direction,
                 .resolution = { resolution.x, resolution.y },
             };
-            bs_m4Inverse(&poser()->camera.proj, &push_const.inv_proj);
+            bs_m4Inverse(&bsgfx_app()->camera.proj, &push_const.inv_proj);
 
             bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
             bs_render(bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_SCREEN)->batch, pipeline, 0, 6, 0, 1);
@@ -133,7 +133,7 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
 
     if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(queue, pipeline, 0, sizeof(poser()->screen_camera.result), &poser()->screen_camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(bsgfx_app()->screen_camera.result), &bsgfx_app()->screen_camera.result);
         bsgfx_renderSubtype(queue, bsgfx_subtypes()[BSGFX_SUBTYPE_256_HI], pipeline);
     }
 
@@ -155,7 +155,7 @@ void basilisk_pipeline() {
 
         if (bs_exists(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)) {
             bs_Renderer* hi_res_renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
-            bs_SubpassCallbackFunction callbacks[] = {
+            bs_SubpassFunction callbacks[] = {
                 basilisk_hiResSubpass0,
             };
             bs_runPass(graphics_queue, hi_res_renderer, callbacks, sizeof(callbacks) / sizeof(*callbacks));
@@ -213,7 +213,7 @@ void basilisk_createRenderers() {
                 BS_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | BS_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
                 BS_ACCESS_MEMORY_READ_BIT,
                 BS_ACCESS_COLOR_ATTACHMENT_READ_BIT | BS_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | BS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
-
+            hi_res->renderer->_->framebuffer;
             bs_renderPass(hi_res->renderer);
             bs_framebuffer(hi_res->renderer, bs_resolution(basilisk.context));
         }

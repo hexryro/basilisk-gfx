@@ -84,7 +84,7 @@ BSGFXAPI bool _bsgfx_validateInstanceType(const char* library_name, bsgfx_Instan
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_TYPES), false, );
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_SUBTYPES), false,);
 //	BSGFX_VALIDATE(instance_type < BSGFX_INSTANCE_TYPE_COUNT, false,);
-//	BSGFX_VALIDATE(_poser_->instance_buffers[instance_type] != NULL, false,);
+//	BSGFX_VALIDATE(_bsgfx_app_.instance_buffers[instance_type] != NULL, false,);
 
 	return true;
 }
@@ -93,7 +93,7 @@ BSGFXAPI bool _bsgfx_validateInstanceType(const char* library_name, bsgfx_Instan
   Create instance type
   */
 BSGFXAPI bs_Result _val_bsgfx_instanceType(size_t instance_size, int bind_set, int point, bsgfx_InstanceType** out) {
-	//BSGFX_VALIDATE(_poser_->instance_buffers[instance_type_id] != NULL,,);
+	//BSGFX_VALIDATE(_bsgfx_app_.instance_buffers[instance_type_id] != NULL,,);
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_TYPES),, );
 	//BSGFX_VALIDATE(bs_exists(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_SUBTYPES),,);
 	bs_BindSet* bind_set_query = bs_queryBindSet(bind_set);

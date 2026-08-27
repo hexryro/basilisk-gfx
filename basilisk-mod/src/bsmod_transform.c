@@ -66,7 +66,7 @@ BSMODAPI void _bsmod_snapPrimitive() {
 
 	bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 	bs_vec2 temp;
-	bs_v2MulS(&poser()->world_camera.position, 4.0, &temp); // what is 4 pixel scale maybe?
+	bs_v2MulS(&bsgfx_app()->world_camera.position, 4.0, &temp); // what is 4 pixel scale maybe?
 	bs_v2Add(&temp, &cursor, &cursor);
 
 	if (_bsmod_.edit_type_old != _bsmod_.edit_type) {
@@ -163,11 +163,11 @@ BSMODAPI void _bsmod_snapPrimitive() {
 
 static inline bs_vec3 _bsmod_axisScreenPosition(bs_vec3 position) {
 	position.x *= BSGFX_TILE_SIZE.x * 2.0;
-	position.x -= poser()->world_camera.position.x;
+	position.x -= bsgfx_app()->world_camera.position.x;
 
 	position.y -= position.z;
 	position.y *= BSGFX_TILE_SIZE.y * 2.0;
-	position.y -= poser()->world_camera.position.y;
+	position.y -= bsgfx_app()->world_camera.position.y;
 
 	position.x -= BSGFX_AXIS_CLICK_SIZE * 0.5;
 	position.y -= BSGFX_AXIS_CLICK_SIZE * 0.5;
@@ -179,7 +179,7 @@ static inline bs_vec3 _bsmod_axisScreenPosition(bs_vec3 position) {
 
 static inline bs_vec3 _bsmod_worldToScreenCoords(bs_vec3 world_coords, float width) {
 	bs_ivec2 resolution = bs_resolution(bs_scope()->context);
-	bs_mat4 camera = poser()->camera.result;
+	bs_mat4 camera = bsgfx_app()->camera.result;
 
 	bs_vec4 px;
 	bs_m4MulV4(&camera, &BS_V3_TO_V4(world_coords, 1.0), &px);

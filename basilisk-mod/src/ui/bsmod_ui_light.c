@@ -59,12 +59,12 @@ BSMODAPI void _bsmod_instanceLightBillboards() {
         bsgfx_instanceLine(light->position, BS_V3_ADD(light->position, BS_V3_MUL_S(light->direction, length)), BS_BLACK);
 
         bs_vec2 p;
-        bsgfx_worldToScreen(&light->position, &poser()->camera.result, &resolution, &p);
+        bsgfx_worldToScreen(&light->position, &bsgfx_app()->camera.result, &resolution, &p);
 
         bs_vec4 clip;
-        bs_m4MulV4(&poser()->camera.result, &BS_V3_TO_V4(light->position, 1.0f), &clip);
+        bs_m4MulV4(&bsgfx_app()->camera.result, &BS_V3_TO_V4(light->position, 1.0f), &clip);
 
-        float pixels_per_unit = poser()->camera.proj.a[1][1] * resolution.y * 0.5f;
+        float pixels_per_unit = bsgfx_app()->camera.proj.a[1][1] * resolution.y * 0.5f;
         float scaled_size = pixels_per_unit / clip.w;
 
         p.x -= scaled_size * 0.5;

@@ -137,14 +137,14 @@ BSGFXAPI void _bsgfx_renderPrimitiveTiles(bs_RendererScope* scope, bs_Queue* que
     struct {
         bs_mat4 camera;
     } push_const = {
-        .camera = _poser_->camera.result,
+        .camera = _bsgfx_app_.camera.result,
     };
 
     bs_beginCommentN(queue, BS_CONSTANT_STRING("Tiles"));
 
     bs_pushConstant(queue, pipeline, 0, sizeof(push_const), &push_const);
     bs_render(queue, batch, pipeline, 0, BS_U32_MAX, 0, 1);
-    _bsgfx_renderPrimitives(scope, queue, _poser_->camera.result);
+    _bsgfx_renderPrimitives(scope, queue, _bsgfx_app_.camera.result);
 
     bs_endComment(queue);
 }
@@ -162,7 +162,7 @@ BSGFXAPI void _bsgfx_renderAtlas(bs_RendererScope* scope, bs_Queue* queue) {
 
     bs_beginCommentN(queue, BS_CONSTANT_STRING("Atlas"));
 
-    bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->world_camera.result), &_poser_->world_camera.result);
+    bs_pushConstant(queue, pipeline, 0, sizeof(_bsgfx_app_.world_camera.result), &_bsgfx_app_.world_camera.result);
     _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS], pipeline);
 
     bs_endComment(queue);
@@ -177,7 +177,7 @@ BSGFXAPI void _bsgfx_renderPoints(bs_RendererScope* scope, bs_Queue* queue) {
     bs_Pipeline* pipeline;
     if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->camera.result), &_poser_->camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(_bsgfx_app_.camera.result), &_bsgfx_app_.camera.result);
         _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_POINT], pipeline);
     }
 }
@@ -242,7 +242,7 @@ BSGFXAPI void _bsgfx_renderAtlasIcons(bs_RendererScope* scope, bs_Queue* queue) 
         float padding;
         bs_vec2 resolution;
     } push_const = {
-        .camera = _poser_->screen_camera.result,
+        .camera = _bsgfx_app_.screen_camera.result,
         .elapsed = bs_elapsedTime(),
         .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
     };
@@ -262,7 +262,7 @@ BSGFXAPI void _bsgfx_renderTileIcons(bs_RendererScope* scope, bs_Queue* queue) {
     if (bs_pipeline(scope, queue, &hash, &pipeline) != BS_RESULT_OK)
         return;
 
-    bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+    bs_pushConstant(queue, pipeline, 0, sizeof(_bsgfx_app_.screen_camera.result), &_bsgfx_app_.screen_camera.result);
     _bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_TILE_ICON], pipeline);
 }
 

@@ -1308,13 +1308,14 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_APP1                                                      \
     0xB6
 
+typedef void (__cdecl* bs_VoidFunction)();
 typedef int (__cdecl* bs_ThreadFunction)(void*);
 typedef bs_Result (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
-typedef void (__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*);
+typedef void (__stdcall* bs_MessageFunction)(const bs_LogQueueItem*);
 typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
-typedef void (__stdcall* bs_ValidationErrorCallbackFunction)();
-typedef void (__stdcall* bs_WindowConfigurationCallbackFunction)();
-typedef void (__stdcall* bs_SubpassCallbackFunction)(bs_RendererScope*);
+typedef void (__stdcall* bs_ValidationErrorFunction)();
+typedef void (__stdcall* bs_ContextTickFunction)(bs_VoidFunction);
+typedef void (__stdcall* bs_SubpassFunction)(bs_RendererScope*);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -3125,13 +3126,13 @@ struct bs_Props {
 };
 
 struct bs_Callbacks {
-    bs_MessageCallbackFunction log;
-    bs_ValidationErrorCallbackFunction error;
-    bs_WindowConfigurationCallbackFunction configureWindow;
+    bs_MessageFunction log;
+    bs_ValidationErrorFunction error;
+    bs_ContextTickFunction tick;
 };
 
 struct bs_LogQueueItem {
-    bs_MessageCallbackFunction log;
+    bs_MessageFunction log;
     bs_Library library;
     bs_MessageLevel level;
     bs_Result result;
@@ -5554,7 +5555,7 @@ BSAPI void
 bs_runPass(
     bs_Queue* queue,
     bs_Renderer* renderer,
-    bs_SubpassCallbackFunction callbacks[],
+    bs_SubpassFunction callbacks[],
     int callbacks_count);
 
  /**
@@ -9032,11 +9033,13 @@ bs_moveWindow(
     int y);
 
  /**
+  @param context
   @param height
   @return void
   */
 BSAPI void
 bs_overrideTitleBar(
+    bs_Context* context,
     int height);
 
  /**
@@ -9057,6 +9060,14 @@ bs_window(
 
  /**
   @param context
+  @return void
+  */
+BSAPI void
+bs_showWindow(
+    bs_Context* context);
+
+ /**
+  @param context
   @param device
   @return void
   */
@@ -9064,14 +9075,6 @@ BSAPI void
 bs_device(
     bs_Context* context,
     bs_PhysicalDevice* device);
-
- /**
-  @param context
-  @return void
-  */
-BSAPI void
-bs_tickContext(
-    bs_Context* context);
 
  /**
   @param fixed_tick

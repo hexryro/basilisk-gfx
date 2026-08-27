@@ -61,7 +61,7 @@ static void _bsmod_renderGradients() {
             float padding;
             bs_vec2 resolution;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .elapsed = bs_elapsedTime(),
             .resolution = BS_IV2_TO_V2(bs_resolution(bs_scope()->context)),
         };
@@ -97,7 +97,7 @@ static void _bsmod_renderMeshSubtypes() {
             bs_mat4 camera;
             float z;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .z = 50 // todo
         };
 
@@ -121,7 +121,7 @@ static void _bsmod_renderMaterialTextureQuads() {
         struct {
             bs_mat4 camera;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
         };
 
         bs_pushConstant(pipeline, 0, sizeof(push_const), &push_const);
@@ -159,7 +159,7 @@ static void _bsmod_renderIcons(const char* comment, int binding, int subtype) {
             bs_mat4 camera;
             int atlas_binding;
         } push_const = {
-            .camera = poser()->screen_camera.result,
+            .camera = bsgfx_app()->screen_camera.result,
             .atlas_binding = binding,
         };
 
@@ -181,7 +181,7 @@ static void _bsmod_renderTileIcons() {
 
     if (bs_pipeline(&hash, &pipeline) == BS_RESULT_OK) {
 
-        bs_pushConstant(pipeline, 0, sizeof(bs_mat4), &poser()->screen_camera.result);
+        bs_pushConstant(pipeline, 0, sizeof(bs_mat4), &bsgfx_app()->screen_camera.result);
         bsgfx_renderSubtype(_bsmod_subtypes_[BSMOD_SUBTYPE_TILE_ICON], pipeline);
     }
 }
@@ -204,7 +204,7 @@ static void _bsmod_renderPrefabs() {
             bs_mat4 camera;
             bs_vec4 uv;
         } mesh_push_const = {
-            .camera = poser()->camera.result,
+            .camera = bsgfx_app()->camera.result,
             .uv = bs_atlasCoordinates(atlas, bs_queryAtlas(atlas, "white")),
         };
 
@@ -239,7 +239,7 @@ static void _bsmod_onRenderUI() {
     _bsmod_renderTiles();
     if (bsgfx_prefabModel())
         _bsmod_renderMeshSubtypes();
-    bsgfx_renderPrimitives(poser()->screen_camera.result);
+    bsgfx_renderPrimitives(bsgfx_app()->screen_camera.result);
 
     _bsmod_renderIcons("Material Icons", BSMOD_ATLAS_ICONS_MATERIALS_BINDING, _bsmod_subtypes_[BSMOD_SUBTYPE_MATERIAL_ICON]);
     _bsmod_renderIcons("Primitive Icons", BSMOD_ATLAS_ICONS_PRIMITIVES_BINDING, _bsmod_subtypes_[BSMOD_SUBTYPE_PRIMITIVE_ICON]);

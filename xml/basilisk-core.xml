@@ -57,13 +57,14 @@
     </includes>
 
 	<typedefs>
+        <typedef><type>void</type><name>(__cdecl* bs_VoidFunction)()</name></typedef>
         <typedef><type>int</type><name>(__cdecl* bs_ThreadFunction)(void*)</name></typedef>
         <typedef><type>bs_Result</type><name>(__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_MessageCallbackFunction)(const bs_LogQueueItem*)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_MessageFunction)(const bs_LogQueueItem*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorCallbackFunction)()</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_WindowConfigurationCallbackFunction)()</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_SubpassCallbackFunction)(bs_RendererScope*)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorFunction)()</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_VoidFunction)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
@@ -1892,13 +1893,13 @@
         </structure>
 		
 		<structure name="bs_Callbacks">
-			<field><type>bs_MessageCallbackFunction</type><name>log</name></field>
-			<field><type>bs_ValidationErrorCallbackFunction</type><name>error</name></field>
-			<field><type>bs_WindowConfigurationCallbackFunction</type><name>configureWindow</name></field>
+			<field><type>bs_MessageFunction</type><name>log</name></field>
+			<field><type>bs_ValidationErrorFunction</type><name>error</name></field>
+			<field><type>bs_ContextTickFunction</type><name>tick</name></field>
 		</structure>
 
 		<structure name="bs_LogQueueItem">
-			<field><type>bs_MessageCallbackFunction</type><name>log</name></field>
+			<field><type>bs_MessageFunction</type><name>log</name></field>
 			<field><type>bs_Library</type><name>library</name></field>
 			<field><type>bs_MessageLevel</type><name>level</name></field>
 			<field><type>bs_Result</type><name>result</name></field>
@@ -2802,7 +2803,7 @@
             <return>void</return>
             <param><type>bs_Queue*</type><name>queue</name></param>
             <param><type>bs_Renderer*</type><name>renderer</name></param>
-            <param><type>bs_SubpassCallbackFunction</type><name>callbacks</name><size></size></param>
+            <param><type>bs_SubpassFunction</type><name>callbacks</name><size></size></param>
             <param><type>int</type><name>callbacks_count</name></param>
         </function>
         <function name="bs_rendererIsDynamic">
@@ -3995,6 +3996,7 @@
         </function>
 		<function name="bs_overrideTitleBar">
 			<return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
             <param><type>int</type><name>height</name></param>
 		</function>
         <function name="bs_window">
@@ -4005,14 +4007,14 @@
             <param><type>bs_U32</type><name>height</name></param>
             <param><type>const char*</type><name>title</name></param>
         </function>
+		<function name="bs_showWindow">
+            <return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
 		<function name="bs_device">
 			<return>void</return>
             <param><type>bs_Context*</type><name>context</name></param>
             <param nullable="true"><type>bs_PhysicalDevice*</type><name>device</name></param>
-        </function>
-		<function name="bs_tickContext">
-            <return>void</return>
-            <param><type>bs_Context*</type><name>context</name></param>
         </function>
         <function name="bs_tick">
             <return>void</return>

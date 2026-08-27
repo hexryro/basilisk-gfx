@@ -609,7 +609,7 @@ BSGFXAPI void _bsgfx_renderColorPickers(bs_RendererScope* scope, bs_Queue* queue
 
 	if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-		bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+		bs_pushConstant(queue, pipeline, 0, sizeof(_bsgfx_app_.screen_camera.result), &_bsgfx_app_.screen_camera.result);
 		_bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER], pipeline);
 	}
 
@@ -623,7 +623,7 @@ BSGFXAPI void _bsgfx_renderColorPickers(bs_RendererScope* scope, bs_Queue* queue
 
 	if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
 
-		bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+		bs_pushConstant(queue, pipeline, 0, sizeof(_bsgfx_app_.screen_camera.result), &_bsgfx_app_.screen_camera.result);
 		_bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER_HUE], pipeline);
 	}
 
@@ -636,7 +636,7 @@ BSGFXAPI void _bsgfx_renderColorPickers(bs_RendererScope* scope, bs_Queue* queue
 	hash.shaders[1] = $fs_bsgfx_alpha();
 
 	if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
-		bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->screen_camera.result), &_poser_->screen_camera.result);
+		bs_pushConstant(queue, pipeline, 0, sizeof(_bsgfx_app_.screen_camera.result), &_bsgfx_app_.screen_camera.result);
 		_bsgfx_renderSubtype(queue, _bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER_ALPHA], pipeline);
 	}
 
@@ -1639,7 +1639,6 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 
 		bs_vec2 cursor_position = bs_windowCursorPosition(bs_scope()->context);
 		if (bs_rectangleVsPoint(&position.xy, &scale.xy, &cursor_position)) {
-			_poser_->menu_blocked = true;
 			if (bs_leftClickOnce())
 				*tab_bar->active_tab = i;
 		}
@@ -1866,7 +1865,7 @@ BSGFXAPI bool _bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* title_bar,
 	bool hovering_menu = _bsgfx_instanceDebugSettingsMenu(&menu, title_bar, menu_start_position, menu.untextured.dimensions, menu.untextured.border_id, title_bar_height);
 
 	if (hovering_widgets || hovering_menu)
-		_poser_->menu_blocked = true;
+		_bsgfx_app_.menu_blocked = true;
 	return hovering_widgets || hovering_menu;
 	*/
 	return false;

@@ -99,7 +99,7 @@ BSGFXAPI void _bsgfx_computePrefabShadows(bs_Queue* queue) {
         int exclude_flag;
     } push_constant = { 0 };
 
-    push_constant.light_direction = _poser_->sun_direction;
+    push_constant.light_direction = _bsgfx_app_.sun_direction;
     push_constant.subtype_offset = 0;
     push_constant.subtype_count = -1;
 
@@ -151,7 +151,7 @@ BSGFXAPI void _bsgfx_renderPrefabShadowVolumes(bs_RendererScope* scope, bs_Queue
     if (bs_pipeline(scope, queue, &hash, &pipeline) == BS_RESULT_OK) {
         bs_Batch* prefab_shadows_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_PREFAB_SHADOWS)->batch;
 
-        bs_pushConstant(queue, pipeline, 0, sizeof(_poser_->camera.result), &_poser_->camera.result);
+        bs_pushConstant(queue, pipeline, 0, sizeof(_bsgfx_app_.camera.result), &_bsgfx_app_.camera.result);
         bs_render(queue, prefab_shadows_batch, pipeline, 0, count, 0, 1);
 
         bs_barrier(queue, 0,
@@ -473,9 +473,9 @@ BSGFXAPI void _bsgfx_renderScenePrefabs(bs_Queue* queue) {
         bs_vec4 uv;
         bs_vec4 sun_direction;
     } mesh_push_const = {
-        .camera = _poser_->camera.result,
+        .camera = _bsgfx_app_.camera.result,
         .uv = bs_atlasCoordinates(atlas, bs_queryAtlas(atlas, "white")),
-        .sun_direction.xyz = _poser_->sun_direction,
+        .sun_direction.xyz = _bsgfx_app_.sun_direction,
     };
 
     bs_PipelineHash hash = bsgfx_defaultPipelineHash();

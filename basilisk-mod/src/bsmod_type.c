@@ -154,7 +154,7 @@ BSMODAPI bs_Result _bsmod_saveTypeN(bsgfx_TypeId id, char* comment, int comment_
 
 	// TODO: get application package name
 	result = _bsmod_packResourceF(resource_type, data, size, _bsmod_applicationContentPath(), "levels/%s_%s", bsgfx_currentScene()->name, type->plural);
-	// bs_saveFileF(data, size, "resources/levels/%s/%s.bin", bsgfx_fetchLevel(poser()->current_level)->name, type->plural);
+	// bs_saveFileF(data, size, "resources/levels/%s/%s.bin", bsgfx_fetchLevel(bsgfx_app()->current_level)->name, type->plural);
 	bs_free(data);
 	if (result != BS_RESULT_OK)
 		return result;
@@ -587,7 +587,7 @@ BSMODAPI void _bsmod_readHoveringInstanceData() {
 	}
 
 	if (_bsmod_.hovering.instance_type != -1) {
-		bsgfx_InstanceBuffer* instance = bs_bufferMap(poser()->instance_buffers[_bsmod_.hovering.instance_type]);
+		bsgfx_InstanceBuffer* instance = bs_bufferMap(bsgfx_app()->instance_buffers[_bsmod_.hovering.instance_type]);
 		instance += _bsmod_.hovering.index;
 		_bsmod_.hovering.instance_id = instance->header.id;
 
@@ -628,7 +628,7 @@ BSMODAPI void _bsmod_readHoveringVertex() {
 
 	bs_U32* data = buffer->_->data ? bs_bufferMap(buffer) : bs_mapBuffer(buffer, buffer->num_bytes);
 
-	bsgfx_InstanceBuffer* instance = bs_bufferMap(poser()->instance_buffers[_bsmod_.hovering.instance_type]);
+	bsgfx_InstanceBuffer* instance = bs_bufferMap(bsgfx_app()->instance_buffers[_bsmod_.hovering.instance_type]);
 
 	bool is_unselected_primitive = _bsmod_.hovering.flags & BSGFX_ID_IS_PRIMITIVE && !_bsmod_isSelected(BSMOD_IDS, BSGFX_TYPE_PRIMITIVE, instance->header.id);
 	if (is_unselected_primitive)

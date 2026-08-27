@@ -413,8 +413,8 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_moveWindow = (PFN_bs_moveWindow)GetProcAddress(module, "_preval_bs_moveWindow");
     functions.bs_overrideTitleBar = (PFN_bs_overrideTitleBar)GetProcAddress(module, "_preval_bs_overrideTitleBar");
     functions.bs_window = (PFN_bs_window)GetProcAddress(module, "_preval_bs_window");
+    functions.bs_showWindow = (PFN_bs_showWindow)GetProcAddress(module, "_preval_bs_showWindow");
     functions.bs_device = (PFN_bs_device)GetProcAddress(module, "_preval_bs_device");
-    functions.bs_tickContext = (PFN_bs_tickContext)GetProcAddress(module, "_preval_bs_tickContext");
     functions.bs_tick = (PFN_bs_tick)GetProcAddress(module, "_preval_bs_tick");
     functions.bs_exit = (PFN_bs_exit)GetProcAddress(module, "_preval_bs_exit");
     functions.bs_setCursor = (PFN_bs_setCursor)GetProcAddress(module, "_preval_bs_setCursor");

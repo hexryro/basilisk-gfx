@@ -107,7 +107,7 @@ static bool _bsgfx_instanceSpawner(bs_vec3 position, int id, const char* materia
         .transform = bs_rotate(bs_translate(BS_MAT4_IDENTITY, bs_v3AddY(position, 1.0)), bs_qFromDegreesV3(0.0, bs_elapsedTime() * 60.0, 0.0))
     }, 0, id, _bsgfx_queryMaterial(material)->id);
 
-    return _poser_->hovering.subtype == _bsgfx_subtypes_[BSGFX_SUBTYPE_BIPYRAMID] && _poser_->hovering.instance_id == id;
+    return _bsgfx_app_.hovering.subtype == _bsgfx_subtypes_[BSGFX_SUBTYPE_BIPYRAMID] && _bsgfx_app_.hovering.instance_id == id;
 }
 
 void _bsgfx_instanceSpawners() {
@@ -148,7 +148,7 @@ void _bsgfx_instanceSpawners() {
             break;
         }
         
-        if (hovering && !_poser_->menu_blocked) {
+        if (hovering && !_bsgfx_app_.menu_blocked) {
             //if (!_bsgfx_quickMenuEnabled())
             //    _bsgfx_instanceHint(bs_windowCursorPosition(bs_scope()->context), name);
 

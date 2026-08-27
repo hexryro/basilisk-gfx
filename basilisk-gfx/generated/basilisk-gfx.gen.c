@@ -678,6 +678,16 @@ void bsgfx_ini(
     next.bsgfx_ini(name, width, height, argc, argv);
 }
 
+void bsgfx_tick()
+{
+    next.bsgfx_tick();
+}
+
+void bsgfx_show()
+{
+    next.bsgfx_show();
+}
+
 bsgfx_Application* bsgfx_app()
 {
     return next.bsgfx_app();
@@ -691,11 +701,6 @@ bsgfx_Callbacks* bsgfx_callbacks()
 bsgfx_Settings* bsgfx_settings()
 {
     return next.bsgfx_settings();
-}
-
-struct Poser* poser()
-{
-    return next.poser();
 }
 
 void bsgfx_setCamera(

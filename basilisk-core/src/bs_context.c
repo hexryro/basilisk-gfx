@@ -389,12 +389,14 @@ static void _bs_prepareLogicalDevice(bs_PhysicalDevice* physical_device) {
     /**
     Creation
     */
-    float queue_priority = 1.0;
+    float queue_priorities[] = { 1.0, 1.0 };
+    const int queue_priorities_count = sizeof(queue_priorities) / sizeof(*queue_priorities);
+
     VkDeviceQueueCreateInfo queue_ci = {
         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = _bs_instance_->queue_family->index,
-        .queueCount = 2,
-        .pQueuePriorities = &queue_priority,
+        .queueCount = queue_priorities_count,
+        .pQueuePriorities = queue_priorities,
     };
 
     VkDeviceCreateInfo ci = {
@@ -727,6 +729,12 @@ BSAPI double _bs_elapsedTime() {
     return _bs_instance_->time;
 }
 
+BSAPI bs_ivec2 _val_bs_resolution(bs_Context* context) {
+    BS_VALIDATE(context->swapchain_image != NULL, , "");
+
+    return _bs_resolution(context);
+}
+
 BSAPI bs_ivec2 _bs_resolution(bs_Context* context) {
     return context->swapchain_image->image->dim;
 }
@@ -884,58 +892,11 @@ BSAPI void _bs_setTargetFramerate(int fps) {
 }
 
 BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
-    context->io.scroll = 0;
-    memset(context->io.chars, 0, sizeof(context->io.chars));
 
     if (BS_GET_BIT(context->io.keys, BS_KEY_ALT) && BS_GET_BIT(context->io.keys, BS_KEY_F4))
         _bs_exit();
 
-#ifdef _WIN32
     context->active = context->hwnd == GetForegroundWindow();
-
-    MSG msg;
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-        switch (msg.message) {
-        case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
-
-        case WM_LBUTTONDOWN: context->io.left_clicked = true; break;
-        case WM_LBUTTONUP: context->io.left_clicked = false; break;
-
-        case WM_RBUTTONDOWN: context->io.right_clicked = true; break;
-        case WM_RBUTTONUP: context->io.right_clicked = false; break;
-
-        case WM_MBUTTONDOWN: context->io.middle_clicked = true; break;
-        case WM_MBUTTONUP: context->io.middle_clicked = false; break;
-        case WM_MOUSEWHEEL: {
-            context->io.scroll = (SHORT)HIWORD(msg.wParam) / 120.0;
-        } break;
-        case WM_CHAR: {
-            if (msg.wParam < 256)
-                BS_SET_BIT(context->io.chars, (bs_U32)msg.wParam);
-        } break;
-        case WM_KEYDOWN: {
-            if (msg.wParam < 256) {
-                BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
-                BS_SET_BIT(context->io.hold_keys, (bs_U32)msg.wParam);
-            }
-        } break;
-        case WM_KEYUP: {
-            if (msg.wParam < 256)
-                BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
-        } break;
-        case WM_SYSKEYDOWN: {
-            if (msg.wParam < 256)
-                BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
-        } break;
-        case WM_SYSKEYUP: {
-            if (msg.wParam < 256)
-                BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
-        } break;
-        }
-
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
 
     if (context->title_bar_height > 0 && context->io.left_clicked) {
         bs_ivec2 resolution = bs_resolution(context);
@@ -965,9 +926,10 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
     if (ScreenToClient(context->hwnd, &p))
         context->cursor = BS_V2(p.x, p.y);
 
-#endif
-
-    tick();
+    if (_bs_callbacks_.tick)
+        _bs_callbacks_.tick(tick);
+    else if (tick)
+        tick();
 
     context->io.scroll_old = context->io.scroll;
     _bs_instance_->time_old = _bs_instance_->time;
@@ -1018,16 +980,98 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
         if (GetCursorPos(&p)) {
             _bs_instance_->screen_cursor = BS_V2(p.x, p.y);
         }
-
-        // pretty shit
         bs_List* object_sources = bs_objectSources();
+
+       /**
+        Message loop
+        */
+        MSG msg;
+        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            bs_Context* context = NULL;
+            for (int i = 0; i < object_sources->count; i++) {
+                bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
+                if (source->type != BS_OBJECT_CONTEXT)
+                    continue;
+
+                for (int j = 0; j < source->ids_count; j++) {
+                    if (!source->ids[j].object)
+                        continue;
+
+                    bs_Context* ctx = source->ids[j].object->context;
+                    if (ctx->hwnd == msg.hwnd)
+                        context = ctx;
+                }
+            }
+
+            if (!context) {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+                continue;
+            }
+
+            context->io.scroll = 0;
+            memset(context->io.chars, 0, sizeof(context->io.chars));
+
+            switch (msg.message) {
+            case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
+
+            case WM_LBUTTONDOWN: context->io.left_clicked = true; break;
+            case WM_LBUTTONUP: context->io.left_clicked = false; break;
+
+            case WM_RBUTTONDOWN: context->io.right_clicked = true; break;
+            case WM_RBUTTONUP: context->io.right_clicked = false; break;
+
+            case WM_MBUTTONDOWN: context->io.middle_clicked = true; break;
+            case WM_MBUTTONUP: context->io.middle_clicked = false; break;
+            case WM_MOUSEWHEEL: {
+                context->io.scroll = (SHORT)HIWORD(msg.wParam) / 120.0;
+            } break;
+            case WM_CHAR: {
+                if (msg.wParam < 256)
+                    BS_SET_BIT(context->io.chars, (bs_U32)msg.wParam);
+            } break;
+            case WM_KEYDOWN: {
+                if (msg.wParam < 256) {
+                    BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
+                    BS_SET_BIT(context->io.hold_keys, (bs_U32)msg.wParam);
+                }
+            } break;
+            case WM_KEYUP: {
+                if (msg.wParam < 256)
+                    BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
+            } break;
+            case WM_SYSKEYDOWN: {
+                if (msg.wParam < 256)
+                    BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
+            } break;
+            case WM_SYSKEYUP: {
+                if (msg.wParam < 256)
+                    BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
+            } break;
+            }
+
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+       /**
+        Tick all contexts
+        */
         for (int i = 0; i < object_sources->count; i++) {
             bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
             if (source->type != BS_OBJECT_CONTEXT)
                 continue;
 
             for (int j = 0; j < source->ids_count; j++) {
+                if (!source->ids[j].object)
+                    continue;
+
                 bs_Context* context = source->ids[j].object->context;
+
+             //   context->io.scroll = 0;
+             //   memset(context->io.chars, 0, sizeof(context->io.chars));
+
+
                 _bs_scope_.context = context;
                 _bs_tickContext(context, context->tick);
                 _bs_scope_.context = NULL;
@@ -1073,8 +1117,7 @@ BSAPI void _bs_moveWindow(bs_Context* context, int x, int y) {
  /**
   TODO: should probably build a system around this
   */
-BSAPI void _bs_overrideTitleBar(int height) {
-    bs_Context* context = _bs_scope_.context;
+BSAPI void _bs_overrideTitleBar(bs_Context* context, int height) {
     context->title_bar_height = height;
 
     SetWindowLong(context->hwnd, GWL_STYLE, 0);
@@ -1118,7 +1161,7 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Callback callback, bs_U32 wid
     bs_Timer timer = _bs_timer();
     _bs_setTargetFramerate(60);
 
-    const char class_name[] = "class";
+    const char* class_name = title;
     HINSTANCE hinstance = GetModuleHandle(0);
 
     HICON hicon = (HICON)LoadImage(
@@ -1146,6 +1189,7 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Callback callback, bs_U32 wid
 
     if (!RegisterClassEx(&wc)) {
         BS_WARN_WIN32_PATH("RegisterClassEx", title);
+        _bs_scope_.context = NULL;
         return _bs_convertWin32Error(GetLastError());
     }
 
@@ -1161,6 +1205,7 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Callback callback, bs_U32 wid
 
     if (!context->hwnd) {
         BS_WARN_WIN32_PATH("CreateWindowEx", title);
+        _bs_scope_.context = NULL;
         return _bs_convertWin32Error(GetLastError());
     }
 
@@ -1186,20 +1231,25 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Callback callback, bs_U32 wid
      int pixel_format = ChoosePixelFormat(hdc, &pixel_format_descriptor);
 	 SetPixelFormat(hdc, pixel_format, &pixel_format_descriptor);
 
-     if (_bs_callbacks_.configureWindow)
-         _bs_callbacks_.configureWindow();
-
-     ShowWindow(context->hwnd, SW_SHOW);
-     UpdateWindow(context->hwnd);
-
-	 _bs_setCursor(BS_CURSOR_DEFAULT);
-
      _bs_createSurface();
 
      _bs_scope_.context = NULL;
 
      return BS_RESULT_OK;
  }
+
+BSAPI void _bs_showWindow(bs_Context* context) {
+    _bs_scope_.context = context;
+
+    _bs_prepareSwapchain();
+
+    ShowWindow(context->hwnd, SW_SHOW);
+    UpdateWindow(context->hwnd);
+
+    _bs_setCursor(BS_CURSOR_DEFAULT);
+
+    _bs_scope_.context = NULL;
+}
 
 BSAPI void _bs_device(bs_Context* context, bs_PhysicalDevice* device) {
     _bs_scope_.context = context;
@@ -1211,6 +1261,5 @@ BSAPI void _bs_device(bs_Context* context, bs_PhysicalDevice* device) {
     bs_Procedure procedures[] = { BS_FOREACH_PROC(BS_STRING_GEN_2) };
     _bs_queryProcedures(procedures, sizeof(procedures) / sizeof(*procedures), 0, &_bs_procs_);
 
-    _bs_prepareSwapchain();
     _bs_scope_.context = NULL;
 }

@@ -822,7 +822,7 @@ BSAPI bs_Result _preval_bs_framebuffer(bs_Renderer* renderer, bs_ivec2 resolutio
     return next.bs_framebuffer(renderer, resolution);
 }
 
-BSAPI void _preval_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassCallbackFunction callbacks[], int callbacks_count) {
+BSAPI void _preval_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassFunction callbacks[], int callbacks_count) {
     BS_VALIDATE(queue != NULL, ,);
     BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, ,);
     BS_VALIDATE(renderer != NULL, ,);
@@ -2472,8 +2472,9 @@ BSAPI void _preval_bs_moveWindow(bs_Context* context, int x, int y) {
     next.bs_moveWindow(context, x, y);
 }
 
-BSAPI void _preval_bs_overrideTitleBar(int height) {
-    next.bs_overrideTitleBar(height);
+BSAPI void _preval_bs_overrideTitleBar(bs_Context* context, int height) {
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_overrideTitleBar(context, height);
 }
 
 BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title) {
@@ -2482,14 +2483,14 @@ BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Callback tick, bs_U32 
     return next.bs_window(context, tick, width, height, title);
 }
 
+BSAPI void _preval_bs_showWindow(bs_Context* context) {
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_showWindow(context);
+}
+
 BSAPI void _preval_bs_device(bs_Context* context, bs_PhysicalDevice* device) {
     BS_VALIDATE(context != NULL, ,);
     next.bs_device(context, device);
-}
-
-BSAPI void _preval_bs_tickContext(bs_Context* context) {
-    BS_VALIDATE(context != NULL, ,);
-    next.bs_tickContext(context);
 }
 
 BSAPI void _preval_bs_tick(bs_Callback fixed_tick) {
@@ -3200,8 +3201,8 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_moveWindow = _preval_bs_moveWindow;
     functions.bs_overrideTitleBar = _preval_bs_overrideTitleBar;
     functions.bs_window = _preval_bs_window;
+    functions.bs_showWindow = _preval_bs_showWindow;
     functions.bs_device = _preval_bs_device;
-    functions.bs_tickContext = _preval_bs_tickContext;
     functions.bs_tick = _preval_bs_tick;
     functions.bs_exit = _preval_bs_exit;
     functions.bs_setCursor = _preval_bs_setCursor;

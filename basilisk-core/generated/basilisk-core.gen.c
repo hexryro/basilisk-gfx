@@ -1705,7 +1705,7 @@ bs_Result bs_framebuffer(
 void bs_runPass(
     bs_Queue* queue, 
     bs_Renderer* renderer, 
-    bs_SubpassCallbackFunction callbacks[], 
+    bs_SubpassFunction callbacks[], 
     int callbacks_count)
 {
     next.bs_runPass(queue, renderer, callbacks, callbacks_count);
@@ -4225,9 +4225,10 @@ void bs_moveWindow(
 }
 
 void bs_overrideTitleBar(
+    bs_Context* context, 
     int height)
 {
-    next.bs_overrideTitleBar(height);
+    next.bs_overrideTitleBar(context, height);
 }
 
 bs_Result bs_window(
@@ -4240,17 +4241,17 @@ bs_Result bs_window(
     return next.bs_window(context, tick, width, height, title);
 }
 
+void bs_showWindow(
+    bs_Context* context)
+{
+    next.bs_showWindow(context);
+}
+
 void bs_device(
     bs_Context* context, 
     bs_PhysicalDevice* device)
 {
     next.bs_device(context, device);
-}
-
-void bs_tickContext(
-    bs_Context* context)
-{
-    next.bs_tickContext(context);
 }
 
 void bs_tick(

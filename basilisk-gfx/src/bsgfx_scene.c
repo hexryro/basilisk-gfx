@@ -157,8 +157,9 @@ static void _bsgfx_loadResources() {
     _bsgfx_allocateMaterials();
 
   //  _bsgfx_loadMaterials();
+    bs_Context* context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
 
-    bs_ivec2 resolution = bs_resolution(bs_scope()->context);
+    bs_ivec2 resolution = bs_resolution(context);
     resolution.x /= BSGFX_PIXEL_SCALE;
     resolution.y /= BSGFX_PIXEL_SCALE;
 

@@ -59,7 +59,6 @@ typedef struct bsgfx_SweepCollision bsgfx_SweepCollision;
 typedef struct bsgfx_Animator bsgfx_Animator;
 typedef struct bsgfx_AnimatorCallbacks bsgfx_AnimatorCallbacks;
 typedef struct bsgfx_Settings bsgfx_Settings;
-typedef struct Poser Poser;
 typedef struct bsgfx_Callbacks bsgfx_Callbacks;
 typedef struct bsgfx_Application bsgfx_Application;
 typedef struct bsgfx_TypeHeader bsgfx_TypeHeader;
@@ -170,9 +169,6 @@ typedef enum bsgfx_Language bsgfx_Language;
             vsprintf(data, format, args);                            \
             va_end(args);                                            \
         } while (0)
-
-#define BSGFX_MAX_NUMBER_PLAYERS                                     \
-    (8)
 
 #define BSGFX_PIXEL_SCALE                                            \
     (4.0)
@@ -1253,13 +1249,17 @@ struct bsgfx_Settings {
     bool music;
 };
 
-struct Poser {
-    int day;
-    int hour;
-    int minute;
-    int second;
-    float time;
-    bs_vec3 sun_direction;
+struct bsgfx_Callbacks {
+    PFN_void tick;
+    PFN_void fixedTick;
+    PFN_void render;
+    PFN_void loadScene;
+    PFN_bsgfx_onQueue queue;
+    PFN_void pipeline;
+};
+
+struct bsgfx_Application {
+    const char* name;
     struct {
         bs_mat4 proj;
         bs_mat4 view;
@@ -1274,29 +1274,8 @@ struct Poser {
     struct {
         bs_mat4 result;
     } screen_camera;
-    float zoom;
-    struct {
-        int joint_offset;
-    } members[BSGFX_MAX_NUMBER_PLAYERS];
-    int member_count;
     bs_List sweep_collisions;
-    bool menu_blocked;
-    bool menu_open;
-};
-
-struct bsgfx_Callbacks {
-    PFN_void tick;
-    PFN_void fixedTick;
-    PFN_void render;
-    PFN_void ini;
-    PFN_void lateIni;
-    PFN_void loadScene;
-    PFN_bsgfx_onQueue queue;
-    PFN_void pipeline;
-};
-
-struct bsgfx_Application {
-    const char* name;
+    int joint_offset;
 };
 
 struct bsgfx_TypeHeader {
@@ -2692,6 +2671,18 @@ bsgfx_ini(
     char* argv[]);
 
  /**
+  @return void
+  */
+BSGFXAPI void
+bsgfx_tick();
+
+ /**
+  @return void
+  */
+BSGFXAPI void
+bsgfx_show();
+
+ /**
   @return bsgfx_Application*
   */
 BSGFXAPI bsgfx_Application*
@@ -2708,12 +2699,6 @@ bsgfx_callbacks();
   */
 BSGFXAPI bsgfx_Settings*
 bsgfx_settings();
-
- /**
-  @return struct Poser*
-  */
-BSGFXAPI struct Poser*
-poser();
 
  /**
   @param proj
@@ -3324,7 +3309,6 @@ BSGFXAPI extern bs_List _bsgfx_materials_;
 BSGFXAPI extern bs_mat4* _bsgfx_shader_joints_;
 BSGFXAPI extern bs_U32 _bsgfx_num_shader_joints_;
 BSGFXAPI extern bsgfx_Settings _bsgfx_settings_;
-BSGFXAPI extern struct Poser* _poser_;
 BSGFXAPI extern bsgfx_Application _bsgfx_app_;
 BSGFXAPI extern bs_Model* _bsgfx_prefab_model_;
 BSGFXAPI extern bsgfx_Callbacks _bsgfx_callbacks_;

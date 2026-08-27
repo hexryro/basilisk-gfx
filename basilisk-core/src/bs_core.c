@@ -131,7 +131,6 @@ BSAPI void _bs_endComment(bs_Queue* queue) {
 BSAPI void _bs_parseArgs(int argc, char* argv[]) {
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "--use-validation-layers") == 0) _bs_args_.use_validation_layers = true;
-        else if (strcmp(argv[i], "--track-changes") == 0) _bs_args_.track_changes = true;
     }
 }
 
@@ -1932,7 +1931,7 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
 
     VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
-    VkClearValue clear_values[BS_MAX_ATTACHMENTS_COUNT] = { 0 };
+    VkClearValue* clear_values = bs_alloca(renderer->num_outputs * sizeof(VkClearValue));
 
     for (int i = 0; i < renderer->num_outputs; i++) {
         bs_Output* output = renderer->outputs + i;
@@ -2039,7 +2038,7 @@ BSAPI void _bs_endRender(bs_Queue* queue, bs_Renderer* renderer) {
     //_bs_scope_.subpass = 0;
 }
 
-BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassCallbackFunction subpasses[], int subpasses_count) {
+BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassFunction subpasses[], int subpasses_count) {
     BS_VALIDATE(subpasses_count <= renderer->num_subpasses,,);
 
     for (int i = 0; i < subpasses_count; i++) {
@@ -2049,13 +2048,13 @@ BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassCal
     _bs_runPass(queue, renderer, subpasses, subpasses_count);
 }
 
-BSAPI void _bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassCallbackFunction callbacks[], int callbacks_count) {
+BSAPI void _bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassFunction callbacks[], int callbacks_count) {
     _bs_beginRender(queue, renderer);
     VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     if (renderer->render_pass) {
         for (int i = 0; i < renderer->num_subpasses; i++) {
-            bs_SubpassCallbackFunction callback = callbacks[i];
+            bs_SubpassFunction callback = callbacks[i];
 
             if (i != 0) {
                 //_bs_scope_.subpass = i;

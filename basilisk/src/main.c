@@ -37,22 +37,6 @@ Basilisk basilisk = {
 	.package_id = -1,
 };
 
-static void basilisk_loadFontCollection(bs_Object* object) {/*
-	bs_Sampler* nearest_sampler = bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler;
-
-	bs_Object* sans_serif_16 = BS_FONT(BSGFX_FONTS, BSGFX_FONT_SANS_SERIF_16, 0);
-	result = bs_loadFont(sans_serif_16, _bsmod_.package, "fonts/sans-serif_16", BSGFX_ALPHABET_DEFAULT, 16.0, 0);
-	if (result == BS_RESULT_OK)
-		bs_bindFont(sans_serif_16->font, nearest_sampler, BSGFX_SET_FONTS, BSGFX_BINDING_FONT_SANS_SERIF);
-
-	bs_Object* quad_instanced_batch = bs_fetch(BSGFX_BATCHES, BSGFX_BATCH_QUAD_INSTANCED);
-	bs_Range range = {
-		.num = 6, // single quad
-	};
-	_bsmod_subtypes_[BSMOD_SUBTYPE_FONT_SANS_SERIF] = bsgfx_subtype(BSGFX_INSTANCE_TYPE_QUAD, quad_instanced_batch->batch, 0, range);
-	*/
-}
-
 static void onLoadScene() {
 	bsgfx_test(); // temp testing fonts
 	$vs_bsgfx_mesh_color();
@@ -73,14 +57,8 @@ static void onLoadScene() {
 	bsmod_bindAtlases();
 }
 
-static bs_Queue* onQueue() {
-	bs_Queue* queue = bsmod_onQueue();
-
-	return NULL;
-}
-
 static void onTick() {
-	_bsmod_onTick();
+	bsmod_onTick();
 
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
@@ -88,20 +66,8 @@ static void onTick() {
 	basilisk_instantiateTitleBarUI();
 }
 
-static void onModTick() {
-
-}
-
-static void onIni() {
-	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
-
-	bsmod_onIni();
-}
-
-static void onLateIni() {
-	bsmod_onLateIni();
-
-	bsgfx_loadScene("engine");
+static void onTitleBarTick() {
+	//bs_clearColor(queue, 0, bs_resolution(bs_scope()->context), &clear_color);
 }
 
 static void onLog(const bs_LogQueueItem* item) {
@@ -142,14 +108,6 @@ static void onLog(const bs_LogQueueItem* item) {
 	}
 }
 
-// hack to debug validation errors
-static void onError() {
-}
-
-static void basilisk_configureWindow() {
-	bs_overrideTitleBar(BASILISK_TITLE_BAR_HEIGHT);
-}
-
 int main(int argc, char* argv[]) {
 	bs_enableValidation();
 	bsgfx_enableValidation();
@@ -161,25 +119,16 @@ int main(int argc, char* argv[]) {
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {
 		.log = onLog,
-		.error = onError,
-		.configureWindow = basilisk_configureWindow,
 	};
 
 	bsgfx_Callbacks* gfx_callbacks = bsgfx_callbacks();
 	*gfx_callbacks = (bsgfx_Callbacks) {
-		.queue = onQueue,
 		.loadScene = onLoadScene,
-		.ini = onIni,
-		.lateIni = onLateIni,
 		.tick = onTick,
 		.pipeline = basilisk_pipeline,
 	};
 
-	bsmod_Callbacks* mod_callbacks = bsmod_callbacks();
-	*mod_callbacks = (bsmod_Callbacks) {
-		.tick = onModTick,
-	};
-
+	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_CONTEXT, BASILISK_CONTEXTS_COUNT, BASILISK_CONTEXT_IDS);
 	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_IMAGE, BASILISK_IMAGES_COUNT, BASILISK_IMAGE_IDS);
 	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_SAMPLER, BASILISK_SAMPLERS_COUNT, BASILISK_SAMPLER_IDS);
 	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_BUFFER, BASILISK_BUFFERS_COUNT, BASILISK_BUFFER_IDS);
@@ -190,6 +139,19 @@ int main(int argc, char* argv[]) {
 	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_ATLAS, BASILISK_ATLASES_COUNT, BASILISK_ATLAS_IDS);
 
 	bsgfx_ini("Basilisk", 1920, 1080, argc, argv);
+
+	bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);
+	bs_window(title_bar_context->context, onTitleBarTick, 800, 600, "test");
+	bs_showWindow(title_bar_context->context);
+
+	bsgfx_show();
+
+	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
+	bsmod_onIni();
+	bsmod_onLateIni();
+	bsgfx_loadScene("engine");
+
+	bsgfx_tick();
 
 	return 0;
 }

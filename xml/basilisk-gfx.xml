@@ -948,7 +948,6 @@
             <line>    } while (0)</line>
         </macro>
 
-        <macro><name>#define BSGFX_MAX_NUMBER_PLAYERS</name><line>(8)</line></macro>
         <macro><name>#define BSGFX_PIXEL_SCALE</name><line>(4.0)</line></macro>
         <macro><name>#define BSGFX_FIXED_TICK</name><line>(1.0 / 40.0)</line></macro>
         <macro><name>#define BSGFX_TITLE_BAR_COLOR</name><line>(bs_RGBA) { 255, 255, 255, 200 }</line></macro>
@@ -1140,13 +1139,17 @@
 			<field><type>bool</type><name>music</name></field>
 		</structure>
 
-		<structure name="Poser">
-			<field><type>int</type><name>day</name></field>
-			<field><type>int</type><name>hour</name></field>
-			<field><type>int</type><name>minute</name></field>
-			<field><type>int</type><name>second</name></field>
-			<field><type>float</type><name>time</name></field>
-			<field><type>bs_vec3</type><name>sun_direction</name></field>
+		<structure name="bsgfx_Callbacks">
+			<field><type>PFN_void</type><name>tick</name></field>
+			<field><type>PFN_void</type><name>fixedTick</name></field>
+			<field><type>PFN_void</type><name>render</name></field>
+			<field><type>PFN_void</type><name>loadScene</name></field>
+			<field><type>PFN_bsgfx_onQueue</type><name>queue</name></field>
+			<field><type>PFN_void</type><name>pipeline</name></field>
+		</structure>
+
+		<structure name="bsgfx_Application">
+			<field><type>const char*</type><name>name</name></field>
 			<structure instance=" camera">
 				<field><type>bs_mat4</type><name>proj</name></field>
 				<field><type>bs_mat4</type><name>view</name></field>
@@ -1161,29 +1164,8 @@
 			<structure instance=" screen_camera">
 				<field><type>bs_mat4</type><name>result</name></field>
 			</structure>
-			<field><type>float</type><name>zoom</name></field>
-			<structure instance=" members[BSGFX_MAX_NUMBER_PLAYERS]">
-				<field><type>int</type><name>joint_offset</name></field>
-			</structure>
-			<field><type>int</type><name>member_count</name></field>
 			<field><type>bs_List</type><name>sweep_collisions</name></field>
-			<field><type>bool</type><name>menu_blocked</name></field>
-			<field><type>bool</type><name>menu_open</name></field>
-		</structure>
-
-		<structure name="bsgfx_Callbacks">
-			<field><type>PFN_void</type><name>tick</name></field>
-			<field><type>PFN_void</type><name>fixedTick</name></field>
-			<field><type>PFN_void</type><name>render</name></field>
-			<field><type>PFN_void</type><name>ini</name></field>
-			<field><type>PFN_void</type><name>lateIni</name></field>
-			<field><type>PFN_void</type><name>loadScene</name></field>
-			<field><type>PFN_bsgfx_onQueue</type><name>queue</name></field>
-			<field><type>PFN_void</type><name>pipeline</name></field>
-		</structure>
-
-		<structure name="bsgfx_Application">
-			<field><type>const char*</type><name>name</name></field>
+			<field><type>int</type><name>joint_offset</name></field>
 		</structure>
 
 		<structure name="bsgfx_TypeHeader">
@@ -2088,10 +2070,15 @@
 			<param><type>int</type><name>argc</name></param>
 			<param><type>char*</type><name>argv</name><size></size></param>
 		</function>
+		<function name="bsgfx_tick">
+			<return>void</return>
+		</function>
+		<function name="bsgfx_show">
+			<return>void</return>
+		</function>
 		<function name="bsgfx_app"><return>bsgfx_Application*</return></function>
 		<function name="bsgfx_callbacks"><return>bsgfx_Callbacks*</return></function>
 		<function name="bsgfx_settings"><return>bsgfx_Settings*</return></function>
-		<function name="poser"><return>struct Poser*</return></function>
 		<function name="bsgfx_setCamera">
 			<return>void</return>
 			<param><type>const bs_mat4*</type><name>proj</name></param>
@@ -2413,7 +2400,6 @@
 		<extern><type>bs_mat4*</type><name>bsgfx_shader_joints</name></extern>
 		<extern><type>bs_U32</type><name>bsgfx_num_shader_joints</name></extern>
 		<extern><type>bsgfx_Settings</type><name>bsgfx_settings</name></extern>
-		<extern><type>struct Poser*</type><name>poser</name></extern>
 		<extern><type>bsgfx_Application</type><name>bsgfx_app</name></extern>
 		<extern><type>bs_Model*</type><name>bsgfx_prefab_model</name></extern>
 		<extern><type>bsgfx_Callbacks</type><name>bsgfx_callbacks</name></extern>

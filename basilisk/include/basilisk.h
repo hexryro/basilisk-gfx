@@ -37,6 +37,10 @@ extern Basilisk basilisk;
 
 #define BASILISK_TITLE_BAR_HEIGHT 32
 
+#define BASILISK_CONTEXT_IDS(X)								    \
+    X(BASILISK_CONTEXT_TITLE_BAR)                               \
+    X(BASILISK_CONTEXTS_COUNT)
+
 #define BASILISK_IMAGE_IDS(X)								    \
     X(BASILISK_IMAGE_MAIN_OUTPUT_DEPTH)                         \
     X(BASILISK_IMAGE_MAIN_OUTPUT_COLOR)                         \
@@ -67,6 +71,7 @@ extern Basilisk basilisk;
 #define BASILISK_FONT_IDS(X)                                    \
 	X(BASILISK_FONTS_COUNT)
 
+BS_GENERATE_ENUM(BASILISK_CONTEXT_IDS);
 BS_GENERATE_ENUM(BASILISK_IMAGE_IDS);
 BS_GENERATE_ENUM(BASILISK_SAMPLER_IDS);
 BS_GENERATE_ENUM(BASILISK_BUFFER_IDS);

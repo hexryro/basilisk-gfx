@@ -458,6 +458,14 @@ BSGFXAPI void _preval_bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, i
     next.bsgfx_ini(name, width, height, argc, argv);
 }
 
+BSGFXAPI void _preval_bsgfx_tick() {
+    next.bsgfx_tick();
+}
+
+BSGFXAPI void _preval_bsgfx_show() {
+    next.bsgfx_show();
+}
+
 BSGFXAPI bsgfx_Application* _preval_bsgfx_app() {
     return next.bsgfx_app();
 }
@@ -468,10 +476,6 @@ BSGFXAPI bsgfx_Callbacks* _preval_bsgfx_callbacks() {
 
 BSGFXAPI bsgfx_Settings* _preval_bsgfx_settings() {
     return next.bsgfx_settings();
-}
-
-BSGFXAPI struct Poser* _preval_poser() {
-    return next.poser();
 }
 
 BSGFXAPI void _preval_bsgfx_setCamera(const bs_mat4* proj, const bs_mat4* view) {
@@ -833,10 +837,11 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_prefabModel = _preval_bsgfx_prefabModel;
     functions.bsgfx_package = _preval_bsgfx_package;
     functions.bsgfx_ini = _preval_bsgfx_ini;
+    functions.bsgfx_tick = _preval_bsgfx_tick;
+    functions.bsgfx_show = _preval_bsgfx_show;
     functions.bsgfx_app = _preval_bsgfx_app;
     functions.bsgfx_callbacks = _preval_bsgfx_callbacks;
     functions.bsgfx_settings = _preval_bsgfx_settings;
-    functions.poser = _preval_poser;
     functions.bsgfx_setCamera = _preval_bsgfx_setCamera;
     functions.bsgfx_type = _preval_bsgfx_type;
     functions.bsgfx_map = _preval_bsgfx_map;
