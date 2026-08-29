@@ -1321,6 +1321,7 @@ typedef void (__stdcall* bs_ConfigureWindowFunction)(bs_Context*);
 typedef bs_NonClientArea (__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2);
 typedef void (__stdcall* bs_ResizeContextFunction)(bs_Context*);
 typedef void (__stdcall* bs_SubpassFunction)(bs_RendererScope*);
+typedef void (__stdcall* bs_ContextTickFunction)(bs_Context* context);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -1410,7 +1411,7 @@ enum bs_NonClientArea {
 enum bs_WindowType {
     BS_WINDOW_DEFAULT = 0,
     BS_WINDOW_NO_TITLE_BAR = 1,
-    BS_WINDOW_POPUP = 2,
+    BS_WINDOW_MENU = 2,
 };
 
 enum bs_ImageFilter {
@@ -1660,7 +1661,6 @@ enum bs_ImageBit {
     BS_IMAGE_INPUT_ATTACHMENT_BIT = 1 << 6,
     BS_IMAGE_USAGE_TRANSFER_DST_BIT = 1 << 7,
     BS_IMAGE_USAGE_TRANSFER_SRC_BIT = 1 << 8,
-    BS_IMAGE_AUTO_RESIZE_BIT = 1 << 9,
     BS_IMAGE_IS_BOUND = 1 << 10,
     BS_IMAGE_USAGE_STORAGE_BIT = 1 << 13,
 };
@@ -1707,7 +1707,6 @@ enum bs_RendererBit {
     BSI_RENDERER_SUBPASS_03_DEPTH_BIT = (1 << 3),
     BSI_RENDERER_SUBPASS_04_DEPTH_BIT = (1 << 4),
     BSI_RENDERER_SUBPASS_05_DEPTH_BIT = (1 << 5),
-    BS_RENDERER_AUTO_RESIZE_BIT = (1 << 6),
     BSI_RENDERER_HAS_SWAPS_BIT = (1 << 7),
 };
 
@@ -2700,6 +2699,7 @@ struct bs_Renderer {
     int num_dependencies;
     bs_ivec2 dim;
     bs_Queue* queue;
+    bs_Context* context;
     struct VkRenderPass_T* render_pass;
     bs_RendererSwaps _[];
 };
@@ -3098,7 +3098,7 @@ struct bs_Context {
     bs_Timer timer;
     bs_ivec2 dimensions;
     bs_Callback destroy;
-    bs_Callback tick;
+    bs_ContextTickFunction tick;
     bs_vec2 cursor;
     bs_vec2 border_size;
     bs_WindowType window_type;
@@ -3131,7 +3131,6 @@ struct bs_Scope {
 
 struct bs_Args {
     bool use_validation_layers;
-    bool track_changes;
 };
 
 struct bs_Features {
@@ -3148,7 +3147,6 @@ struct bs_Props {
 struct bs_Callbacks {
     bs_MessageFunction log;
     bs_ValidationErrorFunction error;
-    bs_ContextTickFunction tick;
     bs_NonClientAreaTickFunction client_area_tick;
 };
 
@@ -5494,6 +5492,16 @@ BSAPI bs_Range
 bs_pushModel(
     bs_Batch* batch,
     bs_Model* model);
+
+ /**
+  @param renderer
+  @param context
+  @return void
+  */
+BSAPI void
+bs_autoResizeRenderer(
+    bs_Renderer* renderer,
+    bs_Context* context);
 
  /**
   @param object
@@ -9075,7 +9083,7 @@ BSAPI bs_Result
 bs_window(
     bs_Context* context,
     bs_Context* parent,
-    bs_Callback tick,
+    bs_ContextTickFunction tick,
     bs_U32 width,
     bs_U32 height,
     const char* title,

@@ -388,9 +388,9 @@ BSMODAPI void _bsmod_instanceTransform() {
 		}
 	}
 
-	//bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], bsgfx_matrix(sx, BS_V3(width, width, 0.0)), $BSMOD_ATLAS_UI_white()->coords, 0, 0, $yellow_material()->id);
-	//bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], bsgfx_matrix(sy, BS_V3(width, width, 0.0)), $BSMOD_ATLAS_UI_white()->coords, 0, 0, $yellow_material()->id);
-	//bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], bsgfx_matrix(sz, BS_V3(width, width, 0.0)), $BSMOD_ATLAS_UI_white()->coords, 0, 0, $yellow_material()->id);
+	//bsgfx_instantiateQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], bsgfx_matrix(sx, BS_V3(width, width, 0.0)), $BSMOD_ATLAS_UI_white()->coords, 0, 0, $yellow_material()->id);
+	//bsgfx_instantiateQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], bsgfx_matrix(sy, BS_V3(width, width, 0.0)), $BSMOD_ATLAS_UI_white()->coords, 0, 0, $yellow_material()->id);
+	//bsgfx_instantiateQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], bsgfx_matrix(sz, BS_V3(width, width, 0.0)), $BSMOD_ATLAS_UI_white()->coords, 0, 0, $yellow_material()->id);
 
 	//bsgfx_instancePoint(px1, BS_YELLOW, 16.0);
 	//int cone_subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_CONE_MESH];

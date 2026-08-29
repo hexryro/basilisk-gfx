@@ -47,6 +47,9 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     functions.bsgfx_test = (PFN_bsgfx_test)GetProcAddress(module, "_preval_bsgfx_test");
     functions.bsgfx_subtypes = (PFN_bsgfx_subtypes)GetProcAddress(module, "_preval_bsgfx_subtypes");
     functions.bsgfx_instanceTypes = (PFN_bsgfx_instanceTypes)GetProcAddress(module, "_preval_bsgfx_instanceTypes");
+    functions.bsgfx_computeContextCamera = (PFN_bsgfx_computeContextCamera)GetProcAddress(module, "_preval_bsgfx_computeContextCamera");
+    functions.bsgfx_tickInstanceTypes = (PFN_bsgfx_tickInstanceTypes)GetProcAddress(module, "_preval_bsgfx_tickInstanceTypes");
+    functions.bsgfx_resetInstanceTypes = (PFN_bsgfx_resetInstanceTypes)GetProcAddress(module, "_preval_bsgfx_resetInstanceTypes");
     functions.bsgfx_textDimensions = (PFN_bsgfx_textDimensions)GetProcAddress(module, "_preval_bsgfx_textDimensions");
     functions.bsgfx_defaultPipelineHash = (PFN_bsgfx_defaultPipelineHash)GetProcAddress(module, "_preval_bsgfx_defaultPipelineHash");
     functions.bsgfx_renderTileIcons = (PFN_bsgfx_renderTileIcons)GetProcAddress(module, "_preval_bsgfx_renderTileIcons");
@@ -106,7 +109,7 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     functions.bsgfx_instanceSphere = (PFN_bsgfx_instanceSphere)GetProcAddress(module, "_preval_bsgfx_instanceSphere");
     functions.bsgfx_instanceCone = (PFN_bsgfx_instanceCone)GetProcAddress(module, "_preval_bsgfx_instanceCone");
     functions.bsgfx_instancePoint = (PFN_bsgfx_instancePoint)GetProcAddress(module, "_preval_bsgfx_instancePoint");
-    functions.bsgfx_instanceQuad = (PFN_bsgfx_instanceQuad)GetProcAddress(module, "_preval_bsgfx_instanceQuad");
+    functions.bsgfx_instantiateQuad = (PFN_bsgfx_instantiateQuad)GetProcAddress(module, "_preval_bsgfx_instantiateQuad");
     functions.bsgfx_instanceDepthlessCircle = (PFN_bsgfx_instanceDepthlessCircle)GetProcAddress(module, "_preval_bsgfx_instanceDepthlessCircle");
     functions.bsgfx_instanceAtlas = (PFN_bsgfx_instanceAtlas)GetProcAddress(module, "_preval_bsgfx_instanceAtlas");
     functions.bsgfx_instanceAtlasFlipped = (PFN_bsgfx_instanceAtlasFlipped)GetProcAddress(module, "_preval_bsgfx_instanceAtlasFlipped");

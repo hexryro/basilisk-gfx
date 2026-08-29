@@ -37,6 +37,37 @@ Basilisk basilisk = {
 	.package_id = -1,
 };
 
+Fonts _fonts_ = { 0 };
+
+
+
+  /*==============================================================================
+   * Load
+   *============================================================================*/
+
+static void queryFonts() {
+	int package = bs_queryPackage("content/basilisk-fonts.bpak");
+
+	struct {
+		const char* resource_name;
+		bsgfx_Font** destination;
+	} table[] = {
+		{ "project/fonts/selawk.ttf", &_fonts_.selawik }
+	};
+	int count = sizeof(table) / sizeof(*table);
+
+	if (package >= 0) {
+		for (int i = 0; i < count; i++) {
+			bs_Resource* resource = NULL;
+			bs_queryResource(package, BS_RESOURCE_FONT, table[i].resource_name, &resource);
+			if (resource)
+				*table[i].destination = resource->font;
+		}
+	}
+
+	return NULL;
+}
+
 static void onLoadScene() {
 	bsgfx_test(); // temp testing fonts
 	$vs_bsgfx_mesh_color();
@@ -44,6 +75,8 @@ static void onLoadScene() {
 
 	basilisk_createRenderers();
 		//basilisk_loadFonts();
+
+	queryFonts();
 
 	bs_loadPackage(&basilisk.package_id, "content/basilisk.bpak");
 	bsmod_iniPackage(basilisk.package_id);
@@ -63,23 +96,22 @@ static void onLoadScene() {
 	bsmod_bindAtlases();
 }
 
+
+
+  /*==============================================================================
+   * Tick
+   *============================================================================*/
+
 static void onTick() {
-	bsmod_onTick();
+	onTitleBarTick();
 
-	bs_mat4 transform = BS_MAT4_IDENTITY;
-	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
-
-	//basilisk_instantiateBaseUI();
-	basilisk_instantiateTitleBarUI();
 }
 
-static void onTitleBarTick() {
-	basilisk_instantiateTitleBarUI();
-}
 
-static void onContextMenuTick() {
-	basilisk_instantiateContextMenuUI();
-}
+
+  /*==============================================================================
+   * Log
+   *============================================================================*/
 
 static void onLog(const bs_LogQueueItem* item) {
 	static const char* libraries[BS_LIBRARIES_COUNT] = {
@@ -119,6 +151,12 @@ static void onLog(const bs_LogQueueItem* item) {
 	}
 }
 
+
+
+  /*==============================================================================
+   * Resize
+   *============================================================================*/
+
 static void onResizeContext(bs_Context* context) {
 	bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
 
@@ -143,8 +181,8 @@ int main(int argc, char* argv[]) {
 	bsgfx_Callbacks* gfx_callbacks = bsgfx_callbacks();
 	*gfx_callbacks = (bsgfx_Callbacks) {
 		.loadScene = onLoadScene,
-		.tick = onTick,
 		.pipeline = basilisk_pipeline,
+		.tick = onTick,
 	};
 
 	BS_CONFIGURE_SOURCE(basilisk.sources, BS_OBJECT_CONTEXT, BASILISK_CONTEXTS_COUNT, BASILISK_CONTEXT_IDS);
@@ -166,9 +204,10 @@ int main(int argc, char* argv[]) {
 
 	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
 
-//	bs_Object* menu_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU, 0);
-//	bs_window(menu_context->context, NULL, onContextMenuTick, bs_resolution(basilisk.context).x, 32, "test", BS_WINDOW_POPUP);
-//	bs_swapchain(menu_context->context);
+	bs_Object* menu_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU, 0);
+	bs_window(menu_context->context, NULL, onContextMenuTick, bs_resolution(basilisk.context).x, 32, "ContextMenu", BS_WINDOW_MENU);
+	//bs_showWindow(menu_context->context);
+	bs_swapchain(menu_context->context);
 
 	//bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);
 	//bs_window(title_bar_context->context, basilisk.context, onTitleBarTick, bs_resolution(basilisk.context).x, 32, "test", 0);

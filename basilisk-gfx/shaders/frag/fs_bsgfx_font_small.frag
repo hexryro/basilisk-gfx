@@ -30,5 +30,6 @@ void main() {
     float alpha_scale = 0.6;
     float coverage = pow(r, alpha_scale);
 
-    out_color = vec4(1.0, 1.0, 1.0, coverage);
+    vec3 c = vec3(in_color.xyz);
+    out_color = vec4(c, coverage);
 }

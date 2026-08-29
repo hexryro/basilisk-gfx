@@ -1035,6 +1035,7 @@
 			<structure>
 				<field><type>char*</type><name>as_ascii</name></field>
 			</structure>
+			<field><type>int</type><name>material_id</name></field>
 		</structure>
 		
 		<structure name="bsgfx_Text">
@@ -1142,7 +1143,6 @@
 		<structure name="bsgfx_Callbacks">
 			<field><type>PFN_void</type><name>tick</name></field>
 			<field><type>PFN_void</type><name>fixedTick</name></field>
-			<field><type>PFN_void</type><name>render</name></field>
 			<field><type>PFN_void</type><name>loadScene</name></field>
 			<field><type>PFN_bsgfx_onQueue</type><name>queue</name></field>
 			<field><type>PFN_void</type><name>pipeline</name></field>
@@ -1687,7 +1687,19 @@
 		<function name="bsgfx_instanceTypes">
 			<return>bsgfx_InstanceType**</return>
 		</function>
+		
+		<function name="bsgfx_computeContextCamera">
+			<return>void</return>
+		</function>
+		
+		<function name="bsgfx_tickInstanceTypes">
+			<return>void</return>
+		</function>
 
+		<function name="bsgfx_resetInstanceTypes">
+			<return>void</return>
+		</function>
+		
 		<function name="bsgfx_textDimensions">
 			<return>void</return>
 			<param><type>bsgfx_Font*</type><name>font</name></param>
@@ -2003,7 +2015,7 @@
 			<param><type>bs_RGBA</type><name>color</name></param>
 			<param><type>float</type><name>size</name></param>
 		</function>
-		<function name="bsgfx_instanceQuad">
+		<function name="bsgfx_instantiateQuad">
 			<return>int</return>
 			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bs_mat4x3</type><name>transform</name></param>
@@ -2049,6 +2061,7 @@
 			<param><type>bsgfx_Font*</type><name>font</name></param>
 			<param><type>bs_vec3</type><name>position</name></param>
 			<param><type>int</type><name>pt_size</name></param>
+			<param><type>int</type><name>material_id</name></param>
 		</variadicStringTemplate>
 		<function name="bsgfx_matrix">
 			<return>bs_mat4x3</return>

@@ -60,20 +60,6 @@ bs_NonClientArea onClientAreaTick(bs_Context* context, bs_ivec2 pt) {
     return BS_CLIENT_AREA;
 }
 
-static bsgfx_Font* basilisk_querySegoeUI() {
-    int package = bs_queryPackage("content/basilisk-fonts.bpak");
-    if (package >= 0) {
-        bs_Resource* resource = NULL;
-        bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
-
-        if (resource && resource->model) {
-            return (bsgfx_Font*)resource->model;
-        }
-    }
-
-    return NULL;
-}
-
 static bool basilisk_instantiateButtonBackgroundUI(bsgfx_UIElement* element, bsgfx_Material* material, bs_vec3 position, bs_vec2 size) {
     bsgfx_UISolid button = {
         .position = position,
@@ -144,7 +130,7 @@ static bool basilisk_instantiateTitleBarTextButtonUI(const char* text, bsgfx_Mat
 
 void basilisk_instantiateTitleBarUI() {
     basilisk_hovering_title_bar_buttons = false;
-    basilisk_title_bar_font = basilisk_querySegoeUI();
+    basilisk_title_bar_font = _fonts_.selawik;
 
     if (!basilisk_title_bar_font)
         return;
@@ -197,7 +183,8 @@ void basilisk_instantiateTitleBarUI() {
 
     hovering = basilisk_instantiateTitleBarTextButtonUI("File", default_button_background_material, position, title_bar_size);
     if (hovering && bs_leftClickOnce()) {
-
+        bs_Context* menu_context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
+        showContextMenuUI(CONTEXT_MENU_FILE, position);
     }
 
     position.x = title_bar_size.x;
@@ -309,4 +296,24 @@ void basilisk_instantiateTitleBarUI() {
    /**
     Engine icon
     */
+}
+
+void onTitleBarTick() {
+    bsgfx_computeContextCamera();
+    bsmod_onTick();
+
+    //basilisk_instantiateBaseUI();
+    bs_Context* context = bs_scope()->context;
+    bool was_hidden = context->hidden;
+    basilisk_instantiateTitleBarUI();
+
+    bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
+    bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
+    //bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_TITLE_BAR)->renderer;
+    //bs_Queue* queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_TITLE_BAR)->queue;
+
+    bs_RGBA clear_color = BS_RGBA(75, 75, 75, 255);
+    bsgfx_tickInstanceTypes();
+    basilisk_pipeline(queue, renderer, clear_color);
+    bsgfx_resetInstanceTypes();
 }

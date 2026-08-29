@@ -68,6 +68,7 @@
 		<typedef><type>bs_NonClientArea</type><name>(__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ResizeContextFunction)(bs_Context*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
+        <typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_Context* context)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
@@ -159,7 +160,7 @@
 		<enum name="bs_WindowType">
 			<line><name>BS_WINDOW_DEFAULT</name><value>0</value></line>
 			<line><name>BS_WINDOW_NO_TITLE_BAR</name><value>1</value></line>
-			<line><name>BS_WINDOW_POPUP</name><value>2</value></line>
+			<line><name>BS_WINDOW_MENU</name><value>2</value></line>
 		</enum>
 		<enum name="bs_ImageFilter">
 			<line><name>BS_FILTER_NEAREST</name><value>0</value></line>
@@ -281,7 +282,6 @@
 			<line><name>BS_IMAGE_INPUT_ATTACHMENT_BIT</name><value>1 &lt;&lt; 6</value></line>
 			<line><name>BS_IMAGE_USAGE_TRANSFER_DST_BIT</name><value>1 &lt;&lt; 7</value></line>
 			<line><name>BS_IMAGE_USAGE_TRANSFER_SRC_BIT</name><value>1 &lt;&lt; 8</value></line>
-			<line><name>BS_IMAGE_AUTO_RESIZE_BIT</name><value>1 &lt;&lt; 9</value></line>
 			<line><name>BS_IMAGE_IS_BOUND</name><value>1 &lt;&lt; 10</value></line>
 			<line><name>BS_IMAGE_USAGE_STORAGE_BIT</name><value>1 &lt;&lt; 13</value></line>
 		</enum>
@@ -321,7 +321,6 @@
 			<line><name>BSI_RENDERER_SUBPASS_03_DEPTH_BIT</name><value>(1 &lt;&lt; 3)</value></line>
 			<line><name>BSI_RENDERER_SUBPASS_04_DEPTH_BIT</name><value>(1 &lt;&lt; 4)</value></line>
 			<line><name>BSI_RENDERER_SUBPASS_05_DEPTH_BIT</name><value>(1 &lt;&lt; 5)</value></line>
-			<line><name>BS_RENDERER_AUTO_RESIZE_BIT</name><value>(1 &lt;&lt; 6)</value></line>
 			<line><name>BSI_RENDERER_HAS_SWAPS_BIT</name><value>(1 &lt;&lt; 7)</value></line>
 		</enum>
 		<enum name="bs_OutputFlag">
@@ -1483,6 +1482,7 @@
             <field><type>int</type><name>num_dependencies</name></field>
             <field><type>bs_ivec2</type><name>dim</name></field>
             <field><type>bs_Queue*</type><name>queue</name></field>
+            <field><type>bs_Context*</type><name>context</name></field>
             <field><type>struct VkRenderPass_T*</type><name>render_pass</name></field>
             <field><type>bs_RendererSwaps</type><name>_</name><size></size></field>
         </structure>
@@ -1859,7 +1859,7 @@
             <field><type>bs_Timer</type><name>timer</name></field>
             <field><type>bs_ivec2</type><name>dimensions</name></field>
             <field><type>bs_Callback</type><name>destroy</name></field>
-            <field><type>bs_Callback</type><name>tick</name></field>
+            <field><type>bs_ContextTickFunction</type><name>tick</name></field>
             <field><type>bs_vec2</type><name>cursor</name></field>
             <field><type>bs_vec2</type><name>border_size</name></field>
             <field><type>bs_WindowType</type><name>window_type</name></field>
@@ -1896,7 +1896,6 @@
 		
         <structure name="bs_Args">
             <field><type>bool</type><name>use_validation_layers</name></field>
-            <field><type>bool</type><name>track_changes</name></field>
         </structure>
         <structure name="bs_Features">
             <field><type>bool</type><name>independent_blend</name></field>
@@ -1911,7 +1910,6 @@
 		<structure name="bs_Callbacks">
 			<field><type>bs_MessageFunction</type><name>log</name></field>
 			<field><type>bs_ValidationErrorFunction</type><name>error</name></field>
-			<field><type>bs_ContextTickFunction</type><name>tick</name></field>
 			<field><type>bs_NonClientAreaTickFunction</type><name>client_area_tick</name></field>
 		</structure>
 
@@ -2781,6 +2779,11 @@
         <batchFunctionTemplate name="Model">
             <param><type>bs_Model*</type><name>model</name></param>
         </batchFunctionTemplate>
+		<function name="bs_autoResizeRenderer">
+            <return>void</return>
+            <param><type>bs_Renderer*</type><name>renderer</name></param>
+			<param><type>bs_Context*</type><name>context</name></param>
+        </function>
         <function name="bs_renderer">
             <return>bs_Result</return>
             <param><type>bs_Object*</type><name>object</name></param>
@@ -2899,7 +2902,7 @@
         <function name="bs_image" section="bs_images.h">
             <return>bs_Result</return>
             <param><type>bs_Object*</type><name>object</name></param>
-            <param><assert>dim.y &gt; 0</assert><assert>dim.x &gt; 0</assert><type>bs_ivec2</type><name>dim</name></param>
+            <param><type>bs_ivec2</type><name>dim</name></param>
             <param><type>int</type><name>num_indices</name></param>
             <param><type>bs_Format</type><name>format</name></param>
             <param><type>bs_U32</type><name>flags</name></param>
@@ -4019,7 +4022,7 @@
             <return>bs_Result</return>
             <param><type>bs_Context*</type><name>context</name></param>
 			<param nullable="true"><type>bs_Context*</type><name>parent</name></param>
-            <param><type>bs_Callback</type><name>tick</name></param>
+            <param nullable="true"><type>bs_ContextTickFunction</type><name>tick</name></param>
             <param><type>bs_U32</type><name>width</name></param>
             <param><type>bs_U32</type><name>height</name></param>
             <param><type>const char*</type><name>title</name></param>

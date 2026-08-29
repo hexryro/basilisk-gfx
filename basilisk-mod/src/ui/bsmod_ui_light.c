@@ -53,7 +53,7 @@ BSMODAPI void _bsmod_instanceLightBillboards() {
         default: continue;
         }
 
-        bsgfx_instanceQuad(_bsmod_subtypes_[BSMOD_SUBTYPE_BILLBOARD], m, cache->coords, 0, 0, $white_material()->id);
+        bsgfx_instantiateQuad(_bsmod_subtypes_[BSMOD_SUBTYPE_BILLBOARD], m, cache->coords, 0, 0, $white_material()->id);
 
         const float length = 100.0;
         bsgfx_instanceLine(light->position, BS_V3_ADD(light->position, BS_V3_MUL_S(light->direction, length)), BS_BLACK);
@@ -72,7 +72,7 @@ BSMODAPI void _bsmod_instanceLightBillboards() {
 
        // bsgfx_AtlasCache* white = $BSMOD_ATLAS_UI_white();
        // bs_mat4x3 m2 = bsgfx_matrix(bs_v3V2(p, 50.0f), BS_V3(scaled_size, scaled_size, 0.0f));
-       // bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], m2, white->coords, 0, 0, $white_material()->id);
+       // bsgfx_instantiateQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_UI], m2, white->coords, 0, 0, $white_material()->id);
 
         bool hovering = bs_rectangleVsPoint(&p, &BS_V2(scaled_size, scaled_size), &cursor);
         if (hovering) {

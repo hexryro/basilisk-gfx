@@ -1655,6 +1655,13 @@ bs_Range bs_pushModel(
     return next.bs_pushModel(batch, model);
 }
 
+void bs_autoResizeRenderer(
+    bs_Renderer* renderer, 
+    bs_Context* context)
+{
+    next.bs_autoResizeRenderer(renderer, context);
+}
+
 bs_Result bs_renderer(
     bs_Object* object, 
     bs_RendererBits flags)
@@ -4233,7 +4240,7 @@ void bs_moveWindow(
 bs_Result bs_window(
     bs_Context* context, 
     bs_Context* parent, 
-    bs_Callback tick, 
+    bs_ContextTickFunction tick, 
     bs_U32 width, 
     bs_U32 height, 
     const char* title, 

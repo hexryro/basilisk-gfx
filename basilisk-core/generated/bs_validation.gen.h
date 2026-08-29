@@ -155,6 +155,7 @@ static inline bs_FunctionTable* _val_bs_getFunctions() {
     functions.bs_pushMesh = (PFN_bs_pushMesh)GetProcAddress(module, "_val_bs_pushMesh");
     functions.bs_batchModel = (PFN_bs_batchModel)GetProcAddress(module, "_val_bs_batchModel");
     functions.bs_pushModel = (PFN_bs_pushModel)GetProcAddress(module, "_val_bs_pushModel");
+    functions.bs_autoResizeRenderer = (PFN_bs_autoResizeRenderer)GetProcAddress(module, "_val_bs_autoResizeRenderer");
     functions.bs_renderer = (PFN_bs_renderer)GetProcAddress(module, "_val_bs_renderer");
     functions.bs_output = (PFN_bs_output)GetProcAddress(module, "_val_bs_output");
     functions.bs_input = (PFN_bs_input)GetProcAddress(module, "_val_bs_input");

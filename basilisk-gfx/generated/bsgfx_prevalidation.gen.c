@@ -61,6 +61,18 @@ BSGFXAPI bsgfx_InstanceType** _preval_bsgfx_instanceTypes() {
     return next.bsgfx_instanceTypes();
 }
 
+BSGFXAPI void _preval_bsgfx_computeContextCamera() {
+    next.bsgfx_computeContextCamera();
+}
+
+BSGFXAPI void _preval_bsgfx_tickInstanceTypes() {
+    next.bsgfx_tickInstanceTypes();
+}
+
+BSGFXAPI void _preval_bsgfx_resetInstanceTypes() {
+    next.bsgfx_resetInstanceTypes();
+}
+
 BSGFXAPI void _preval_bsgfx_textDimensions(bsgfx_Font* font, bs_vec2* out, char* name, int length) {
     BSGFX_VALIDATE(font != NULL, ,);
     BSGFX_VALIDATE(out != NULL, ,);
@@ -381,9 +393,9 @@ BSGFXAPI int _preval_bsgfx_instancePoint(bs_vec3 position, bs_RGBA color, float 
     return next.bsgfx_instancePoint(position, color, size);
 }
 
-BSGFXAPI int _preval_bsgfx_instanceQuad(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instantiateQuad(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material) {
     BSGFX_VALIDATE(subtype != NULL, 0,);
-    return next.bsgfx_instanceQuad(subtype, transform, coords, flags, id, material);
+    return next.bsgfx_instantiateQuad(subtype, transform, coords, flags, id, material);
 }
 
 BSGFXAPI void _preval_bsgfx_instanceDepthlessCircle(const bs_mat4* transform, int segments, float radius, bs_RGBA color, bs_Range* out) {
@@ -407,25 +419,25 @@ BSGFXAPI float _preval_bsgfx_fontHeight(bsgfx_Font* font, int px_size) {
     return next.bsgfx_fontHeight(font, px_size);
 }
 
-BSGFXAPI float _preval_bsgfx_instanceASCIIText(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text) {
+BSGFXAPI float _preval_bsgfx_instanceASCIIText(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, char* text) {
     BSGFX_VALIDATE(subtype != NULL, 0,);
     BSGFX_VALIDATE(font != NULL, 0,);
     BSGFX_VALIDATE(text != NULL, 0,);
-    return next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
+    return next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, material_id, text);
 }
 
-BSGFXAPI float _preval_bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* text, int text_length) {
+BSGFXAPI float _preval_bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, char* text, int text_length) {
     BSGFX_VALIDATE(subtype != NULL, 0,);
     BSGFX_VALIDATE(font != NULL, 0,);
     BSGFX_VALIDATE(text != NULL, 0,);
-    return next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
+    return next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, material_id, text, text_length);
 }
 
-BSGFXAPI float _preval_bsgfx_instanceASCIITextV(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char* format, va_list args) {
+BSGFXAPI float _preval_bsgfx_instanceASCIITextV(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, char* format, va_list args) {
     BSGFX_VALIDATE(subtype != NULL, 0,);
     BSGFX_VALIDATE(font != NULL, 0,);
     BSGFX_VALIDATE(format != NULL, 0,);
-    return next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    return next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, material_id, format, args);
 }
 
 BSGFXAPI bs_mat4x3 _preval_bsgfx_matrix(bs_vec3 position, bs_vec3 scale) {
@@ -757,6 +769,9 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_test = _preval_bsgfx_test;
     functions.bsgfx_subtypes = _preval_bsgfx_subtypes;
     functions.bsgfx_instanceTypes = _preval_bsgfx_instanceTypes;
+    functions.bsgfx_computeContextCamera = _preval_bsgfx_computeContextCamera;
+    functions.bsgfx_tickInstanceTypes = _preval_bsgfx_tickInstanceTypes;
+    functions.bsgfx_resetInstanceTypes = _preval_bsgfx_resetInstanceTypes;
     functions.bsgfx_textDimensions = _preval_bsgfx_textDimensions;
     functions.bsgfx_defaultPipelineHash = _preval_bsgfx_defaultPipelineHash;
     functions.bsgfx_renderTileIcons = _preval_bsgfx_renderTileIcons;
@@ -818,7 +833,7 @@ bsgfx_FunctionTable* _preval_bsgfx_getFunctionTable() {
     functions.bsgfx_instanceSphere = _preval_bsgfx_instanceSphere;
     functions.bsgfx_instanceCone = _preval_bsgfx_instanceCone;
     functions.bsgfx_instancePoint = _preval_bsgfx_instancePoint;
-    functions.bsgfx_instanceQuad = _preval_bsgfx_instanceQuad;
+    functions.bsgfx_instantiateQuad = _preval_bsgfx_instantiateQuad;
     functions.bsgfx_instanceDepthlessCircle = _preval_bsgfx_instanceDepthlessCircle;
     functions.bsgfx_instanceAtlas = _preval_bsgfx_instanceAtlas;
     functions.bsgfx_instanceAtlasFlipped = _preval_bsgfx_instanceAtlasFlipped;

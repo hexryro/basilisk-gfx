@@ -583,8 +583,7 @@ static DWORD WINAPI _bsmod_tickAsync(void* param) {
 }
 
 BSMODAPI void _bsmod_beginTrackChanges() {
-	if (bs_args()->track_changes)
-		CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
+	CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
 }
 
 BSMODAPI void _bsmod_tickTracker() {

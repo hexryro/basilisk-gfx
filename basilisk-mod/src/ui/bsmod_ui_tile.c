@@ -123,7 +123,7 @@ BSMODAPI bool _bsmod_instanceTilePreview(bsgfx_Widget* widget, bs_vec2* position
 
     bs_mat4x3 transform = bsgfx_matrix(BS_V3(position->x, position->y, 0.0), BS_V3(widget->grid.size.x, widget->grid.size.y, 0));
     transform.f[8] = id;
-    bsgfx_instanceQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_TILE_ICON], transform, BS_V4(0, 0, 1, 1), 0, 0, $white_material()->id);
+    bsgfx_instantiateQuad(bsgfx_subtypes()[BSGFX_SUBTYPE_TILE_ICON], transform, BS_V4(0, 0, 1, 1), 0, 0, $white_material()->id);
 
     return true;
 }

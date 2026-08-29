@@ -97,7 +97,16 @@ BSAPI float _bsgfx_fontHeight(bsgfx_Font* font, int px_size) {
     return _bsgfx_convertDesignUnits(font, px_size, font->du_height);
 }
 
-BSGFXAPI float _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int px_size, char* text, int text_length) {
+BSGFXAPI float 
+_bsgfx_instanceASCIITextN(
+    bsgfx_InstanceSubtype* subtype, 
+    bsgfx_Font* font, 
+    bs_vec3 position, 
+    int px_size, 
+    int material_id, 
+    char* text, 
+    int text_length) 
+{
     // TODO: check if basic latin block is available
     int pt_size_id = _bsgfx_queryPtSize(font, px_size);
     px_size = font->pt_sizes[pt_size_id];
@@ -116,7 +125,7 @@ BSGFXAPI float _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_F
     bs_m4Translate(&test_transform, &BS_V3(100.0, 100.0, 0.0), &test_transform);
     bs_m4Scale(&test_transform, &BS_V3(1024, 1024, 0), &test_transform);
 
-  //  bsgfx_instanceQuad(subtype, bs_m4x3(&test_transform), BS_V4(0, 0, 1, 1), 0, 0, 0);
+  //  bsgfx_instantiateQuad(subtype, bs_m4x3(&test_transform), BS_V4(0, 0, 1, 1), 0, 0, 0);
     if (block->offset != 0)
         return 0.0;
     if (block->count != 127)
@@ -186,7 +195,7 @@ BSGFXAPI float _bsgfx_instanceASCIITextN(bsgfx_InstanceSubtype* subtype, bsgfx_F
             bs_m4Translate(&transform, &p, &transform);
             bs_m4Scale(&transform, &BS_V3(size.x, size.y, 0), &transform);
 
-            bsgfx_instanceQuad(subtype, bs_m4x3(&transform), coords, 0, glyph->atlas_page, 0);
+            bsgfx_instantiateQuad(subtype, bs_m4x3(&transform), coords, 0, glyph->atlas_page, material_id);
         }
 
         // instanceAtlasTexture(glyph->atlas_page, glyph->atlas_index)
@@ -372,7 +381,7 @@ BSGFXAPI void _bsgfx_test() {
     bs_Queue* queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_SINGLE_TIMES)->queue;
 
     bs_Resource* resource;
-    _bsgfx_loadFont(queue, package_id, "project/fonts/segoeui.ttf", 0, &resource);
+    _bsgfx_loadFont(queue, package_id, "project/fonts/selawk.ttf", 0, &resource);
 
     bsgfx_Font* font = resource->model;
     bs_bindImage(BSGFX_SET_FONTS, BSGFX_BINDING_FONTS, font->atlas_object->atlas->image, bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler, BS_IMAGE_LAYOUT_GENERAL);

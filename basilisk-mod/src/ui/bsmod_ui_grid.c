@@ -302,7 +302,7 @@ static bool _bsmod_instanceGridPreview(bsgfx_Widget* widget, bsgfx_GridParams gr
     }
 
     if (hovering) {
-        bsgfx_instanceQuad(
+        bsgfx_instantiateQuad(
             bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
             bsgfx_matrix(
                 BS_V3(grid.position->x, grid.position->y, 50.0),
@@ -347,7 +347,7 @@ static void _bsmod_checkHoverGrid(bsgfx_Widget* widget, bsgfx_GridParams* grid) 
             _bsmod_.dragging_id = -1;
         }
 
-        bsgfx_instanceQuad(
+        bsgfx_instantiateQuad(
             bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
             bsgfx_matrix(
                 BS_V3(grid->position->x, grid->position->y, 50.0),
@@ -401,7 +401,7 @@ static bool _bsmod_instanceAtlasPreview(bsgfx_Widget* widget, bsgfx_GridParams g
         last_category = material->category;
     }
 
-    bsgfx_instanceQuad(
+    bsgfx_instantiateQuad(
         params->subtype2,
         bsgfx_matrix(
             BS_V3(grid.position->x, grid.position->y, 60.0),
@@ -425,7 +425,7 @@ static bool _bsmod_instanceImageArrayPreview(bsgfx_Widget* widget, bsgfx_GridPar
         BS_V3(widget->grid.size.x, widget->grid.size.y, 0.0)
     );
     matrix.f[8] = grid.index;
-    bsgfx_instanceQuad(
+    bsgfx_instantiateQuad(
         params->subtype2,
         matrix,
         BS_V4(0.0, 0.0, 1.0, 1.0),

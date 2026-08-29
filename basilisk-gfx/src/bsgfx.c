@@ -87,7 +87,17 @@ static void _bsgfx_fixedTick() {
         _bsgfx_callbacks_.fixedTick();
 }
 
-static void _bsgfx_onTick(bs_VoidFunction tick) {
+
+int to_reset[] = {
+    BSGFX_INSTANCE_TYPE_2_BONE,
+    BSGFX_INSTANCE_TYPE_2_MESH,
+    BSGFX_INSTANCE_TYPE_2_LINE,
+    BSGFX_INSTANCE_TYPE_2_POINT,
+    BSGFX_INSTANCE_TYPE_2_QUAD,
+    BSGFX_INSTANCE_TYPE_2_MESH_STATIC,
+};
+
+void _bsgfx_computeContextCamera() {
     bs_Context* ctx = bs_scope()->context;
     bs_vec2 resolution = { .x = (float)bs_resolution(ctx).x, .y = (float)bs_resolution(ctx).y };
 
@@ -95,26 +105,20 @@ static void _bsgfx_onTick(bs_VoidFunction tick) {
     bs_mat4 screen_camera_view;
 
     bs_orthographic(0, resolution.x, 0, resolution.y, -1000, 1000, &screen_camera_proj);
-    bs_lookAt(&(bs_vec3) { 0 }, &(bs_vec3) { 0.0, 0.0, -1.0 }, &(bs_vec3) { 0.0, 1.0, 0.0 }, &screen_camera_view);
+    bs_lookAt(&(bs_vec3) { 0 }, & (bs_vec3) { 0.0, 0.0, -1.0 }, & (bs_vec3) { 0.0, 1.0, 0.0 }, & screen_camera_view);
     bs_m4Mul(&screen_camera_proj, &screen_camera_view, &_bsgfx_app_.screen_camera.result);
+}
 
-    if (tick)
-        tick();
-
-    int to_reset[] = {
-        BSGFX_INSTANCE_TYPE_2_BONE,
-        BSGFX_INSTANCE_TYPE_2_MESH,
-        BSGFX_INSTANCE_TYPE_2_LINE,
-        BSGFX_INSTANCE_TYPE_2_POINT,
-        BSGFX_INSTANCE_TYPE_2_QUAD,
-        BSGFX_INSTANCE_TYPE_2_MESH_STATIC,
-    };
+void _bsgfx_tickInstanceTypes() {
     int to_reset_count = sizeof(to_reset) / sizeof(*to_reset);
 
     for (int i = 0; i < to_reset_count; i++)
         bsgfx_tickInstanceType(_bsgfx_instance_types_[to_reset[i]]);
 
-    _bsgfx_callbacks_.pipeline();
+}
+
+void _bsgfx_resetInstanceTypes() {
+    int to_reset_count = sizeof(to_reset) / sizeof(*to_reset);
 
     for (int i = 0; i < to_reset_count; i++)
         bsgfx_resetInstanceType(_bsgfx_instance_types_[to_reset[i]]);
@@ -135,17 +139,16 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, bs_U32 w
     bs_parseArgs(argc, argv);
 
 #ifdef _DEBUG
-    const char* args[] = { "--use-validation-layers" };
+    const char* args[] = { "--use-validation-layers", "--track-changes"};
     bs_parseArgs(sizeof(args) / sizeof(char*), args);
 #endif
     
     _bsgfx_configure();
     bs_ini();
 
-    bs_callbacks()->tick = _bsgfx_onTick;
-
     bs_Object* context_object = BS_CONTEXT(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN, 0);
     bs_window(context_object->context, NULL, _bsgfx_callbacks_.tick, width, height, name, window_flags);
+    bs_showWindow(context_object->context);
     bs_device(context_object->context, NULL);
     bs_swapchain(context_object->context);
     bs_iniAudio();

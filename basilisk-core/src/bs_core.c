@@ -1685,7 +1685,11 @@ static void _bs_nameRenderer(bs_Object* object, const char* name) {
     }
 }
 
-BSAPI bs_Result _bs_renderer(bs_Object* object, bs_RendererBits flags) {
+BSAPI void _bs_autoResizeRenderer(bs_Renderer* renderer, bs_Context* context) {
+    renderer->context = context;
+}
+
+BSAPI bs_Result _bs_renderer(bs_Object* object, bs_Context* context, bs_RendererBits flags) {
     assert(object != NULL);
     bs_Renderer* renderer = object->renderer;
 
@@ -2938,10 +2942,11 @@ static void _bs_destroySwapchain() {
 
 typedef void(__stdcall* bs_AutoResizeFunction)(bs_Object*);
 
-static void _bs_autoResizeImage(bs_Object* object) {
+/*
+static void _bs_onAutoResizeImage(bs_Object* object) {
     bs_Image* image = object->image;
 
-    if (image->flags & BS_IMAGE_AUTO_RESIZE_BIT) {
+    if (image->context == _bs_scope_.context) {
         if (image == _bs_scope_.context->swapchain_image->image)
             return;
 
@@ -2949,12 +2954,20 @@ static void _bs_autoResizeImage(bs_Object* object) {
         _bs_resizeImage(image, resolution, image->num_indices);
     }
 }
-
-static void _bs_autoResizeRenderer(bs_Object* object) {
+*/
+static void _bs_onAutoResizeRenderer(bs_Object* object) {
     bs_Renderer* renderer = object->renderer;
 
-    if (renderer->flags & BS_RENDERER_AUTO_RESIZE_BIT) {
+    if (renderer->context == _bs_scope_.context) {
         bs_ivec2 resolution = bs_resolution(_bs_scope_.context);
+
+        for (int i = 0; i < renderer->num_outputs; i++) {
+            bs_Image* image = renderer->outputs[i].image;
+            if (image != _bs_scope_.context->swapchain_image->image) {
+                bs_resizeImage(image, resolution, image->num_indices);
+            }
+        }
+
         _bs_resizeRenderer(renderer, resolution);
     }
 }
@@ -2979,7 +2992,7 @@ static inline void _bs_autoResize(bs_ObjectType type, bs_AutoResizeFunction func
 static void _bs_resizeSwapchain() {
     bs_Context* ctx = _bs_scope_.context;
 
-    bs_stallGPU();
+  //  bs_stallGPU();
 
     _bs_destroySwapchain();
     _bs_swapchain(_bs_scope_.context);
@@ -2987,18 +3000,18 @@ static void _bs_resizeSwapchain() {
     _bs_scope_.context = ctx;
 }
 
-static void _bs_resizeContext() {
-
+void _bs_resizeContext() {
+    bs_logF("Resizing context \"%s\"", _bs_scope_.context->title);
     bs_ivec2 resolution = bs_resolution(_bs_scope_.context);
     _bs_resizeSwapchain();
 
     resolution = bs_resolution(_bs_scope_.context);
 
-    /**
-     Auto resize
-     */
-    _bs_autoResize(BS_OBJECT_IMAGE, _bs_autoResizeImage);
-    _bs_autoResize(BS_OBJECT_RENDERER, _bs_autoResizeRenderer);
+   /**
+    Auto resize
+    */
+    //_bs_autoResize(BS_OBJECT_IMAGE, _bs_onAutoResizeImage);
+    _bs_autoResize(BS_OBJECT_RENDERER, _bs_onAutoResizeRenderer);
 
     if (_bs_scope_.context->resize)
         _bs_scope_.context->resize(_bs_scope_.context);

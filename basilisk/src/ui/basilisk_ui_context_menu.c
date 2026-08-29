@@ -23,45 +23,133 @@
  SOFTWARE.
  */
 
-
- /**
-  MIT License
-
-  Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
-  */
-
 #include <basilisk-mod.h>
 #include <bsmod_cache.h>
 #include <basilisk.h>
 
 #define BASILISK_TITLE_BAR_HEIGHT 32
+#define BASILISK_CONTEXT_MENU_TEXT_INDENT 16
+#define BASILISK_CONTEXT_MENU_BUTTON_HEIGHT 16
+#define BASILISK_CONTEXT_MENU_WIDTH 300
+#define BASILISK_CONTEXT_MENU_CLEAR_COLOR BS_RGBA(255, 255, 255, 255)
+
+BSGFX_CACHE_COLOR_MATERIAL(context_menu_button_hover_color, BS_RGBA(0, 120, 215, 255))
 
   //BSGFX_CACHE_ATLAS_QUERY(BSMOD_ATLASES, BSMOD_ATLAS_UI, icon)
   //BSGFX_CACHE_COLOR_MATERIAL(test_color, BS_RGBA(255, 83, 83, 255))
 
+static ContextMenu last_context_menu_type = 0;
+static ContextMenu context_menu_type = 0;
+static bsgfx_Font* context_menu_font = NULL;
+
+typedef struct {
+    const char* left_text;
+    const char* right_text;
+    ContextMenu hover_menu;
+} ContextMenuElement;
+
+void showContextMenuUI(ContextMenu type, bs_vec3 position) {
+    bs_Context* context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
+
+    bs_ivec2 new_position = bs_windowPosition(bs_scope()->context);
+    new_position.x += position.x;
+    new_position.y -= position.y;
+
+    bs_moveWindow(context, new_position.x, new_position.y);
+
+    context_menu_type = type;
+}
+
+void hideContextMenuUI() {
+    bs_Context* context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
+    bs_hideWindow(context);
+
+    context_menu_type = last_context_menu_type = CONTEXT_MENU_UNDEFINED;
+}
+
+static void instantiateFileContextMenuUI() {
+    bs_Context* context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
+    ContextMenuElement elements[] = {
+        {
+            .left_text = "New...",
+            .right_text = "Ctrl+N",
+        },
+        {
+            .left_text = "Open...",
+            .right_text = "Ctrl+N",
+        },
+        {
+            .left_text = "Open Recent...",
+            .right_text = "Ctrl+N",
+        },
+        {
+            .left_text = "Save",
+            .right_text = "Ctrl+S",
+        },
+        {
+            .left_text = "Save As...",
+            .right_text = "Shift+Ctrl+S",
+        },
+        {
+            .left_text = "Exit",
+            .right_text = "Alt+F4",
+        }
+    };
+    const int elements_count = sizeof(elements) / sizeof(*elements);
+
+    int window_height = elements_count * BASILISK_CONTEXT_MENU_BUTTON_HEIGHT;
+
+    bs_vec3 position = { 0.0 };
+    position.y += window_height;
+
+    for (int i = 0; i < elements_count; i++) {
+        ContextMenuElement* context_menu_element = elements + i;
+        bsgfx_UIElement element;
+
+        bsgfx_Material* text_material = $black_material();
+
+        bsgfx_UISolid solid = {
+            .position = position,
+            .size = { BASILISK_CONTEXT_MENU_WIDTH, BASILISK_CONTEXT_MENU_BUTTON_HEIGHT },
+        };
+
+        bsgfx_solidUIElement(solid, &element);
+        element.position.y -= element.size.y;
+        position = element.position;
+
+        if (bsgfx_hoveringUIElement(&element)) {
+            solid.material_id = $context_menu_button_hover_color()->id,
+            bsgfx_instantiateSolidUIElement(solid, &element);
+            text_material = $white_material();
+        }
+
+        bs_vec3 revert_position = position;
+        position.z++;
+        position.x += BASILISK_CONTEXT_MENU_TEXT_INDENT;
+        bsgfx_UIText left_text = {
+            .position = position,
+            .as_ascii = context_menu_element->left_text,
+            .font = _fonts_.selawik,
+            .px_size = 13,
+            .material_id = text_material->id,
+            .align = { 0, BASILISK_CONTEXT_MENU_BUTTON_HEIGHT },
+        };
+
+        bsgfx_instantiateTextUI(left_text, &element);
+
+        position = revert_position;
+    }
+
+    if (context_menu_type != last_context_menu_type) {
+        bs_showWindow(context);
+        bs_resizeWindow(context, BASILISK_CONTEXT_MENU_WIDTH, window_height);
+        last_context_menu_type = context_menu_type;
+    }
+}
+
 void basilisk_instantiateContextMenuUI() {
     bs_ivec2 resolution = bs_resolution(bs_scope()->context);
     bs_vec2 title_bar_size = { resolution.x, BASILISK_TITLE_BAR_HEIGHT };
-
-    bsgfx_AtlasCache* icon_atlas_cache = $BSMOD_ATLAS_UI_icon();
 
     bs_vec3 position;
     bsgfx_UIElement element_v;
@@ -71,14 +159,25 @@ void basilisk_instantiateContextMenuUI() {
     position = BS_V3(0, resolution.y - title_bar_size.y, 0);
     position.y = 0.0;
 
-    /**
-     Background
-     */
-    bsgfx_instantiateSolidUI((bsgfx_UISolid) {
-        .position = position,
-            .size = title_bar_size,
-            //     .material_id = $test_color()->id,
-    }, element);
-    position.z++;
+    switch (context_menu_type) {
+    case CONTEXT_MENU_FILE:
+        instantiateFileContextMenuUI();
+        break;
+    }
+}
 
+void onContextMenuTick() {
+    bsgfx_computeContextCamera();
+    basilisk_instantiateContextMenuUI();
+
+    if (bs_leftClickOnce()) {
+       // hideContextMenuUI();
+    }
+
+    bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MENU_CONTEXT)->renderer;
+    bs_Queue* queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_MENU_CONTEXT)->queue;
+
+    bsgfx_tickInstanceTypes();
+    basilisk_pipeline(queue, renderer, BASILISK_CONTEXT_MENU_CLEAR_COLOR);
+    bsgfx_resetInstanceTypes();
 }

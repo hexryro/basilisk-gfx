@@ -45,6 +45,8 @@ static void _bsgfx_loResSubpass0() {
   High Resolution Subpass 0
   Writes to the swapchain
   */
+_Thread_local bs_RGBA _clear_color_;
+
 static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     bs_Queue* queue = scope->queue;
 
@@ -53,13 +55,9 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
 
     bs_beginCommentN(queue, BS_CONSTANT_STRING("High Resolution Subpass 0"));
 
-    bs_vec4 clear_color = bs_rgbUCharToV4(BS_RGBA(75, 75, 75, 255));
+    bs_vec4 clear_color = bs_rgbUCharToV4(_clear_color_);
     clear_color.xyz = bs_sRGBToLinearV3(&clear_color.xyz);
 
-    if (bs_scope()->context != basilisk.context) {
-        clear_color = bs_rgbUCharToV4(BS_RGBA(255, 75, 75, 255));
-        clear_color.xyz = bs_sRGBToLinearV3(&clear_color.xyz);
-    } 
     bs_clearColor(queue, 0, bs_resolution(bs_scope()->context), &clear_color);
 
     basilisk_renderDepthlessLines(scope, queue);
@@ -71,16 +69,8 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     basilisk_renderUISolid(scope, queue);
     basilisk_renderUI(scope, queue);
 
-    int package = bs_queryPackage("content/basilisk-fonts.bpak");
+    basilisk_renderFontSubtype(scope, queue, bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
 
-    if (package >= 0) {
-        bs_Resource* resource = NULL;
-        bs_queryResource(package, BS_RESOURCE_FONT, "project/fonts/segoeui.ttf", &resource);
-        if (resource && resource->model) {
-            bsgfx_Font* font = (bsgfx_Font*)resource->model;
-            basilisk_renderFontSubtype(scope, queue, bsgfx_subtypes()[BSGFX_SUBTYPE_FONT], 0, $fs_bsgfx_font_small());
-        }
-    }
     basilisk_renderUIStencil(scope, queue);
     basilisk_renderDither(scope, queue);
 
@@ -110,31 +100,11 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     bs_endComment(queue);
 }
 
-void basilisk_pipeline() {
+void basilisk_pipeline(bs_Queue* queue, bs_Renderer* renderer, bs_RGBA clear_color) {
     if (!bs_exists(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS))
         return;
 
-    bs_Queue* queue;
-    bs_Renderer* renderer;
-
-   /**
-    TODO: should have a callback instead
-    */
-    bs_Context* context = bs_scope()->context;
-    if (context == bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context) {
-        renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
-        queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
-    }
-    else if (context == bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context) {
-        renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MENU_CONTEXT)->renderer;
-        queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_MENU_CONTEXT)->queue;
-    }
-    else if (context == bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context) {
-        renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_TITLE_BAR)->renderer;
-        queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_TITLE_BAR)->queue;
-    }
-    else return;
-
+    _clear_color_ = clear_color;
     bs_acquire();
 
     if (bs_resetQueue(queue) == BS_RESULT_OK) {
@@ -165,12 +135,12 @@ void basilisk_pipeline() {
 
 void basilisk_createHiResRenderer(bs_Context* context, int id) {
     bs_Object* hi_res = BS_RENDERER(BASILISK_RENDERERS, id, BS_OBJECT_HAS_SWAPS_BIT);
-    if (bs_renderer(hi_res, BS_RENDERER_AUTO_RESIZE_BIT) == BS_RESULT_OK) {
+    if (bs_renderer(hi_res, 0) == BS_RESULT_OK) {
+        bs_autoResizeRenderer(hi_res->renderer, context);
 
         bs_ivec2 resolution = bs_resolution(context);
-        bs_Object* hi_res_0_depth = BS_IMAGE(BASILISK_IMAGES, BASILISK_IMAGE_MAIN_OUTPUT_DEPTH, 0);
-        if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_AUTO_RESIZE_BIT) == BS_RESULT_OK) {
-
+        bs_Object* hi_res_0_depth = BS_IMAGE(-1, -1, 0);
+        if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT) == BS_RESULT_OK) {
             bs_output(hi_res->renderer, (bs_Output) {
                 .subpass = 0,
                 .image = hi_res_0_depth->image,

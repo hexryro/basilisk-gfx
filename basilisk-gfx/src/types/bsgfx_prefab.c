@@ -419,9 +419,9 @@ BSGFXAPI int _bsgfx_instancePrefab(int id, bsgfx_PrefabSubtype prefab_subtype) {
             if (!(raw_prefab->flags & BSGFX_PREFAB_HIDDEN)) {
                 bs_mat4x3 mat = bs_m4x3(&quad_transform);
                 if (raw_prefab->flags & BSGFX_PREFAB_WRITE_POSITION)
-                    quad_instance_offset = _bsgfx_instanceQuad(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT], mat, coords, flags, id, 0);
+                    quad_instance_offset = _bsgfx_instantiateQuad(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT], mat, coords, flags, id, 0);
                 else
-                    quad_instance_offset = _bsgfx_instanceQuad(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT], mat, coords, flags, id, 0);
+                    quad_instance_offset = _bsgfx_instantiateQuad(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_PREFAB_TRANSPARENT], mat, coords, flags, id, 0);
             }
         }
     }

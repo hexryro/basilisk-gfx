@@ -279,7 +279,7 @@ static void _bsmod_instanceDraggingIcon() {
     bs_Atlas* atlas_ui = bs_fetch(BSMOD_ATLASES, BSMOD_ATLAS_UI)->atlas;
     bsgfx_AtlasCache* cache = $BSMOD_ATLAS_UI_prohibition();
 
-    bsgfx_instanceQuad(
+    bsgfx_instantiateQuad(
         bsgfx_subtypes()[BSGFX_SUBTYPE_UI],
         bsgfx_matrix(
             BS_V3(cursor.x, cursor.y, 101.0),

@@ -491,7 +491,7 @@ BSGFXAPI int _bsgfx_instancePoint(bs_vec3 position, bs_RGBA color, float size) {
 	return bsgfx_instantiate(_bsgfx_subtypes_[BSGFX_SUBTYPE_POINT], &data, sizeof(data), 0, 0, 0, 0);
 }
 
-BSGFXAPI int _bsgfx_instanceQuad(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material) {
+BSGFXAPI int _bsgfx_instantiateQuad(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material) {
 	struct bsgfx_QuadInstance tmp = {
 		.transform = transform,
 		.offset = coords.xy,

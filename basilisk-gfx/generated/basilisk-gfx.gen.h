@@ -1145,6 +1145,7 @@ struct bsgfx_UIText {
     struct {
         char* as_ascii;
     };
+    int material_id;
 };
 
 struct bsgfx_Text {
@@ -1252,7 +1253,6 @@ struct bsgfx_Settings {
 struct bsgfx_Callbacks {
     PFN_void tick;
     PFN_void fixedTick;
-    PFN_void render;
     PFN_void loadScene;
     PFN_bsgfx_onQueue queue;
     PFN_void pipeline;
@@ -1809,6 +1809,24 @@ bsgfx_subtypes();
   */
 BSGFXAPI bsgfx_InstanceType**
 bsgfx_instanceTypes();
+
+ /**
+  @return void
+  */
+BSGFXAPI void
+bsgfx_computeContextCamera();
+
+ /**
+  @return void
+  */
+BSGFXAPI void
+bsgfx_tickInstanceTypes();
+
+ /**
+  @return void
+  */
+BSGFXAPI void
+bsgfx_resetInstanceTypes();
 
  /**
   @param font
@@ -2474,7 +2492,7 @@ bsgfx_instancePoint(
   @return int
   */
 BSGFXAPI int
-bsgfx_instanceQuad(
+bsgfx_instantiateQuad(
     bsgfx_InstanceSubtype* subtype,
     bs_mat4x3 transform,
     bs_vec4 coords,
@@ -2549,6 +2567,7 @@ bsgfx_fontHeight(
   @param font
   @param position
   @param pt_size
+  @param material_id
   @param text
   @return float
   */
@@ -2558,6 +2577,7 @@ bsgfx_instanceASCIIText(
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
+    int material_id,
     char* text);
 
  /**
@@ -2565,6 +2585,7 @@ bsgfx_instanceASCIIText(
   @param font
   @param position
   @param pt_size
+  @param material_id
   @param text
   @param text_length
   @return float
@@ -2575,6 +2596,7 @@ bsgfx_instanceASCIITextN(
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
+    int material_id,
     char* text,
     int text_length);
 
@@ -2583,6 +2605,7 @@ bsgfx_instanceASCIITextN(
   @param font
   @param position
   @param pt_size
+  @param material_id
   @param format
   @param args
   @return float
@@ -2593,6 +2616,7 @@ bsgfx_instanceASCIITextV(
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
+    int material_id,
     char* format,
     va_list args);
 
@@ -2601,6 +2625,7 @@ bsgfx_instanceASCIITextV(
   @param font
   @param position
   @param pt_size
+  @param material_id
   @param format
   @param ...
   @return float
@@ -2611,6 +2636,7 @@ bsgfx_instanceASCIITextF(
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
+    int material_id,
     char* format,
      ...);
 

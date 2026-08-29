@@ -689,8 +689,30 @@ BSAPI void _bs_setCursor(bs_CursorIcon icon) {
 	*/
 }
 
+void _bs_resizeContext();
+
 BSAPI void _bs_resizeWindow(bs_Context* context, bs_U32 width, bs_U32 height) {
-//	bsi_resizeObjects();
+#ifdef _WIN32
+    RECT rect;
+    GetWindowRect(context->hwnd, &rect);
+
+    SetWindowPos(
+        context->hwnd,
+        NULL,
+        rect.left,
+        rect.top,
+        width,
+        height,
+        SWP_FRAMECHANGED | SWP_NOACTIVATE
+    );
+
+    bs_Context* previous_context = _bs_scope_.context;
+    _bs_scope_.context = context;
+    _bs_resizeContext();
+    _bs_scope_.context = previous_context;
+#else
+    _bs_warnF("_bs_resizeWindow has not been implemented for this OS yet");
+#endif
 }
 
 BSAPI void _bs_maximizeWindow(bs_Context* context) {
@@ -711,8 +733,8 @@ BSAPI void _bs_minimizeWindow(bs_Context* context) {
 
 BSAPI void _bs_hideWindow(bs_Context* context) {
 #ifdef _WIN32
+    context->hidden = true;
     ShowWindow(context->hwnd, SW_HIDE);
-    UpdateWindow(context->hwnd);
 #else
     _bs_warnF("_bs_hideWindow has not been implemented for this OS yet");
 #endif
@@ -720,10 +742,8 @@ BSAPI void _bs_hideWindow(bs_Context* context) {
 
 BSAPI void _bs_showWindow(bs_Context* context) {
 #ifdef _WIN32
+    context->hidden = false;
     ShowWindow(context->hwnd, SW_SHOWNOACTIVATE);
-    UpdateWindow(context->hwnd);
-   // _bs_moveWindow(context, 0, 0);
-
 #else
     _bs_warnF("_bs_showWindow has not been implemented for this OS yet");
 #endif
@@ -936,9 +956,7 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
     if (ScreenToClient(context->hwnd, &p))
         context->cursor = BS_V2(p.x, p.y);
 
-    if (_bs_callbacks_.tick)
-        _bs_callbacks_.tick(tick);
-    else if (tick)
+    if (tick)
         tick();
 
     context->io.scroll_old = context->io.scroll;
@@ -1151,24 +1169,28 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
         _bs_updateWindowDPI(context);
         return DefWindowProc(hwnd, msg, w_param, l_param);
     case WM_NCHITTEST:
-        if (context && _bs_callbacks_.client_area_tick) {
-            bs_ivec2 pt = {
-                GET_X_LPARAM(l_param),
-                GET_Y_LPARAM(l_param)
-            };
+        if (context) {
+            if (context->window_type == BS_WINDOW_MENU)
+                return HTCLIENT;
+            else if (_bs_callbacks_.client_area_tick) {
+                bs_ivec2 pt = {
+                    GET_X_LPARAM(l_param),
+                    GET_Y_LPARAM(l_param)
+                };
 
-            bs_NonClientArea non_client_area = _bs_callbacks_.client_area_tick(context, pt);
+                bs_NonClientArea non_client_area = _bs_callbacks_.client_area_tick(context, pt);
 
-            switch (non_client_area) {
-            case BS_CLIENT_AREA:
-                return _bs_hitTestResize(context, pt, HTCLIENT);
-            case BS_NON_CLIENT_AREA_CAPTION_BUTTON:
-                return _bs_hitTestResize(context, pt, HTCLIENT);
-            case BS_NON_CLIENT_AREA_CAPTION:
-                return _bs_hitTestResize(context, pt, HTCAPTION);
+                switch (non_client_area) {
+                case BS_CLIENT_AREA:
+                    return _bs_hitTestResize(context, pt, HTCLIENT);
+                case BS_NON_CLIENT_AREA_CAPTION_BUTTON:
+                    return _bs_hitTestResize(context, pt, HTCLIENT);
+                case BS_NON_CLIENT_AREA_CAPTION:
+                    return _bs_hitTestResize(context, pt, HTCAPTION);
+                }
+
+                return HTCLIENT;
             }
-
-            return HTCLIENT;
         }
 
         return DefWindowProc(hwnd, msg, w_param, l_param);
@@ -1179,6 +1201,12 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
                 return 0;
             break;
         }
+        else
+            return DefWindowProc(hwnd, msg, w_param, l_param);
+    case WM_MOUSEACTIVATE:
+
+        if (context && context->window_type == BS_WINDOW_MENU)
+            return MA_NOACTIVATE;
         else
             return DefWindowProc(hwnd, msg, w_param, l_param);
 
@@ -1204,14 +1232,22 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
 
 BSAPI void _bs_moveWindow(bs_Context* context, int x, int y) {
     bs_ivec2 resolution = _bs_resolution(context);
-	SetWindowPos(context->hwnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+	SetWindowPos(context->hwnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
-BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title, bs_WindowType type) {
+BSAPI bs_Result _bs_window(
+    bs_Context* context, 
+    bs_Context* parent, 
+    bs_ContextTickFunction tick, 
+    bs_U32 width, 
+    bs_U32 height, 
+    const char* title, 
+    bs_WindowType type) 
+{
     _bs_scope_.context = context;
 
     context->hidden = true;
-    context->tick = callback;
+    context->tick = tick;
     context->title = title;
     context->dimensions = (bs_ivec2) { width, height };
     context->window_type = type;
@@ -1262,8 +1298,9 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback 
     else if (type == BS_WINDOW_NO_TITLE_BAR) {
         style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
     }
-    else if (type == BS_WINDOW_POPUP) {
+    else if (type == BS_WINDOW_MENU) {
         style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+        ex_style = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
     }
   
     context->hwnd = CreateWindowEx(
@@ -1305,8 +1342,6 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback 
     _bs_createSurface();
 
     if (context->window_type == BS_WINDOW_NO_TITLE_BAR) {
-
-
         RECT rect;
         GetWindowRect(context->hwnd, &rect);
 
@@ -1331,7 +1366,6 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback 
     }
 
     _bs_updateWindowDPI(context);
-    _bs_showWindow(context);
 
     _bs_scope_.context = NULL;
 

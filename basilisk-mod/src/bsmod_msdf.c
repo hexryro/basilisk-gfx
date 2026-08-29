@@ -499,13 +499,13 @@ static void _bsmod_renderGlyphAtlas(bsmod_MSDFPushConstant push_const) {
 
         int glyph_width = 64, glyph_height = 64;
         bs_mat4x3 matrix = bsgfx_matrix(BS_V3(92, 108, 0), BS_V3(glyph_width, glyph_height, 0));
-        int instance = bsgfx_instanceQuad(
+        int instance = bsgfx_instantiateQuad(
             subtype,
             matrix,
             BS_V4(0, 0, 1, 1),
             0, 0, 0);
         matrix = bsgfx_matrix(BS_V3(400, 208, 0), BS_V3(glyph_width, glyph_height, 0));
-        int instance2 = bsgfx_instanceQuad(
+        int instance2 = bsgfx_instantiateQuad(
             subtype,
             matrix,
             BS_V4(0, 0, 1, 1),

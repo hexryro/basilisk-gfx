@@ -787,6 +787,13 @@ BSAPI bs_Range _preval_bs_pushModel(bs_Batch* batch, bs_Model* model) {
     return next.bs_pushModel(batch, model);
 }
 
+BSAPI void _preval_bs_autoResizeRenderer(bs_Renderer* renderer, bs_Context* context) {
+    BS_VALIDATE(renderer != NULL, ,);
+    BS_VALIDATE(renderer->head.type == BS_OBJECT_RENDERER, ,);
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_autoResizeRenderer(renderer, context);
+}
+
 BSAPI bs_Result _preval_bs_renderer(bs_Object* object, bs_RendererBits flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_renderer(object, flags);
@@ -2476,7 +2483,7 @@ BSAPI void _preval_bs_moveWindow(bs_Context* context, int x, int y) {
     next.bs_moveWindow(context, x, y);
 }
 
-BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Context* parent, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title, bs_WindowType type) {
+BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Context* parent, bs_ContextTickFunction tick, bs_U32 width, bs_U32 height, const char* title, bs_WindowType type) {
     BS_VALIDATE(context != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(title != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_window(context, parent, tick, width, height, title, type);
@@ -2895,6 +2902,7 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_pushMesh = _preval_bs_pushMesh;
     functions.bs_batchModel = _preval_bs_batchModel;
     functions.bs_pushModel = _preval_bs_pushModel;
+    functions.bs_autoResizeRenderer = _preval_bs_autoResizeRenderer;
     functions.bs_renderer = _preval_bs_renderer;
     functions.bs_output = _preval_bs_output;
     functions.bs_input = _preval_bs_input;

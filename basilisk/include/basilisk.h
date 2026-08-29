@@ -23,8 +23,10 @@
   SOFTWARE.
   */ 
 
-#ifndef BASILISK_OBJECTS_H
-#define BASILISK_OBJECTS_H
+#ifndef BASILISK_H
+#define BASILISK_H
+
+#include <basilisk-gfx.h>
 
 typedef struct {
     int sources[BS_OBJECT_TYPE_COUNT];
@@ -33,7 +35,12 @@ typedef struct {
     bs_Context* context;
 } Basilisk;
 
+typedef struct {
+    bsgfx_Font* selawik;
+} Fonts;
+
 extern Basilisk basilisk;
+extern Fonts _fonts_;
 
 #define BASILISK_TITLE_BAR_HEIGHT 32
 
@@ -104,5 +111,33 @@ void basilisk_instantiateContextMenuUI();
 void basilisk_instantiateTitleBarUI();
 void basilisk_instantiateBaseUI();
 bs_NonClientArea onClientAreaTick(bs_ivec2 pt);
+
+typedef enum {
+    CONTEXT_MENU_UNDEFINED,
+    CONTEXT_MENU_FILE,
+} ContextMenu;
+
+void showContextMenuUI(ContextMenu type, bs_vec3 position);
+void hideContextMenuUI();
+
+void onContextMenuTick();
+void onTitleBarTick();
+
+void basilisk_renderDither(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderUIStencil(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderUISolid(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderUI(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderRoundedQuads(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderPrefabOutlines(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderFontSubtype(bs_RendererScope* scope, bs_Queue* queue, bsgfx_InstanceSubtype* subtype, bsgfx_Id font_id, bs_Shader* fragment_shader);
+void basilisk_renderTiles(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderSelectedTile(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderUIPost(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderCones(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderPoints(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderLines(bs_RendererScope* scope, bs_Queue* queue);
+void basilisk_renderDepthlessLines(bs_RendererScope* scope, bs_Queue* queue);
+
+void basilisk_pipeline(bs_Queue* queue, bs_Renderer* renderer, bs_RGBA clear_color);
 
 #endif

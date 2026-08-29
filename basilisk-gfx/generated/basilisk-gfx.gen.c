@@ -84,6 +84,21 @@ bsgfx_InstanceType** bsgfx_instanceTypes()
     return next.bsgfx_instanceTypes();
 }
 
+void bsgfx_computeContextCamera()
+{
+    next.bsgfx_computeContextCamera();
+}
+
+void bsgfx_tickInstanceTypes()
+{
+    next.bsgfx_tickInstanceTypes();
+}
+
+void bsgfx_resetInstanceTypes()
+{
+    next.bsgfx_resetInstanceTypes();
+}
+
 void bsgfx_textDimensions(
     bsgfx_Font* font, 
     bs_vec2* out, 
@@ -539,7 +554,7 @@ int bsgfx_instancePoint(
     return next.bsgfx_instancePoint(position, color, size);
 }
 
-int bsgfx_instanceQuad(
+int bsgfx_instantiateQuad(
     bsgfx_InstanceSubtype* subtype, 
     bs_mat4x3 transform, 
     bs_vec4 coords, 
@@ -547,7 +562,7 @@ int bsgfx_instanceQuad(
     int id, 
     int material)
 {
-    return next.bsgfx_instanceQuad(subtype, transform, coords, flags, id, material);
+    return next.bsgfx_instantiateQuad(subtype, transform, coords, flags, id, material);
 }
 
 void bsgfx_instanceDepthlessCircle(
@@ -594,9 +609,10 @@ float bsgfx_instanceASCIIText(
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
+    int material_id, 
     char* text)
 {
-    return next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, text);
+    return next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, material_id, text);
 }
 
 float bsgfx_instanceASCIITextN(
@@ -604,10 +620,11 @@ float bsgfx_instanceASCIITextN(
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
+    int material_id, 
     char* text, 
     int text_length)
 {
-    return next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, text, text_length);
+    return next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, material_id, text, text_length);
 }
 
 float bsgfx_instanceASCIITextV(
@@ -615,10 +632,11 @@ float bsgfx_instanceASCIITextV(
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
+    int material_id, 
     char* format, 
     va_list args)
 {
-    return next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    return next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, material_id, format, args);
 }
 
 float bsgfx_instanceASCIITextF(
@@ -626,12 +644,13 @@ float bsgfx_instanceASCIITextF(
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
+    int material_id, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    float _return = next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, format, args);
+    float _return = next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, material_id, format, args);
     va_end(args);
     return _return;
 }
