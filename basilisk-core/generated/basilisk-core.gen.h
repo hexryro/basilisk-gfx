@@ -155,7 +155,7 @@ typedef enum bs_MessageLevel bs_MessageLevel;
 typedef enum bs_Result bs_Result;
 typedef enum bs_IniFlag bs_IniFlag;
 typedef enum bs_NonClientArea bs_NonClientArea;
-typedef enum bs_WindowFlag bs_WindowFlag;
+typedef enum bs_WindowType bs_WindowType;
 typedef enum bs_ImageFilter bs_ImageFilter;
 typedef enum bs_PngType bs_PngType;
 typedef enum bs_Slot bs_Slot;
@@ -1318,7 +1318,8 @@ typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
 typedef void (__stdcall* bs_ValidationErrorFunction)();
 typedef void (__stdcall* bs_ContextTickFunction)(bs_VoidFunction);
 typedef void (__stdcall* bs_ConfigureWindowFunction)(bs_Context*);
-typedef bs_NonClientArea (__stdcall* bs_NonClientAreaTickFunction)(bs_ivec2);
+typedef bs_NonClientArea (__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2);
+typedef void (__stdcall* bs_ResizeContextFunction)(bs_Context*);
 typedef void (__stdcall* bs_SubpassFunction)(bs_RendererScope*);
 typedef long long bs_I64;
 typedef int bs_I32;
@@ -1403,10 +1404,13 @@ enum bs_IniFlag {
 enum bs_NonClientArea {
     BS_CLIENT_AREA = 0,
     BS_NON_CLIENT_AREA_CAPTION = 1,
+    BS_NON_CLIENT_AREA_CAPTION_BUTTON = 2,
 };
 
-enum bs_WindowFlag {
-    BS_WINDOW_NO_TITLE_BAR = 1 << 0,
+enum bs_WindowType {
+    BS_WINDOW_DEFAULT = 0,
+    BS_WINDOW_NO_TITLE_BAR = 1,
+    BS_WINDOW_POPUP = 2,
 };
 
 enum bs_ImageFilter {
@@ -3093,12 +3097,13 @@ struct bs_Context {
     void* hwnd;
     bs_Timer timer;
     bs_ivec2 dimensions;
-    bs_Callback resize;
     bs_Callback destroy;
     bs_Callback tick;
     bs_vec2 cursor;
+    bs_vec2 border_size;
+    bs_WindowType window_type;
     bs_CursorIcon cursor_icon;
-    int title_bar_height;
+    bs_ResizeContextFunction resize;
     struct VkSurfaceKHR_T* surface;
     bs_SurfaceFormat surface_format;
     bs_PresentMode present_mode;
@@ -9058,22 +9063,12 @@ bs_moveWindow(
 
  /**
   @param context
-  @param height
-  @return void
-  */
-BSAPI void
-bs_overrideTitleBar(
-    bs_Context* context,
-    int height);
-
- /**
-  @param context
   @param parent
   @param tick
   @param width
   @param height
   @param title
-  @param flags
+  @param type
   @return bs_Result
   */
 BSAPI bs_Result
@@ -9084,7 +9079,7 @@ bs_window(
     bs_U32 width,
     bs_U32 height,
     const char* title,
-    bs_U32 flags);
+    bs_WindowType type);
 
  /**
   @param context

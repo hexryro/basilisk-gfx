@@ -39,6 +39,7 @@ extern Basilisk basilisk;
 
 #define BASILISK_CONTEXT_IDS(X)                                 \
     X(BASILISK_CONTEXT_TITLE_BAR)                               \
+    X(BASILISK_CONTEXT_MENU)                                    \
     X(BASILISK_CONTEXTS_COUNT)
 
 #define BASILISK_IMAGE_IDS(X)                                   \
@@ -57,10 +58,12 @@ extern Basilisk basilisk;
 
 #define BASILISK_RENDERER_IDS(X)                                \
     X(BASILISK_RENDERER_MAIN)                                   \
+    X(BASILISK_RENDERER_MENU_CONTEXT)                           \
     X(BASILISK_RENDERER_TITLE_BAR)                              \
     X(BASILISK_RENDERERS_COUNT)
 
 #define BASILISK_QUEUE_IDS(X)                                   \
+    X(BASILISK_QUEUE_MENU_CONTEXT)                              \
     X(BASILISK_QUEUE_TITLE_BAR)                                 \
     X(BASILISK_QUEUES_COUNT)
 
@@ -97,8 +100,9 @@ BS_GENERATE_ENUM(BASILISK_FONT_IDS);
 
 void basilisk_createRenderers();
 
+void basilisk_instantiateContextMenuUI();
 void basilisk_instantiateTitleBarUI();
 void basilisk_instantiateBaseUI();
-bs_NonClientArea basilisk_onClientAreaTick(bs_ivec2 pt);
+bs_NonClientArea onClientAreaTick(bs_ivec2 pt);
 
 #endif

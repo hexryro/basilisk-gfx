@@ -45,16 +45,16 @@ BSGFX_CACHE_COLOR_MATERIAL(default_button_background_color, BS_RGBA(93, 93, 93, 
 static bsgfx_Font* basilisk_title_bar_font;
 static bool basilisk_hovering_title_bar_buttons;
 
-bs_NonClientArea basilisk_onClientAreaTick(bs_ivec2 pt) {
+bs_NonClientArea onClientAreaTick(bs_Context* context, bs_ivec2 pt) {
     RECT rc;
-    GetWindowRect(bs_scope()->context->hwnd, &rc);
+    GetWindowRect(context->hwnd, &rc);
 
     int y = pt.y - rc.top;
 
     if (basilisk_hovering_title_bar_buttons)
-        return BS_CLIENT_AREA;
+        return BS_NON_CLIENT_AREA_CAPTION_BUTTON;
 
-    if (y >= 0 && y < 32)
+    if (y >= 0 && y < BASILISK_TITLE_BAR_HEIGHT)
         return BS_NON_CLIENT_AREA_CAPTION;
 
     return BS_CLIENT_AREA;
@@ -74,7 +74,7 @@ static bsgfx_Font* basilisk_querySegoeUI() {
     return NULL;
 }
 
-static void basilisk_instantiateButtonBackgroundUI(bsgfx_UIElement* element, bsgfx_Material* material, bs_vec3 position, bs_vec2 size) {
+static bool basilisk_instantiateButtonBackgroundUI(bsgfx_UIElement* element, bsgfx_Material* material, bs_vec3 position, bs_vec2 size) {
     bsgfx_UISolid button = {
         .position = position,
         .size = size,
@@ -86,14 +86,17 @@ static void basilisk_instantiateButtonBackgroundUI(bsgfx_UIElement* element, bsg
     if (bsgfx_hoveringUIElement(element)) {
         basilisk_hovering_title_bar_buttons = true;
         bsgfx_instantiateSolidUIElement(button, element);
+        return true;
     }
+
+    return false;
 }
 
-static void basilisk_instantiateTitleBarButtonUI(bsgfx_AtlasCache* icon_cache, bsgfx_Material* material, bs_vec3 position, bs_vec2 title_bar_size, int width) {
+static bool basilisk_instantiateTitleBarButtonUI(bsgfx_AtlasCache* icon_cache, bsgfx_Material* material, bs_vec3 position, bs_vec2 title_bar_size, int width) {
     bsgfx_UIElement element_v;
     bsgfx_UIElement* element = &element_v;
 
-    basilisk_instantiateButtonBackgroundUI(element, material, position, BS_V2(width, BASILISK_TITLE_BAR_HEIGHT));
+    bool hovering = basilisk_instantiateButtonBackgroundUI(element, material, position, BS_V2(width, BASILISK_TITLE_BAR_HEIGHT));
 
     position.z++;
     bsgfx_UIIcon close_button_icon = {
@@ -105,9 +108,11 @@ static void basilisk_instantiateTitleBarButtonUI(bsgfx_AtlasCache* icon_cache, b
 
     bsgfx_atlasIconUIElement(close_button_icon, element);
     bsgfx_instantiateAtlasIconUIElement(close_button_icon, element);
+
+    return hovering;
 }
 
-static void basilisk_instantiateTitleBarTextButtonUI(const char* text, bsgfx_Material* material, bs_vec3 position, bs_vec2 title_bar_size) {
+static bool basilisk_instantiateTitleBarTextButtonUI(const char* text, bsgfx_Material* material, bs_vec3 position, bs_vec2 title_bar_size) {
     const float x_padding = 8.0; // px padding on each side of the button
     const float y_padding = -4.0;
 
@@ -132,7 +137,9 @@ static void basilisk_instantiateTitleBarTextButtonUI(const char* text, bsgfx_Mat
     float height = BASILISK_TITLE_BAR_HEIGHT;
     height += y_padding * 2.0;
     element->position.y -= y_padding;
-    basilisk_instantiateButtonBackgroundUI(element, material, element->position, BS_V2(element->size.x + x_padding * 2, height));
+    bool hovering = basilisk_instantiateButtonBackgroundUI(element, material, element->position, BS_V2(element->size.x + x_padding * 2, height));
+
+    return hovering;
 }
 
 void basilisk_instantiateTitleBarUI() {
@@ -156,6 +163,7 @@ void basilisk_instantiateTitleBarUI() {
     bs_vec3 position;
     bsgfx_UIElement element_v;
     bsgfx_UIElement* element = &element_v;
+    bool hovering;
 
     // title icon
     //position = bsgfx_seekTopLeftUI(title_bar_size);
@@ -182,28 +190,51 @@ void basilisk_instantiateTitleBarUI() {
     }, element);
 
    /**
-    Title text
+    File button
     */
     position.x += element->size.x;
     position.x += 16.0;
 
-    basilisk_instantiateTitleBarTextButtonUI("File", default_button_background_material, position, title_bar_size);
+    hovering = basilisk_instantiateTitleBarTextButtonUI("File", default_button_background_material, position, title_bar_size);
+    if (hovering && bs_leftClickOnce()) {
+
+    }
 
     position.x = title_bar_size.x;
+
+
 
     const int close_button_width = 32;
     const int maximize_button_width = 32;
     const int minimize_button_width = 32;
 
+
+   /**
+    Close button
+    */
     position.x -= close_button_width;
-    basilisk_instantiateTitleBarButtonUI(close_caption, close_button_background_material, position, title_bar_size, close_button_width);
+    hovering = basilisk_instantiateTitleBarButtonUI(close_caption, close_button_background_material, position, title_bar_size, close_button_width);
+    if (hovering && bs_leftClickUpOnce()) {
+        bs_exit();
+    }
 
+   /**
+    Maximize button
+    */
     position.x -= maximize_button_width;
-    basilisk_instantiateTitleBarButtonUI(maximize_caption, default_button_background_material, position, title_bar_size, maximize_button_width);
+    hovering = basilisk_instantiateTitleBarButtonUI(maximize_caption, default_button_background_material, position, title_bar_size, maximize_button_width);
+    if (hovering && bs_leftClickUpOnce()) {
 
+    }
+    
+   /**
+    Minimize button
+    */
     position.x -= minimize_button_width;
-    basilisk_instantiateTitleBarButtonUI(minimize_caption, default_button_background_material, position, title_bar_size, minimize_button_width);
+    hovering = basilisk_instantiateTitleBarButtonUI(minimize_caption, default_button_background_material, position, title_bar_size, minimize_button_width);
+    if (hovering && bs_leftClickUpOnce()) {
 
+    }
 
    /**
     Close button

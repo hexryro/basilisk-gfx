@@ -2936,21 +2936,74 @@ static void _bs_destroySwapchain() {
     _bs_scope_.context->swapchain = 0;
 }
 
-static void _bs_resizeSwapchain() {
-    // glfwGetFramebufferSize(_bs_instance->glfw, &_bs_swapchain->image.image->dim.x, &_bs_swapchain->image.image->dim.y);
-    //
-    // while (_bs_swapchain->image.image->dim.x == 0 || _bs_swapchain->image.image->dim.y == 0) {
-    //     if (glfwWindowShouldClose(_bs_instance->glfw)) return;
-    //
-    //     glfwGetFramebufferSize(_bs_instance->glfw, &_bs_swapchain->image.image->dim.x, &_bs_swapchain->image.image->dim.y);
-    //     glfwWaitEvents();
-    // }
+typedef void(__stdcall* bs_AutoResizeFunction)(bs_Object*);
 
-    // VkResult result = vkDeviceWaitIdle(_bs_instance_->device);
+static void _bs_autoResizeImage(bs_Object* object) {
+    bs_Image* image = object->image;
+
+    if (image->flags & BS_IMAGE_AUTO_RESIZE_BIT) {
+        if (image == _bs_scope_.context->swapchain_image->image)
+            return;
+
+        bs_ivec2 resolution = bs_resolution(_bs_scope_.context);
+        _bs_resizeImage(image, resolution, image->num_indices);
+    }
+}
+
+static void _bs_autoResizeRenderer(bs_Object* object) {
+    bs_Renderer* renderer = object->renderer;
+
+    if (renderer->flags & BS_RENDERER_AUTO_RESIZE_BIT) {
+        bs_ivec2 resolution = bs_resolution(_bs_scope_.context);
+        _bs_resizeRenderer(renderer, resolution);
+    }
+}
+
+static inline void _bs_autoResize(bs_ObjectType type, bs_AutoResizeFunction function) {
+    bs_List* object_types = bs_objectSources();
+
+    for (int i = 0; i < object_types->count; i++) {
+        bs_ObjectSource* source = bs_fetchUnit(object_types, i);
+
+        if (source->type == type) {
+            for (int j = 0; j < source->ids_count; j++) {
+                if (!source->ids[j].object)
+                    continue;
+
+                function(source->ids[j].object);
+            }
+        }
+    }
+}
+
+static void _bs_resizeSwapchain() {
+    bs_Context* ctx = _bs_scope_.context;
+
+    bs_stallGPU();
 
     _bs_destroySwapchain();
-  // _bs_prepareSwapchain();
+    _bs_swapchain(_bs_scope_.context);
+
+    _bs_scope_.context = ctx;
 }
+
+static void _bs_resizeContext() {
+
+    bs_ivec2 resolution = bs_resolution(_bs_scope_.context);
+    _bs_resizeSwapchain();
+
+    resolution = bs_resolution(_bs_scope_.context);
+
+    /**
+     Auto resize
+     */
+    _bs_autoResize(BS_OBJECT_IMAGE, _bs_autoResizeImage);
+    _bs_autoResize(BS_OBJECT_RENDERER, _bs_autoResizeRenderer);
+
+    if (_bs_scope_.context->resize)
+        _bs_scope_.context->resize(_bs_scope_.context);
+}
+
 
 // these functions should probably not be called by user
 BSAPI void _bs_acquire() {
@@ -2965,9 +3018,7 @@ BSAPI void _bs_acquire() {
         &_bs_image_index_);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        _bs_resizeSwapchain();
-        //if (_bs_wnd.resize)
-        //    _bs_wnd.resize();
+        _bs_resizeContext();
         return;
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -3055,7 +3106,7 @@ BSAPI void _bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues
     VkResult result = vkQueuePresentKHR(queue->queue, &present_i);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-        _bs_criticalN(BS_CONSTANT_STRING("Window was resized"));
+        _bs_resizeContext();
     else if (result != VK_SUCCESS)
         _bs_warnN(BS_CONSTANT_STRING("Failed to present swapchain image"));
 

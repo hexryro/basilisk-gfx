@@ -56,6 +56,9 @@ static void onLoadScene() {
 	bs_Object* title_bar_queue = BS_QUEUE(BASILISK_QUEUES, BASILISK_QUEUE_TITLE_BAR, BS_OBJECT_HAS_SWAPS_BIT);
 	bs_queue(title_bar_queue, 0, 0);
 
+	bs_Object* menu_context_queue = BS_QUEUE(BASILISK_QUEUES, BASILISK_QUEUE_MENU_CONTEXT, BS_OBJECT_HAS_SWAPS_BIT);
+	bs_queue(menu_context_queue, 0, 0);
+
 	bsmod_onLoad();
 	bsmod_bindAtlases();
 }
@@ -72,7 +75,10 @@ static void onTick() {
 
 static void onTitleBarTick() {
 	basilisk_instantiateTitleBarUI();
-	//bs_clearColor(queue, 0, bs_resolution(bs_scope()->context), &clear_color);
+}
+
+static void onContextMenuTick() {
+	basilisk_instantiateContextMenuUI();
 }
 
 static void onLog(const bs_LogQueueItem* item) {
@@ -113,6 +119,14 @@ static void onLog(const bs_LogQueueItem* item) {
 	}
 }
 
+static void onResizeContext(bs_Context* context) {
+	bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
+
+	bs_resizeRenderer(renderer, bs_resolution(context));
+
+	//bs_resizeImage();
+}
+
 int main(int argc, char* argv[]) {
 	bs_enableValidation();
 	bsgfx_enableValidation();
@@ -123,7 +137,7 @@ int main(int argc, char* argv[]) {
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {
 		.log = onLog,
-		.client_area_tick = basilisk_onClientAreaTick,
+		.client_area_tick = onClientAreaTick,
 	};
 
 	bsgfx_Callbacks* gfx_callbacks = bsgfx_callbacks();
@@ -151,10 +165,15 @@ int main(int argc, char* argv[]) {
 	bsgfx_ini("Basilisk", 1920, 1080, BS_WINDOW_NO_TITLE_BAR, argc, argv);
 
 	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
+
+//	bs_Object* menu_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU, 0);
+//	bs_window(menu_context->context, NULL, onContextMenuTick, bs_resolution(basilisk.context).x, 32, "test", BS_WINDOW_POPUP);
+//	bs_swapchain(menu_context->context);
+
 	//bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);
 	//bs_window(title_bar_context->context, basilisk.context, onTitleBarTick, bs_resolution(basilisk.context).x, 32, "test", 0);
 	//bs_swapchain(title_bar_context->context);
-	//bs_moveWindow(title_bar_context->context, 100, -100);
+
 	bsmod_onIni();
 	bsmod_onLateIni();
 	bsgfx_loadScene("engine");

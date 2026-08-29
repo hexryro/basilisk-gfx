@@ -2476,15 +2476,10 @@ BSAPI void _preval_bs_moveWindow(bs_Context* context, int x, int y) {
     next.bs_moveWindow(context, x, y);
 }
 
-BSAPI void _preval_bs_overrideTitleBar(bs_Context* context, int height) {
-    BS_VALIDATE(context != NULL, ,);
-    next.bs_overrideTitleBar(context, height);
-}
-
-BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Context* parent, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title, bs_U32 flags) {
+BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Context* parent, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title, bs_WindowType type) {
     BS_VALIDATE(context != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(title != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_window(context, parent, tick, width, height, title, flags);
+    return next.bs_window(context, parent, tick, width, height, title, type);
 }
 
 BSAPI void _preval_bs_swapchain(bs_Context* context) {
@@ -3214,7 +3209,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_scroll = _preval_bs_scroll;
     functions.bs_resizeWindow = _preval_bs_resizeWindow;
     functions.bs_moveWindow = _preval_bs_moveWindow;
-    functions.bs_overrideTitleBar = _preval_bs_overrideTitleBar;
     functions.bs_window = _preval_bs_window;
     functions.bs_swapchain = _preval_bs_swapchain;
     functions.bs_showWindow = _preval_bs_showWindow;

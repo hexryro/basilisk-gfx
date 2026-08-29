@@ -529,10 +529,16 @@ BSAPI void _bs_destroyImage(bs_Image* image) {
 }
 
 BSAPI bs_Result _bs_resizeImage(bs_Image* image, bs_ivec2 dim, int num_indices) {
+    bs_Image copy = *image;
+
+    bs_logF("Resizing image (%d, %d) -> (%d, %d)", image->dim.x, image->dim.y, dim.x, dim.y);
+
     _bs_destroyImage(image);
 
+    *image = copy;
     image->dim = dim;
     image->num_indices = num_indices;
+
     return _bs_prepareImage(image->head.source_id, image->head.id, image, image->usage_flags, image->aspect_flags);
 }
 

@@ -927,27 +927,6 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
 
     context->active = context->hwnd == GetForegroundWindow();
 
-    /*
-    if (context->title_bar_height > 0 && context->io.left_clicked) {
-        bs_ivec2 resolution = bs_resolution(context);
-        bs_vec2 title_bar_position = { 0, resolution.y - context->title_bar_height };
-        bs_vec2 title_bar_dimensions = { resolution.x, context->title_bar_height };
-        bs_vec2 cursor = bs_windowCursorPosition(context);
-
-        bool hovering_title_bar = _bs_rectangleVsPoint(&title_bar_position, &title_bar_dimensions, &cursor);
-
-        if (hovering_title_bar) {
-            ReleaseCapture();
-            SendMessage(
-                context->hwnd,
-                WM_NCLBUTTONDOWN,
-                HTCAPTION,
-                0
-            );
-        }
-    }
-    */
-
     if (_bs_leftClickOnce() || _bs_rightClickOnce() || _bs_middleClickOnce())
         SetCapture(context->hwnd);
     if (_bs_leftClickUpOnce() || _bs_rightClickUpOnce() || _bs_middleClickUpOnce())
@@ -1121,8 +1100,37 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
     }
 }
 
+static void _bs_updateWindowDPI(bs_Context* context) {
+    UINT dpi = GetDpiForWindow(context->hwnd);
+
+    context->border_size.x = GetSystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
+    context->border_size.y = GetSystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
+}
+
+static LRESULT _bs_hitTestResize(bs_Context* context, bs_ivec2 pt, LRESULT fallback) {
+    RECT rc;
+    GetWindowRect(context->hwnd, &rc);
+
+    const bool left = pt.x < rc.left + context->border_size.x;
+    const bool right = pt.x >= rc.right - context->border_size.x;
+    const bool top = pt.y < rc.top + context->border_size.y;
+    const bool bottom = pt.y >= rc.bottom - context->border_size.y;
+
+    if (top && left) return HTTOPLEFT;
+    if (top && right) return HTTOPRIGHT;
+    if (bottom && left) return HTBOTTOMLEFT;
+    if (bottom && right) return HTBOTTOMRIGHT;
+    if (top) return HTTOP;
+    if (left) return HTLEFT;
+    if (bottom) return HTBOTTOM;
+    if (right) return HTRIGHT;
+
+    return fallback;
+}
+
 LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
     bs_List* object_sources = bs_objectSources();
+    bs_Context* context = NULL;
 
     for (int i = 0; i < object_sources->count; i++) {
         bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
@@ -1133,36 +1141,47 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
             if (!source->ids[j].object)
                 continue;
 
-            if (source->ids[j].object->context->hwnd == hwnd) {
-                _bs_scope_.context = source->ids[j].object->context;
-            }
+            if (source->ids[j].object->context->hwnd == hwnd)
+                context = source->ids[j].object->context;
         }
     }
 
     switch (msg) {
-
+    case WM_DPICHANGED:
+        _bs_updateWindowDPI(context);
+        return DefWindowProc(hwnd, msg, w_param, l_param);
     case WM_NCHITTEST:
-        if (_bs_callbacks_.client_area_tick) {
+        if (context && _bs_callbacks_.client_area_tick) {
             bs_ivec2 pt = {
                 GET_X_LPARAM(l_param),
                 GET_Y_LPARAM(l_param)
             };
 
-            bs_NonClientArea non_client_area = _bs_callbacks_.client_area_tick(pt);
+            bs_NonClientArea non_client_area = _bs_callbacks_.client_area_tick(context, pt);
 
             switch (non_client_area) {
             case BS_CLIENT_AREA:
-                return HTCLIENT;
+                return _bs_hitTestResize(context, pt, HTCLIENT);
+            case BS_NON_CLIENT_AREA_CAPTION_BUTTON:
+                return _bs_hitTestResize(context, pt, HTCLIENT);
             case BS_NON_CLIENT_AREA_CAPTION:
-                return HTCAPTION;
+                return _bs_hitTestResize(context, pt, HTCAPTION);
             }
+
+            return HTCLIENT;
         }
 
         return DefWindowProc(hwnd, msg, w_param, l_param);
     case WM_NCCALCSIZE:
-        if (w_param)
-            return 0;
-        break;
+
+        if (context && context->window_type == BS_WINDOW_NO_TITLE_BAR) {
+            if (w_param)
+                return 0;
+            break;
+        }
+        else
+            return DefWindowProc(hwnd, msg, w_param, l_param);
+
     case WM_CLOSE:
         DestroyWindow(hwnd);
         break;
@@ -1188,48 +1207,14 @@ BSAPI void _bs_moveWindow(bs_Context* context, int x, int y) {
 	SetWindowPos(context->hwnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 }
 
- /**
-  TODO: should probably build a system around this
-  */
-BSAPI void _bs_overrideTitleBar(bs_Context* context, int height) {
-    context->title_bar_height = height;
-
-    COLORREF DARK_COLOR = 0x00000000;
-    BOOL SET_CAPTION_COLOR = SUCCEEDED(DwmSetWindowAttribute(
-        context->hwnd, DWMWA_CAPTION_COLOR,
-        &DARK_COLOR, sizeof(DARK_COLOR)));
-    SetWindowLong(context->hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT);
-
-    RECT rect;
-    GetWindowRect(context->hwnd, &rect);
-
-    SetWindowPos(
-        context->hwnd,
-        NULL,
-        rect.left,
-        rect.top,
-        rect.right - rect.left,
-        rect.bottom - rect.top,
-        SWP_FRAMECHANGED | SWP_NOACTIVATE
-    );
-
-    DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
-
-    DwmSetWindowAttribute(
-        context->hwnd,
-        DWMWA_WINDOW_CORNER_PREFERENCE,
-        &preference,
-        sizeof(preference)
-    );
-}
-
-BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title, bs_U32 flags) {
+BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title, bs_WindowType type) {
     _bs_scope_.context = context;
 
     context->hidden = true;
     context->tick = callback;
     context->title = title;
     context->dimensions = (bs_ivec2) { width, height };
+    context->window_type = type;
 
     bs_Timer timer = _bs_timer();
     _bs_setTargetFramerate(60);
@@ -1274,8 +1259,11 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback 
         parent_hwnd = parent->hwnd;
         style = WS_CHILD | WS_VISIBLE;
     }
-    else if (flags & BS_WINDOW_NO_TITLE_BAR) {
-        style = 0;
+    else if (type == BS_WINDOW_NO_TITLE_BAR) {
+        style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+    }
+    else if (type == BS_WINDOW_POPUP) {
+        style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
     }
   
     context->hwnd = CreateWindowEx(
@@ -1316,9 +1304,34 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback 
 
     _bs_createSurface();
 
-    if (flags & BS_WINDOW_NO_TITLE_BAR) {
-        _bs_overrideTitleBar(context, 32);
+    if (context->window_type == BS_WINDOW_NO_TITLE_BAR) {
+
+
+        RECT rect;
+        GetWindowRect(context->hwnd, &rect);
+
+        SetWindowPos(
+            context->hwnd,
+            NULL,
+            rect.left,
+            rect.top,
+            rect.right - rect.left,
+            rect.bottom - rect.top,
+            SWP_FRAMECHANGED | SWP_NOACTIVATE
+        );
+
+        DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
+
+        DwmSetWindowAttribute(
+            context->hwnd,
+            DWMWA_WINDOW_CORNER_PREFERENCE,
+            &preference,
+            sizeof(preference)
+        );
     }
+
+    _bs_updateWindowDPI(context);
+    _bs_showWindow(context);
 
     _bs_scope_.context = NULL;
 

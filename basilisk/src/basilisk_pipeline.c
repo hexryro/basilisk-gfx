@@ -125,6 +125,10 @@ void basilisk_pipeline() {
         renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MAIN)->renderer;
         queue = bs_fetch(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS)->queue;
     }
+    else if (context == bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context) {
+        renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MENU_CONTEXT)->renderer;
+        queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_MENU_CONTEXT)->queue;
+    }
     else if (context == bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context) {
         renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_TITLE_BAR)->renderer;
         queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_TITLE_BAR)->queue;
@@ -165,7 +169,7 @@ void basilisk_createHiResRenderer(bs_Context* context, int id) {
 
         bs_ivec2 resolution = bs_resolution(context);
         bs_Object* hi_res_0_depth = BS_IMAGE(BASILISK_IMAGES, BASILISK_IMAGE_MAIN_OUTPUT_DEPTH, 0);
-        if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT) == BS_RESULT_OK) {
+        if (bs_image(hi_res_0_depth, resolution, 0, BS_FORMAT_D32_SFLOAT_S8_UINT, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_AUTO_RESIZE_BIT) == BS_RESULT_OK) {
 
             bs_output(hi_res->renderer, (bs_Output) {
                 .subpass = 0,
@@ -199,6 +203,8 @@ void basilisk_createHiResRenderer(bs_Context* context, int id) {
 
 void basilisk_createRenderers() {
     basilisk_createHiResRenderer(bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context, BASILISK_RENDERER_MAIN);
+    if (bs_exists(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU))
+        basilisk_createHiResRenderer(bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context, BASILISK_RENDERER_MENU_CONTEXT);
     if (bs_exists(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR))
         basilisk_createHiResRenderer(bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context, BASILISK_RENDERER_TITLE_BAR);
 }

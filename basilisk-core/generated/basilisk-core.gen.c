@@ -4230,13 +4230,6 @@ void bs_moveWindow(
     next.bs_moveWindow(context, x, y);
 }
 
-void bs_overrideTitleBar(
-    bs_Context* context, 
-    int height)
-{
-    next.bs_overrideTitleBar(context, height);
-}
-
 bs_Result bs_window(
     bs_Context* context, 
     bs_Context* parent, 
@@ -4244,9 +4237,9 @@ bs_Result bs_window(
     bs_U32 width, 
     bs_U32 height, 
     const char* title, 
-    bs_U32 flags)
+    bs_WindowType type)
 {
-    return next.bs_window(context, parent, tick, width, height, title, flags);
+    return next.bs_window(context, parent, tick, width, height, title, type);
 }
 
 void bs_swapchain(

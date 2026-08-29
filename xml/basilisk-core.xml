@@ -65,7 +65,8 @@
 		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorFunction)()</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_VoidFunction)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ConfigureWindowFunction)(bs_Context*)</name></typedef>
-		<typedef><type>bs_NonClientArea</type><name>(__stdcall* bs_NonClientAreaTickFunction)(bs_ivec2)</name></typedef>
+		<typedef><type>bs_NonClientArea</type><name>(__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_ResizeContextFunction)(bs_Context*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
@@ -153,9 +154,12 @@
 		<enum name="bs_NonClientArea">
 			<line><name>BS_CLIENT_AREA</name><value>0</value></line>
 			<line><name>BS_NON_CLIENT_AREA_CAPTION</name><value>1</value></line>
+			<line><name>BS_NON_CLIENT_AREA_CAPTION_BUTTON</name><value>2</value></line>
 		</enum>
-		<enum name="bs_WindowFlag">
-			<line><name>BS_WINDOW_NO_TITLE_BAR</name><value>1 &lt;&lt; 0</value></line>
+		<enum name="bs_WindowType">
+			<line><name>BS_WINDOW_DEFAULT</name><value>0</value></line>
+			<line><name>BS_WINDOW_NO_TITLE_BAR</name><value>1</value></line>
+			<line><name>BS_WINDOW_POPUP</name><value>2</value></line>
 		</enum>
 		<enum name="bs_ImageFilter">
 			<line><name>BS_FILTER_NEAREST</name><value>0</value></line>
@@ -1854,13 +1858,14 @@
             <field><type>void*</type><name>hwnd</name></field>
             <field><type>bs_Timer</type><name>timer</name></field>
             <field><type>bs_ivec2</type><name>dimensions</name></field>
-            <field><type>bs_Callback</type><name>resize</name></field>
             <field><type>bs_Callback</type><name>destroy</name></field>
             <field><type>bs_Callback</type><name>tick</name></field>
             <field><type>bs_vec2</type><name>cursor</name></field>
+            <field><type>bs_vec2</type><name>border_size</name></field>
+            <field><type>bs_WindowType</type><name>window_type</name></field>
 			
             <field><type>bs_CursorIcon</type><name>cursor_icon</name></field>
-            <field comment="For applications with a custom title bar"><type>int</type><name>title_bar_height</name></field>
+			<field><type>bs_ResizeContextFunction</type><name>resize</name></field>
 
 			<field><type>struct VkSurfaceKHR_T*</type><name>surface</name></field>
             <field><type>bs_SurfaceFormat</type><name>surface_format</name></field>
@@ -4010,11 +4015,6 @@
             <param><type>int</type><name>x</name></param>
             <param><type>int</type><name>y</name></param>
         </function>
-		<function name="bs_overrideTitleBar">
-			<return>void</return>
-            <param><type>bs_Context*</type><name>context</name></param>
-            <param><type>int</type><name>height</name></param>
-		</function>
 		<function name="bs_window">
             <return>bs_Result</return>
             <param><type>bs_Context*</type><name>context</name></param>
@@ -4023,7 +4023,7 @@
             <param><type>bs_U32</type><name>width</name></param>
             <param><type>bs_U32</type><name>height</name></param>
             <param><type>const char*</type><name>title</name></param>
-            <param><type>bs_U32</type><name>flags</name></param>
+            <param><type>bs_WindowType</type><name>type</name></param>
         </function>
 		<function name="bs_swapchain">
             <return>void</return>

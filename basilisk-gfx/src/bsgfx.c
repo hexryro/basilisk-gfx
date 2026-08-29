@@ -146,7 +146,6 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, bs_U32 w
 
     bs_Object* context_object = BS_CONTEXT(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN, 0);
     bs_window(context_object->context, NULL, _bsgfx_callbacks_.tick, width, height, name, window_flags);
-    bs_showWindow(context_object->context);
     bs_device(context_object->context, NULL);
     bs_swapchain(context_object->context);
     bs_iniAudio();
