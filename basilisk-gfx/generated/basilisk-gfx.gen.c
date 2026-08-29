@@ -672,10 +672,11 @@ void bsgfx_ini(
     const char* name, 
     bs_U32 width, 
     bs_U32 height, 
+    bs_U32 window_flags, 
     int argc, 
     char* argv[])
 {
-    next.bsgfx_ini(name, width, height, argc, argv);
+    next.bsgfx_ini(name, width, height, window_flags, argc, argv);
 }
 
 void bsgfx_tick()

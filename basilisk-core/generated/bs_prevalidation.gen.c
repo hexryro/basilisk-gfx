@@ -2481,15 +2481,25 @@ BSAPI void _preval_bs_overrideTitleBar(bs_Context* context, int height) {
     next.bs_overrideTitleBar(context, height);
 }
 
-BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Context* parent, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title) {
+BSAPI bs_Result _preval_bs_window(bs_Context* context, bs_Context* parent, bs_Callback tick, bs_U32 width, bs_U32 height, const char* title, bs_U32 flags) {
     BS_VALIDATE(context != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(title != NULL, BS_RESULT_VALIDATION_ERROR,);
-    return next.bs_window(context, parent, tick, width, height, title);
+    return next.bs_window(context, parent, tick, width, height, title, flags);
+}
+
+BSAPI void _preval_bs_swapchain(bs_Context* context) {
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_swapchain(context);
 }
 
 BSAPI void _preval_bs_showWindow(bs_Context* context) {
     BS_VALIDATE(context != NULL, ,);
     next.bs_showWindow(context);
+}
+
+BSAPI void _preval_bs_hideWindow(bs_Context* context) {
+    BS_VALIDATE(context != NULL, ,);
+    next.bs_hideWindow(context);
 }
 
 BSAPI void _preval_bs_device(bs_Context* context, bs_PhysicalDevice* device) {
@@ -3206,7 +3216,9 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_moveWindow = _preval_bs_moveWindow;
     functions.bs_overrideTitleBar = _preval_bs_overrideTitleBar;
     functions.bs_window = _preval_bs_window;
+    functions.bs_swapchain = _preval_bs_swapchain;
     functions.bs_showWindow = _preval_bs_showWindow;
+    functions.bs_hideWindow = _preval_bs_hideWindow;
     functions.bs_device = _preval_bs_device;
     functions.bs_tick = _preval_bs_tick;
     functions.bs_exit = _preval_bs_exit;

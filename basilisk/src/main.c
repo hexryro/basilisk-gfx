@@ -66,7 +66,8 @@ static void onTick() {
 	bs_mat4 transform = BS_MAT4_IDENTITY;
 	bs_m4Scale(&transform, &BS_V3(100.0, 100.0, 0.0), &transform);
 
-	basilisk_instantiateBaseUI();
+	//basilisk_instantiateBaseUI();
+	basilisk_instantiateTitleBarUI();
 }
 
 static void onTitleBarTick() {
@@ -122,6 +123,7 @@ int main(int argc, char* argv[]) {
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {
 		.log = onLog,
+		.client_area_tick = basilisk_onClientAreaTick,
 	};
 
 	bsgfx_Callbacks* gfx_callbacks = bsgfx_callbacks();
@@ -146,13 +148,13 @@ int main(int argc, char* argv[]) {
 	should probably be put in bsmod instead
     */
 	bs_configureQueuesCount(2); 
-	bsgfx_ini("Basilisk", 1920, 1080, argc, argv);
+	bsgfx_ini("Basilisk", 1920, 1080, BS_WINDOW_NO_TITLE_BAR, argc, argv);
 
 	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
-	bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);
-	bs_window(title_bar_context->context, basilisk.context, onTitleBarTick, 800, 600, "test");
-	bs_showWindow(title_bar_context->context);
-
+	//bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);
+	//bs_window(title_bar_context->context, basilisk.context, onTitleBarTick, bs_resolution(basilisk.context).x, 32, "test", 0);
+	//bs_swapchain(title_bar_context->context);
+	//bs_moveWindow(title_bar_context->context, 100, -100);
 	bsmod_onIni();
 	bsmod_onLateIni();
 	bsgfx_loadScene("engine");

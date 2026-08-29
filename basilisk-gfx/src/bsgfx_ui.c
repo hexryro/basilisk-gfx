@@ -32,11 +32,11 @@
 #define BSGFX_DEBUG_URL_COLOR (bs_RGBA) { 70, 80, 200, 255 }
 #define BSGFX_DEBUG_URL_SELECTED_COLOR (bs_RGBA) { 100, 110, 255, 255 }
 
-static inline float _bsgfx_alignUIElement(float align_height, float height) {
-	if (align_height == 0.0)
-		return 0.0;
-
-	return (align_height * 0.5 - height * 0.5) ;
+static inline bs_vec2 _bsgfx_alignUIElement(bs_vec2 align, bs_vec2 size) {
+	return BS_V2(
+		align.x == 0.0 ? 0.0 : (align.x * 0.5 - size.x * 0.5),
+		align.y == 0.0 ? 0.0 : (align.y * 0.5 - size.y * 0.5)
+	);
 }
 
 BSGFXAPI bool _bsgfx_hoveringUIElement(const bsgfx_UIElement* element) {
@@ -55,7 +55,10 @@ BSGFXAPI void _bsgfx_atlasIconUIElement(bsgfx_UIIcon icon, bsgfx_UIElement* elem
 	if (icon.size.x == 0.0)
 		icon.size = icon.cache->size;
 
-	icon.position.y += _bsgfx_alignUIElement(icon.align_height, icon.size.y);
+	bs_vec2 alignment = _bsgfx_alignUIElement(icon.align, icon.size);
+
+	icon.position.x += alignment.x;
+	icon.position.y += alignment.y;
 
 	*element = (bsgfx_UIElement){
 		.position = icon.position,
@@ -91,7 +94,9 @@ BSGFXAPI void _bsgfx_instantiateAtlasIconUI(bsgfx_UIIcon icon, bsgfx_UIElement* 
    *============================================================================*/
 
 BSGFXAPI void _bsgfx_solidUIElement(bsgfx_UISolid solid, bsgfx_UIElement* element) {
-	solid.position.y += _bsgfx_alignUIElement(solid.align_height, solid.size.y);
+	bs_vec2 alignment = _bsgfx_alignUIElement(solid.align, solid.size);
+	solid.position.x += alignment.x;
+	solid.position.y += alignment.y;
 
 	*element = (bsgfx_UIElement){
 		.position = solid.position,
@@ -122,8 +127,9 @@ BSGFXAPI void _bsgfx_instantiateSolidUI(bsgfx_UISolid solid, bsgfx_UIElement* el
    *============================================================================*/
 
 BSGFXAPI void _bsgfx_instantiateTextUI(bsgfx_UIText text, bsgfx_UIElement* element) {
-	if (text.align_height != 0.0)
-		text.position.y += _bsgfx_alignUIElement(text.align_height, text.px_size);
+	bs_vec2 alignment = _bsgfx_alignUIElement(text.align, BS_V2(0, text.px_size));
+	text.position.x += alignment.x;
+	text.position.y += alignment.y;
 
 	float width = bsgfx_instanceASCIIText(
 		bsgfx_subtypes()[BSGFX_SUBTYPE_FONT],

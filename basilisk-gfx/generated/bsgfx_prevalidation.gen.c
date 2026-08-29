@@ -452,10 +452,10 @@ BSGFXAPI int _preval_bsgfx_package() {
     return next.bsgfx_package();
 }
 
-BSGFXAPI void _preval_bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc, char* argv[]) {
+BSGFXAPI void _preval_bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, bs_U32 window_flags, int argc, char* argv[]) {
     BSGFX_VALIDATE(name != NULL, ,);
     BSGFX_VALIDATE(argv != NULL, ,);
-    next.bsgfx_ini(name, width, height, argc, argv);
+    next.bsgfx_ini(name, width, height, window_flags, argc, argv);
 }
 
 BSGFXAPI void _preval_bsgfx_tick() {

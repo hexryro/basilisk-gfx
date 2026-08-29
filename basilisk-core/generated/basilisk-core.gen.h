@@ -154,6 +154,8 @@ typedef enum bs_Library bs_Library;
 typedef enum bs_MessageLevel bs_MessageLevel;
 typedef enum bs_Result bs_Result;
 typedef enum bs_IniFlag bs_IniFlag;
+typedef enum bs_NonClientArea bs_NonClientArea;
+typedef enum bs_WindowFlag bs_WindowFlag;
 typedef enum bs_ImageFilter bs_ImageFilter;
 typedef enum bs_PngType bs_PngType;
 typedef enum bs_Slot bs_Slot;
@@ -1315,6 +1317,8 @@ typedef void (__stdcall* bs_MessageFunction)(const bs_LogQueueItem*);
 typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
 typedef void (__stdcall* bs_ValidationErrorFunction)();
 typedef void (__stdcall* bs_ContextTickFunction)(bs_VoidFunction);
+typedef void (__stdcall* bs_ConfigureWindowFunction)(bs_Context*);
+typedef bs_NonClientArea (__stdcall* bs_NonClientAreaTickFunction)(bs_ivec2);
 typedef void (__stdcall* bs_SubpassFunction)(bs_RendererScope*);
 typedef long long bs_I64;
 typedef int bs_I32;
@@ -1394,6 +1398,15 @@ enum bs_IniFlag {
     BS_INI_AUDIO_BIT = 1 << 0,
     BS_INI_STEAM_BIT = 1 << 1,
     BS_INI_STEAM_INPUT_BIT = 1 << 2,
+};
+
+enum bs_NonClientArea {
+    BS_CLIENT_AREA = 0,
+    BS_NON_CLIENT_AREA_CAPTION = 1,
+};
+
+enum bs_WindowFlag {
+    BS_WINDOW_NO_TITLE_BAR = 1 << 0,
 };
 
 enum bs_ImageFilter {
@@ -3131,6 +3144,7 @@ struct bs_Callbacks {
     bs_MessageFunction log;
     bs_ValidationErrorFunction error;
     bs_ContextTickFunction tick;
+    bs_NonClientAreaTickFunction client_area_tick;
 };
 
 struct bs_LogQueueItem {
@@ -9059,6 +9073,7 @@ bs_overrideTitleBar(
   @param width
   @param height
   @param title
+  @param flags
   @return bs_Result
   */
 BSAPI bs_Result
@@ -9068,7 +9083,16 @@ bs_window(
     bs_Callback tick,
     bs_U32 width,
     bs_U32 height,
-    const char* title);
+    const char* title,
+    bs_U32 flags);
+
+ /**
+  @param context
+  @return void
+  */
+BSAPI void
+bs_swapchain(
+    bs_Context* context);
 
  /**
   @param context
@@ -9076,6 +9100,14 @@ bs_window(
   */
 BSAPI void
 bs_showWindow(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return void
+  */
+BSAPI void
+bs_hideWindow(
     bs_Context* context);
 
  /**

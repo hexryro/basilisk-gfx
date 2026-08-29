@@ -1012,7 +1012,7 @@
 		<structure name="bsgfx_UIIcon">
 			<field><type>bs_vec2</type><name>size</name></field>
 			<field><type>bs_vec3</type><name>position</name></field>
-			<field><type>float</type><name>align_height</name></field>
+			<field><type>bs_vec2</type><name>align</name></field>
 			<field><type>bsgfx_AtlasCache*</type><name>cache</name></field>
 			<field><type>bsgfx_InstanceSubtype*</type><name>subtype</name></field>
 			<field><type>int</type><name>material_id</name></field>
@@ -1023,13 +1023,13 @@
 		<structure name="bsgfx_UISolid">
 			<field><type>bs_vec2</type><name>size</name></field>
 			<field><type>bs_vec3</type><name>position</name></field>
-			<field><type>float</type><name>align_height</name></field>
+			<field><type>bs_vec2</type><name>align</name></field>
 			<field><type>int</type><name>material_id</name></field>
 		</structure>
 
 		<structure name="bsgfx_UIText">
 			<field><type>bs_vec3</type><name>position</name></field>
-			<field><type>float</type><name>align_height</name></field>
+			<field><type>bs_vec2</type><name>align</name></field>
 			<field><type>int</type><name>px_size</name></field>
 			<field><type>bsgfx_Font*</type><name>font</name></field>
 			<structure>
@@ -2067,6 +2067,7 @@
 			<param><type>const char*</type><name>name</name></param>
 			<param><type>bs_U32</type><name>width</name></param>
 			<param><type>bs_U32</type><name>height</name></param>
+			<param><type>bs_U32</type><name>window_flags</name></param>
 			<param><type>int</type><name>argc</name></param>
 			<param><type>char*</type><name>argv</name><size></size></param>
 		</function>

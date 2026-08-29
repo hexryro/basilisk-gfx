@@ -99,5 +99,6 @@ void basilisk_createRenderers();
 
 void basilisk_instantiateTitleBarUI();
 void basilisk_instantiateBaseUI();
+bs_NonClientArea basilisk_onClientAreaTick(bs_ivec2 pt);
 
 #endif

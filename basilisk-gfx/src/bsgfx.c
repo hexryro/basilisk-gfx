@@ -126,7 +126,7 @@ BSGFXAPI void _bsgfx_setCamera(const bs_mat4* proj, const bs_mat4* view) {
     bs_m4Mul(proj, view, &_bsgfx_app_.camera.result);
 }
 
-BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc, char* argv[]) {
+BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, bs_U32 window_flags, int argc, char* argv[]) {
     for (int i = 0; i < BSGFX_SUBTYPE_COUNT; i++)
         _bsgfx_subtypes_[i] = -1;
 
@@ -145,10 +145,10 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
     bs_callbacks()->tick = _bsgfx_onTick;
 
     bs_Object* context_object = BS_CONTEXT(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN, 0);
-    bs_window(context_object->context, NULL, _bsgfx_callbacks_.tick, width, height, name);
-    bs_device(context_object->context, NULL);
+    bs_window(context_object->context, NULL, _bsgfx_callbacks_.tick, width, height, name, window_flags);
     bs_showWindow(context_object->context);
-
+    bs_device(context_object->context, NULL);
+    bs_swapchain(context_object->context);
     bs_iniAudio();
 
     bs_loadPackage(&_bsgfx_package_, BSGFX_CONTENT_PATH);
@@ -165,5 +165,6 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, int argc
 }
 
 BSGFXAPI void _bsgfx_tick() {
+    bs_Object* context_object = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN);
     bs_tick(_bsgfx_fixedTick);
 }

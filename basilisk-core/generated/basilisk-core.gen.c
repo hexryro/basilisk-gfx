@@ -4243,15 +4243,28 @@ bs_Result bs_window(
     bs_Callback tick, 
     bs_U32 width, 
     bs_U32 height, 
-    const char* title)
+    const char* title, 
+    bs_U32 flags)
 {
-    return next.bs_window(context, parent, tick, width, height, title);
+    return next.bs_window(context, parent, tick, width, height, title, flags);
+}
+
+void bs_swapchain(
+    bs_Context* context)
+{
+    next.bs_swapchain(context);
 }
 
 void bs_showWindow(
     bs_Context* context)
 {
     next.bs_showWindow(context);
+}
+
+void bs_hideWindow(
+    bs_Context* context)
+{
+    next.bs_hideWindow(context);
 }
 
 void bs_device(

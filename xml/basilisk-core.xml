@@ -64,6 +64,8 @@
 		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorFunction)()</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_VoidFunction)</name></typedef>
+		<typedef><type>void</type><name>(__stdcall* bs_ConfigureWindowFunction)(bs_Context*)</name></typedef>
+		<typedef><type>bs_NonClientArea</type><name>(__stdcall* bs_NonClientAreaTickFunction)(bs_ivec2)</name></typedef>
 		<typedef><type>void</type><name>(__stdcall* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
@@ -147,6 +149,13 @@
 			<line><name>BS_INI_AUDIO_BIT</name><value>1 &lt;&lt; 0</value></line>
 			<line><name>BS_INI_STEAM_BIT</name><value>1 &lt;&lt; 1</value></line>
 			<line><name>BS_INI_STEAM_INPUT_BIT</name><value>1 &lt;&lt; 2</value></line>
+		</enum>
+		<enum name="bs_NonClientArea">
+			<line><name>BS_CLIENT_AREA</name><value>0</value></line>
+			<line><name>BS_NON_CLIENT_AREA_CAPTION</name><value>1</value></line>
+		</enum>
+		<enum name="bs_WindowFlag">
+			<line><name>BS_WINDOW_NO_TITLE_BAR</name><value>1 &lt;&lt; 0</value></line>
 		</enum>
 		<enum name="bs_ImageFilter">
 			<line><name>BS_FILTER_NEAREST</name><value>0</value></line>
@@ -1898,6 +1907,7 @@
 			<field><type>bs_MessageFunction</type><name>log</name></field>
 			<field><type>bs_ValidationErrorFunction</type><name>error</name></field>
 			<field><type>bs_ContextTickFunction</type><name>tick</name></field>
+			<field><type>bs_NonClientAreaTickFunction</type><name>client_area_tick</name></field>
 		</structure>
 
 		<structure name="bs_LogQueueItem">
@@ -4005,7 +4015,7 @@
             <param><type>bs_Context*</type><name>context</name></param>
             <param><type>int</type><name>height</name></param>
 		</function>
-        <function name="bs_window">
+		<function name="bs_window">
             <return>bs_Result</return>
             <param><type>bs_Context*</type><name>context</name></param>
 			<param nullable="true"><type>bs_Context*</type><name>parent</name></param>
@@ -4013,8 +4023,17 @@
             <param><type>bs_U32</type><name>width</name></param>
             <param><type>bs_U32</type><name>height</name></param>
             <param><type>const char*</type><name>title</name></param>
+            <param><type>bs_U32</type><name>flags</name></param>
+        </function>
+		<function name="bs_swapchain">
+            <return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
         </function>
 		<function name="bs_showWindow">
+            <return>void</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+		<function name="bs_hideWindow">
             <return>void</return>
             <param><type>bs_Context*</type><name>context</name></param>
         </function>

@@ -25,6 +25,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <windowsx.h>
 #include <winuser.h>
 #include <dwmapi.h>
 
@@ -692,7 +693,6 @@ BSAPI void _bs_resizeWindow(bs_Context* context, bs_U32 width, bs_U32 height) {
 //	bsi_resizeObjects();
 }
 
-/*
 BSAPI void _bs_maximizeWindow(bs_Context* context) {
 #ifdef _WIN32
 	ShowWindow(context->hwnd, SW_SHOWMAXIMIZED);
@@ -708,7 +708,26 @@ BSAPI void _bs_minimizeWindow(bs_Context* context) {
 	_bs_warnF("_bs_minimizeWindow has not been implemented for this OS yet");
 #endif
 }
-*/
+
+BSAPI void _bs_hideWindow(bs_Context* context) {
+#ifdef _WIN32
+    ShowWindow(context->hwnd, SW_HIDE);
+    UpdateWindow(context->hwnd);
+#else
+    _bs_warnF("_bs_hideWindow has not been implemented for this OS yet");
+#endif
+}
+
+BSAPI void _bs_showWindow(bs_Context* context) {
+#ifdef _WIN32
+    ShowWindow(context->hwnd, SW_SHOWNOACTIVATE);
+    UpdateWindow(context->hwnd);
+   // _bs_moveWindow(context, 0, 0);
+
+#else
+    _bs_warnF("_bs_showWindow has not been implemented for this OS yet");
+#endif
+}
 
 BSAPI void _bs_exit() {
     _bs_instance_->alive = false;
@@ -908,6 +927,7 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
 
     context->active = context->hwnd == GetForegroundWindow();
 
+    /*
     if (context->title_bar_height > 0 && context->io.left_clicked) {
         bs_ivec2 resolution = bs_resolution(context);
         bs_vec2 title_bar_position = { 0, resolution.y - context->title_bar_height };
@@ -926,6 +946,7 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
             );
         }
     }
+    */
 
     if (_bs_leftClickOnce() || _bs_rightClickOnce() || _bs_middleClickOnce())
         SetCapture(context->hwnd);
@@ -1017,6 +1038,8 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
         */
         MSG msg;
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            _bs_scope_.context = NULL;
+
             bs_Context* context = NULL;
             for (int i = 0; i < contexts.count; i++) {
                 bs_Context* ctx = *(bs_Context**)bs_fetchUnit(&contexts, i);
@@ -1089,20 +1112,6 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
             _bs_scope_.context = NULL;
         }
 
-       /**
-        Show all contexts
-
-        Needs to be done after first paint but kinda 
-        aids to check it in the engine loop
-        */
-        for (int i = 0; i < contexts.count; i++) {
-            bs_Context* ctx = *(bs_Context**)bs_fetchUnit(&contexts, i);
-            if (ctx->hidden) {
-                ShowWindow(ctx->hwnd, SW_SHOWDEFAULT);
-                ctx->hidden = false;
-            }
-        }
-
         _bs_checkTimer(&_bs_instance_->timer);
 
         while ((_bs_instance_->timer.seconds - frame_start) < _bs_instance_->target_frame_time) {
@@ -1113,7 +1122,47 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
 }
 
 LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
+    bs_List* object_sources = bs_objectSources();
+
+    for (int i = 0; i < object_sources->count; i++) {
+        bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
+        if (source->type != BS_OBJECT_CONTEXT)
+            continue;
+
+        for (int j = 0; j < source->ids_count; j++) {
+            if (!source->ids[j].object)
+                continue;
+
+            if (source->ids[j].object->context->hwnd == hwnd) {
+                _bs_scope_.context = source->ids[j].object->context;
+            }
+        }
+    }
+
     switch (msg) {
+
+    case WM_NCHITTEST:
+        if (_bs_callbacks_.client_area_tick) {
+            bs_ivec2 pt = {
+                GET_X_LPARAM(l_param),
+                GET_Y_LPARAM(l_param)
+            };
+
+            bs_NonClientArea non_client_area = _bs_callbacks_.client_area_tick(pt);
+
+            switch (non_client_area) {
+            case BS_CLIENT_AREA:
+                return HTCLIENT;
+            case BS_NON_CLIENT_AREA_CAPTION:
+                return HTCAPTION;
+            }
+        }
+
+        return DefWindowProc(hwnd, msg, w_param, l_param);
+    case WM_NCCALCSIZE:
+        if (w_param)
+            return 0;
+        break;
     case WM_CLOSE:
         DestroyWindow(hwnd);
         break;
@@ -1145,8 +1194,6 @@ BSAPI void _bs_moveWindow(bs_Context* context, int x, int y) {
 BSAPI void _bs_overrideTitleBar(bs_Context* context, int height) {
     context->title_bar_height = height;
 
-    SetWindowLong(context->hwnd, GWL_STYLE, 0);
-
     COLORREF DARK_COLOR = 0x00000000;
     BOOL SET_CAPTION_COLOR = SUCCEEDED(DwmSetWindowAttribute(
         context->hwnd, DWMWA_CAPTION_COLOR,
@@ -1176,7 +1223,7 @@ BSAPI void _bs_overrideTitleBar(bs_Context* context, int height) {
     );
 }
 
-BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title) {
+BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback callback, bs_U32 width, bs_U32 height, const char* title, bs_U32 flags) {
     _bs_scope_.context = context;
 
     context->hidden = true;
@@ -1219,19 +1266,18 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback 
         return _bs_convertWin32Error(GetLastError());
     }
 
-    DWORD style = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
+    DWORD style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
     DWORD ex_style = 0;
     HWND parent_hwnd = NULL;
 
     if (parent) {
         parent_hwnd = parent->hwnd;
-        style = WS_CHILD;
-        ex_style |= WS_EX_LTRREADING | WS_EX_LEFT;
+        style = WS_CHILD | WS_VISIBLE;
     }
-    else {
-        //SetWindowLong(context->hwnd, GWL_EXSTYLE, WS_EX_TRANSPARENT);
+    else if (flags & BS_WINDOW_NO_TITLE_BAR) {
+        style = 0;
     }
-
+  
     context->hwnd = CreateWindowEx(
         ex_style,
         class_name,
@@ -1263,23 +1309,25 @@ BSAPI bs_Result _bs_window(bs_Context* context, bs_Context* parent, bs_Callback 
         .iLayerType = PFD_MAIN_PLANE,
         .dwLayerMask = 0, .dwVisibleMask = 0, .dwDamageMask = 0
     };
- 
-     HDC hdc = GetDC(context->hwnd);
-     int pixel_format = ChoosePixelFormat(hdc, &pixel_format_descriptor);
-	 SetPixelFormat(hdc, pixel_format, &pixel_format_descriptor);
 
-     _bs_createSurface();
+    HDC hdc = GetDC(context->hwnd);
+    int pixel_format = ChoosePixelFormat(hdc, &pixel_format_descriptor);
+    SetPixelFormat(hdc, pixel_format, &pixel_format_descriptor);
 
-     _bs_scope_.context = NULL;
+    _bs_createSurface();
 
-     return BS_RESULT_OK;
+    if (flags & BS_WINDOW_NO_TITLE_BAR) {
+        _bs_overrideTitleBar(context, 32);
+    }
+
+    _bs_scope_.context = NULL;
+
+    return BS_RESULT_OK;
  }
 
-BSAPI void _bs_showWindow(bs_Context* context) {
+BSAPI void _bs_swapchain(bs_Context* context) {
     _bs_scope_.context = context;
-
     _bs_prepareSwapchain();
-
     _bs_scope_.context = NULL;
 }
 

@@ -54,8 +54,8 @@
 
 #define BASILISK_TITLE_BAR_HEIGHT 32
 
-BSGFX_CACHE_ATLAS_QUERY(BSMOD_ATLASES, BSMOD_ATLAS_UI, icon)
-BSGFX_CACHE_COLOR_MATERIAL(test_color, BS_RGBA(255, 83, 83, 255))
+//BSGFX_CACHE_ATLAS_QUERY(BSMOD_ATLASES, BSMOD_ATLAS_UI, icon)
+//BSGFX_CACHE_COLOR_MATERIAL(test_color, BS_RGBA(255, 83, 83, 255))
 
 void basilisk_instantiateBaseUI() {
     bs_ivec2 resolution = bs_resolution(bs_scope()->context);
@@ -77,7 +77,7 @@ void basilisk_instantiateBaseUI() {
     bsgfx_instantiateSolidUI((bsgfx_UISolid) {
         .position = position,
         .size = title_bar_size,
-        .material_id = $test_color()->id,
+   //     .material_id = $test_color()->id,
     }, element);
     position.z++;
 

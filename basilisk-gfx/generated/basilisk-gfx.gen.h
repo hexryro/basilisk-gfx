@@ -1122,7 +1122,7 @@ struct bsgfx_UIElement {
 struct bsgfx_UIIcon {
     bs_vec2 size;
     bs_vec3 position;
-    float align_height;
+    bs_vec2 align;
     bsgfx_AtlasCache* cache;
     bsgfx_InstanceSubtype* subtype;
     int material_id;
@@ -1133,13 +1133,13 @@ struct bsgfx_UIIcon {
 struct bsgfx_UISolid {
     bs_vec2 size;
     bs_vec3 position;
-    float align_height;
+    bs_vec2 align;
     int material_id;
 };
 
 struct bsgfx_UIText {
     bs_vec3 position;
-    float align_height;
+    bs_vec2 align;
     int px_size;
     bsgfx_Font* font;
     struct {
@@ -2658,6 +2658,7 @@ bsgfx_package();
   @param name
   @param width
   @param height
+  @param window_flags
   @param argc
   @param argv
   @return void
@@ -2667,6 +2668,7 @@ bsgfx_ini(
     const char* name,
     bs_U32 width,
     bs_U32 height,
+    bs_U32 window_flags,
     int argc,
     char* argv[]);
 

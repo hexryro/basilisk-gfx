@@ -56,6 +56,10 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
     bs_vec4 clear_color = bs_rgbUCharToV4(BS_RGBA(75, 75, 75, 255));
     clear_color.xyz = bs_sRGBToLinearV3(&clear_color.xyz);
 
+    if (bs_scope()->context != basilisk.context) {
+        clear_color = bs_rgbUCharToV4(BS_RGBA(255, 75, 75, 255));
+        clear_color.xyz = bs_sRGBToLinearV3(&clear_color.xyz);
+    } 
     bs_clearColor(queue, 0, bs_resolution(bs_scope()->context), &clear_color);
 
     basilisk_renderDepthlessLines(scope, queue);
@@ -195,5 +199,6 @@ void basilisk_createHiResRenderer(bs_Context* context, int id) {
 
 void basilisk_createRenderers() {
     basilisk_createHiResRenderer(bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context, BASILISK_RENDERER_MAIN);
-    basilisk_createHiResRenderer(bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context, BASILISK_RENDERER_TITLE_BAR);
+    if (bs_exists(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR))
+        basilisk_createHiResRenderer(bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context, BASILISK_RENDERER_TITLE_BAR);
 }
