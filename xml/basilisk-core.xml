@@ -3975,6 +3975,44 @@
         <function name="bs_leftClickUpOnce">
             <return>bool</return>
         </function>
+		
+		<function name="bs_contextMiddleClick">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextMiddleClickOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextMiddleClickUpOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextLeftClick">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextRightClick">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextRightClickOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextLeftClickOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextRightClickUpOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+        <function name="bs_contextLeftClickUpOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+        </function>
+		
         <function name="bs_keyDown">
             <return>bool</return>
             <param><type>bs_U32</type><name>code</name></param>
@@ -4003,6 +4041,43 @@
             <return>bool</return>
             <param><type>unsigned char</type><name>c</name></param>
         </function>
+		
+		<function name="bs_contextKeyDown">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>bs_U32</type><name>code</name></param>
+        </function>
+        <function name="bs_contextKeyHeld">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>bs_U32</type><name>code</name></param>
+        </function>
+        <function name="bs_contextKeyDownOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>bs_U32</type><name>code</name></param>
+        </function>
+        <function name="bs_contextKeyUpOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>bs_U32</type><name>code</name></param>
+        </function>
+        <function name="bs_contextCharDown">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>unsigned char</type><name>c</name></param>
+        </function>
+        <function name="bs_contextCharDownOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>unsigned char</type><name>c</name></param>
+        </function>
+        <function name="bs_contextCharUpOnce">
+            <return>bool</return>
+            <param><type>bs_Context*</type><name>context</name></param>
+            <param><type>unsigned char</type><name>c</name></param>
+        </function>
+		
         <function name="bs_scroll">
             <return>int</return>
         </function>

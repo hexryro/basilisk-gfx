@@ -1611,12 +1611,12 @@ BSAPI void _preval_bs_toLower(char* string, int len) {
 }
 
 BSAPI bs_U64 _preval_bs_hash(unsigned char* data, size_t size) {
-    BS_VALIDATE(data != NULL, 0,);
+    BS_VALIDATE(data != NULL, (bs_U64) { 0 },);
     return next.bs_hash(data, size);
 }
 
 BSAPI bs_U64 _preval_bs_stringHash(char* string) {
-    BS_VALIDATE(string != NULL, 0,);
+    BS_VALIDATE(string != NULL, (bs_U64) { 0 },);
     return next.bs_stringHash(string);
 }
 
@@ -2013,17 +2013,17 @@ BSAPI bool _preval_bs_fileExistsV(char* format, va_list args) {
 }
 
 BSAPI bs_I64 _preval_bs_toLong(const char* str) {
-    BS_VALIDATE(str != NULL, 0,);
+    BS_VALIDATE(str != NULL, (bs_I64) { 0 },);
     return next.bs_toLong(str);
 }
 
 BSAPI bs_U64 _preval_bs_toULong(const char* str) {
-    BS_VALIDATE(str != NULL, 0,);
+    BS_VALIDATE(str != NULL, (bs_U64) { 0 },);
     return next.bs_toULong(str);
 }
 
 BSAPI bs_F64 _preval_bs_toDouble(const char* str) {
-    BS_VALIDATE(str != NULL, 0,);
+    BS_VALIDATE(str != NULL, (bs_F64) { 0 },);
     return next.bs_toDouble(str);
 }
 
@@ -2270,7 +2270,7 @@ BSAPI bs_Pipeline* _preval_bs_queryPipeline(bs_PipelineType type, bs_U64 hash) {
 }
 
 BSAPI bs_U64 _preval_bs_pipelineHash(bs_PipelineHash* descriptor) {
-    BS_VALIDATE(descriptor != NULL, 0,);
+    BS_VALIDATE(descriptor != NULL, (bs_U64) { 0 },);
     return next.bs_pipelineHash(descriptor);
 }
 
@@ -2382,7 +2382,7 @@ BSAPI bs_DateTime _preval_bs_dateTime() {
 }
 
 BSAPI bs_I64 _preval_bs_totalSeconds(const bs_DateTime* date_time) {
-    BS_VALIDATE(date_time != NULL, 0,);
+    BS_VALIDATE(date_time != NULL, (bs_I64) { 0 },);
     return next.bs_totalSeconds(date_time);
 }
 
@@ -2441,6 +2441,51 @@ BSAPI bool _preval_bs_leftClickUpOnce() {
     return next.bs_leftClickUpOnce();
 }
 
+BSAPI bool _preval_bs_contextMiddleClick(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextMiddleClick(context);
+}
+
+BSAPI bool _preval_bs_contextMiddleClickOnce(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextMiddleClickOnce(context);
+}
+
+BSAPI bool _preval_bs_contextMiddleClickUpOnce(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextMiddleClickUpOnce(context);
+}
+
+BSAPI bool _preval_bs_contextLeftClick(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextLeftClick(context);
+}
+
+BSAPI bool _preval_bs_contextRightClick(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextRightClick(context);
+}
+
+BSAPI bool _preval_bs_contextRightClickOnce(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextRightClickOnce(context);
+}
+
+BSAPI bool _preval_bs_contextLeftClickOnce(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextLeftClickOnce(context);
+}
+
+BSAPI bool _preval_bs_contextRightClickUpOnce(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextRightClickUpOnce(context);
+}
+
+BSAPI bool _preval_bs_contextLeftClickUpOnce(bs_Context* context) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextLeftClickUpOnce(context);
+}
+
 BSAPI bool _preval_bs_keyDown(bs_U32 code) {
     return next.bs_keyDown(code);
 }
@@ -2467,6 +2512,41 @@ BSAPI bool _preval_bs_charDownOnce(unsigned char c) {
 
 BSAPI bool _preval_bs_charUpOnce(unsigned char c) {
     return next.bs_charUpOnce(c);
+}
+
+BSAPI bool _preval_bs_contextKeyDown(bs_Context* context, bs_U32 code) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextKeyDown(context, code);
+}
+
+BSAPI bool _preval_bs_contextKeyHeld(bs_Context* context, bs_U32 code) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextKeyHeld(context, code);
+}
+
+BSAPI bool _preval_bs_contextKeyDownOnce(bs_Context* context, bs_U32 code) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextKeyDownOnce(context, code);
+}
+
+BSAPI bool _preval_bs_contextKeyUpOnce(bs_Context* context, bs_U32 code) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextKeyUpOnce(context, code);
+}
+
+BSAPI bool _preval_bs_contextCharDown(bs_Context* context, unsigned char c) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextCharDown(context, c);
+}
+
+BSAPI bool _preval_bs_contextCharDownOnce(bs_Context* context, unsigned char c) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextCharDownOnce(context, c);
+}
+
+BSAPI bool _preval_bs_contextCharUpOnce(bs_Context* context, unsigned char c) {
+    BS_VALIDATE(context != NULL, false,);
+    return next.bs_contextCharUpOnce(context, c);
 }
 
 BSAPI int _preval_bs_scroll() {
@@ -3207,6 +3287,15 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_leftClickOnce = _preval_bs_leftClickOnce;
     functions.bs_rightClickUpOnce = _preval_bs_rightClickUpOnce;
     functions.bs_leftClickUpOnce = _preval_bs_leftClickUpOnce;
+    functions.bs_contextMiddleClick = _preval_bs_contextMiddleClick;
+    functions.bs_contextMiddleClickOnce = _preval_bs_contextMiddleClickOnce;
+    functions.bs_contextMiddleClickUpOnce = _preval_bs_contextMiddleClickUpOnce;
+    functions.bs_contextLeftClick = _preval_bs_contextLeftClick;
+    functions.bs_contextRightClick = _preval_bs_contextRightClick;
+    functions.bs_contextRightClickOnce = _preval_bs_contextRightClickOnce;
+    functions.bs_contextLeftClickOnce = _preval_bs_contextLeftClickOnce;
+    functions.bs_contextRightClickUpOnce = _preval_bs_contextRightClickUpOnce;
+    functions.bs_contextLeftClickUpOnce = _preval_bs_contextLeftClickUpOnce;
     functions.bs_keyDown = _preval_bs_keyDown;
     functions.bs_keyHeld = _preval_bs_keyHeld;
     functions.bs_keyDownOnce = _preval_bs_keyDownOnce;
@@ -3214,6 +3303,13 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_charDown = _preval_bs_charDown;
     functions.bs_charDownOnce = _preval_bs_charDownOnce;
     functions.bs_charUpOnce = _preval_bs_charUpOnce;
+    functions.bs_contextKeyDown = _preval_bs_contextKeyDown;
+    functions.bs_contextKeyHeld = _preval_bs_contextKeyHeld;
+    functions.bs_contextKeyDownOnce = _preval_bs_contextKeyDownOnce;
+    functions.bs_contextKeyUpOnce = _preval_bs_contextKeyUpOnce;
+    functions.bs_contextCharDown = _preval_bs_contextCharDown;
+    functions.bs_contextCharDownOnce = _preval_bs_contextCharDownOnce;
+    functions.bs_contextCharUpOnce = _preval_bs_contextCharUpOnce;
     functions.bs_scroll = _preval_bs_scroll;
     functions.bs_resizeWindow = _preval_bs_resizeWindow;
     functions.bs_moveWindow = _preval_bs_moveWindow;

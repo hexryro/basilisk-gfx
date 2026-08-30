@@ -97,13 +97,75 @@ BSAPI float _bsgfx_fontHeight(bsgfx_Font* font, int px_size) {
     return _bsgfx_convertDesignUnits(font, px_size, font->du_height);
 }
 
-BSGFXAPI float 
-_bsgfx_instanceASCIITextN(
+BSGFXAPI bs_vec2
+_bsgfx_textSize(
+    bsgfx_Font* font,
+    int px_size,
+    char* text,
+    int text_length) 
+{
+    int pt_size_id = _bsgfx_queryPtSize(font, px_size);
+    px_size = font->pt_sizes[pt_size_id];
+
+    bs_vec2 position = { 0 };
+
+    assert(pt_size_id != -1);
+
+    bsgfx_UnicodeBlock2* block = font->blocks;
+    assert(block != NULL);
+
+    bs_vec2 next_glyph_advance = { 0 };
+
+    for (int i = 0; i < text_length; i++) {
+        char c = text[i];
+        if (c < 0)
+            continue;
+
+        bsgfx_Glyph* glyph = _bsgfx_getGlyph(font, block, c, pt_size_id);
+
+        bs_vec2 advance = next_glyph_advance;
+
+        next_glyph_advance = BS_V2(0, 0);
+
+        bs_vec2 p = position;
+        float mul = 1.0 / 64.0;
+
+        if (i < (text_length - 1)) {
+            char next = text[i + 1];
+
+            int start = glyph->kerning_pair_start;
+            int end = start + glyph->kerning_pair_count;
+
+            for (int j = start; j < end; j++) {
+                bsgfx_KerningPair* pair = font->kerning_pairs + j;
+
+                if (next == pair->right) {
+                    advance.x += _bsgfx_convertDesignUnits(font, px_size, pair->left_x_advance);
+                    advance.y += _bsgfx_convertDesignUnits(font, px_size, pair->left_y_advance);
+
+                    next_glyph_advance.x = _bsgfx_convertDesignUnits(font, px_size, pair->right_x_advance);
+                    next_glyph_advance.y = _bsgfx_convertDesignUnits(font, px_size, pair->right_y_advance);
+
+                    break;
+                }
+            }
+        }
+
+        position.x += (float)glyph->x_advance * mul;
+
+        position.x += advance.x;
+        position.y += advance.y;
+    }
+}
+
+BSGFXAPI bs_Range 
+_bsgfx_instantiateASCIITextN(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int px_size, 
     int material_id, 
+    bs_vec2* out_size,
     char* text, 
     int text_length) 
 {
@@ -111,7 +173,7 @@ _bsgfx_instanceASCIITextN(
     int pt_size_id = _bsgfx_queryPtSize(font, px_size);
     px_size = font->pt_sizes[pt_size_id];
 
-    float start_x = position.x;
+    bs_vec2 start = position.xy;
 
     assert(pt_size_id != -1);
 
@@ -121,22 +183,18 @@ _bsgfx_instanceASCIITextN(
     //assert(block->offset == 0);
     //assert(block->count == 127);
 
-    bs_mat4 test_transform = BS_MAT4_IDENTITY;
-    bs_m4Translate(&test_transform, &BS_V3(100.0, 100.0, 0.0), &test_transform);
-    bs_m4Scale(&test_transform, &BS_V3(1024, 1024, 0), &test_transform);
-
-  //  bsgfx_instantiateQuad(subtype, bs_m4x3(&test_transform), BS_V4(0, 0, 1, 1), 0, 0, 0);
     if (block->offset != 0)
-        return 0.0;
+        return (bs_Range) { 0, 0 };
     if (block->count != 127)
-        return 0.0;
+        return (bs_Range) { 0, 0 };
+
+    int instance_id = subtype->host_instances.count;
+    int instance_count = 0;
 
     int glyph_pt_offset = pt_size_id * block->count;
 
     bs_vec2 next_glyph_placement = { 0 };
     bs_vec2 next_glyph_advance = { 0 };
-
-    const float spacing = 8.0;
 
     for (int i = 0; i < text_length; i++) {
         char c = text[i];
@@ -196,9 +254,8 @@ _bsgfx_instanceASCIITextN(
             bs_m4Scale(&transform, &BS_V3(size.x, size.y, 0), &transform);
 
             bsgfx_instantiateQuad(subtype, bs_m4x3(&transform), coords, 0, glyph->atlas_page, material_id);
+            instance_count++;
         }
-
-        // instanceAtlasTexture(glyph->atlas_page, glyph->atlas_index)
 
         position.x += (float)glyph->x_advance * mul;
 
@@ -207,7 +264,16 @@ _bsgfx_instanceASCIITextN(
         position.z += 0.01;
     }
 
-    return position.x - start_x;
+    *out_size = BS_V2(
+        position.x - start.x, 
+        _bsgfx_fontHeight(font, px_size)
+        //position.y - start.y
+    );
+
+    return (bs_Range) {
+        .offset = instance_id == subtype->host_instances.count ? -1 : instance_id,
+        .num = instance_count
+    };
 }
 
 BSGFXAPI void _bsgfx_instanceUnicodeTextN(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, char32_t* text, int text_length) {

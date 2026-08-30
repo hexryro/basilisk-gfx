@@ -8984,6 +8984,78 @@ BSAPI bool
 bs_leftClickUpOnce();
 
  /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextMiddleClick(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextMiddleClickOnce(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextMiddleClickUpOnce(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextLeftClick(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextRightClick(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextRightClickOnce(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextLeftClickOnce(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextRightClickUpOnce(
+    bs_Context* context);
+
+ /**
+  @param context
+  @return bool
+  */
+BSAPI bool
+bs_contextLeftClickUpOnce(
+    bs_Context* context);
+
+ /**
   @param code
   @return bool
   */
@@ -9037,6 +9109,76 @@ bs_charDownOnce(
   */
 BSAPI bool
 bs_charUpOnce(
+    unsigned char c);
+
+ /**
+  @param context
+  @param code
+  @return bool
+  */
+BSAPI bool
+bs_contextKeyDown(
+    bs_Context* context,
+    bs_U32 code);
+
+ /**
+  @param context
+  @param code
+  @return bool
+  */
+BSAPI bool
+bs_contextKeyHeld(
+    bs_Context* context,
+    bs_U32 code);
+
+ /**
+  @param context
+  @param code
+  @return bool
+  */
+BSAPI bool
+bs_contextKeyDownOnce(
+    bs_Context* context,
+    bs_U32 code);
+
+ /**
+  @param context
+  @param code
+  @return bool
+  */
+BSAPI bool
+bs_contextKeyUpOnce(
+    bs_Context* context,
+    bs_U32 code);
+
+ /**
+  @param context
+  @param c
+  @return bool
+  */
+BSAPI bool
+bs_contextCharDown(
+    bs_Context* context,
+    unsigned char c);
+
+ /**
+  @param context
+  @param c
+  @return bool
+  */
+BSAPI bool
+bs_contextCharDownOnce(
+    bs_Context* context,
+    unsigned char c);
+
+ /**
+  @param context
+  @param c
+  @return bool
+  */
+BSAPI bool
+bs_contextCharUpOnce(
+    bs_Context* context,
     unsigned char c);
 
  /**

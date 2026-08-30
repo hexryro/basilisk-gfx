@@ -31,7 +31,7 @@ layout(push_constant) uniform constants {
 } pushConst;
 
 void main() {
-    out_color = vec4(in_normal, 1.0);
+    //out_color = vec4(in_normal, 1.0);
     //out_normal.xyz = in_normal;
     //out_normal.a = 0.0;
     //out_position = vec4(in_world_position, 1.0);
@@ -40,7 +40,7 @@ void main() {
     //if (out_normal.x != 0.0 || out_normal.y != 0.0 || out_normal.z != 0.0)
     //    out_normal.a = 1.0;
 
-    out_color = texture(atlas_texture, vec2(in_texture.x, 1.0 - in_texture.y)) ;
+    out_color = texture(atlas_texture, vec2(in_texture.x, 1.0 - in_texture.y)) * in_color;
 
     vec2 scale = vec2(
         bsgfx_quad_instances[in_instance].transform[0],

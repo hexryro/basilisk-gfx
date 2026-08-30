@@ -115,6 +115,7 @@ bs_NonClientArea onClientAreaTick(bs_ivec2 pt);
 typedef enum {
     CONTEXT_MENU_UNDEFINED,
     CONTEXT_MENU_FILE,
+    CONTEXT_MENU_OPEN_RECENT,
 } ContextMenu;
 
 void showContextMenuUI(ContextMenu type, bs_vec3 position);

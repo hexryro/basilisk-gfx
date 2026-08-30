@@ -114,7 +114,9 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     functions.bsgfx_instanceAtlas = (PFN_bsgfx_instanceAtlas)GetProcAddress(module, "_preval_bsgfx_instanceAtlas");
     functions.bsgfx_instanceAtlasFlipped = (PFN_bsgfx_instanceAtlasFlipped)GetProcAddress(module, "_preval_bsgfx_instanceAtlasFlipped");
     functions.bsgfx_fontHeight = (PFN_bsgfx_fontHeight)GetProcAddress(module, "_preval_bsgfx_fontHeight");
-    functions.bsgfx_instanceASCIIText = (PFN_bsgfx_instanceASCIIText)GetProcAddress(module, "_preval_bsgfx_instanceASCIIText");
+    functions.bsgfx_instantiateASCIIText = (PFN_bsgfx_instantiateASCIIText)GetProcAddress(module, "_preval_bsgfx_instantiateASCIIText");
+    functions.bsgfx_instanceHeader = (PFN_bsgfx_instanceHeader)GetProcAddress(module, "_preval_bsgfx_instanceHeader");
+    functions.bsgfx_instanceData = (PFN_bsgfx_instanceData)GetProcAddress(module, "_preval_bsgfx_instanceData");
     functions.bsgfx_matrix = (PFN_bsgfx_matrix)GetProcAddress(module, "_preval_bsgfx_matrix");
     functions.bsgfx_renderFineShadowVolumes = (PFN_bsgfx_renderFineShadowVolumes)GetProcAddress(module, "_preval_bsgfx_renderFineShadowVolumes");
     functions.bsgfx_renderShadowVolumes = (PFN_bsgfx_renderShadowVolumes)GetProcAddress(module, "_preval_bsgfx_renderShadowVolumes");
@@ -181,6 +183,7 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     functions.bsgfx_instantiateAtlasIconUIElement = (PFN_bsgfx_instantiateAtlasIconUIElement)GetProcAddress(module, "_preval_bsgfx_instantiateAtlasIconUIElement");
     functions.bsgfx_atlasIconUIElement = (PFN_bsgfx_atlasIconUIElement)GetProcAddress(module, "_preval_bsgfx_atlasIconUIElement");
     functions.bsgfx_hoveringUIElement = (PFN_bsgfx_hoveringUIElement)GetProcAddress(module, "_preval_bsgfx_hoveringUIElement");
+    functions.bsgfx_translateUIElement = (PFN_bsgfx_translateUIElement)GetProcAddress(module, "_preval_bsgfx_translateUIElement");
     functions.bsgfx_renderColorPickers = (PFN_bsgfx_renderColorPickers)GetProcAddress(module, "_preval_bsgfx_renderColorPickers");
 
     return &functions;

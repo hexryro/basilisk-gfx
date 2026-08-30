@@ -276,6 +276,7 @@ typedef bs_U32 bsgfx_SpawnerFlags;
 typedef void (__stdcall* PFN_bsgfx_TypeMapper)(void*, void*);
 typedef bool (__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*);
 typedef struct bsgfx_InstanceHeader bsgfx_InstanceHeader;
+typedef bs_Range bsgfx_Range;
 enum bsgfx_MaterialCategory {
     BSGFX_MATERIAL_CATEGORY_NONE,
     BSGFX_MATERIAL_CATEGORY_UI_COLOR_SCHEME,
@@ -1117,6 +1118,8 @@ enum bsgfx_Language {
 struct bsgfx_UIElement {
     bs_vec2 size;
     bs_vec3 position;
+    bsgfx_Range instance_range;
+    bsgfx_InstanceSubtype* subtype;
 };
 
 struct bsgfx_UIIcon {
@@ -2568,16 +2571,18 @@ bsgfx_fontHeight(
   @param position
   @param pt_size
   @param material_id
+  @param out_size
   @param text
-  @return float
+  @return bsgfx_Range
   */
-BSGFXAPI float
-bsgfx_instanceASCIIText(
+BSGFXAPI bsgfx_Range
+bsgfx_instantiateASCIIText(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
     int material_id,
+    bs_vec2* out_size,
     char* text);
 
  /**
@@ -2586,17 +2591,19 @@ bsgfx_instanceASCIIText(
   @param position
   @param pt_size
   @param material_id
+  @param out_size
   @param text
   @param text_length
-  @return float
+  @return bsgfx_Range
   */
-BSGFXAPI float
-bsgfx_instanceASCIITextN(
+BSGFXAPI bsgfx_Range
+bsgfx_instantiateASCIITextN(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
     int material_id,
+    bs_vec2* out_size,
     char* text,
     int text_length);
 
@@ -2606,17 +2613,19 @@ bsgfx_instanceASCIITextN(
   @param position
   @param pt_size
   @param material_id
+  @param out_size
   @param format
   @param args
-  @return float
+  @return bsgfx_Range
   */
-BSGFXAPI float
-bsgfx_instanceASCIITextV(
+BSGFXAPI bsgfx_Range
+bsgfx_instantiateASCIITextV(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
     int material_id,
+    bs_vec2* out_size,
     char* format,
     va_list args);
 
@@ -2626,19 +2635,41 @@ bsgfx_instanceASCIITextV(
   @param position
   @param pt_size
   @param material_id
+  @param out_size
   @param format
   @param ...
-  @return float
+  @return bsgfx_Range
   */
-BSGFXAPI float
-bsgfx_instanceASCIITextF(
+BSGFXAPI bsgfx_Range
+bsgfx_instantiateASCIITextF(
     bsgfx_InstanceSubtype* subtype,
     bsgfx_Font* font,
     bs_vec3 position,
     int pt_size,
     int material_id,
+    bs_vec2* out_size,
     char* format,
      ...);
+
+ /**
+  @param subtype
+  @param instance_id
+  @return bsgfx_InstanceHeader*
+  */
+BSGFXAPI bsgfx_InstanceHeader*
+bsgfx_instanceHeader(
+    bsgfx_InstanceSubtype* subtype,
+    int instance_id);
+
+ /**
+  @param subtype
+  @param instance_id
+  @return bsgfx_InstanceHeader*
+  */
+BSGFXAPI bsgfx_InstanceHeader*
+bsgfx_instanceData(
+    bsgfx_InstanceSubtype* subtype,
+    int instance_id);
 
  /**
   @param position
@@ -3313,6 +3344,16 @@ bsgfx_atlasIconUIElement(
 BSGFXAPI bool
 bsgfx_hoveringUIElement(
     const bsgfx_UIElement* element);
+
+ /**
+  @param element
+  @param position
+  @return void
+  */
+BSGFXAPI void
+bsgfx_translateUIElement(
+    const bsgfx_UIElement* element,
+    const bs_vec3* position);
 
  /**
   @param scope

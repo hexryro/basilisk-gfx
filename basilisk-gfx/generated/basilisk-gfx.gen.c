@@ -604,55 +604,73 @@ float bsgfx_fontHeight(
     return next.bsgfx_fontHeight(font, px_size);
 }
 
-float bsgfx_instanceASCIIText(
+bsgfx_Range bsgfx_instantiateASCIIText(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     int material_id, 
+    bs_vec2* out_size, 
     char* text)
 {
-    return next.bsgfx_instanceASCIIText(subtype, font, position, pt_size, material_id, text);
+    return next.bsgfx_instantiateASCIIText(subtype, font, position, pt_size, material_id, out_size, text);
 }
 
-float bsgfx_instanceASCIITextN(
+bsgfx_Range bsgfx_instantiateASCIITextN(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     int material_id, 
+    bs_vec2* out_size, 
     char* text, 
     int text_length)
 {
-    return next.bsgfx_instanceASCIITextN(subtype, font, position, pt_size, material_id, text, text_length);
+    return next.bsgfx_instantiateASCIITextN(subtype, font, position, pt_size, material_id, out_size, text, text_length);
 }
 
-float bsgfx_instanceASCIITextV(
+bsgfx_Range bsgfx_instantiateASCIITextV(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     int material_id, 
+    bs_vec2* out_size, 
     char* format, 
     va_list args)
 {
-    return next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, material_id, format, args);
+    return next.bsgfx_instantiateASCIITextV(subtype, font, position, pt_size, material_id, out_size, format, args);
 }
 
-float bsgfx_instanceASCIITextF(
+bsgfx_Range bsgfx_instantiateASCIITextF(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     int material_id, 
+    bs_vec2* out_size, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    float _return = next.bsgfx_instanceASCIITextV(subtype, font, position, pt_size, material_id, format, args);
+    bsgfx_Range _return = next.bsgfx_instantiateASCIITextV(subtype, font, position, pt_size, material_id, out_size, format, args);
     va_end(args);
     return _return;
+}
+
+bsgfx_InstanceHeader* bsgfx_instanceHeader(
+    bsgfx_InstanceSubtype* subtype, 
+    int instance_id)
+{
+    return next.bsgfx_instanceHeader(subtype, instance_id);
+}
+
+bsgfx_InstanceHeader* bsgfx_instanceData(
+    bsgfx_InstanceSubtype* subtype, 
+    int instance_id)
+{
+    return next.bsgfx_instanceData(subtype, instance_id);
 }
 
 bs_mat4x3 bsgfx_matrix(
@@ -1122,6 +1140,13 @@ bool bsgfx_hoveringUIElement(
     const bsgfx_UIElement* element)
 {
     return next.bsgfx_hoveringUIElement(element);
+}
+
+void bsgfx_translateUIElement(
+    const bsgfx_UIElement* element, 
+    const bs_vec3* position)
+{
+    next.bsgfx_translateUIElement(element, position);
 }
 
 void bsgfx_renderColorPickers(

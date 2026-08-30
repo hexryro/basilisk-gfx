@@ -4174,6 +4174,60 @@ bool bs_leftClickUpOnce()
     return next.bs_leftClickUpOnce();
 }
 
+bool bs_contextMiddleClick(
+    bs_Context* context)
+{
+    return next.bs_contextMiddleClick(context);
+}
+
+bool bs_contextMiddleClickOnce(
+    bs_Context* context)
+{
+    return next.bs_contextMiddleClickOnce(context);
+}
+
+bool bs_contextMiddleClickUpOnce(
+    bs_Context* context)
+{
+    return next.bs_contextMiddleClickUpOnce(context);
+}
+
+bool bs_contextLeftClick(
+    bs_Context* context)
+{
+    return next.bs_contextLeftClick(context);
+}
+
+bool bs_contextRightClick(
+    bs_Context* context)
+{
+    return next.bs_contextRightClick(context);
+}
+
+bool bs_contextRightClickOnce(
+    bs_Context* context)
+{
+    return next.bs_contextRightClickOnce(context);
+}
+
+bool bs_contextLeftClickOnce(
+    bs_Context* context)
+{
+    return next.bs_contextLeftClickOnce(context);
+}
+
+bool bs_contextRightClickUpOnce(
+    bs_Context* context)
+{
+    return next.bs_contextRightClickUpOnce(context);
+}
+
+bool bs_contextLeftClickUpOnce(
+    bs_Context* context)
+{
+    return next.bs_contextLeftClickUpOnce(context);
+}
+
 bool bs_keyDown(
     bs_U32 code)
 {
@@ -4214,6 +4268,55 @@ bool bs_charUpOnce(
     unsigned char c)
 {
     return next.bs_charUpOnce(c);
+}
+
+bool bs_contextKeyDown(
+    bs_Context* context, 
+    bs_U32 code)
+{
+    return next.bs_contextKeyDown(context, code);
+}
+
+bool bs_contextKeyHeld(
+    bs_Context* context, 
+    bs_U32 code)
+{
+    return next.bs_contextKeyHeld(context, code);
+}
+
+bool bs_contextKeyDownOnce(
+    bs_Context* context, 
+    bs_U32 code)
+{
+    return next.bs_contextKeyDownOnce(context, code);
+}
+
+bool bs_contextKeyUpOnce(
+    bs_Context* context, 
+    bs_U32 code)
+{
+    return next.bs_contextKeyUpOnce(context, code);
+}
+
+bool bs_contextCharDown(
+    bs_Context* context, 
+    unsigned char c)
+{
+    return next.bs_contextCharDown(context, c);
+}
+
+bool bs_contextCharDownOnce(
+    bs_Context* context, 
+    unsigned char c)
+{
+    return next.bs_contextCharDownOnce(context, c);
+}
+
+bool bs_contextCharUpOnce(
+    bs_Context* context, 
+    unsigned char c)
+{
+    return next.bs_contextCharUpOnce(context, c);
 }
 
 int bs_scroll()

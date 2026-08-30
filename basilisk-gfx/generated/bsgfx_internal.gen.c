@@ -61,44 +61,47 @@ bsgfx_Material* _bsgfx_materialF(
     return _return;
 }
 
-float _bsgfx_instanceASCIIText(
+bsgfx_Range _bsgfx_instantiateASCIIText(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     int material_id, 
+    bs_vec2* out_size, 
     char* text)
 {
-    return _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, material_id, text, strlen(text));
+    return _bsgfx_instantiateASCIITextN(subtype, font, position, pt_size, material_id, out_size, text, strlen(text));
 }
 
-float _bsgfx_instanceASCIITextV(
+bsgfx_Range _bsgfx_instantiateASCIITextV(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     int material_id, 
+    bs_vec2* out_size, 
     char* format, 
     va_list args)
 {
     int _length = bs_formatStringLength(format, args);
     char* _formatted = bs_alloca(_length + 1);
     vsnprintf(_formatted, _length + 1, format, args);
-    return _bsgfx_instanceASCIITextN(subtype, font, position, pt_size, material_id, _formatted, _length);
+    return _bsgfx_instantiateASCIITextN(subtype, font, position, pt_size, material_id, out_size, _formatted, _length);
 }
 
-float _bsgfx_instanceASCIITextF(
+bsgfx_Range _bsgfx_instantiateASCIITextF(
     bsgfx_InstanceSubtype* subtype, 
     bsgfx_Font* font, 
     bs_vec3 position, 
     int pt_size, 
     int material_id, 
+    bs_vec2* out_size, 
     char* format, 
     ...)
 {
     va_list args;
     va_start(args, format);
-    float _return = _bsgfx_instanceASCIITextV(subtype, font, position, pt_size, material_id, format, args);
+    bsgfx_Range _return = _bsgfx_instantiateASCIITextV(subtype, font, position, pt_size, material_id, out_size, format, args);
     va_end(args);
     return _return;
 }

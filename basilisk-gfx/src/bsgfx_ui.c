@@ -45,6 +45,13 @@ BSGFXAPI bool _bsgfx_hoveringUIElement(const bsgfx_UIElement* element) {
 	return hovering;
 }
 
+BSGFXAPI void _bsgfx_translateUIElement(const bsgfx_UIElement* element, const bs_vec3* position) {
+	for (int i = 0; i < element->instance_range.num; i++) {
+		bsgfx_QuadInstance* instance = bsgfx_instanceData(element->subtype, element->instance_range.offset + i);
+		bs_v3Add(&instance->transform.v[3], position, &instance->transform.v[3]);
+	}
+}
+
 
 
   /*==============================================================================
@@ -63,6 +70,7 @@ BSGFXAPI void _bsgfx_atlasIconUIElement(bsgfx_UIIcon icon, bsgfx_UIElement* elem
 	*element = (bsgfx_UIElement){
 		.position = icon.position,
 		.size = icon.size,
+		.subtype = icon.subtype,
 	};
 }
 
@@ -101,6 +109,7 @@ BSGFXAPI void _bsgfx_solidUIElement(bsgfx_UISolid solid, bsgfx_UIElement* elemen
 	*element = (bsgfx_UIElement){
 		.position = solid.position,
 		.size = solid.size,
+		.subtype = _bsgfx_subtypes_[BSGFX_SUBTYPE_UI_COLOR],
 	};
 }
 
@@ -131,20 +140,24 @@ BSGFXAPI void _bsgfx_instantiateTextUI(bsgfx_UIText text, bsgfx_UIElement* eleme
 	text.position.x += alignment.x;
 	text.position.y += alignment.y;
 
-	float width = bsgfx_instanceASCIIText(
-		bsgfx_subtypes()[BSGFX_SUBTYPE_FONT],
+	bsgfx_InstanceSubtype* subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_FONT];
+
+	bs_vec2 size = { 0 };
+	bs_Range instance_range = bsgfx_instantiateASCIIText(
+		subtype,
 		text.font,
 		text.position,
 		text.px_size,
 		text.material_id,
+		&size,
 		text.as_ascii
 	);
 
-	float height = bsgfx_fontHeight(text.font, text.px_size);
-
 	*element = (bsgfx_UIElement) {
 		.position = text.position,
-		.size = { width, height },
+		.size = size,
+		.instance_range = instance_range,
+		.subtype = subtype,
 	};
 }
 

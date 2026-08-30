@@ -86,6 +86,11 @@
                         <xsl:value-of select="return"/>
                         <xsl:text>) { 0 }</xsl:text>
                     </xsl:when>
+                    <xsl:when test="/registry/typedefs/typedef[name = current()/return]">
+                        <xsl:text>(</xsl:text>
+                        <xsl:value-of select="return"/>
+                        <xsl:text>) { 0 }</xsl:text>
+                    </xsl:when>
                     <xsl:otherwise>
                         <xsl:text>0</xsl:text>
                     </xsl:otherwise>

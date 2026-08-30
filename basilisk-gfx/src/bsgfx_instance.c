@@ -409,7 +409,7 @@ BSGFXAPI void _bsgfx_instanceHiResMesh(bs_Mesh* mesh, const bs_vec3* position, c
 
 
   /*==============================================================================
-   * Helpers
+   * Instantiate Helpers
    =============================================================================*/
 
 static inline int _bsgfx_instanceLineSubtype(bs_vec3 start, bs_vec3 end, bs_RGBA color, bsgfx_InstanceSubtype* subtype) {
@@ -562,4 +562,14 @@ BSGFXAPI bs_mat4x3 _bsgfx_matrix(bs_vec3 position, bs_vec3 scale) {
 		0.0, 0.0, scale.z,
 		position.x, position.y, position.z,
 	};
+}
+
+BSGFXAPI bsgfx_InstanceHeader* _bsgfx_instanceHeader(bsgfx_InstanceSubtype* subtype, int instance_id) {
+	bsgfx_InstanceHeader* header = bs_fetchUnit(&subtype->host_instances, instance_id);
+	return header;
+}
+
+BSGFXAPI bsgfx_InstanceHeader* _bsgfx_instanceData(bsgfx_InstanceSubtype* subtype, int instance_id) {
+	bsgfx_InstanceHeader* header = _bsgfx_instanceHeader(subtype, instance_id);
+	return header + 1;
 }

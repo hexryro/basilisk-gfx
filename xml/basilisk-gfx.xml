@@ -61,6 +61,8 @@
 		<typedef><type>bool</type><name>(__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*)</name></typedef>
 
 		<typedef><type>struct bsgfx_InstanceHeader</type><name>bsgfx_InstanceHeader</name></typedef>
+		
+		<typedef><type>bs_Range</type><name>bsgfx_Range</name></typedef>
 	</typedefs>
 
 	<enums>
@@ -1007,6 +1009,8 @@
 		<structure name="bsgfx_UIElement">
 			<field><type>bs_vec2</type><name>size</name></field>
 			<field><type>bs_vec3</type><name>position</name></field>
+			<field><type>bsgfx_Range</type><name>instance_range</name></field>
+			<field><type>bsgfx_InstanceSubtype*</type><name>subtype</name></field>
 		</structure>
 		
 		<structure name="bsgfx_UIIcon">
@@ -2055,14 +2059,28 @@
 			<param><type>bsgfx_Font*</type><name>font</name></param>
 			<param><type>int</type><name>px_size</name></param>
 		</function>
-		<variadicStringTemplate name="bsgfx_instanceASCIIText" string="text">
-			<return>float</return>
+		<variadicStringTemplate name="bsgfx_instantiateASCIIText" string="text">
+			<return>bsgfx_Range</return>
 			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>bsgfx_Font*</type><name>font</name></param>
 			<param><type>bs_vec3</type><name>position</name></param>
 			<param><type>int</type><name>pt_size</name></param>
 			<param><type>int</type><name>material_id</name></param>
+			<param><type>bs_vec2*</type><name>out_size</name></param>
 		</variadicStringTemplate>
+
+		<function name="bsgfx_instanceHeader">
+			<return>bsgfx_InstanceHeader*</return>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
+			<param><type>int</type><name>instance_id</name></param>
+		</function>
+
+		<function name="bsgfx_instanceData">
+			<return>bsgfx_InstanceHeader*</return>
+			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
+			<param><type>int</type><name>instance_id</name></param>
+		</function>
+		
 		<function name="bsgfx_matrix">
 			<return>bs_mat4x3</return>
 			<param><type>bs_vec3</type><name>position</name></param>
@@ -2392,7 +2410,12 @@
 			<return>bool</return>
 			<param><type>const bsgfx_UIElement*</type><name>element</name></param>
 		</function>
-
+		<function name="bsgfx_translateUIElement">
+			<return>void</return>
+			<param><type>const bsgfx_UIElement*</type><name>element</name></param>
+			<param><type>const bs_vec3*</type><name>position</name></param>
+		</function>
+		
 		<function name="bsgfx_renderColorPickers">
 			<return>void</return>
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
