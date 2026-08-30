@@ -1254,7 +1254,7 @@ struct bsgfx_Settings {
 };
 
 struct bsgfx_Callbacks {
-    PFN_void tick;
+    bs_ContextTickFunction tick;
     PFN_void fixedTick;
     PFN_void loadScene;
     PFN_bsgfx_onQueue queue;

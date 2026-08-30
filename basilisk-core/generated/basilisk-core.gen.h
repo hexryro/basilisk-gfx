@@ -3107,6 +3107,7 @@ struct bs_Context {
     struct VkSurfaceKHR_T* surface;
     bs_SurfaceFormat surface_format;
     bs_PresentMode present_mode;
+    void* user_data;
     int id;
     int frames_in_flight;
     int frame;

@@ -1145,7 +1145,7 @@
 		</structure>
 
 		<structure name="bsgfx_Callbacks">
-			<field><type>PFN_void</type><name>tick</name></field>
+			<field><type>bs_ContextTickFunction</type><name>tick</name></field>
 			<field><type>PFN_void</type><name>fixedTick</name></field>
 			<field><type>PFN_void</type><name>loadScene</name></field>
 			<field><type>PFN_bsgfx_onQueue</type><name>queue</name></field>

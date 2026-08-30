@@ -1871,6 +1871,7 @@
             <field><type>bs_SurfaceFormat</type><name>surface_format</name></field>
             <field><type>bs_PresentMode</type><name>present_mode</name></field>
 			
+            <field><type>void*</type><name>user_data</name></field>
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>frames_in_flight</name></field>
             <field><type>int</type><name>frame</name></field>

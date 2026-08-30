@@ -737,6 +737,7 @@ BSAPI void _bs_hideWindow(bs_Context* context) {
     ShowWindow(context->hwnd, SW_HIDE);
     if (context->window_type == BS_WINDOW_MENU)
         ReleaseCapture();
+    bs_logF("Hiding window \"%s\"", context->title);
 #else
     _bs_warnF("_bs_hideWindow has not been implemented for this OS yet");
 #endif
@@ -748,6 +749,7 @@ BSAPI void _bs_showWindow(bs_Context* context) {
     ShowWindow(context->hwnd, SW_SHOWNOACTIVATE);
     if (context->window_type == BS_WINDOW_MENU)
         SetCapture(context->hwnd);
+    bs_logF("Showing window \"%s\"", context->title);
 #else
     _bs_warnF("_bs_showWindow has not been implemented for this OS yet");
 #endif
@@ -975,7 +977,7 @@ static void _bs_resetIO(bs_IO* io) {
     io->middle_clicked = 0;
 }
 
-BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
+BSAPI void _bs_tickContext(bs_Context* context, bs_ContextTickFunction tick) {
 
     if (BS_GET_BIT(context->io.keys, BS_KEY_ALT) && BS_GET_BIT(context->io.keys, BS_KEY_F4))
         _bs_exit();
@@ -992,7 +994,7 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_Callback tick) {
         context->cursor = BS_V2(p.x, p.y);
 
     if (tick)
-        tick();
+        tick(context);
 
     _bs_instance_->time_old = _bs_instance_->time;
     _bs_resetIO(&context->io);
@@ -1349,7 +1351,7 @@ BSAPI bs_Result _bs_window(
         style = WS_CHILD | WS_VISIBLE;
     }
     else if (type == BS_WINDOW_NO_TITLE_BAR) {
-        style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+        style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
     }
     else if (type == BS_WINDOW_MENU) {
         style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;

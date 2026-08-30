@@ -89,9 +89,6 @@ static void onLoadScene() {
 	bs_Object* title_bar_queue = BS_QUEUE(BASILISK_QUEUES, BASILISK_QUEUE_TITLE_BAR, BS_OBJECT_HAS_SWAPS_BIT);
 	bs_queue(title_bar_queue, 0, 0);
 
-	bs_Object* menu_context_queue = BS_QUEUE(BASILISK_QUEUES, BASILISK_QUEUE_MENU_CONTEXT, BS_OBJECT_HAS_SWAPS_BIT);
-	bs_queue(menu_context_queue, 0, 0);
-
 	bsmod_onLoad();
 	bsmod_bindAtlases();
 }
@@ -102,7 +99,7 @@ static void onLoadScene() {
    * Tick
    *============================================================================*/
 
-static void onTick() {
+static void onTick(bs_Context* context) {
 	onTitleBarTick();
 
 }
@@ -204,10 +201,7 @@ int main(int argc, char* argv[]) {
 
 	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;
 
-	bs_Object* menu_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU, 0);
-	bs_window(menu_context->context, NULL, onContextMenuTick, bs_resolution(basilisk.context).x, 32, "ContextMenu", BS_WINDOW_MENU);
-	//bs_showWindow(menu_context->context);
-	bs_swapchain(menu_context->context);
+	iniContextMenus();
 
 	//bs_Object* title_bar_context = BS_CONTEXT(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR, 0);
 	//bs_window(title_bar_context->context, basilisk.context, onTitleBarTick, bs_resolution(basilisk.context).x, 32, "test", 0);

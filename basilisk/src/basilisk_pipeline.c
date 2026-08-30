@@ -133,8 +133,8 @@ void basilisk_pipeline(bs_Queue* queue, bs_Renderer* renderer, bs_RGBA clear_col
     bs_present(last_queue, wait_queues, sizeof(wait_queues) / sizeof(*wait_queues));
 }
 
-void basilisk_createHiResRenderer(bs_Context* context, int id) {
-    bs_Object* hi_res = BS_RENDERER(BASILISK_RENDERERS, id, BS_OBJECT_HAS_SWAPS_BIT);
+bs_Object* basilisk_createHiResRenderer(bs_Context* context, int id) {
+    bs_Object* hi_res = BS_RENDERER(id < 0 ? -1 : BASILISK_RENDERERS, id, BS_OBJECT_HAS_SWAPS_BIT);
     if (bs_renderer(hi_res, 0) == BS_RESULT_OK) {
         bs_autoResizeRenderer(hi_res->renderer, context);
 
@@ -169,12 +169,12 @@ void basilisk_createHiResRenderer(bs_Context* context, int id) {
             bs_framebuffer(hi_res->renderer, bs_resolution(context));
         }
     }
+
+    return hi_res;
 }
 
 void basilisk_createRenderers() {
     basilisk_createHiResRenderer(bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context, BASILISK_RENDERER_MAIN);
-    if (bs_exists(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU))
-        basilisk_createHiResRenderer(bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context, BASILISK_RENDERER_MENU_CONTEXT);
     if (bs_exists(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR))
         basilisk_createHiResRenderer(bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_TITLE_BAR)->context, BASILISK_RENDERER_TITLE_BAR);
 }

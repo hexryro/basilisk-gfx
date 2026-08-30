@@ -1940,6 +1940,7 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
     VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     VkClearValue* clear_values = bs_alloca(renderer->num_outputs * sizeof(VkClearValue));
+    memset(clear_values, 0, renderer->num_outputs * sizeof(VkClearValue));
 
     for (int i = 0; i < renderer->num_outputs; i++) {
         bs_Output* output = renderer->outputs + i;

@@ -38,39 +38,99 @@ BSGFX_CACHE_COLOR_MATERIAL(context_menu_button_hover_color, BS_RGBA(0, 120, 215,
   //BSGFX_CACHE_ATLAS_QUERY(BSMOD_ATLASES, BSMOD_ATLAS_UI, icon)
   //BSGFX_CACHE_COLOR_MATERIAL(test_color, BS_RGBA(255, 83, 83, 255))
 
-static ContextMenu last_context_menu_type = 0;
-static ContextMenu context_menu_type = 0;
 static bsgfx_Font* context_menu_font = NULL;
 
 typedef struct {
     const char* left_text;
     const char* right_text;
-    ContextMenu hover_menu;
+    ContextMenuType hover_menu;
 } ContextMenuElement;
 
-void showContextMenuUI(ContextMenu type, bs_vec3 position) {
-    bs_Context* context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
+typedef struct {
+    int id;
+    ContextMenuType type;
+    bs_Queue* queue;
+    bs_Renderer* renderer;
+    bs_Context* context;
+} ContextMenu;
+
+static ContextMenu _context_menus_[] = {
+    { .id = BASILISK_CONTEXT_MENU },
+};
+
+ContextMenuElement _context_menu_open_recent_elements_[] = {
+    {
+        .left_text = "Testing...",
+    },
+    {
+        .left_text = "Abc123",
+    },
+};
+
+static ContextMenuElement _context_menu_file_elements_[] = {
+    {
+        .left_text = "New...",
+        .right_text = "Ctrl+N",
+    },
+    {
+        .left_text = "Open...",
+    },
+    {
+        .left_text = "Open Recent",
+        .hover_menu = CONTEXT_MENU_OPEN_RECENT,
+    },
+    {
+        .left_text = "Save",
+        .right_text = "Ctrl+S",
+    },
+    {
+        .left_text = "Save As...",
+        .right_text = "Shift+Ctrl+S",
+    },
+    {
+        .left_text = "Exit",
+        .right_text = "Alt+F4",
+    }
+};
+
+#define CONTEXT_MENU(name) \
+    { .elements = name, .count = sizeof(name) / sizeof(*name) }
+
+static struct {
+    ContextMenuElement* elements;
+    int count;
+} _context_menu_elements_[] = {
+    [CONTEXT_MENU_FILE]             = CONTEXT_MENU(_context_menu_file_elements_),
+    [CONTEXT_MENU_OPEN_RECENT]      = CONTEXT_MENU(_context_menu_open_recent_elements_),
+};
+
+void showContextMenuUI(bs_Context* context, ContextMenuType type, bs_vec3 position) {
+    if (!context->hidden)
+        return;
+
+    int window_height = _context_menu_elements_[type].count * BASILISK_CONTEXT_MENU_BUTTON_HEIGHT;
+
+    ContextMenu* menu = context->user_data;
+    menu->type = type;
 
     bs_ivec2 new_position = bs_windowPosition(bs_scope()->context);
     new_position.x += position.x;
     new_position.y -= position.y;
-
     bs_moveWindow(context, new_position.x, new_position.y);
     bs_showWindow(context);
+    bs_ivec2 resolution = bs_resolution(context);
+    if (resolution.x != BASILISK_CONTEXT_MENU_WIDTH || resolution.y != window_height) {
+        bs_resizeWindow(context, BASILISK_CONTEXT_MENU_WIDTH, window_height);
+    }
 
-    context_menu_type = type;
+
 }
 
-void hideContextMenuUI() {
-    bs_Context* context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
+void hideContextMenuUI(bs_Context* context) {
     bs_hideWindow(context);
-
-    context_menu_type = last_context_menu_type = CONTEXT_MENU_UNDEFINED;
 }
 
-static void instantiateContextMenuUI(ContextMenuElement elements[], int elements_count) {
-    bs_Context* context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
-
+static void instantiateContextMenuUI(bs_Context* context, ContextMenuElement elements[], int elements_count) {
     int window_height = elements_count * BASILISK_CONTEXT_MENU_BUTTON_HEIGHT;
 
     bs_vec3 position = { 0.0 };
@@ -148,67 +208,25 @@ static void instantiateContextMenuUI(ContextMenuElement elements[], int elements
             bsgfx_instantiateAtlasIconUIElement(icon, &element);
 
             if (hovering) {
-
+                bs_Context* menu_context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
+            //    showContextMenuUI(menu_context, context_menu_element->hover_menu, position);
             }
         }
 
         position = revert_position;
     }
 
-    if (context_menu_type != last_context_menu_type) {
-        bs_showWindow(context);
-        bs_resizeWindow(context, BASILISK_CONTEXT_MENU_WIDTH, window_height);
-        last_context_menu_type = context_menu_type;
+    if (context->hidden) {
+
+
+       // bs_showWindow(context);
     }
 }
 
-static void instantiateOpenRecentContextMenuUI() {
-    ContextMenuElement elements[] = {
-        {
-            .left_text = "Testing...",
-        },
-        {
-            .left_text = "Abc123",
-        },
-    };
+void basilisk_instantiateContextMenuUI(bs_Context* context) {
+    ContextMenu* menu = context->user_data;
 
-    const int elements_count = sizeof(elements) / sizeof(*elements);
-    instantiateContextMenuUI(elements, elements_count);
-}
-
-static void instantiateFileContextMenuUI() {
-    ContextMenuElement elements[] = {
-        {
-            .left_text = "New...",
-            .right_text = "Ctrl+N",
-        },
-        {
-            .left_text = "Open...",
-        },
-        {
-            .left_text = "Open Recent",
-            .hover_menu = CONTEXT_MENU_OPEN_RECENT,
-        },
-        {
-            .left_text = "Save",
-            .right_text = "Ctrl+S",
-        },
-        {
-            .left_text = "Save As...",
-            .right_text = "Shift+Ctrl+S",
-        },
-        {
-            .left_text = "Exit",
-            .right_text = "Alt+F4",
-        }
-    };
-
-    const int elements_count = sizeof(elements) / sizeof(*elements);
-    instantiateContextMenuUI(elements, elements_count);
-}
-
-void basilisk_instantiateContextMenuUI() {
-    bs_ivec2 resolution = bs_resolution(bs_scope()->context);
+    bs_ivec2 resolution = bs_resolution(context);
     bs_vec2 title_bar_size = { resolution.x, BASILISK_TITLE_BAR_HEIGHT };
 
     bs_vec3 position;
@@ -219,24 +237,49 @@ void basilisk_instantiateContextMenuUI() {
     position = BS_V3(0, resolution.y - title_bar_size.y, 0);
     position.y = 0.0;
 
-    switch (context_menu_type) {
-    case CONTEXT_MENU_FILE: instantiateFileContextMenuUI(); break;
-    case CONTEXT_MENU_OPEN_RECENT: instantiateOpenRecentContextMenuUI(); break;
-    }
+    instantiateContextMenuUI(context, _context_menu_elements_[menu->type].elements, _context_menu_elements_[menu->type].count);
 }
 
-void onContextMenuTick() {
+void onContextMenuTick(bs_Context* context) {
+    ContextMenu* menu = context->user_data;
+
     bsgfx_computeContextCamera();
-    basilisk_instantiateContextMenuUI();
+    basilisk_instantiateContextMenuUI(context);
 
     if (bs_leftClickOnce()) {
         //hideContextMenuUI();
     }
 
-    bs_Renderer* renderer = bs_fetch(BASILISK_RENDERERS, BASILISK_RENDERER_MENU_CONTEXT)->renderer;
-    bs_Queue* queue = bs_fetch(BASILISK_QUEUES, BASILISK_QUEUE_MENU_CONTEXT)->queue;
-
     bsgfx_tickInstanceTypes();
-    basilisk_pipeline(queue, renderer, BASILISK_CONTEXT_MENU_CLEAR_COLOR);
+    basilisk_pipeline(menu->queue, menu->renderer, BASILISK_CONTEXT_MENU_CLEAR_COLOR);
     bsgfx_resetInstanceTypes();
+}
+
+static void iniContextMenu(int i) {
+    ContextMenu* menu = _context_menus_ + i;
+
+    bs_Object* menu_context_queue = BS_QUEUE(-1, -1, BS_OBJECT_HAS_SWAPS_BIT);
+    bs_queue(menu_context_queue, 0, BS_QUEUE_GRAPHICS_BIT);
+
+    char* name = bs_alloca(sizeof("ContextMenu_") + bs_numDigits(i));
+    sprintf(name, "ContextMenu_%d", i);
+
+    bs_Object* context_obj = BS_CONTEXT(BASILISK_CONTEXTS, menu->id, 0);
+    bs_Context* context = context_obj->context;
+
+    context->user_data = menu;
+
+    bs_window(context, NULL, onContextMenuTick, 512, 512, strdup(name), BS_WINDOW_MENU);
+    bs_swapchain(context);
+
+    menu->queue = menu_context_queue->queue;
+    menu->context = context;
+    menu->renderer = basilisk_createHiResRenderer(context, -1)->renderer;
+}
+
+void iniContextMenus() {
+    int context_menus_count = sizeof(_context_menus_) / sizeof(*_context_menus_);
+    for (int i = 0; i < context_menus_count; i++) {
+        iniContextMenu(i);
+    }
 }

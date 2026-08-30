@@ -79,7 +79,7 @@ BSMODAPI bs_Result _val_bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, in
 }
 
 BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int height, int channels_count, char* package_name, char* resource_name, bool allow_paging) {
-	const int padding = 0;
+	const int padding = 1;
 
 	bs_Result result;
 
@@ -105,6 +105,11 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 
 	memcpy(remaining_rects, packer->rects.data, header.images_count * sizeof(stbrp_rect));
 
+	for (int i = 0; i < header.images_count; i++) {
+		remaining_rects[i].w += padding * 2;
+		remaining_rects[i].h += padding * 2;
+	}
+
 	packer->rects.count = 0;
 
 	int remaining = header.images_count;
@@ -122,6 +127,12 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 				bsmod_TextureInfo* info = bs_fetchUnit(&packer->info, rect->id);
 
 				info->page = header.pages_count;
+
+				rect->x += padding;
+				rect->y += padding;
+				rect->w -= padding * 2;
+				rect->h -= padding * 2;
+
 				original_rects[packer->rects.count++] = *rect;
 			}
 			else {
@@ -161,6 +172,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
     */
 	unsigned char* offset = batl;
 	offset += sizeof(bs_BatlHeader);
+	memset(batl + total_size_excluding_binary, 0, (total_size - total_size_excluding_binary));
 
 	for (int i = 0; i < header.images_count; i++) {
 		stbrp_rect* rect = bs_fetchUnit(&packer->rects, i);
@@ -213,7 +225,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 
 	memcpy(batl, &header, sizeof(bs_BatlHeader));
 
-	//result = bs_savePngN(batl + total_size_excluding_binary, BS_IV2(width, height), BS_PNG_GREY, BS_CONSTANT_STRING("test.png"));
+	result = bs_savePngN(batl + total_size_excluding_binary, BS_IV2(width, height), BS_PNG_RGBA, BS_CONSTANT_STRING("test.png"));
 
 	if (package_name && resource_name)
 		result = _bsmod_packResource(BS_RESOURCE_ATLAS, batl, total_size, package_name, resource_name);

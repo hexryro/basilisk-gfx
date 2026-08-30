@@ -465,7 +465,7 @@ BSAPI const char* _bs_idName(bs_U32 source_id, bs_U32 id) {
     return source->ids[id].name;
 }
 
-static bs_Object* _bs_allocateObject(size_t size, size_t flexible_size, int flexible_count, bs_U32 flags) {
+static bs_Object* _bs_allocateObject(size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType type) {
     static int heaps_count;
     static struct {
         char* block;
@@ -528,7 +528,7 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
     bs_Object* result;
 
     if (source_id == BS_U32_MAX) {
-        result = _bs_allocateObject(size, flexible_array_size, flexible_count, flags);
+        result = _bs_allocateObject(size, flexible_array_size, flexible_count, flags, object_type);
         result->head->type = object_type;
         result->head->source_id = source_id;
         result->head->swaps_count = flexible_count;
@@ -551,7 +551,7 @@ BSAPI bs_Object* _bs_object(bs_U32 source_id, bs_U32 id, size_t size, size_t fle
     }
 
     if (!_bs_exists(source_id, id)) {
-        result = source->ids[id].object = _bs_allocateObject(size, flexible_array_size, flexible_count, flags);
+        result = source->ids[id].object = _bs_allocateObject(size, flexible_array_size, flexible_count, flags, object_type);
         result->head->type = object_type;
         result->head->id = id;
         result->head->source_id = source_id;

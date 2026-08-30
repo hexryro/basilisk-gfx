@@ -47,6 +47,7 @@ extern Fonts _fonts_;
 #define BASILISK_CONTEXT_IDS(X)                                 \
     X(BASILISK_CONTEXT_TITLE_BAR)                               \
     X(BASILISK_CONTEXT_MENU)                                    \
+    X(BASILISK_CONTEXT_MENU_2)                                  \
     X(BASILISK_CONTEXTS_COUNT)
 
 #define BASILISK_IMAGE_IDS(X)                                   \
@@ -65,12 +66,10 @@ extern Fonts _fonts_;
 
 #define BASILISK_RENDERER_IDS(X)                                \
     X(BASILISK_RENDERER_MAIN)                                   \
-    X(BASILISK_RENDERER_MENU_CONTEXT)                           \
     X(BASILISK_RENDERER_TITLE_BAR)                              \
     X(BASILISK_RENDERERS_COUNT)
 
 #define BASILISK_QUEUE_IDS(X)                                   \
-    X(BASILISK_QUEUE_MENU_CONTEXT)                              \
     X(BASILISK_QUEUE_TITLE_BAR)                                 \
     X(BASILISK_QUEUES_COUNT)
 
@@ -105,6 +104,7 @@ BS_GENERATE_ENUM(BASILISK_FONT_IDS);
 #define BASILISK_ATLASES basilisk.sources[BS_OBJECT_ATLAS]
 #define BASILISK_FONTS basilisk.sources[BS_OBJECT_FONT]
 
+bs_Object* basilisk_createHiResRenderer(bs_Context* context, int id);
 void basilisk_createRenderers();
 
 void basilisk_instantiateContextMenuUI();
@@ -114,15 +114,19 @@ bs_NonClientArea onClientAreaTick(bs_ivec2 pt);
 
 typedef enum {
     CONTEXT_MENU_UNDEFINED,
+
     CONTEXT_MENU_FILE,
     CONTEXT_MENU_OPEN_RECENT,
-} ContextMenu;
 
-void showContextMenuUI(ContextMenu type, bs_vec3 position);
-void hideContextMenuUI();
+    CONTEXT_MENU_COUNT
+} ContextMenuType;
+
+void showContextMenuUI(bs_Context* context, ContextMenuType type, bs_vec3 position);
+void hideContextMenuUI(bs_Context* context);
 
 void onContextMenuTick();
 void onTitleBarTick();
+void iniContextMenus();
 
 void basilisk_renderDither(bs_RendererScope* scope, bs_Queue* queue);
 void basilisk_renderUIStencil(bs_RendererScope* scope, bs_Queue* queue);
