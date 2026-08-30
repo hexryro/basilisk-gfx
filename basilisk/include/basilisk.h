@@ -46,8 +46,8 @@ extern Fonts _fonts_;
 
 #define BASILISK_CONTEXT_IDS(X)                                 \
     X(BASILISK_CONTEXT_TITLE_BAR)                               \
-    X(BASILISK_CONTEXT_MENU)                                    \
-    X(BASILISK_CONTEXT_MENU_2)                                  \
+    X(BASILISK_CONTEXT_MENU_0)                                  \
+    X(BASILISK_CONTEXT_MENU_1)                                  \
     X(BASILISK_CONTEXTS_COUNT)
 
 #define BASILISK_IMAGE_IDS(X)                                   \
@@ -67,6 +67,8 @@ extern Fonts _fonts_;
 #define BASILISK_RENDERER_IDS(X)                                \
     X(BASILISK_RENDERER_MAIN)                                   \
     X(BASILISK_RENDERER_TITLE_BAR)                              \
+    X(BASILISK_RENDERER_CONTEXT_MENU_0)                         \
+    X(BASILISK_RENDERER_CONTEXT_MENU_1)                         \
     X(BASILISK_RENDERERS_COUNT)
 
 #define BASILISK_QUEUE_IDS(X)                                   \
@@ -121,8 +123,9 @@ typedef enum {
     CONTEXT_MENU_COUNT
 } ContextMenuType;
 
-void showContextMenuUI(bs_Context* context, ContextMenuType type, bs_vec3 position);
+void showContextMenuUI(ContextMenuType type, bs_vec3 position);
 void hideContextMenuUI(bs_Context* context);
+void toggleContextMenuUI(ContextMenuType type, bs_vec3 position);
 
 void onContextMenuTick();
 void onTitleBarTick();

@@ -1685,6 +1685,13 @@ static void _bs_nameRenderer(bs_Object* object, const char* name) {
     }
 }
 
+BSAPI void _val_bs_autoResizeRenderer(bs_Renderer* renderer, bs_Context* context) {
+    if (renderer->head.source_id < 0)
+        bs_criticalN(BS_CONSTANT_STRING("Renderer cannot be auto resized without id"));
+
+    return _bs_autoResizeRenderer(renderer, context);
+}
+
 BSAPI void _bs_autoResizeRenderer(bs_Renderer* renderer, bs_Context* context) {
     renderer->context = context;
 }

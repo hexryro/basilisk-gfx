@@ -134,7 +134,7 @@ void basilisk_pipeline(bs_Queue* queue, bs_Renderer* renderer, bs_RGBA clear_col
 }
 
 bs_Object* basilisk_createHiResRenderer(bs_Context* context, int id) {
-    bs_Object* hi_res = BS_RENDERER(id < 0 ? -1 : BASILISK_RENDERERS, id, BS_OBJECT_HAS_SWAPS_BIT);
+    bs_Object* hi_res = BS_RENDERER(BASILISK_RENDERERS, id, BS_OBJECT_HAS_SWAPS_BIT);
     if (bs_renderer(hi_res, 0) == BS_RESULT_OK) {
         bs_autoResizeRenderer(hi_res->renderer, context);
 

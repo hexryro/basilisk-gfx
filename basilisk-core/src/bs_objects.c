@@ -466,8 +466,8 @@ BSAPI const char* _bs_idName(bs_U32 source_id, bs_U32 id) {
 }
 
 static bs_Object* _bs_allocateObject(size_t size, size_t flexible_size, int flexible_count, bs_U32 flags, bs_ObjectType type) {
-    static int heaps_count;
-    static struct {
+    _Thread_local static int heaps_count;
+    _Thread_local static struct {
         char* block;
         bs_U64 size;
     }* heaps = NULL;

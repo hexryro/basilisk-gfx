@@ -190,8 +190,8 @@ void basilisk_instantiateTitleBarUI() {
     if (hovering && bs_leftClickOnce()) {
         bs_logF("Clicked file");
 
-        bs_Context* menu_context = bs_fetch(BASILISK_CONTEXTS, BASILISK_CONTEXT_MENU)->context;
-        showContextMenuUI(menu_context, CONTEXT_MENU_FILE, position);
+
+        toggleContextMenuUI(CONTEXT_MENU_FILE, position);
     }
 
     position.x = title_bar_size.x;

@@ -733,10 +733,11 @@ BSAPI void _bs_minimizeWindow(bs_Context* context) {
 
 BSAPI void _bs_hideWindow(bs_Context* context) {
 #ifdef _WIN32
+    if (context->hidden)
+        return;
+
     context->hidden = true;
     ShowWindow(context->hwnd, SW_HIDE);
-    if (context->window_type == BS_WINDOW_MENU)
-        ReleaseCapture();
     bs_logF("Hiding window \"%s\"", context->title);
 #else
     _bs_warnF("_bs_hideWindow has not been implemented for this OS yet");
@@ -745,10 +746,15 @@ BSAPI void _bs_hideWindow(bs_Context* context) {
 
 BSAPI void _bs_showWindow(bs_Context* context) {
 #ifdef _WIN32
+    if (!context->hidden)
+        return;
+
     context->hidden = false;
-    ShowWindow(context->hwnd, SW_SHOWNOACTIVATE);
     if (context->window_type == BS_WINDOW_MENU)
-        SetCapture(context->hwnd);
+        ShowWindow(context->hwnd, SW_SHOWNOACTIVATE);
+    else
+        ShowWindow(context->hwnd, SW_SHOW);
+
     bs_logF("Showing window \"%s\"", context->title);
 #else
     _bs_warnF("_bs_showWindow has not been implemented for this OS yet");
@@ -894,15 +900,15 @@ BSAPI bool _bs_contextLeftClickOnce(bs_Context* context) { return context->io.le
 BSAPI bool _bs_contextRightClickUpOnce(bs_Context* context) { return !context->io.right_clicked && context->io.right_clicked_last; }
 BSAPI bool _bs_contextLeftClickUpOnce(bs_Context* context) { return !context->io.left_clicked && context->io.left_clicked_last; }
 
-BSAPI bool _bs_middleClick() { return _bs_scope_.context->io.middle_clicked; }
-BSAPI bool _bs_middleClickOnce() { return _bs_scope_.context->io.middle_clicked && !_bs_scope_.context->io.middle_clicked_last; }
-BSAPI bool _bs_middleClickUpOnce() { return !_bs_scope_.context->io.middle_clicked && _bs_scope_.context->io.middle_clicked_last; }
-BSAPI bool _bs_leftClick() { return _bs_scope_.context->io.left_clicked; }
-BSAPI bool _bs_rightClick() { return _bs_scope_.context->io.right_clicked; }
-BSAPI bool _bs_rightClickOnce() { return _bs_scope_.context->io.right_clicked && !_bs_scope_.context->io.right_clicked_last; }
-BSAPI bool _bs_leftClickOnce() { return _bs_scope_.context->io.left_clicked && !_bs_scope_.context->io.left_clicked_last; }
-BSAPI bool _bs_rightClickUpOnce() { return !_bs_scope_.context->io.right_clicked && _bs_scope_.context->io.right_clicked_last; }
-BSAPI bool _bs_leftClickUpOnce() { return !_bs_scope_.context->io.left_clicked && _bs_scope_.context->io.left_clicked_last; }
+BSAPI bool _bs_middleClick() { return _bs_contextMiddleClick(_bs_scope_.context); }
+BSAPI bool _bs_middleClickOnce() { return _bs_contextMiddleClickOnce(_bs_scope_.context); }
+BSAPI bool _bs_middleClickUpOnce() { return _bs_contextMiddleClickUpOnce(_bs_scope_.context); }
+BSAPI bool _bs_leftClick() { return _bs_contextLeftClick(_bs_scope_.context); }
+BSAPI bool _bs_rightClick() { return _bs_contextRightClick(_bs_scope_.context); }
+BSAPI bool _bs_rightClickOnce() { return _bs_contextRightClickOnce(_bs_scope_.context); }
+BSAPI bool _bs_leftClickOnce() { return _bs_contextLeftClickOnce(_bs_scope_.context); }
+BSAPI bool _bs_rightClickUpOnce() { return _bs_contextRightClickUpOnce(_bs_scope_.context); }
+BSAPI bool _bs_leftClickUpOnce() { return _bs_contextLeftClickUpOnce(_bs_scope_.context); }
 
 BSAPI int _bs_scroll() {
 	return _bs_scope_.context->io.scroll;
@@ -972,9 +978,18 @@ static void _bs_resetIO(bs_IO* io) {
     memset(io->hold_keys, 0, sizeof(io->hold_keys));
     memcpy(io->keys_old, io->keys, sizeof(io->keys_old));
     memcpy(io->chars_old, io->chars, sizeof(io->chars_old));
-    io->left_clicked = 0;
-    io->right_clicked = 0;
-    io->middle_clicked = 0;
+}
+
+static _Thread_local bool _hide_menu_windows_ = false;
+static void _bs_hideMenuWindows(bs_List* contexts) {
+    for (int i = 0; i < contexts->count; i++) {
+        bs_Context* ctx = *(bs_Context**)_bs_fetchUnit(contexts, i);
+        if (ctx->window_type == BS_WINDOW_MENU) {
+            bs_hideWindow(ctx);
+        }
+    }
+
+    _hide_menu_windows_ = false;
 }
 
 BSAPI void _bs_tickContext(bs_Context* context, bs_ContextTickFunction tick) {
@@ -984,10 +999,14 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_ContextTickFunction tick) {
 
     context->active = context->hwnd == GetForegroundWindow();
 
-    //if (_bs_leftClickOnce() || _bs_rightClickOnce() || _bs_middleClickOnce())
-    //    SetCapture(context->hwnd);
-    //if (_bs_leftClickUpOnce() || _bs_rightClickUpOnce() || _bs_middleClickUpOnce())
-    //    ReleaseCapture();
+    if (_bs_leftClickOnce() || _bs_rightClickOnce() || _bs_middleClickOnce()) {
+     //   bs_logF("Now capturing \"%s\"", context->title);
+     //   SetCapture(context->hwnd);
+    }
+    if (_bs_leftClickUpOnce() || _bs_rightClickUpOnce() || _bs_middleClickUpOnce()) {
+     //   bs_logF("No longer capturing \"%s\"", context->title);
+     //   ReleaseCapture();
+    }
 
     POINT p = { _bs_instance_->screen_cursor.x, _bs_instance_->screen_cursor.y };
     if (ScreenToClient(context->hwnd, &p))
@@ -1063,10 +1082,8 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
 
        /**
         Message loop
+        TODO: Find out if it all should be moved to wndproc
         */
-        bool any_click = false;
-        POINT any_click_position;
-
         MSG msg;
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             _bs_scope_.context = NULL;
@@ -1092,21 +1109,34 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
 
             switch (msg.message) {
             case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
-
-            case WM_LBUTTONDOWN: context->io.left_clicked = true; 
-                static bool first;
-                any_click = true;
-                any_click_position = (POINT){ GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam) };
-                first = true;
-
+ 
+            case WM_LBUTTONDOWN: 
+                context->io.left_clicked = true;
+                if (context->window_type != BS_WINDOW_MENU)
+                    _hide_menu_windows_ = true;
                 break;
-            case WM_LBUTTONUP: context->io.left_clicked = false; break;
+            case WM_LBUTTONUP:
+                context->io.left_clicked = false; 
+                break;
 
-            case WM_RBUTTONDOWN: context->io.right_clicked = true; break;
-            case WM_RBUTTONUP: context->io.right_clicked = false; break;
+            case WM_RBUTTONDOWN: 
+                context->io.right_clicked = true; 
+                if (context->window_type != BS_WINDOW_MENU)
+                    _hide_menu_windows_ = true;
+                break;
+            case WM_RBUTTONUP: 
+                context->io.right_clicked = false; 
+                break;
 
-            case WM_MBUTTONDOWN: context->io.middle_clicked = true; break;
-            case WM_MBUTTONUP: context->io.middle_clicked = false; break;
+            case WM_MBUTTONDOWN: 
+                context->io.middle_clicked = true; 
+                if (context->window_type != BS_WINDOW_MENU)
+                    _hide_menu_windows_ = true;
+                break;
+            case WM_MBUTTONUP: 
+                context->io.middle_clicked = false; 
+                break;
+
             case WM_MOUSEWHEEL: {
                 context->io.scroll = (SHORT)HIWORD(msg.wParam) / 120.0;
             } break;
@@ -1132,26 +1162,28 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
                 if (msg.wParam < 256)
                     BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
             } break;
+            case WM_NCLBUTTONDOWN:
+            case WM_NCLBUTTONUP:
+            case WM_NCLBUTTONDBLCLK:
+            case WM_NCRBUTTONDOWN:
+            case WM_NCRBUTTONUP:
+            case WM_NCRBUTTONDBLCLK:
+            case WM_NCMBUTTONDOWN:
+            case WM_NCMBUTTONUP:
+            case WM_NCMBUTTONDBLCLK:
+                _hide_menu_windows_ = true;
+                break;
             }
+
+            if (_hide_menu_windows_)
+                _bs_hideMenuWindows(&contexts);
 
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
-        if (any_click) {
-            for (int i = 0; i < contexts.count; i++) {
-                bs_Context* ctx = *(bs_Context**)_bs_fetchUnit(&contexts, i);
-                if (ctx->window_type == BS_WINDOW_MENU) {
-
-                    RECT rc;
-                    GetClientRect(msg.hwnd, &rc);
-
-                    if (!PtInRect(&rc, any_click_position)) {
-                        bs_hideWindow(ctx);
-                    }
-                }
-            }
-        }
+        if (_hide_menu_windows_)
+            _bs_hideMenuWindows(&contexts);
 
        /**
         Tick all contexts
@@ -1220,6 +1252,10 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
     }
 
     switch (msg) {
+    case WM_ACTIVATE:
+        if (LOWORD(w_param) == WA_INACTIVE)
+            _hide_menu_windows_ = true;
+        break;
     case WM_DPICHANGED:
         _bs_updateWindowDPI(context);
         return DefWindowProc(hwnd, msg, w_param, l_param);
@@ -1351,7 +1387,7 @@ BSAPI bs_Result _bs_window(
         style = WS_CHILD | WS_VISIBLE;
     }
     else if (type == BS_WINDOW_NO_TITLE_BAR) {
-        style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+        style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
     }
     else if (type == BS_WINDOW_MENU) {
         style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;

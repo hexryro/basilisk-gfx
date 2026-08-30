@@ -3027,6 +3027,9 @@ struct bs_Instance {
     bool descriptor_pool_needs_update;
     bool alive;
     bs_vec2 screen_cursor;
+    struct {
+        bs_List objects;
+    } object_types[BS_OBJECT_TYPE_COUNT];
     bs_Timer timer;
     double time, time_old;
     double delta_time;
