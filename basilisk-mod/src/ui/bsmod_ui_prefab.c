@@ -104,7 +104,7 @@ BSMODAPI void _bsmod_onDragPrefab(bsmod_DraggingParams params) {
     bs_Model* prefab_model = bsgfx_prefabModel();
     bs_Mesh* prefab_mesh = prefab_model->meshes + _bsmod_.dragging_id;
 
-    if (bs_leftClickUpOnce()) {
+    if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
         bsgfx_RawPrefab* prefab = _bsmod_add(BSGFX_TYPE_PREFAB, &(bsgfx_RawPrefab) {
             .position = tile_position,
             .rotation = euler_rotation,

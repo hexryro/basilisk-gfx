@@ -75,6 +75,120 @@ BSAPI void _bs_systemN(char* command, int command_length) {
     free(command);
 }
 
+BSAPI bs_Result _bs_timeZoneBias(int* out) {
+#ifdef _WIN32
+	TIME_ZONE_INFORMATION info = { 0 };
+
+	DWORD time_zone_id = 0;
+	if ((time_zone_id = GetTimeZoneInformation(&info)) == TIME_ZONE_ID_INVALID) {
+		_bs_warnF("GetTimeZoneInformation failed (GetLastError() = %d)", GetLastError());
+		return _bs_convertWin32Error(GetLastError());
+	}
+
+	*out = info.Bias / 60;
+
+	return BS_RESULT_OK;
+#else
+	return BS_RESULT_NOT_SUPPORTED;
+#endif
+}
+
+BSAPI bs_I64 _bs_totalSeconds(const bs_DateTime* date_time) {
+	return (bs_I64)mktime(&(struct tm) {
+		.tm_year = date_time->years - 1900,
+		.tm_mon = date_time->months - 1,
+		.tm_mday = date_time->days,
+		.tm_hour = date_time->hours,
+		.tm_min = date_time->minutes,
+		.tm_sec = date_time->seconds,
+	});
+}
+
+BSAPI bs_DateTime _bs_dateTime() {
+#ifdef _WIN32
+    SYSTEMTIME time;
+    GetSystemTime(&time);
+
+    return (bs_DateTime) {
+        .years = time.wYear,
+        .months = time.wMonth,
+        .days = time.wDay,
+        .hours = time.wHour,
+        .minutes = time.wMinute,
+        .seconds = time.wSecond,
+        .milliseconds = time.wMilliseconds,
+        .day_of_week = time.wDayOfWeek
+    };
+#else
+    struct timespec ts;
+    timespec_get(&ts, TIME_UTC);
+
+    time_t t = ts.tv_sec;
+    struct tm tm;
+
+    gmtime_r(&t, &tm);
+
+    return (bs_DateTime) {
+        .years = tm.tm_year + 1900,
+        .months = tm.tm_mon + 1,
+        .days = tm.tm_mday,
+        .hours = tm.tm_hour,
+        .minutes = tm.tm_min,
+        .seconds = tm.tm_sec,
+        .milliseconds = (int)(ts.tv_nsec / 1000000),
+        .day_of_week = tm.tm_wday
+    };
+#endif
+}
+
+BSAPI bool _bs_isLaterThan(const bs_DateTime* a, const bs_DateTime* b) {
+	return _bs_totalSeconds(a) - _bs_totalSeconds(b) > 0;
+}
+
+BSAPI bs_Timer _bs_timer() {
+    bs_Timer timer = { 0 };
+
+#ifdef _WIN32
+    QueryPerformanceFrequency(&timer.ticks_per_second);
+    QueryPerformanceCounter(&timer.last_tick_count);
+#else
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    timer.last_tick_count.quad_part =
+        (long long)ts.tv_sec * 1000000000LL +
+        (long long)ts.tv_nsec;
+
+    timer.ticks_per_second.quad_part = 1000000000LL;
+#endif
+
+    return timer;
+}
+
+BSAPI void _bs_checkTimer(bs_Timer* timer) {
+#ifdef _WIN32
+	QueryPerformanceCounter(&timer->tick_count);
+	bs_U64 elapsed_ticks = timer->tick_count.quad_part - timer->last_tick_count.quad_part;
+	timer->microseconds = (elapsed_ticks * 1000000) / timer->ticks_per_second.quad_part;
+
+#else
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    timer->tick_count.quad_part =
+        (long long)ts.tv_sec * 1000000000LL +
+        (long long)ts.tv_nsec;
+
+    long long elapsed =
+        timer->tick_count.quad_part -
+        timer->last_tick_count.quad_part;
+
+    timer->microseconds = (bs_U64)(elapsed / 1000LL);
+#endif
+
+    timer->seconds = timer->microseconds / 1000000.0;
+}
+
 
 
   /*==============================================================================

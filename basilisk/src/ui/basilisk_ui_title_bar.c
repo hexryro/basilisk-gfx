@@ -182,13 +182,9 @@ void basilisk_instantiateTitleBarUI() {
     position.x += 16.0;
 
     hovering = basilisk_instantiateTitleBarTextButtonUI("File", default_button_background_material, position, title_bar_size);
-    if (bs_leftClickOnce()) {
-        bs_logF("Clicked");
 
-    }
-
-    if (hovering && bs_leftClickOnce()) {
-        bs_logF("Clicked file");
+    if (hovering && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
+    //    bs_logF("Clicked file");
 
 
         toggleContextMenuUI(CONTEXT_MENU_FILE, position);
@@ -208,7 +204,7 @@ void basilisk_instantiateTitleBarUI() {
     */
     position.x -= close_button_width;
     hovering = basilisk_instantiateTitleBarButtonUI(close_caption, close_button_background_material, position, title_bar_size, close_button_width);
-    if (hovering && bs_leftClickUpOnce()) {
+    if (hovering && bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
         bs_exit();
     }
 
@@ -217,7 +213,7 @@ void basilisk_instantiateTitleBarUI() {
     */
     position.x -= maximize_button_width;
     hovering = basilisk_instantiateTitleBarButtonUI(maximize_caption, default_button_background_material, position, title_bar_size, maximize_button_width);
-    if (hovering && bs_leftClickUpOnce()) {
+    if (hovering && bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
 
     }
     
@@ -226,7 +222,7 @@ void basilisk_instantiateTitleBarUI() {
     */
     position.x -= minimize_button_width;
     hovering = basilisk_instantiateTitleBarButtonUI(minimize_caption, default_button_background_material, position, title_bar_size, minimize_button_width);
-    if (hovering && bs_leftClickUpOnce()) {
+    if (hovering && bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
 
     }
 
@@ -306,11 +302,12 @@ void basilisk_instantiateTitleBarUI() {
 }
 
 void onTitleBarTick() {
+    bs_Context* context = bs_scope()->context;
+
     bsgfx_computeContextCamera();
     bsmod_onTick();
 
     //basilisk_instantiateBaseUI();
-    bs_Context* context = bs_scope()->context;
     bool was_hidden = context->hidden;
     basilisk_instantiateTitleBarUI();
 

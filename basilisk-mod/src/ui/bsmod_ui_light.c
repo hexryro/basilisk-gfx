@@ -78,8 +78,8 @@ BSMODAPI void _bsmod_instanceLightBillboards() {
         if (hovering) {
             //_bsmod_.hovering.billboard = true;
 
-            if (bs_leftClickOnce()) {
-                if (!bs_keyDown(BS_KEY_ALT))
+            if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
+                if (!bs_inputDown(BS_KEY_ALT))
                     _bsmod_deselectAll();
 
                 _bsmod_select(&_bsmod_.selected_ids, BSGFX_TYPE_LIGHT, i);
@@ -118,14 +118,14 @@ static inline void _bsmod_addLight(bsgfx_LightType type) {
 }
 
 static bool _bsmod_onAddPointTick(const bsgfx_ButtonParams* params) {
-    if (params->hovering && bs_leftClickOnce())
+    if (params->hovering && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
         bs_warnN(BS_CONSTANT_STRING("Point light is not implemented\n"));
 
     return params->hovering;
 }
 
 static bool _bsmod_onAddSunTick(const bsgfx_ButtonParams* params) {
-    if (params->hovering && bs_leftClickOnce())
+    if (params->hovering && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
         _bsmod_addLight(BSGFX_LIGHT_TYPE_SUN);
 
     return params->hovering;

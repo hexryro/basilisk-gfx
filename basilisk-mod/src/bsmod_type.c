@@ -679,7 +679,7 @@ BSMODAPI void _bsmod_editSelectedType() {
 
 	bsgfx_Type* type = bsgfx_getType(_bsmod_.selected_type);
 
-	if (bs_keyDownOnce(BS_KEY_DELETE)) {
+	if (bs_inputDownOnce(BS_KEY_DELETE)) {
 		_bsmod_deleteSelected(_bsmod_.selected_type);
 	}
 }
@@ -691,19 +691,19 @@ BSMODAPI void _bsmod_selectHoveringTypes() {
 	}
 
 	bool select_tile = false;
-	if (bs_leftClickOnce()) {
+	if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
 		if (_bsmod_.selected_type == BSGFX_TYPE_PRIMITIVE && _bsmod_.selected_ids.count && _bsmod_.hovering.primitive == _bsmod_firstSelectedId(BSMOD_IDS)) {
 			select_tile = true;
 		}
 		else if (_bsmod_.selected_type == BSGFX_TYPE_TILE) {
-			if (bs_keyDown(BS_KEY_ALT) && !bs_keyDown(BS_KEY_LEFT_CONTROL))
+			if (bs_inputDown(BS_KEY_ALT) && !bs_inputDown(BS_KEY_LEFT_CONTROL))
 				select_tile = true;
-			if (bs_keyDown(BS_KEY_LEFT_SHIFT))
+			if (bs_inputDown(BS_KEY_LEFT_SHIFT))
 				select_tile = true;
 		}
 	}
 
-	if (select_tile && !bs_keyDown(BS_KEY_LEFT_SHIFT)) {
+	if (select_tile && !bs_inputDown(BS_KEY_LEFT_SHIFT)) {
 		if (_bsmod_.selected_tile_axis != _bsmod_.hovering.tile_axis)
 			_bsmod_deselectAll();
 
@@ -725,7 +725,7 @@ BSMODAPI void _bsmod_selectHoveringTypes() {
 		for (int i = 0; i < bsgfx_count(BSGFX_TYPE_PRIMITIVE); i++) {
 			bsgfx_Primitive* primitive = bsgfx_get(BSGFX_TYPE_PRIMITIVE, i);
 			if (tile >= primitive->first_tile && tile < primitive->last_tile) {
-				if (bs_leftClickOnce() && !select_tile) {
+				if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON) && !select_tile) {
 					_bsmod_deselectAll();
 					_bsmod_select(BSMOD_IDS, BSGFX_TYPE_PRIMITIVE, i);
 				}
@@ -742,15 +742,15 @@ BSMODAPI void _bsmod_selectHoveringTypes() {
 	if (_bsmod_.hovering.flags & BSGFX_ID_IS_PREFAB) {
 		//bsgfx_Prefab* prefab = bsgfx_get(BSGFX_TYPE_PREFAB, _bsmod_.hovering.index);
 
-		if (bs_leftClickOnce()) {
-			if (!bs_keyDown(BS_KEY_ALT) || bs_keyDown(BS_KEY_LEFT_CONTROL))
+		if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
+			if (!bs_inputDown(BS_KEY_ALT) || bs_inputDown(BS_KEY_LEFT_CONTROL))
 				_bsmod_deselectAll();
 
 			_bsmod_select(BSMOD_IDS, BSGFX_TYPE_PREFAB, _bsmod_.hovering.instance_id);
 		}
 	}
 
-	if (bs_leftClickOnce() && _bsmod_.selected_type == BSGFX_TYPE_TILE && bs_keyDown(BS_KEY_LEFT_SHIFT)) {
+	if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON) && _bsmod_.selected_type == BSGFX_TYPE_TILE && bs_inputDown(BS_KEY_LEFT_SHIFT)) {
 		bsgfx_Primitive* primitive = bsgfx_get(BSGFX_TYPE_PRIMITIVE, _bsmod_.selected_tile_primitive);
 
 		int first_tile = _bsmod_firstSelectedId(BSMOD_TILE_IDS);
@@ -793,7 +793,7 @@ BSMODAPI void _bsmod_selectHoveringTypes() {
 	  */
 
 /*
-	if (_bsmod_.selected_type == BSGFX_TYPE_TILE && bs_keyDown(BS_KEY_LEFT_CONTROL) && bs_keyDownOnce(BS_KEY_A)) {
+	if (_bsmod_.selected_type == BSGFX_TYPE_TILE && bs_inputDown(BS_KEY_LEFT_CONTROL) && bs_inputDownOnce(BS_KEY_A)) {
 		static bs_List primitives_to_select = { .unit_size = sizeof(int) , .increment = 256 };
 		bs_seekList(&primitives_to_select, 0);
 
@@ -828,7 +828,7 @@ BSMODAPI void _bsmod_selectHoveringTypes() {
 		}
 	}
 
-	if (bs_leftClickOnce()) {
+	if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
 		_bsmod_.ui_blocked = true;
 	}
 	*/

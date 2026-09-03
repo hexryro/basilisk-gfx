@@ -38,7 +38,7 @@ BSMODAPI void _bsmod_onDragMaterial(bsmod_DraggingParams params) {
     if (_bsmod_.hovering.flags & BSGFX_ID_IS_PREFAB) {
         bsgfx_Prefab* prefab = bsgfx_get(BSGFX_TYPE_PREFAB, _bsmod_.hovering.instance_id);
         bsgfx_RawPrefab* raw_prefab = bsgfx_getRaw(BSGFX_TYPE_PREFAB, _bsmod_.hovering.instance_id);
-        if (bs_leftClickUpOnce()) {
+        if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
             raw_prefab->material_hash = bsgfx_fetchMaterial(_bsmod_.dragging_id)->hash;
             _bsmod_saveTypeN(BSGFX_TYPE_PREFAB, BS_CONSTANT_STRING("Changed prefab material"));
         }

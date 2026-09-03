@@ -79,7 +79,7 @@ BSMODAPI void _bsmod_onDragPrimitive(bsmod_DraggingParams params) {
     bsgfx_InstanceSubtype* subtype = bsgfx_primitiveSubtype(_bsmod_.dragging_id);
     bsgfx_instancePrimitive(subtype, matrix, 0, 0, $bsmod_light_blue()->id);
 
-    if (bs_leftClickUpOnce()) {
+    if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
         bsgfx_RawPrimitive* primitive = _bsmod_add(BSGFX_TYPE_PRIMITIVE, &(bsgfx_RawPrimitive) {
             .position = tile_position,
             .rotation = euler_rotation,

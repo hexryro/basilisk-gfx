@@ -2405,101 +2405,20 @@ BSAPI bs_vec2 _preval_bs_screenCursorPosition() {
     return next.bs_screenCursorPosition();
 }
 
-BSAPI bool _preval_bs_middleClick() {
-    return next.bs_middleClick();
+BSAPI bool _preval_bs_inputDown(bs_U32 code) {
+    return next.bs_inputDown(code);
 }
 
-BSAPI bool _preval_bs_middleClickOnce() {
-    return next.bs_middleClickOnce();
+BSAPI bool _preval_bs_inputHeld(bs_U32 code) {
+    return next.bs_inputHeld(code);
 }
 
-BSAPI bool _preval_bs_middleClickUpOnce() {
-    return next.bs_middleClickUpOnce();
+BSAPI bool _preval_bs_inputDownOnce(bs_U32 code) {
+    return next.bs_inputDownOnce(code);
 }
 
-BSAPI bool _preval_bs_leftClick() {
-    return next.bs_leftClick();
-}
-
-BSAPI bool _preval_bs_rightClick() {
-    return next.bs_rightClick();
-}
-
-BSAPI bool _preval_bs_rightClickOnce() {
-    return next.bs_rightClickOnce();
-}
-
-BSAPI bool _preval_bs_leftClickOnce() {
-    return next.bs_leftClickOnce();
-}
-
-BSAPI bool _preval_bs_rightClickUpOnce() {
-    return next.bs_rightClickUpOnce();
-}
-
-BSAPI bool _preval_bs_leftClickUpOnce() {
-    return next.bs_leftClickUpOnce();
-}
-
-BSAPI bool _preval_bs_contextMiddleClick(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextMiddleClick(context);
-}
-
-BSAPI bool _preval_bs_contextMiddleClickOnce(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextMiddleClickOnce(context);
-}
-
-BSAPI bool _preval_bs_contextMiddleClickUpOnce(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextMiddleClickUpOnce(context);
-}
-
-BSAPI bool _preval_bs_contextLeftClick(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextLeftClick(context);
-}
-
-BSAPI bool _preval_bs_contextRightClick(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextRightClick(context);
-}
-
-BSAPI bool _preval_bs_contextRightClickOnce(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextRightClickOnce(context);
-}
-
-BSAPI bool _preval_bs_contextLeftClickOnce(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextLeftClickOnce(context);
-}
-
-BSAPI bool _preval_bs_contextRightClickUpOnce(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextRightClickUpOnce(context);
-}
-
-BSAPI bool _preval_bs_contextLeftClickUpOnce(bs_Context* context) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextLeftClickUpOnce(context);
-}
-
-BSAPI bool _preval_bs_keyDown(bs_U32 code) {
-    return next.bs_keyDown(code);
-}
-
-BSAPI bool _preval_bs_keyHeld(bs_U32 code) {
-    return next.bs_keyHeld(code);
-}
-
-BSAPI bool _preval_bs_keyDownOnce(bs_U32 code) {
-    return next.bs_keyDownOnce(code);
-}
-
-BSAPI bool _preval_bs_keyUpOnce(bs_U32 code) {
-    return next.bs_keyUpOnce(code);
+BSAPI bool _preval_bs_inputUpOnce(bs_U32 code) {
+    return next.bs_inputUpOnce(code);
 }
 
 BSAPI bool _preval_bs_charDown(unsigned char c) {
@@ -2514,24 +2433,19 @@ BSAPI bool _preval_bs_charUpOnce(unsigned char c) {
     return next.bs_charUpOnce(c);
 }
 
-BSAPI bool _preval_bs_contextKeyDown(bs_Context* context, bs_U32 code) {
+BSAPI bool _preval_bs_contextInputDown(bs_Context* context, bs_U32 code) {
     BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextKeyDown(context, code);
+    return next.bs_contextInputDown(context, code);
 }
 
-BSAPI bool _preval_bs_contextKeyHeld(bs_Context* context, bs_U32 code) {
+BSAPI bool _preval_bs_contextInputDownOnce(bs_Context* context, bs_U32 code) {
     BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextKeyHeld(context, code);
+    return next.bs_contextInputDownOnce(context, code);
 }
 
-BSAPI bool _preval_bs_contextKeyDownOnce(bs_Context* context, bs_U32 code) {
+BSAPI bool _preval_bs_contextInputUpOnce(bs_Context* context, bs_U32 code) {
     BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextKeyDownOnce(context, code);
-}
-
-BSAPI bool _preval_bs_contextKeyUpOnce(bs_Context* context, bs_U32 code) {
-    BS_VALIDATE(context != NULL, false,);
-    return next.bs_contextKeyUpOnce(context, code);
+    return next.bs_contextInputUpOnce(context, code);
 }
 
 BSAPI bool _preval_bs_contextCharDown(bs_Context* context, unsigned char c) {
@@ -3278,35 +3192,16 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_windowCursorPosition = _preval_bs_windowCursorPosition;
     functions.bs_windowPosition = _preval_bs_windowPosition;
     functions.bs_screenCursorPosition = _preval_bs_screenCursorPosition;
-    functions.bs_middleClick = _preval_bs_middleClick;
-    functions.bs_middleClickOnce = _preval_bs_middleClickOnce;
-    functions.bs_middleClickUpOnce = _preval_bs_middleClickUpOnce;
-    functions.bs_leftClick = _preval_bs_leftClick;
-    functions.bs_rightClick = _preval_bs_rightClick;
-    functions.bs_rightClickOnce = _preval_bs_rightClickOnce;
-    functions.bs_leftClickOnce = _preval_bs_leftClickOnce;
-    functions.bs_rightClickUpOnce = _preval_bs_rightClickUpOnce;
-    functions.bs_leftClickUpOnce = _preval_bs_leftClickUpOnce;
-    functions.bs_contextMiddleClick = _preval_bs_contextMiddleClick;
-    functions.bs_contextMiddleClickOnce = _preval_bs_contextMiddleClickOnce;
-    functions.bs_contextMiddleClickUpOnce = _preval_bs_contextMiddleClickUpOnce;
-    functions.bs_contextLeftClick = _preval_bs_contextLeftClick;
-    functions.bs_contextRightClick = _preval_bs_contextRightClick;
-    functions.bs_contextRightClickOnce = _preval_bs_contextRightClickOnce;
-    functions.bs_contextLeftClickOnce = _preval_bs_contextLeftClickOnce;
-    functions.bs_contextRightClickUpOnce = _preval_bs_contextRightClickUpOnce;
-    functions.bs_contextLeftClickUpOnce = _preval_bs_contextLeftClickUpOnce;
-    functions.bs_keyDown = _preval_bs_keyDown;
-    functions.bs_keyHeld = _preval_bs_keyHeld;
-    functions.bs_keyDownOnce = _preval_bs_keyDownOnce;
-    functions.bs_keyUpOnce = _preval_bs_keyUpOnce;
+    functions.bs_inputDown = _preval_bs_inputDown;
+    functions.bs_inputHeld = _preval_bs_inputHeld;
+    functions.bs_inputDownOnce = _preval_bs_inputDownOnce;
+    functions.bs_inputUpOnce = _preval_bs_inputUpOnce;
     functions.bs_charDown = _preval_bs_charDown;
     functions.bs_charDownOnce = _preval_bs_charDownOnce;
     functions.bs_charUpOnce = _preval_bs_charUpOnce;
-    functions.bs_contextKeyDown = _preval_bs_contextKeyDown;
-    functions.bs_contextKeyHeld = _preval_bs_contextKeyHeld;
-    functions.bs_contextKeyDownOnce = _preval_bs_contextKeyDownOnce;
-    functions.bs_contextKeyUpOnce = _preval_bs_contextKeyUpOnce;
+    functions.bs_contextInputDown = _preval_bs_contextInputDown;
+    functions.bs_contextInputDownOnce = _preval_bs_contextInputDownOnce;
+    functions.bs_contextInputUpOnce = _preval_bs_contextInputUpOnce;
     functions.bs_contextCharDown = _preval_bs_contextCharDown;
     functions.bs_contextCharDownOnce = _preval_bs_contextCharDownOnce;
     functions.bs_contextCharUpOnce = _preval_bs_contextCharUpOnce;

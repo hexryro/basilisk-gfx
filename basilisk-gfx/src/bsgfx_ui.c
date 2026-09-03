@@ -376,7 +376,7 @@ static bool _bsgfx_instanceUrl(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alre
 
 	//bsgfx_atlasLegacyHiResInstance(atlas, copy_position, ui_copy, bs_v2V1(BSGFX_PIXEL_SCALE), BS_WHITE, false);
 
-	if (bs_leftClickOnce()) {
+	if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
 		if (url_hovering) {
 			bs_throwBasilisk(BSX_NOT_IMPLEMENTED);
 			bs_systemF(false, "explorer /select,\"%s\"", widget->url.path);
@@ -417,7 +417,7 @@ static bool _bsgfx_instanceRange(bsgfx_Menu* menu, bsgfx_Widget* widget, bool al
 	bs_mat4x3 m = _bsgfx_matrix(copy_position, BS_V3(copy_dimensions.x, copy_dimensions.y, 0.0));
 	_bsgfx_instanceAtlasFlipped(_bsgfx_subtypes_[BSGFX_SUBTYPE_ATLAS_ICON], m, ui_increment->id, 0, 0, $white_material()->id);
 
-	bool hovering = !already_hovering && bs_rectangleVsPoint(&copy_position.xy, &copy_dimensions, &cursor) && bs_leftClickOnce();
+	bool hovering = !already_hovering && bs_rectangleVsPoint(&copy_position.xy, &copy_dimensions, &cursor) && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON);
 	if (hovering) {
 		(*widget->range.value)--;
 		if (widget->range.on_change)
@@ -436,7 +436,7 @@ static bool _bsgfx_instanceRange(bsgfx_Menu* menu, bsgfx_Widget* widget, bool al
 	//_bsgfx_instanceTextF(font, &text, "%d/%d", &text_size, *widget->range.value, widget->range.max);
 	//copy_position.x += text_size.x;
 
-	if (bs_rectangleVsPoint(&copy_position.xy, &copy_dimensions, &cursor) && bs_leftClickOnce()) {
+	if (bs_rectangleVsPoint(&copy_position.xy, &copy_dimensions, &cursor) && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
 		(*widget->range.value)++;
 		if (widget->range.on_change)
 			widget->range.on_change(widget);
@@ -494,7 +494,7 @@ static bool _bsgfx_instanceSlider(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	if (!bs_leftClick())
 		dragging = false;
 
-	if (_bsgfx_rectangleVsPointExpand(&bar_position.xy, &bar_dimensions, &cursor, 0.0) && bs_leftClickOnce())
+	if (_bsgfx_rectangleVsPointExpand(&bar_position.xy, &bar_dimensions, &cursor, 0.0) && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
 		dragging = true;
 
 	if (dragging) {
@@ -1038,7 +1038,7 @@ static bool _bsgfx_instanceInput(
 		int select_position = *widget->input.select_position;
 		int select_size = *widget->input.select_size;
 
-		if (bs_leftClickOnce()) {
+		if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
 			if (hovering) {
 				if (_bsgfx_selected_input != widget->input.hash) {
 					_bsgfx_selected_input = widget->input.hash;
@@ -1061,12 +1061,12 @@ static bool _bsgfx_instanceInput(
 			bs_setCursor(BS_CURSOR_DEFAULT);
 
 		int x_dir = 0, y_dir = 0;
-		if (bs_keyHeld(BS_KEY_LEFT)) x_dir = -1;
-		if (bs_keyHeld(BS_KEY_RIGHT)) x_dir = 1;
-		if (bs_keyHeld(BS_KEY_UP)) y_dir = -1;
-		if (bs_keyHeld(BS_KEY_DOWN)) y_dir = 1;
+		if (bs_inputHeld(BS_KEY_LEFT)) x_dir = -1;
+		if (bs_inputHeld(BS_KEY_RIGHT)) x_dir = 1;
+		if (bs_inputHeld(BS_KEY_UP)) y_dir = -1;
+		if (bs_inputHeld(BS_KEY_DOWN)) y_dir = 1;
 
-		if (!bs_keyDown(BS_KEY_LEFT_SHIFT)) {
+		if (!bs_inputDown(BS_KEY_LEFT_SHIFT)) {
 			if (x_dir != 0)
 				select_size = 0;
 		}
@@ -1087,10 +1087,10 @@ static bool _bsgfx_instanceInput(
 		else if (select_position > string->len || (select_position + select_size) > string->len) {
 			select_position = string->len;
 		}
-		else if (bs_keyDown(BS_KEY_LEFT_SHIFT)) {
-			if (bs_keyHeld(BS_KEY_LEFT))
+		else if (bs_inputDown(BS_KEY_LEFT_SHIFT)) {
+			if (bs_inputHeld(BS_KEY_LEFT))
 				select_size++;
-			else if (bs_keyHeld(BS_KEY_RIGHT))
+			else if (bs_inputHeld(BS_KEY_RIGHT))
 				select_size--;
 		}
 
@@ -1104,7 +1104,7 @@ static bool _bsgfx_instanceInput(
 			}
 		}
 
-		if (bs_keyHeld(BS_KEY_END)) {
+		if (bs_inputHeld(BS_KEY_END)) {
 			blink_timer = 0.0;
 			blinking_underscore = '|';
 
@@ -1116,21 +1116,21 @@ static bool _bsgfx_instanceInput(
 				}
 			}
 
-			if (bs_keyDown(BS_KEY_LEFT_SHIFT))
+			if (bs_inputDown(BS_KEY_LEFT_SHIFT))
 				select_size = start - select_position;
 			else
 				select_size = 0;
 		}
-		else if (bs_keyHeld(BS_KEY_HOME)) {
+		else if (bs_inputHeld(BS_KEY_HOME)) {
 			blink_timer = 0.0;
 			blinking_underscore = '|';
-			if (bs_keyDown(BS_KEY_LEFT_SHIFT))
+			if (bs_inputDown(BS_KEY_LEFT_SHIFT))
 				select_size += select_position - row_position;
 			else
 				select_size = 0;
 			select_position = row_position;
 		}
-		else if (bs_keyDown(BS_KEY_LEFT_CONTROL) && bs_keyHeld(BS_KEY_A)) {
+		else if (bs_inputDown(BS_KEY_LEFT_CONTROL) && bs_inputHeld(BS_KEY_A)) {
 			blink_timer = 0.0;
 			blinking_underscore = '|';
 			select_position = 0;
@@ -1142,7 +1142,7 @@ static bool _bsgfx_instanceInput(
 		bsgfx_textDimensions(font, &select_draw_position, row, select_position - row_position);
 		select_draw_position.y = widget->input.dimensions.y - _bsgfx_textHeight() - (row_index * _bsgfx_textHeight());
 		if (y_dir != 0) {
-			if (bs_keyDown(BS_KEY_LEFT_SHIFT)) {
+			if (bs_inputDown(BS_KEY_LEFT_SHIFT)) {
 				int select_size_end = select_position;
 				float select_size_draw_position_x = select_draw_position.x;
 				float select_size_draw_position_y = select_draw_position.y;
@@ -1177,7 +1177,7 @@ static bool _bsgfx_instanceInput(
 		select_size = 0; \
 	}
 
-			if (bs_keyHeld(BS_KEY_BACKSPACE) && string->len > 0) {
+			if (bs_inputHeld(BS_KEY_BACKSPACE) && string->len > 0) {
 				blink_timer = 0.0;
 				blinking_underscore = '|';
 
@@ -1185,7 +1185,7 @@ static bool _bsgfx_instanceInput(
 
 				_bsgfx_deserializeInputValue(widget, string);
 			}
-			else if (bs_keyHeld(BS_KEY_ENTER) && widget->input.new_line_on_enter) {
+			else if (bs_inputHeld(BS_KEY_ENTER) && widget->input.new_line_on_enter) {
 				blink_timer = 0.0;
 				blinking_underscore = '|';
 
@@ -1195,7 +1195,7 @@ static bool _bsgfx_instanceInput(
 				string = bs_insertChar(string, select_position++, '\n');
 				_bsgfx_deserializeInputValue(widget, string);
 			}
-			else if (bs_keyHeld(BS_KEY_SPACE)) {
+			else if (bs_inputHeld(BS_KEY_SPACE)) {
 				blink_timer = 0.0;
 				blinking_underscore = '|';
 
@@ -1287,7 +1287,7 @@ static bool _bsgfx_instanceInput(
 		widget->input.background_outline_material_id,
 		widget->input.background_shadow_material_id);
 
-	//	if (active && bs_keyDownOnce(BS_KEY_ENTER) && widget->input.action) {
+	//	if (active && bs_inputDownOnce(BS_KEY_ENTER) && widget->input.action) {
 	//		widget->input.action(widget);
 	//		_bsgfx_selected_input = 0;
 	//	}
@@ -1353,7 +1353,7 @@ static bool _bsgfx_instanceGrid(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alr
 		});
 		grid_position.x += widget->grid.size.x;
 
-	//	if (hovering && bs_leftClickOnce())
+	//	if (hovering && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
 	//		_bsgfx_selected_grid = _bsgfx_selected_grid == id ? 0 : id;
 	//	if (_bsgfx_selected_grid != id)
 	//		return hovering;
@@ -1443,7 +1443,7 @@ static bool _bsgfx_instanceModel(bsgfx_Menu* menu, bsgfx_Widget* widget, bool al
 	static float diff = 0.0;
 	static float start = 0.0;
 
-	if (bs_leftClickOnce())
+	if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
 		start = cursor.x;
 
 	if (bs_leftClick()) {
@@ -1659,7 +1659,7 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 
 		bs_vec2 cursor_position = bs_windowCursorPosition(bs_scope()->context);
 		if (bs_rectangleVsPoint(&position.xy, &scale.xy, &cursor_position)) {
-			if (bs_leftClickOnce())
+			if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
 				*tab_bar->active_tab = i;
 		}
 
@@ -1760,7 +1760,7 @@ static void _bsgfx_instanceTitleBar(bsgfx_Menu* menu, bsgfx_TitleBar* title_bar,
 			coords,
 			0, 0, buttons[i].action ? (hovering ? title_bar->button_hovering_material_id : title_bar->button_material_id) : title_bar->button_unavailable_material_id);
 
-		if (hovering && bs_leftClickOnce())
+		if (hovering && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
 			buttons[i].action();
 
 		bs_vec3 icon_size = BS_V3(size.x, size.y, 1.0);

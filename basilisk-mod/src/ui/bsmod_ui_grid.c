@@ -59,7 +59,7 @@ typedef enum {
 
 static bsmod_Directory _bsmod_selected_directory;
 static void _bsmod_onHoverDirectoryWidget(bsgfx_Widget* widget) {
-    if (bs_leftClickOnce()) {
+    if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
         _bsmod_selected_directory = *(bsmod_Directory*)widget->params;
     }
 }
@@ -335,7 +335,7 @@ static void _bsmod_checkHoverGrid(bsgfx_Widget* widget, bsgfx_GridParams* grid) 
     bool hovering = bs_rectangleVsPoint(grid->position, &widget->grid.size, &cursor);
 
     if (hovering) {
-        if (bs_leftClickOnce()) {
+        if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
             _bsmod_.dragging_id = grid->index;
 
             _bsmod_setSideMenuTab(params->tab_id, (bsmod_GridClickParams) {
@@ -343,7 +343,7 @@ static void _bsmod_checkHoverGrid(bsgfx_Widget* widget, bsgfx_GridParams* grid) 
             });
         }
 
-        if (bs_leftClickUpOnce()) {
+        if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
             _bsmod_.dragging_id = -1;
         }
 

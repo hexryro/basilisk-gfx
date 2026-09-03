@@ -121,7 +121,7 @@ BSMODAPI void _bsmod_onTick() {
     if (!_bsmod_.ui_blocked)
         _bsmod_editSelectedType();
 
-    if (bs_keyDown(BS_KEY_LEFT_CONTROL) && bs_keyDownOnce(BS_KEY_C))
+    if (bs_inputDown(BS_KEY_LEFT_CONTROL) && bs_inputDownOnce(BS_KEY_C))
         _bsmod_deselectAll();
 
     static int last_selected_count = 0;
@@ -246,15 +246,15 @@ static void _bsmod_computeFlyCamera() {
 
     bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 
-    if (bs_keyDown(BS_KEY_LEFT_SHIFT))
+    if (bs_inputDown(BS_KEY_LEFT_SHIFT))
         move_speed = 0.5;
 
-    if (bs_middleClickOnce()) {
+    if (bs_inputDown(BS_MIDDLE_MOUSE_BUTTON)) {
         rotating = true;
         last_cursor = cursor;
     }
 
-    if (bs_middleClick()) {
+    if (bs_inputDownOnce(BS_MIDDLE_MOUSE_BUTTON)) {
         bs_vec2 delta = {
             last_cursor.x - cursor.x,
             last_cursor.y - cursor.y
@@ -269,7 +269,7 @@ static void _bsmod_computeFlyCamera() {
         last_cursor = cursor;
     }
 
-    if (bs_middleClickUpOnce()) {
+    if (bs_inputDownOnce(BS_MIDDLE_MOUSE_BUTTON)) {
         rotating = false;
     }
 
@@ -289,22 +289,22 @@ static void _bsmod_computeFlyCamera() {
     bs_v3Cross(&camera_direction, &BS_V3(0.0, 1.0, 0.0), &right);
     bs_v3Normalize(&right, &right);
 
-    if (bs_keyDown(BS_KEY_W)) {
+    if (bs_inputDown(BS_KEY_W)) {
         bs_v3MulS(&camera_direction, move_speed, &temp);
         bs_v3Add(&camera_position, &temp, &camera_position);
     }
 
-    if (bs_keyDown(BS_KEY_S)) {
+    if (bs_inputDown(BS_KEY_S)) {
         bs_v3MulS(&camera_direction, move_speed, &temp);
         bs_v3Sub(&camera_position, &temp, &camera_position);
     }
 
-    if (bs_keyDown(BS_KEY_D)) {
+    if (bs_inputDown(BS_KEY_D)) {
         bs_v3MulS(&right, move_speed, &temp);
         bs_v3Add(&camera_position, &temp, &camera_position);
     }
 
-    if (bs_keyDown(BS_KEY_A)) {
+    if (bs_inputDown(BS_KEY_A)) {
         bs_v3MulS(&right, move_speed, &temp);
         bs_v3Sub(&camera_position, &temp, &camera_position);
     }

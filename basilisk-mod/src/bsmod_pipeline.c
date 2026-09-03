@@ -306,13 +306,13 @@ BSMODAPI bs_Queue* _bsmod_onQueue() {
     //if (result == BS_RESULT_DEVICE_LOST)
     //    bsgfx_onDeviceLost();
 
-    if (bs_keyDownOnce(BS_KEY_G))
+    if (bs_inputDownOnce(BS_KEY_G))
         _bsmod_queueRasterize(BSMOD_CONTENT_PATH, "material_icons", _bsmod_rasterizeMaterialIcons);
 
-    if (bs_keyDownOnce(BS_KEY_K))
+    if (bs_inputDownOnce(BS_KEY_K))
         _bsmod_queueRasterize(BSMOD_CONTENT_PATH, "primitive_icons", _bsmod_rasterizePrimitiveIcons);
 
-    if (bs_keyDownOnce(BS_KEY_L))
+    if (bs_inputDownOnce(BS_KEY_L))
         _bsmod_queueRasterize(BSMOD_CONTENT_PATH, "prefab_icons", _bsmod_rasterizePrefabIcons);
 
     _bsmod_pollRasterizer();

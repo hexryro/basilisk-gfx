@@ -166,7 +166,7 @@ BSMODAPI void _bsmod_onDragTile(bsmod_DraggingParams params) {
 
     assert(_bsmod_.dragging_id >= 0 && _bsmod_.dragging_id < tile_image_object->image->num_indices);
 
-    if (bs_leftClickUpOnce()) {
+    if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
         if (_bsmod_isSelected(BSMOD_TILE_IDS, BSGFX_TYPE_TILE, _bsmod_.hovering.tile)) {
             for (int i = 0; i < _bsmod_.selected_tiles.count; i++) {
                 int id = *(int*)bs_fetchUnit(&_bsmod_.selected_tiles, i);

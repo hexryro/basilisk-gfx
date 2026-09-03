@@ -2623,7 +2623,7 @@ static void _bs_nameQueue(bs_Object* object, const char* name) {
     int name_length = strlen(name);
     //object->queue->flags |= BS_QUEUE_IS_NAMED;
 
-    bsi_nameHandleN(object->queue->queue, VK_OBJECT_TYPE_QUEUE, name, name_length);
+    //bsi_nameHandleN(object->queue->queue, VK_OBJECT_TYPE_QUEUE, name, name_length);
 
     for (int i = 0; i < object->queue->head.swaps_count; i++) {
         if (object->queue->_[i].fence)

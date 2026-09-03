@@ -307,7 +307,7 @@ void onContextMenuTick(bs_Context* context) {
     bsgfx_computeContextCamera();
     basilisk_instantiateContextMenuUI(context);
 
-    if (bs_leftClickOnce()) {
+    if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
         //hideContextMenuUI();
     }
 

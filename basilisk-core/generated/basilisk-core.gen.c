@@ -4129,127 +4129,28 @@ bs_vec2 bs_screenCursorPosition()
     return next.bs_screenCursorPosition();
 }
 
-bool bs_middleClick()
-{
-    return next.bs_middleClick();
-}
-
-bool bs_middleClickOnce()
-{
-    return next.bs_middleClickOnce();
-}
-
-bool bs_middleClickUpOnce()
-{
-    return next.bs_middleClickUpOnce();
-}
-
-bool bs_leftClick()
-{
-    return next.bs_leftClick();
-}
-
-bool bs_rightClick()
-{
-    return next.bs_rightClick();
-}
-
-bool bs_rightClickOnce()
-{
-    return next.bs_rightClickOnce();
-}
-
-bool bs_leftClickOnce()
-{
-    return next.bs_leftClickOnce();
-}
-
-bool bs_rightClickUpOnce()
-{
-    return next.bs_rightClickUpOnce();
-}
-
-bool bs_leftClickUpOnce()
-{
-    return next.bs_leftClickUpOnce();
-}
-
-bool bs_contextMiddleClick(
-    bs_Context* context)
-{
-    return next.bs_contextMiddleClick(context);
-}
-
-bool bs_contextMiddleClickOnce(
-    bs_Context* context)
-{
-    return next.bs_contextMiddleClickOnce(context);
-}
-
-bool bs_contextMiddleClickUpOnce(
-    bs_Context* context)
-{
-    return next.bs_contextMiddleClickUpOnce(context);
-}
-
-bool bs_contextLeftClick(
-    bs_Context* context)
-{
-    return next.bs_contextLeftClick(context);
-}
-
-bool bs_contextRightClick(
-    bs_Context* context)
-{
-    return next.bs_contextRightClick(context);
-}
-
-bool bs_contextRightClickOnce(
-    bs_Context* context)
-{
-    return next.bs_contextRightClickOnce(context);
-}
-
-bool bs_contextLeftClickOnce(
-    bs_Context* context)
-{
-    return next.bs_contextLeftClickOnce(context);
-}
-
-bool bs_contextRightClickUpOnce(
-    bs_Context* context)
-{
-    return next.bs_contextRightClickUpOnce(context);
-}
-
-bool bs_contextLeftClickUpOnce(
-    bs_Context* context)
-{
-    return next.bs_contextLeftClickUpOnce(context);
-}
-
-bool bs_keyDown(
+bool bs_inputDown(
     bs_U32 code)
 {
-    return next.bs_keyDown(code);
+    return next.bs_inputDown(code);
 }
 
-bool bs_keyHeld(
+bool bs_inputHeld(
     bs_U32 code)
 {
-    return next.bs_keyHeld(code);
+    return next.bs_inputHeld(code);
 }
 
-bool bs_keyDownOnce(
+bool bs_inputDownOnce(
     bs_U32 code)
 {
-    return next.bs_keyDownOnce(code);
+    return next.bs_inputDownOnce(code);
 }
 
-bool bs_keyUpOnce(
+bool bs_inputUpOnce(
     bs_U32 code)
 {
-    return next.bs_keyUpOnce(code);
+    return next.bs_inputUpOnce(code);
 }
 
 bool bs_charDown(
@@ -4270,32 +4171,25 @@ bool bs_charUpOnce(
     return next.bs_charUpOnce(c);
 }
 
-bool bs_contextKeyDown(
+bool bs_contextInputDown(
     bs_Context* context, 
     bs_U32 code)
 {
-    return next.bs_contextKeyDown(context, code);
+    return next.bs_contextInputDown(context, code);
 }
 
-bool bs_contextKeyHeld(
+bool bs_contextInputDownOnce(
     bs_Context* context, 
     bs_U32 code)
 {
-    return next.bs_contextKeyHeld(context, code);
+    return next.bs_contextInputDownOnce(context, code);
 }
 
-bool bs_contextKeyDownOnce(
+bool bs_contextInputUpOnce(
     bs_Context* context, 
     bs_U32 code)
 {
-    return next.bs_contextKeyDownOnce(context, code);
-}
-
-bool bs_contextKeyUpOnce(
-    bs_Context* context, 
-    bs_U32 code)
-{
-    return next.bs_contextKeyUpOnce(context, code);
+    return next.bs_contextInputUpOnce(context, code);
 }
 
 bool bs_contextCharDown(

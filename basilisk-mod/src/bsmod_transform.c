@@ -99,7 +99,7 @@ BSMODAPI void _bsmod_snapPrimitive() {
 			bs_vec3 previous_scale = raw_primitive->scale;
 
 			bs_mat4 transform;
-			if (bs_keyDown(BS_KEY_LEFT_CONTROL)) {
+			if (bs_inputDown(BS_KEY_LEFT_CONTROL)) {
 				bsgfx_RawPrimitive* closest_primitive = bsgfx_getRaw(BSGFX_TYPE_PRIMITIVE, _bsmod_.hovering.closest_primitive);
 
 				bs_mat4 m = bsgfx_primitiveOrigin(closest_primitive, _bsmod_.hovering.closest_vertex);
@@ -108,7 +108,7 @@ BSMODAPI void _bsmod_snapPrimitive() {
 				bs_m4MulV3(&m, &BS_V3(0.0, 0.0, 0.0), &target);
 
 				float dist = bs_v3Distance(&raw_primitive->position, &target);
-				if (bs_keyDown(BS_KEY_LEFT_SHIFT)) {
+				if (bs_inputDown(BS_KEY_LEFT_SHIFT)) {
 					bs_vec3 v1 = raw_primitive->position;
 					bs_vec3 v2 = target;
 					bs_vec4 q;
@@ -135,8 +135,8 @@ BSMODAPI void _bsmod_snapPrimitive() {
 
 			bsgfx_instantiate(bsgfx_subtypes()[BSGFX_SUBTYPE_PRIMITIVE_BOX], &transform, sizeof(bs_mat4), BSGFX_ID_SELECTED | BSGFX_ID_INSTANCE_TYPE_MESH | BSGFX_ID_HIGHLIGHT | BSGFX_ID_IS_PRIMITIVE, 0, 0, 0);
 
-			if (bs_keyDown(BS_KEY_LEFT_CONTROL)) {
-				if (!bs_leftClickOnce()) {
+			if (bs_inputDown(BS_KEY_LEFT_CONTROL)) {
+				if (!bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
 					raw_primitive->position = previous_position;
 					raw_primitive->rotation = previous_rotation;
 					raw_primitive->scale = previous_scale;
@@ -257,7 +257,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 	bs_m4Rotate(&transform, &rotation, &transform);
 	bs_m4Scale(&transform, &scale, &transform);
 
-	if (bs_leftClickUpOnce() && _bsmod_.axis != -1) {
+	if (bs_inputDown(BS_LEFT_MOUSE_BUTTON) && _bsmod_.axis != -1) {
 		_bsmod_saveTypeN(type, NULL, 0);
 
 		_bsmod_.axis = -1;
@@ -380,7 +380,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 	}
 
 	if (closest_z != BS_FLT_MAX) {
-		if (bs_leftClickOnce()) {
+		if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
 			_bsmod_.ui_blocked = true;
 			_bsmod_.axis = closest_axis;
 			start_coordinate = _bsmod_worldToScreenCoords(origin, 1.0);
@@ -394,7 +394,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 
 	//bsgfx_instancePoint(px1, BS_YELLOW, 16.0);
 	//int cone_subtype = bsgfx_subtypes()[BSGFX_SUBTYPE_CONE_MESH];
-	//if (bs_leftClickOnce() && _bsmod_.hovering.subtype == cone_subtype) {
+	//if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON) && _bsmod_.hovering.subtype == cone_subtype) {
 	//	pressed_cursor = cursor;
 	//	int new_axis = _bsmod_.hovering.instance_id - editor_cone_offset;
 	//	if (new_axis >= 0 && new_axis < 3)
@@ -403,7 +403,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 	static float last_angle = 0.0f;
 
 
-	if (rotation_offset != -1 && bs_keyDownOnce(BS_KEY_ALT)) {
+	if (rotation_offset != -1 && bs_inputDownOnce(BS_KEY_ALT)) {
 		bs_vec2 up = BS_V2(0.0, 1.0);
 		bs_vec2 diff = BS_V2_SUB(cursor, start_coordinate.xy);
 		bs_v2Normalize(&BS_V2(diff.x, diff.y), &diff);
@@ -428,7 +428,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 	   /**
 	    Rotate
 	    */
-		if (rotation_offset != -1 && bs_keyDown(BS_KEY_ALT)) {
+		if (rotation_offset != -1 && bs_inputDown(BS_KEY_ALT)) {
 
 			bs_vec2 up = BS_V2(0.0, 1.0);
 			bs_vec2 diff = BS_V2_SUB(cursor, start_coordinate.xy);
@@ -507,7 +507,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 
 			float scales[3] = { BSGFX_TILE_SIZE.x, BSGFX_TILE_SIZE.y, BSGFX_TILE_SIZE.y };
 
-			if (bs_keyDown(BS_KEY_LEFT_CONTROL)) {
+			if (bs_inputDown(BS_KEY_LEFT_CONTROL)) {
 				for (int j = 0; j < 3; j++) {
 					float move_tiles = (directions[_bsmod_.axis].a[j] * -d / scales[j]) / 2.0f;
 					for (int i = 0; i < _bsmod_.selected_ids.count; i++) {
@@ -521,7 +521,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 				}
 			}
 			else if (bs_abs(d) > 0.5f) {
-				if (scale_offset != -1 && bs_keyDown(BS_KEY_LEFT_SHIFT)) {
+				if (scale_offset != -1 && bs_inputDown(BS_KEY_LEFT_SHIFT)) {
 					float move_tiles = (directions[_bsmod_.axis].a[_bsmod_.axis] * -d / scales[_bsmod_.axis]) / 2.0f;
 
 					tile_remainder[_bsmod_.axis] += move_tiles;

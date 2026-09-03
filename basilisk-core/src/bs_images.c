@@ -262,11 +262,14 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
         .samples = VK_SAMPLE_COUNT_1_BIT,
     };
+    bs_U32 num_swaps = image->flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
 
-    vk_result = vkCreateImage(_bs_instance_->device, &image_ci, NULL, &image->_->vk_image);
-    if (vk_result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkCreateImage", vk_result, "(%d, %d)", source_id, id);
-        return _bs_convertVulkanResult(vk_result);
+    for (int i = 0; i < num_swaps; i++) {
+        vk_result = vkCreateImage(_bs_instance_->device, &image_ci, NULL, &image->_[i].vk_image);
+        if (vk_result != VK_SUCCESS) {
+            BS_WARN_VULKAN_ERROR("vkCreateImage", vk_result, "(%d, %d)", source_id, id);
+            return _bs_convertVulkanResult(vk_result);
+        }
     }
 
     VkMemoryRequirements mem_req;
@@ -288,42 +291,44 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
         .memoryTypeIndex = memory_type,
     };
 
-    vk_result = vkAllocateMemory(_bs_instance_->device, &alloc_i, NULL, &image->_->vk_memory);
-    if (vk_result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkAllocateMemory", result, "(%d, %d)", source_id, id);
-        return _bs_convertVulkanResult(vk_result);
-    }
+    for (int i = 0; i < num_swaps; i++) {
+        vk_result = vkAllocateMemory(_bs_instance_->device, &alloc_i, NULL, &image->_[i].vk_memory);
+        if (vk_result != VK_SUCCESS) {
+            BS_WARN_VULKAN_ERROR("vkAllocateMemory", result, "(%d, %d)", source_id, id);
+            return _bs_convertVulkanResult(vk_result);
+        }
 
-    vk_result = vkBindImageMemory(_bs_instance_->device, image->_->vk_image, image->_->vk_memory, 0);
-    if (vk_result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkBindImageMemory", result, "(%d, %d)", source_id, id);
-        return _bs_convertVulkanResult(vk_result);
-    }
+        vk_result = vkBindImageMemory(_bs_instance_->device, image->_[i].vk_image, image->_[i].vk_memory, 0);
+        if (vk_result != VK_SUCCESS) {
+            BS_WARN_VULKAN_ERROR("vkBindImageMemory", result, "(%d, %d)", source_id, id);
+            return _bs_convertVulkanResult(vk_result);
+        }
 
-   /**
-    Create Vulkan image view
-    */
-    VkImageViewType view_type;
-    // todo 1d, 3d
-    if (image->num_indices > 0)
-        view_type = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
-    else
-        view_type = VK_IMAGE_VIEW_TYPE_2D;
+        /**
+         Create Vulkan image view
+         */
+        VkImageViewType view_type;
+        // todo 1d, 3d
+        if (image->num_indices > 0)
+            view_type = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+        else
+            view_type = VK_IMAGE_VIEW_TYPE_2D;
 
-    VkImageViewCreateInfo image_view_ci = {
-        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-        .image = image->_->vk_image,
-        .viewType = view_type,
-        .format = (VkFormat)image->format,
-        .subresourceRange.aspectMask = image->aspect_flags,
-        .subresourceRange.levelCount = 1,
-        .subresourceRange.layerCount = image->num_indices == 0 ? 1 : image->num_indices,
-    };
+        VkImageViewCreateInfo image_view_ci = {
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            .image = image->_[i].vk_image,
+            .viewType = view_type,
+            .format = (VkFormat)image->format,
+            .subresourceRange.aspectMask = image->aspect_flags,
+            .subresourceRange.levelCount = 1,
+            .subresourceRange.layerCount = image->num_indices == 0 ? 1 : image->num_indices,
+        };
 
-    vk_result = vkCreateImageView(_bs_instance_->device, &image_view_ci, NULL, &image->_->vk_image_view);
-    if (vk_result != VK_SUCCESS) {
-        BS_WARN_VULKAN_ERROR("vkCreateImageView", result, "(%d, %d)", source_id, id);
-        return _bs_convertVulkanResult(vk_result);
+        vk_result = vkCreateImageView(_bs_instance_->device, &image_view_ci, NULL, &image->_[i].vk_image_view);
+        if (vk_result != VK_SUCCESS) {
+            BS_WARN_VULKAN_ERROR("vkCreateImageView", result, "(%d, %d)", source_id, id);
+            return _bs_convertVulkanResult(vk_result);
+        }
     }
 
     return BS_RESULT_OK;

@@ -152,7 +152,7 @@ void _bsgfx_instanceSpawners() {
             //if (!_bsgfx_quickMenuEnabled())
             //    _bsgfx_instanceHint(bs_windowCursorPosition(bs_scope()->context), name);
 
-            if (bs_leftClickOnce()) {
+            if (bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
                 bsmod_select(BSGFX_TYPE_SPAWNER, i);
             }
 

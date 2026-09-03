@@ -101,10 +101,8 @@ static void basilisk_hiResSubpass0(bs_RendererScope* scope) {
 }
 
 void basilisk_pipeline(bs_Queue* queue, bs_Renderer* renderer, bs_RGBA clear_color) {
-    if (!bs_exists(BSGFX_QUEUES, BSGFX_QUEUE_GRAPHICS))
-        return;
-
     _clear_color_ = clear_color;
+
     bs_acquire();
 
     if (bs_resetQueue(queue) == BS_RESULT_OK) {
@@ -117,20 +115,16 @@ void basilisk_pipeline(bs_Queue* queue, bs_Renderer* renderer, bs_RGBA clear_col
             bs_acquisitionSemaphore(),
         };
         int wait_semaphores_count = sizeof(wait_semaphores) / sizeof(*wait_semaphores);
+
         bs_pushQueue(queue, wait_semaphores_count, wait_semaphores);
+        bs_stall(queue);
     }
-    bs_stall(queue);
 
-    bs_Queue* user_queue = NULL;
-    if (bsgfx_callbacks()->queue)
-        user_queue = bsgfx_callbacks()->queue();
-
-    bs_Queue* last_queue = user_queue ? user_queue : queue;
     bs_Queue* wait_queues[] = {
-        last_queue
+        queue
     };
 
-    bs_present(last_queue, wait_queues, sizeof(wait_queues) / sizeof(*wait_queues));
+    bs_present(queue, wait_queues, sizeof(wait_queues) / sizeof(*wait_queues));
 }
 
 bs_Object* basilisk_createHiResRenderer(bs_Context* context, int id) {

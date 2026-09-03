@@ -297,7 +297,7 @@ static void _bsmod_instanceDraggingIcon() {
         return;
     }
 
-    if (bs_leftClickUpOnce()) {
+    if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
         bs_infoF("Drop\n");
         _bsmod_.dragging_id = -1;
         _bsmod_.dragging_object_id = 0;
@@ -344,12 +344,12 @@ BSMODAPI void _bsmod_instanceUI() {
     static bool right_clicked;
     static bs_vec2 position;
 
-    if (bs_rightClickUpOnce()) {
+    if (bs_inputUpOnce(BS_RIGHT_MOUSE_BUTTON)) {
         right_clicked = true;
         position = bs_windowCursorPosition(bs_scope()->context);
     }
 
-    if (bs_leftClickUpOnce() || bs_middleClickOnce())
+    if (bs_inputDown(BS_LEFT_MOUSE_BUTTON) || bs_inputDown(BS_MIDDLE_MOUSE_BUTTON))
         right_clicked = false;
 
     if (right_clicked) {
@@ -365,14 +365,14 @@ BSMODAPI void _bsmod_instanceUI() {
             _bsmod_instanceTileContextMenu(p, s);
     }
 
-    if (bs_keyDown(BS_KEY_ALT) && !bs_keyDown(BS_KEY_LEFT_CONTROL)) {
-        if (bs_keyDownOnce(BS_KEY_1)) {
+    if (bs_inputDown(BS_KEY_ALT) && !bs_inputDown(BS_KEY_LEFT_CONTROL)) {
+        if (bs_inputDownOnce(BS_KEY_1)) {
             _bsmod_instance_grid_menu_ = true;
 
         }
 
         for (int i = BS_KEY_2; i < BS_KEY_9; i++) {
-            if (bs_keyDownOnce(i)) {
+            if (bs_inputDownOnce(i)) {
                 _bsmod_instance_grid_menu_ = false;
                 //bs_disableUserInputs(false);
             }

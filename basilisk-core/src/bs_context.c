@@ -481,8 +481,8 @@ static void _bs_prepareSwapchain() {
     VkResult result;
 
     const VkPresentModeKHR modes[] = {
-        VK_PRESENT_MODE_IMMEDIATE_KHR,
         VK_PRESENT_MODE_FIFO_KHR,
+        VK_PRESENT_MODE_IMMEDIATE_KHR,
         VK_PRESENT_MODE_MAILBOX_KHR,
         VK_PRESENT_MODE_FIFO_RELAXED_KHR,
 
@@ -550,6 +550,8 @@ static void _bs_prepareSwapchain() {
         _bs_warnF("Failed to create swapchain for window \"%s\"", _bs_scope_.context->title);
         return;
     }
+    
+    bsi_nameHandle(_bs_scope_.context->swapchain, VK_OBJECT_TYPE_SWAPCHAIN_KHR, _bs_scope_.context->title);
 
     /**
      Swapchain images
@@ -606,74 +608,8 @@ static void _bs_prepareSwapchain() {
    * Window
    *============================================================================*/
 
-BSAPI bs_Result _bs_timeZoneBias(int* out) {
-#ifdef _WIN32
-	TIME_ZONE_INFORMATION info = { 0 };
-
-	DWORD time_zone_id = 0;
-	if ((time_zone_id = GetTimeZoneInformation(&info)) == TIME_ZONE_ID_INVALID) {
-		_bs_warnF("GetTimeZoneInformation failed (GetLastError() = %d)", GetLastError());
-		return _bs_convertWin32Error(GetLastError());
-	}
-
-	*out = info.Bias / 60;
-
-	return BS_RESULT_OK;
-#else
-	return BS_RESULT_NOT_SUPPORTED;
-#endif
-}
-
-BSAPI bs_I64 _bs_totalSeconds(const bs_DateTime* date_time) {
-	return (bs_I64)mktime(&(struct tm) {
-		.tm_year = date_time->years - 1900,
-		.tm_mon = date_time->months - 1,
-		.tm_mday = date_time->days,
-		.tm_hour = date_time->hours,
-		.tm_min = date_time->minutes,
-		.tm_sec = date_time->seconds,
-	});
-}
-
-BSAPI bs_DateTime _bs_dateTime() {
-#ifdef _WIN32
-    SYSTEMTIME time;
-    GetSystemTime(&time);
-
-    return (bs_DateTime) {
-        .years = time.wYear,
-        .months = time.wMonth,
-        .days = time.wDay,
-        .hours = time.wHour,
-        .minutes = time.wMinute,
-        .seconds = time.wSecond,
-        .milliseconds = time.wMilliseconds,
-        .day_of_week = time.wDayOfWeek
-    };
-#else
-    struct timespec ts;
-    timespec_get(&ts, TIME_UTC);
-
-    time_t t = ts.tv_sec;
-    struct tm tm;
-
-    gmtime_r(&t, &tm);
-
-    return (bs_DateTime) {
-        .years = tm.tm_year + 1900,
-        .months = tm.tm_mon + 1,
-        .days = tm.tm_mday,
-        .hours = tm.tm_hour,
-        .minutes = tm.tm_min,
-        .seconds = tm.tm_sec,
-        .milliseconds = (int)(ts.tv_nsec / 1000000),
-        .day_of_week = tm.tm_wday
-    };
-#endif
-}
-
-BSAPI bool _bs_isLaterThan(const bs_DateTime* a, const bs_DateTime* b) {
-	return _bs_totalSeconds(a) - _bs_totalSeconds(b) > 0;
+BSAPI void _bs_titleWindowN(bs_Context* context, char* name, int name_length) {
+    context->title = name; // todo
 }
 
 BSAPI void _bs_setCursor(bs_CursorIcon icon) {
@@ -850,116 +786,99 @@ BSAPI bs_ivec2 _bs_windowPosition(bs_Context* context) {
 #endif
 }
 
+
+
+  /*==============================================================================
+   * Inputs
+   *============================================================================*/
+
+const bool separate_message_thread = false; // temp
+
+
+static inline void bs_setBit(long A[], unsigned int k) {
+    InterlockedOr(&A[k / 32U], 1L << (k % 32U));
+}
+
+static inline void bs_clearBit(long A[], unsigned int k) {
+    InterlockedAnd(&A[k / 32U], ~(1L << (k % 32U)));
+}
+
+static inline int bs_getBit(long A[], unsigned int k) {
+    long value = InterlockedCompareExchange(&A[k / 32U], 0, 0);
+    return (value & (1L << (k % 32U))) != 0;
+}
+
+static inline int bs_testBit(long A[], unsigned int k) {
+    long value = InterlockedCompareExchange(&A[k / 32U], 0, 0);
+    return (value & (1L << (k % 32U))) != 0;
+}
+
+/*
+static inline void bs_setBit(bs_I16 A[], unsigned int k) {
+    InterlockedOr16(&A[k / 16U], (bs_I16)(1U << (k % 16U)));
+}
+
+static inline void bs_clearBit(bs_I16 A[], unsigned int k) {
+    InterlockedAnd16(&A[k / 16U], (bs_I16)~(1U << (k % 16U)));
+}
+
+static inline int bs_getBit(bs_I16 A[], unsigned int k) {
+    bs_I16 value = InterlockedCompareExchange16(&A[k / 16U], 0, 0);
+
+    return (value & (bs_I16)(1U << (k % 16U))) != 0;
+}
+
+static inline int bs_testBit(bs_I16 A[], unsigned int k) {
+    bs_I16 value = InterlockedCompareExchange16(&A[k / 16U], 0, 0);
+
+    return (value & (bs_I16)(1U << (k % 16U))) != 0;
+}
+*/
+
+
 BSAPI bs_vec2 _bs_screenCursorPosition() {
 	return _bs_instance_->screen_cursor;
 }
 
 BSAPI bool _bs_contextKeyHeld(bs_Context* context, bs_U32 code) {
-    return code > BS_KEYS_COUNT ? false : BS_GET_BIT(context->io.hold_keys, code);
+    return false;
 }
 
-BSAPI bool _bs_contextKeyDown(bs_Context* context, bs_U32 code) {
-    return code > BS_KEYS_COUNT ? false : BS_GET_BIT(context->io.keys, code);
+BSAPI bool _bs_contextInputDown(bs_Context* context, bs_U32 code) {
+    return bs_getBit(context->io.inputs_down, code);
 }
 
-BSAPI bool _bs_contextKeyDownOnce(bs_Context* context, bs_U32 code) {
-    return code > BS_KEYS_COUNT ? false : (BS_GET_BIT(context->io.keys, code) && !BS_GET_BIT(context->io.keys_old, code));
+BSAPI bool _bs_contextInputDownOnce(bs_Context* context, bs_U32 code) {
+    return bs_getBit(context->io.inputs_down_once, code);
 }
 
-BSAPI bool _bs_contextKeyUpOnce(bs_Context* context, bs_U32 code) {
-    return code > BS_KEYS_COUNT ? false : (!BS_GET_BIT(context->io.keys, code) && BS_GET_BIT(context->io.keys_old, code));
+BSAPI bool _bs_contextInputUpOnce(bs_Context* context, bs_U32 code) {
+    return bs_getBit(context->io.inputs_up_once, code);
 }
 
 BSAPI bool _bs_contextCharDown(bs_Context* context, unsigned char code) {
-    return BS_GET_BIT(context->io.chars, code);
+    return false;
 }
 
 BSAPI bool _bs_contextCharDownOnce(bs_Context* context, unsigned char code) {
-    return code > BS_KEY_BYTES_COUNT ? false : (BS_GET_BIT(context->io.chars, code) && !BS_GET_BIT(context->io.chars_old, code));
+    return false;
 }
 
 BSAPI bool _bs_contextCharUpOnce(bs_Context* context, unsigned char code) {
-    return code > BS_KEY_BYTES_COUNT ? false : (!BS_GET_BIT(context->io.chars, code) && BS_GET_BIT(context->io.chars_old, code));
+    return false;
 }
 
-BSAPI bool _bs_keyHeld(bs_U32 code) { return _bs_contextKeyHeld(_bs_scope_.context, code); }
-BSAPI bool _bs_keyDown(bs_U32 code) { return _bs_contextKeyDown(_bs_scope_.context, code); }
-BSAPI bool _bs_keyDownOnce(bs_U32 code) { return _bs_contextKeyDownOnce(_bs_scope_.context, code); }
-BSAPI bool _bs_keyUpOnce(bs_U32 code) { return _bs_contextKeyUpOnce(_bs_scope_.context, code); }
+BSAPI bool _bs_inputHeld(bs_U32 code) { return _bs_contextKeyHeld(_bs_scope_.context, code); }
+BSAPI bool _bs_inputDown(bs_U32 code) { return _bs_contextInputDown(_bs_scope_.context, code); }
+BSAPI bool _bs_inputDownOnce(bs_U32 code) { return _bs_contextInputDownOnce(_bs_scope_.context, code); }
+BSAPI bool _bs_inputUpOnce(bs_U32 code) { return _bs_contextInputUpOnce(_bs_scope_.context, code); }
+
 BSAPI bool _bs_charDown(unsigned char code) { return _bs_contextCharDown(_bs_scope_.context, code); }
 BSAPI bool _bs_charDownOnce(unsigned char code) { return _bs_contextCharDownOnce(_bs_scope_.context, code); }
 BSAPI bool _bs_charUpOnce(unsigned char code) { return _bs_contextCharUpOnce(_bs_scope_.context, code); }
 
-BSAPI bool _bs_contextMiddleClick(bs_Context* context) { return context->io.middle_clicked; }
-BSAPI bool _bs_contextMiddleClickOnce(bs_Context* context) { return context->io.middle_clicked && !context->io.middle_clicked_last; }
-BSAPI bool _bs_contextMiddleClickUpOnce(bs_Context* context) { return !context->io.middle_clicked && context->io.middle_clicked_last; }
-BSAPI bool _bs_contextLeftClick(bs_Context* context) { return context->io.left_clicked; }
-BSAPI bool _bs_contextRightClick(bs_Context* context) { return context->io.right_clicked; }
-BSAPI bool _bs_contextRightClickOnce(bs_Context* context) { return context->io.right_clicked && !context->io.right_clicked_last; }
-BSAPI bool _bs_contextLeftClickOnce(bs_Context* context) { return context->io.left_clicked && !context->io.left_clicked_last; }
-BSAPI bool _bs_contextRightClickUpOnce(bs_Context* context) { return !context->io.right_clicked && context->io.right_clicked_last; }
-BSAPI bool _bs_contextLeftClickUpOnce(bs_Context* context) { return !context->io.left_clicked && context->io.left_clicked_last; }
-
-BSAPI bool _bs_middleClick() { return _bs_contextMiddleClick(_bs_scope_.context); }
-BSAPI bool _bs_middleClickOnce() { return _bs_contextMiddleClickOnce(_bs_scope_.context); }
-BSAPI bool _bs_middleClickUpOnce() { return _bs_contextMiddleClickUpOnce(_bs_scope_.context); }
-BSAPI bool _bs_leftClick() { return _bs_contextLeftClick(_bs_scope_.context); }
-BSAPI bool _bs_rightClick() { return _bs_contextRightClick(_bs_scope_.context); }
-BSAPI bool _bs_rightClickOnce() { return _bs_contextRightClickOnce(_bs_scope_.context); }
-BSAPI bool _bs_leftClickOnce() { return _bs_contextLeftClickOnce(_bs_scope_.context); }
-BSAPI bool _bs_rightClickUpOnce() { return _bs_contextRightClickUpOnce(_bs_scope_.context); }
-BSAPI bool _bs_leftClickUpOnce() { return _bs_contextLeftClickUpOnce(_bs_scope_.context); }
-
 BSAPI int _bs_scroll() {
 	return _bs_scope_.context->io.scroll;
-}
-
-BSAPI bs_Timer _bs_timer() {
-    bs_Timer timer = { 0 };
-
-#ifdef _WIN32
-    QueryPerformanceFrequency(&timer.ticks_per_second);
-    QueryPerformanceCounter(&timer.last_tick_count);
-#else
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-
-    timer.last_tick_count.quad_part =
-        (long long)ts.tv_sec * 1000000000LL +
-        (long long)ts.tv_nsec;
-
-    timer.ticks_per_second.quad_part = 1000000000LL;
-#endif
-
-    return timer;
-}
-
-BSAPI void _bs_checkTimer(bs_Timer* timer) {
-#ifdef _WIN32
-	QueryPerformanceCounter(&timer->tick_count);
-	bs_U64 elapsed_ticks = timer->tick_count.quad_part - timer->last_tick_count.quad_part;
-	timer->microseconds = (elapsed_ticks * 1000000) / timer->ticks_per_second.quad_part;
-
-#else
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-
-    timer->tick_count.quad_part =
-        (long long)ts.tv_sec * 1000000000LL +
-        (long long)ts.tv_nsec;
-
-    long long elapsed =
-        timer->tick_count.quad_part -
-        timer->last_tick_count.quad_part;
-
-    timer->microseconds = (bs_U64)(elapsed / 1000LL);
-#endif
-
-    timer->seconds = timer->microseconds / 1000000.0;
-}
-
-BSAPI void _bs_titleWindowN(bs_Context* context, char* name, int name_length) {
-    context->title = name; // todo
 }
 
 BSAPI bool _bs_inFixedTick() {
@@ -972,12 +891,12 @@ BSAPI void _bs_setTargetFramerate(int fps) {
 
 static void _bs_resetIO(bs_IO* io) {
     io->scroll_old = io->scroll;
-    io->left_clicked_last = io->left_clicked;
-    io->right_clicked_last = io->right_clicked;
-    io->middle_clicked_last = io->middle_clicked;
-    memset(io->hold_keys, 0, sizeof(io->hold_keys));
-    memcpy(io->keys_old, io->keys, sizeof(io->keys_old));
-    memcpy(io->chars_old, io->chars, sizeof(io->chars_old));
+//    io->left_clicked_last = io->left_clicked;
+//    io->right_clicked_last = io->right_clicked;
+//    io->middle_clicked_last = io->middle_clicked;
+//    memset(io->hold_keys, 0, sizeof(io->hold_keys));
+//    memcpy(io->keys_old, io->keys, sizeof(io->keys_old));
+//    memcpy(io->chars_old, io->chars, sizeof(io->chars_old));
 }
 
 static _Thread_local bool _hide_menu_windows_ = false;
@@ -994,71 +913,223 @@ static void _bs_hideMenuWindows(bs_List* contexts) {
 
 BSAPI void _bs_tickContext(bs_Context* context, bs_ContextTickFunction tick) {
 
-    if (BS_GET_BIT(context->io.keys, BS_KEY_ALT) && BS_GET_BIT(context->io.keys, BS_KEY_F4))
-        _bs_exit();
+   // if (bs_getBit(context->io.keys, BS_KEY_ALT) && bs_getBit(context->io.keys, BS_KEY_F4))
+   //     _bs_exit();
 
     context->active = context->hwnd == GetForegroundWindow();
-
-    if (_bs_leftClickOnce() || _bs_rightClickOnce() || _bs_middleClickOnce()) {
-     //   bs_logF("Now capturing \"%s\"", context->title);
-     //   SetCapture(context->hwnd);
-    }
-    if (_bs_leftClickUpOnce() || _bs_rightClickUpOnce() || _bs_middleClickUpOnce()) {
-     //   bs_logF("No longer capturing \"%s\"", context->title);
-     //   ReleaseCapture();
-    }
 
     POINT p = { _bs_instance_->screen_cursor.x, _bs_instance_->screen_cursor.y };
     if (ScreenToClient(context->hwnd, &p))
         context->cursor = BS_V2(p.x, p.y);
+    
+    if (separate_message_thread) {
+        for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
+            context->io.inputs_up_once[i] = InterlockedExchange(&context->io.input_up_events[i], 0);
+        }
+
+        for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
+            context->io.inputs_down_last[i] = context->io.inputs_down[i];
+            context->io.inputs_down_once[i] = InterlockedExchange(&context->io.input_down_events[i], 0);
+        }
+
+    } else {
+        for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
+            context->io.inputs_up_once[i] = context->io.input_up_events[i];
+            context->io.input_up_events[i] = 0;
+        }
+
+        for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
+            context->io.inputs_down_last[i] = context->io.inputs_down[i];
+            context->io.inputs_down_once[i] = context->io.input_down_events[i];
+            context->io.input_down_events[i] = 0;
+        }
+    }
+
+    for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
+        context->io.inputs_down[i] |= context->io.inputs_down_once[i];
+    }
+    //context->io.scroll = 0;
 
     if (tick)
         tick(context);
 
+    for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
+        context->io.inputs_down[i] &= ~context->io.inputs_up_once[i];
+    }
+
     _bs_instance_->time_old = _bs_instance_->time;
-    _bs_resetIO(&context->io);
+    //_bs_resetIO(&context->io);
+}
+
+static void _bs_renderTick(bs_Callback fixed_tick) {
+    //  _bs_checkTimer(&_bs_instance_->timer);
+    double frame_start = _bs_instance_->timer.seconds;
+
+    if (fixed_tick) {
+        _bs_instance_->in_fixed = true;
+        for (int i = 0; _bs_instance_->advance || (_bs_instance_->elapsed_time < _bs_instance_->time && i < 200 && !_bs_instance_->paused); i++) {
+            _bs_instance_->new_time_index = !_bs_instance_->new_time_index;
+            _bs_instance_->last_fixed_update_times[_bs_instance_->new_time_index] = _bs_instance_->fixed_time;
+
+            _bs_instance_->delta_time = _bs_instance_->fixed_time;
+            fixed_tick();
+            _bs_instance_->elapsed_time += _bs_instance_->fixed_time;
+            _bs_instance_->advance = false;
+        }
+    }
+
+    _bs_checkTimer(&_bs_instance_->timer);
+    _bs_instance_->time = _bs_instance_->timer.seconds;
+
+    float newer_time = _bs_instance_->last_fixed_update_times[_bs_instance_->new_time_index];
+    float older_time = _bs_instance_->last_fixed_update_times[!_bs_instance_->new_time_index];
+
+    if (newer_time != older_time)
+        _bs_instance_->fixed_interpolation = (_bs_instance_->time - newer_time) / (newer_time - older_time);
+    else
+        _bs_instance_->fixed_interpolation = 1.0f;
+
+    _bs_instance_->delta_time = _bs_instance_->time - _bs_instance_->time_old;
+    _bs_instance_->in_fixed = false;
+
+    POINT p;
+    if (GetCursorPos(&p)) {
+        _bs_instance_->screen_cursor = BS_V2(p.x, p.y);
+    }
+
+    /**
+        Cache contexts
+        Should be improved maybe somehow
+        */
+    bs_List* object_sources = bs_objectSources();
+    static bs_List contexts = { .unit_size = sizeof(bs_Context*), .increment = 4 };
+    contexts.count = 0;
+
+    for (int i = 0; i < object_sources->count; i++) {
+        bs_ObjectSource* source = bs_fetchUnit(object_sources, i);
+        if (source->type != BS_OBJECT_CONTEXT)
+            continue;
+
+        for (int j = 0; j < source->ids_count; j++) {
+            if (!source->ids[j].object)
+                continue;
+
+            bs_pushBack(&contexts, &source->ids[j].object->context);
+        }
+    }
+
+   /**
+    Tick all contexts
+    */
+    for (int i = 0; i < contexts.count; i++) {
+        bs_Context* ctx = *(bs_Context**)_bs_fetchUnit(&contexts, i);
+
+        _bs_scope_.context = ctx;
+        _bs_tickContext(ctx, ctx->tick);
+        _bs_scope_.context = NULL;
+    }
+    _bs_checkTimer(&_bs_instance_->timer);
+
+    while ((_bs_instance_->timer.seconds - frame_start) < _bs_instance_->target_frame_time) {
+        Sleep(0);
+        _bs_checkTimer(&_bs_instance_->timer);
+    }
+}
+
+static void _bs_startRenderTick(bs_Callback fixed_tick) {
+    while (_bs_instance_->alive) {
+        _bs_renderTick(fixed_tick);
+    }
+}
+
+static void _bs_handleMessageAtomic(bs_List* contexts, bs_Context* context, MSG msg) {
+    switch (msg.message) {
+    case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
+ 
+    case WM_LBUTTONDOWN: 
+        SetCapture(context->hwnd);
+        bs_setBit(context->io.input_down_events, BS_LEFT_MOUSE_BUTTON);
+
+        if (context->window_type != BS_WINDOW_MENU)
+            _hide_menu_windows_ = true;
+        break;
+    case WM_LBUTTONUP:
+        ReleaseCapture();
+        bs_setBit(context->io.input_up_events, BS_LEFT_MOUSE_BUTTON);
+        break;
+
+    case WM_RBUTTONDOWN: 
+        SetCapture(context->hwnd);
+        bs_setBit(context->io.input_down_events, BS_RIGHT_MOUSE_BUTTON);
+        if (context->window_type != BS_WINDOW_MENU)
+            _hide_menu_windows_ = true;
+        break;
+    case WM_RBUTTONUP: 
+        ReleaseCapture();
+        bs_setBit(context->io.input_up_events, BS_RIGHT_MOUSE_BUTTON);
+        break;
+
+    case WM_MBUTTONDOWN: 
+        SetCapture(context->hwnd);
+        bs_setBit(context->io.input_down_events, BS_MIDDLE_MOUSE_BUTTON);
+        if (context->window_type != BS_WINDOW_MENU)
+            _hide_menu_windows_ = true;
+        break;
+    case WM_MBUTTONUP: 
+        ReleaseCapture();
+        bs_setBit(context->io.input_up_events, BS_MIDDLE_MOUSE_BUTTON);
+        break;
+
+    case WM_MOUSEWHEEL: {
+        context->io.scroll = (SHORT)HIWORD(msg.wParam) / 120.0;
+    } break;
+    case WM_CHAR: {
+     //   if (msg.wParam < BS_KEYS_COUNT)
+     //       bs_setBit(context->io.chars, (bs_U32)msg.wParam);
+    } break;
+    case WM_KEYDOWN: {
+        if (msg.wParam < BS_KEYS_COUNT)
+            bs_setBit(context->io.input_down_events, (bs_U32)msg.wParam);
+    } break;
+    case WM_KEYUP: {
+        if (msg.wParam < BS_KEYS_COUNT)
+            bs_setBit(context->io.input_up_events, (bs_U32)msg.wParam);
+       // if (msg.wParam < 256)
+       //     bs_clearBit(context->io.key_events, (bs_U32)msg.wParam);
+    } break;
+    case WM_SYSKEYDOWN: {
+        //if (msg.wParam < 256)
+        //    bs_setBit(context->io.key_events, (bs_U32)msg.wParam);
+    } break;
+    case WM_SYSKEYUP: {
+      // if (msg.wParam < 256)
+      //     bs_clearBit(context->io.key_events, (bs_U32)msg.wParam);
+    } break;
+    case WM_NCLBUTTONDOWN:
+    case WM_NCLBUTTONUP:
+    case WM_NCLBUTTONDBLCLK:
+    case WM_NCRBUTTONDOWN:
+    case WM_NCRBUTTONUP:
+    case WM_NCRBUTTONDBLCLK:
+    case WM_NCMBUTTONDOWN:
+    case WM_NCMBUTTONUP:
+    case WM_NCMBUTTONDBLCLK:
+        _hide_menu_windows_ = true;
+        break;
+    }
+
+    if (_hide_menu_windows_)
+        _bs_hideMenuWindows(contexts);
 }
 
 BSAPI void _bs_tick(bs_Callback fixed_tick) {
     _bs_instance_->alive = true;
     _bs_instance_->timer = _bs_timer();
 
+    if (separate_message_thread)
+        bs_createThread(_bs_startRenderTick, fixed_tick);
+
     while (_bs_instance_->alive) {
-        //  _bs_checkTimer(&_bs_instance_->timer);
-        double frame_start = _bs_instance_->timer.seconds;
-
-        if (fixed_tick) {
-            _bs_instance_->in_fixed = true;
-            for (int i = 0; _bs_instance_->advance || (_bs_instance_->elapsed_time < _bs_instance_->time && i < 200 && !_bs_instance_->paused); i++) {
-                _bs_instance_->new_time_index = !_bs_instance_->new_time_index;
-                _bs_instance_->last_fixed_update_times[_bs_instance_->new_time_index] = _bs_instance_->fixed_time;
-
-                _bs_instance_->delta_time = _bs_instance_->fixed_time;
-                fixed_tick();
-                _bs_instance_->elapsed_time += _bs_instance_->fixed_time;
-                _bs_instance_->advance = false;
-            }
-        }
-
-        _bs_checkTimer(&_bs_instance_->timer);
-        _bs_instance_->time = _bs_instance_->timer.seconds;
-
-        float newer_time = _bs_instance_->last_fixed_update_times[_bs_instance_->new_time_index];
-        float older_time = _bs_instance_->last_fixed_update_times[!_bs_instance_->new_time_index];
-
-        if (newer_time != older_time)
-            _bs_instance_->fixed_interpolation = (_bs_instance_->time - newer_time) / (newer_time - older_time);
-        else
-            _bs_instance_->fixed_interpolation = 1.0f;
-
-        _bs_instance_->delta_time = _bs_instance_->time - _bs_instance_->time_old;
-        _bs_instance_->in_fixed = false;
-
-        POINT p;
-        if (GetCursorPos(&p)) {
-            _bs_instance_->screen_cursor = BS_V2(p.x, p.y);
-        }
-
        /**
         Cache contexts
         Should be improved maybe somehow
@@ -1082,7 +1153,6 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
 
        /**
         Message loop
-        TODO: Find out if it all should be moved to wndproc
         */
         MSG msg;
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -1104,104 +1174,27 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
                 continue;
             }
 
-            context->io.scroll = 0;
-            memset(context->io.chars, 0, sizeof(context->io.chars));
-
-            switch (msg.message) {
-            case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
- 
-            case WM_LBUTTONDOWN: 
-                context->io.left_clicked = true;
-                if (context->window_type != BS_WINDOW_MENU)
-                    _hide_menu_windows_ = true;
-                break;
-            case WM_LBUTTONUP:
-                context->io.left_clicked = false; 
-                break;
-
-            case WM_RBUTTONDOWN: 
-                context->io.right_clicked = true; 
-                if (context->window_type != BS_WINDOW_MENU)
-                    _hide_menu_windows_ = true;
-                break;
-            case WM_RBUTTONUP: 
-                context->io.right_clicked = false; 
-                break;
-
-            case WM_MBUTTONDOWN: 
-                context->io.middle_clicked = true; 
-                if (context->window_type != BS_WINDOW_MENU)
-                    _hide_menu_windows_ = true;
-                break;
-            case WM_MBUTTONUP: 
-                context->io.middle_clicked = false; 
-                break;
-
-            case WM_MOUSEWHEEL: {
-                context->io.scroll = (SHORT)HIWORD(msg.wParam) / 120.0;
-            } break;
-            case WM_CHAR: {
-                if (msg.wParam < 256)
-                    BS_SET_BIT(context->io.chars, (bs_U32)msg.wParam);
-            } break;
-            case WM_KEYDOWN: {
-                if (msg.wParam < 256) {
-                    BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
-                    BS_SET_BIT(context->io.hold_keys, (bs_U32)msg.wParam);
-                }
-            } break;
-            case WM_KEYUP: {
-                if (msg.wParam < 256)
-                    BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
-            } break;
-            case WM_SYSKEYDOWN: {
-                if (msg.wParam < 256)
-                    BS_SET_BIT(context->io.keys, (bs_U32)msg.wParam);
-            } break;
-            case WM_SYSKEYUP: {
-                if (msg.wParam < 256)
-                    BS_CLEAR_BIT(context->io.keys, (bs_U32)msg.wParam);
-            } break;
-            case WM_NCLBUTTONDOWN:
-            case WM_NCLBUTTONUP:
-            case WM_NCLBUTTONDBLCLK:
-            case WM_NCRBUTTONDOWN:
-            case WM_NCRBUTTONUP:
-            case WM_NCRBUTTONDBLCLK:
-            case WM_NCMBUTTONDOWN:
-            case WM_NCMBUTTONUP:
-            case WM_NCMBUTTONDBLCLK:
-                _hide_menu_windows_ = true;
-                break;
-            }
-
-            if (_hide_menu_windows_)
-                _bs_hideMenuWindows(&contexts);
+            //if (!separate_message_thread)
+            _bs_handleMessageAtomic(&contexts, context, msg);
 
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
-        if (_hide_menu_windows_)
-            _bs_hideMenuWindows(&contexts);
-
-       /**
-        Tick all contexts
-        */
-        for (int i = 0; i < contexts.count; i++) {
-            bs_Context* ctx = *(bs_Context**)_bs_fetchUnit(&contexts, i);
-
-            _bs_scope_.context = ctx;
-            _bs_tickContext(ctx, ctx->tick);
-            _bs_scope_.context = NULL;
+        if (!separate_message_thread) {
+            _bs_renderTick(fixed_tick);
+        }
+        else {
+            if (_hide_menu_windows_)
+                _bs_hideMenuWindows(&contexts);
         }
 
-        _bs_checkTimer(&_bs_instance_->timer);
-
+        /*
         while ((_bs_instance_->timer.seconds - frame_start) < _bs_instance_->target_frame_time) {
             Sleep(0);
             _bs_checkTimer(&_bs_instance_->timer);
         }
+        */
     }
 }
 
