@@ -792,7 +792,7 @@ BSAPI bs_ivec2 _bs_windowPosition(bs_Context* context) {
    * Inputs
    *============================================================================*/
 
-const bool separate_message_thread = false; // temp
+const bool separate_message_thread = true; // temp
 
 
 static inline void bs_setBit(long A[], unsigned int k) {
@@ -889,22 +889,16 @@ BSAPI void _bs_setTargetFramerate(int fps) {
     _bs_instance_->target_frame_time = 1.0 / (double)fps;
 }
 
-static void _bs_resetIO(bs_IO* io) {
-    io->scroll_old = io->scroll;
-//    io->left_clicked_last = io->left_clicked;
-//    io->right_clicked_last = io->right_clicked;
-//    io->middle_clicked_last = io->middle_clicked;
-//    memset(io->hold_keys, 0, sizeof(io->hold_keys));
-//    memcpy(io->keys_old, io->keys, sizeof(io->keys_old));
-//    memcpy(io->chars_old, io->chars, sizeof(io->chars_old));
-}
-
+ /**
+  Ugly implementation
+  */
 static _Thread_local bool _hide_menu_windows_ = false;
+
 static void _bs_hideMenuWindows(bs_List* contexts) {
     for (int i = 0; i < contexts->count; i++) {
         bs_Context* ctx = *(bs_Context**)_bs_fetchUnit(contexts, i);
         if (ctx->window_type == BS_WINDOW_MENU) {
-            bs_hideWindow(ctx);
+            _bs_hideWindow(ctx);
         }
     }
 
@@ -958,7 +952,6 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_ContextTickFunction tick) {
     }
 
     _bs_instance_->time_old = _bs_instance_->time;
-    //_bs_resetIO(&context->io);
 }
 
 static void _bs_renderTick(bs_Callback fixed_tick) {
@@ -1281,8 +1274,32 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
     case WM_NCCALCSIZE:
 
         if (context && context->window_type == BS_WINDOW_NO_TITLE_BAR) {
-            if (w_param)
-                return 0;
+
+            // https://handmade.network/forums/articles/t/9073-custom_window_title_bar_and_almost_correctly_drawing_windows_10_borders
+            // int padding = GetSystemMetrics(SM_CXPADDEDBORDER);
+            // TODO: dpi shit
+            int padding = 0;
+            int borderLR = GetSystemMetrics(SM_CXFRAME) + padding;
+            int borderTB = GetSystemMetrics(SM_CYFRAME) + padding;
+
+            RECT* rect = 0;
+
+            if (w_param) {
+                rect = ((NCCALCSIZE_PARAMS*)l_param)->rgrc;
+            }
+            else {
+                rect = (RECT*)l_param;
+            }
+
+            rect->left += borderLR;
+            rect->right -= borderLR;
+            rect->bottom -= borderTB;
+
+            if (IsZoomed(hwnd)) {
+                rect->top += borderTB;
+            }
+
+
             break;
         }
         else
@@ -1337,7 +1354,7 @@ BSAPI bs_Result _bs_window(
     context->window_type = type;
 
     bs_Timer timer = _bs_timer();
-    _bs_setTargetFramerate(60);
+    _bs_setTargetFramerate(120);
 
     const char* class_name = title;
     HINSTANCE hinstance = GetModuleHandle(0);

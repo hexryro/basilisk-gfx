@@ -175,7 +175,6 @@ typedef void(__stdcall* PFN_bs_present)(bs_Queue* queue, bs_Queue* wait_queues[]
 typedef void(__stdcall* PFN_bs_acquire)();
 typedef int(__stdcall* PFN_bs_queueSwap)(bs_Queue* queue);
 typedef void(__stdcall* PFN_bs_enqueue)(bs_Queue* queue, bs_Callback function);
-typedef int(__stdcall* PFN_bs_imageIndex)();
 typedef bs_Result(__stdcall* PFN_bs_queue)(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags);
 typedef void(__stdcall* PFN_bs_destroyQueue)(bs_Queue* queue);
 typedef void(__stdcall* PFN_bs_stallGPU)();
@@ -707,7 +706,6 @@ typedef struct {
     PFN_bs_acquire bs_acquire;
     PFN_bs_queueSwap bs_queueSwap;
     PFN_bs_enqueue bs_enqueue;
-    PFN_bs_imageIndex bs_imageIndex;
     PFN_bs_queue bs_queue;
     PFN_bs_destroyQueue bs_destroyQueue;
     PFN_bs_stallGPU bs_stallGPU;
@@ -1239,7 +1237,6 @@ BSAPI void _bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues
 BSAPI void _bs_acquire();
 BSAPI int _bs_queueSwap(bs_Queue* queue);
 BSAPI void _bs_enqueue(bs_Queue* queue, bs_Callback function);
-BSAPI int _bs_imageIndex();
 BSAPI bs_Result _bs_queue(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags);
 BSAPI void _bs_destroyQueue(bs_Queue* queue);
 BSAPI void _bs_stallGPU();
@@ -1773,7 +1770,6 @@ static inline bs_FunctionTable* _bs_getFunctions() {
     functions.bs_acquire = _bs_acquire;
     functions.bs_queueSwap = _bs_queueSwap;
     functions.bs_enqueue = _bs_enqueue;
-    functions.bs_imageIndex = _bs_imageIndex;
     functions.bs_queue = _bs_queue;
     functions.bs_destroyQueue = _bs_destroyQueue;
     functions.bs_stallGPU = _bs_stallGPU;

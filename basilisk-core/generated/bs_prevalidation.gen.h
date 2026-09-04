@@ -172,7 +172,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_acquire = (PFN_bs_acquire)GetProcAddress(module, "_preval_bs_acquire");
     functions.bs_queueSwap = (PFN_bs_queueSwap)GetProcAddress(module, "_preval_bs_queueSwap");
     functions.bs_enqueue = (PFN_bs_enqueue)GetProcAddress(module, "_preval_bs_enqueue");
-    functions.bs_imageIndex = (PFN_bs_imageIndex)GetProcAddress(module, "_preval_bs_imageIndex");
     functions.bs_queue = (PFN_bs_queue)GetProcAddress(module, "_preval_bs_queue");
     functions.bs_destroyQueue = (PFN_bs_destroyQueue)GetProcAddress(module, "_preval_bs_destroyQueue");
     functions.bs_stallGPU = (PFN_bs_stallGPU)GetProcAddress(module, "_preval_bs_stallGPU");

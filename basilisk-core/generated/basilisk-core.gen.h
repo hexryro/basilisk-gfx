@@ -452,7 +452,7 @@ typedef enum bs_VkObjectType bs_VkObjectType;
     10
 
 #define BS_MAX_LOG_SIZE                                              \
-    1024
+    2048
 
 #define BS_I8_MIN                                                    \
     (bs_I8)(-127 - 1)
@@ -3256,6 +3256,7 @@ struct bs_Context {
     int id;
     int frames_in_flight;
     int frame;
+    int image_index;
     bool hidden;
     bool active;
     bool resized;
@@ -5822,12 +5823,6 @@ BSAPI void
 bs_enqueue(
     bs_Queue* queue,
     bs_Callback function);
-
- /**
-  @return int
-  */
-BSAPI int
-bs_imageIndex();
 
  /**
   @param object
@@ -10049,7 +10044,6 @@ BSAPI extern bs_Config _bs_config_;
 BSAPI extern bs_Args _bs_args_;
 BSAPI extern bs_Features _bs_features_;
 BSAPI extern bs_Props _bs_props_;
-BSAPI extern int _bs_image_index_;
 BSAPI extern bs_List _bs_physical_devices_;
 BSAPI extern bs_Callbacks _bs_callbacks_;
 

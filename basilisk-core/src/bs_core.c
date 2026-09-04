@@ -51,7 +51,6 @@ bs_Config _bs_config_ = {
 _Thread_local bs_Scope _bs_scope_ = { 0 };
 
 bs_Instance* _bs_instance_ = NULL;
-int _bs_image_index_ = 0;
 bs_Callbacks _bs_callbacks_ = { 0 };
 
 bs_List _bs_physical_devices_ = { .unit_size = sizeof(bs_PhysicalDevice) };
@@ -1962,7 +1961,7 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
         VkRenderPassBeginInfo render_pass_i = {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
             .renderPass = renderer->render_pass,
-            .framebuffer = renderer->_[_bs_image_index_].framebuffer,
+            .framebuffer = renderer->_[_bs_scope_.context->image_index].framebuffer,
             .renderArea.extent = {
                 .width = renderer->dim.x,
                 .height = renderer->dim.y,
@@ -1983,7 +1982,7 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
 
             attachments[i] = (VkRenderingAttachmentInfo){
                 .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-                .imageView = output->image->_[output->image->flags & BS_IMAGE_SWAPS_BIT ? _bs_image_index_ : 0].vk_image_view,
+                .imageView = output->image->_[output->image->flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->image_index : 0].vk_image_view,
                 .imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL_KHR,
                 .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
                 .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
@@ -2616,7 +2615,7 @@ BSAPI bs_I32 _bs_queueFamily(bs_QueueBits _bs_flags) {
 }
 
 BSAPI int _bs_queueSwap(bs_Queue* queue) {
-    return queue->flags & BSI_QUEUE_SWAPS_BIT ? _bs_scope_.context->frame : 0;
+    return queue->flags & BSI_QUEUE_SWAPS_BIT ? _bs_scope_.context->image_index : 0;
 }
 
 static void _bs_nameQueue(bs_Object* object, const char* name) {
@@ -2932,10 +2931,6 @@ BSAPI bs_Image* _bs_swapchainImage() {
     return _bs_scope_.context->swapchain_image->image;
 }
 
-BSAPI int _bs_imageIndex() {
-    return _bs_image_index_;
-}
-
 static void _bs_destroySwapchain() {
     bs_Image* swapchain_image = _bs_scope_.context->swapchain_image->image;
 
@@ -3036,7 +3031,7 @@ BSAPI void _bs_acquire() {
         BS_U64_MAX,
         _bs_scope_.context->_[_bs_scope_.context->frame].semaphore,
         VK_NULL_HANDLE,
-        &_bs_image_index_);
+        &_bs_scope_.context->image_index);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         _bs_resizeContext();
@@ -3121,7 +3116,7 @@ BSAPI void _bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues
         .pWaitSemaphores = wait_semaphores,
         .swapchainCount = 1,
         .pSwapchains = &_bs_scope_.context->swapchain,
-        .pImageIndices = &_bs_image_index_,
+        .pImageIndices = &_bs_scope_.context->image_index,
     };
 
     VkResult result = vkQueuePresentKHR(queue->queue, &present_i);

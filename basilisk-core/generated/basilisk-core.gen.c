@@ -1783,11 +1783,6 @@ void bs_enqueue(
     next.bs_enqueue(queue, function);
 }
 
-int bs_imageIndex()
-{
-    return next.bs_imageIndex();
-}
-
 bs_Result bs_queue(
     bs_Object* object, 
     bs_U32 queue_index, 

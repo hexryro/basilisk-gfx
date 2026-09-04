@@ -571,7 +571,7 @@
 		</macro>
 
 		<macro><name>#define BS_LOG_QUEUE_SIZE</name><line>10</line></macro>
-		<macro><name>#define BS_MAX_LOG_SIZE</name><line>1024</line></macro>
+		<macro><name>#define BS_MAX_LOG_SIZE</name><line>2048</line></macro>
 
 		<macro><name>#define BS_I8_MIN</name><line>(bs_I8)(-127 - 1)</line></macro>
 		<macro><name>#define BS_I16_MIN</name><line>(bs_I16)(-32767 - 1)</line></macro>
@@ -1929,6 +1929,7 @@
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>frames_in_flight</name></field>
             <field><type>int</type><name>frame</name></field>
+            <field><type>int</type><name>image_index</name></field>
             <field><type>bool</type><name>hidden</name></field>
             <field><type>bool</type><name>active</name></field>
             <field><type>bool</type><name>resized</name></field>
@@ -1989,7 +1990,6 @@
 		<extern><type>bs_Args</type><name>bs_args</name></extern>
 		<extern><type>bs_Features</type><name>bs_features</name></extern>
 		<extern><type>bs_Props</type><name>bs_props</name></extern>
-		<extern><type>int</type><name>bs_image_index</name></extern>
 		<extern><type>bs_List</type><name>bs_physical_devices</name></extern>
 		<extern><type>bs_Callbacks</type><name>bs_callbacks</name></extern>
 	</externs>
@@ -2925,9 +2925,6 @@
             <return>void</return>
             <param><type>bs_Queue*</type><name>queue</name></param>
             <param><type>bs_Callback</type><name>function</name></param>
-        </function>
-        <function name="bs_imageIndex">
-            <return>int</return>
         </function>
         <function name="bs_queue">
             <return>bs_Result</return>

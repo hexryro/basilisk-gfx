@@ -107,6 +107,10 @@ static struct {
     [CONTEXT_MENU_OPEN_RECENT]      = CONTEXT_MENU(_context_menu_open_recent_elements_, BASILISK_CONTEXT_MENU_1),
 };
 
+bs_Context* contextFromMenuType(ContextMenuType type) {
+    return bs_fetch(BASILISK_CONTEXTS, _context_menu_types_[type].context_id)->context;
+}
+
 void showContextMenuUI(ContextMenuType type, bs_vec3 position) {
     bs_Context* context = bs_fetch(BASILISK_CONTEXTS, _context_menu_types_[type].context_id)->context;
 

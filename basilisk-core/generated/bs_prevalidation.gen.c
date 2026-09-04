@@ -898,10 +898,6 @@ BSAPI void _preval_bs_enqueue(bs_Queue* queue, bs_Callback function) {
     next.bs_enqueue(queue, function);
 }
 
-BSAPI int _preval_bs_imageIndex() {
-    return next.bs_imageIndex();
-}
-
 BSAPI bs_Result _preval_bs_queue(bs_Object* object, bs_U32 queue_index, bs_QueueBits flags) {
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_queue(object, queue_index, flags);
@@ -2914,7 +2910,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_acquire = _preval_bs_acquire;
     functions.bs_queueSwap = _preval_bs_queueSwap;
     functions.bs_enqueue = _preval_bs_enqueue;
-    functions.bs_imageIndex = _preval_bs_imageIndex;
     functions.bs_queue = _preval_bs_queue;
     functions.bs_destroyQueue = _preval_bs_destroyQueue;
     functions.bs_stallGPU = _preval_bs_stallGPU;

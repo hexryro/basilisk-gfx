@@ -182,10 +182,9 @@ void basilisk_instantiateTitleBarUI() {
     position.x += 16.0;
 
     hovering = basilisk_instantiateTitleBarTextButtonUI("File", default_button_background_material, position, title_bar_size);
+    bs_Context* ctx = contextFromMenuType(CONTEXT_MENU_FILE);
 
-    if (hovering && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON)) {
-    //    bs_logF("Clicked file");
-
+    if (hovering && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON) && ctx->hidden) {
 
         toggleContextMenuUI(CONTEXT_MENU_FILE, position);
     }

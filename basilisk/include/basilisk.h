@@ -123,6 +123,7 @@ typedef enum {
     CONTEXT_MENU_COUNT
 } ContextMenuType;
 
+bs_Context* contextFromMenuType(ContextMenuType type);
 void showContextMenuUI(ContextMenuType type, bs_vec3 position);
 void hideContextMenuUI(bs_Context* context);
 void toggleContextMenuUI(ContextMenuType type, bs_vec3 position);
