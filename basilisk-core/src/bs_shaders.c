@@ -1223,11 +1223,11 @@ BSAPI bs_Result _val_bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_Pi
 
     bool is_dynamic_renderer = _bs_rendererIsDynamic(scope->renderer);
     if (!is_dynamic_renderer) {
-        BS_VALIDATE(descriptor->subpass < scope->renderer->num_subpasses, BS_RESULT_VALIDATION_ERROR,
+        BS_VALIDATE(descriptor->subpass < scope->renderer->subpasses_count, BS_RESULT_VALIDATION_ERROR,
             "Pipeline subpass (%d) falls outside renderer (%d) subpass count (%d)",
             descriptor->subpass,
             scope->renderer->head.id,
-            scope->renderer->num_subpasses);
+            scope->renderer->subpasses_count);
     }
 
     return _bs_pipeline(scope, queue, descriptor, out);
@@ -1265,14 +1265,15 @@ BSAPI bs_Result _bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_Pipeli
     };
 
     VkPipelineDepthStencilStateCreateInfo depth_stencil_state;
-    VkPipelineColorBlendAttachmentState blend_states[BS_MAX_ATTACHMENTS_COUNT];
+    VkPipelineColorBlendAttachmentState* blend_states = bs_alloca(scope->renderer->outputs.count * sizeof(VkPipelineColorBlendAttachmentState));
 
     int num_blend_states = 0;
 
     bool is_dynamic_renderer = _bs_rendererIsDynamic(scope->renderer);
     if (!is_dynamic_renderer) {
-        for (int i = 0; i < scope->renderer->num_outputs; i++) {
-            bs_Output* output = scope->renderer->outputs + i;
+        for (int i = 0; i < scope->renderer->outputs.count; i++) {
+            bs_Output* output = _bs_fetchUnit(&scope->renderer->outputs, i);
+
             if (output->subpass != descriptor->subpass)
                 continue;
             if (_bs_isDepthFormat(output->image->format))
@@ -1282,7 +1283,8 @@ BSAPI bs_Result _bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_Pipeli
                 memcpy(blend_states + num_blend_states++, blend_states, sizeof(VkPipelineColorBlendAttachmentState));
             else {
                 blend_states[num_blend_states++] = (VkPipelineColorBlendAttachmentState){
-                    .colorWriteMask = descriptor->attachments[num_blend_states].skip_write ? 0 : VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
+                    .colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
+                   // .colorWriteMask = descriptor->attachments[num_blend_states].skip_write ? 0 : VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
                     .srcColorBlendFactor = (VkBlendFactor)descriptor->src_color_factor,
                     .dstColorBlendFactor = (VkBlendFactor)descriptor->dst_color_factor,
                     .colorBlendOp = (VkBlendOp)descriptor->color_op,
@@ -1296,11 +1298,11 @@ BSAPI bs_Result _bs_pipeline(bs_RendererScope* scope, bs_Queue* queue, bs_Pipeli
         }
     }
     else {
-        for (int i = 0; i < scope->renderer->num_outputs; i++) {
-            bs_Output* output = scope->renderer->outputs + i;
-            if (_bs_isDepthFormat(output->image->format)) {
+        for (int i = 0; i < scope->renderer->outputs.count; i++) {
+            bs_Output* output = _bs_fetchUnit(&scope->renderer->outputs, i);
+
+            if (_bs_isDepthFormat(output->image->format))
                 render_info.depthAttachmentFormat = (VkFormat)output->image->format; // TODO: ensure only one?
-            }
         }
     }
 

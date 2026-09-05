@@ -541,8 +541,10 @@ BSMODAPI void _bsmod_copyHoveringDataToBuffer() {
 		bs_Buffer* cursor_reads_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_CURSOR_READS)->buffer;
 		bs_Buffer* tile_read_buffer = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_LO_RES_SCREENSHOT)->buffer;
 
-		for (int i = 0; i < renderer->num_outputs; i++) {
-			bs_Image* image = renderer->outputs[i].image;
+		for (int i = 0; i < renderer->outputs.count; i++) {
+			bs_Output* output = bs_fetchUnit(&renderer->outputs, i);
+			bs_Image* image = output->image;
+
 			if (!(image->flags & BS_IMAGE_USAGE_TRANSFER_SRC_BIT))
 				continue;
 

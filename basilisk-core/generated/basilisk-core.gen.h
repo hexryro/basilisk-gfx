@@ -209,6 +209,13 @@ typedef enum bs_DescriptorType bs_DescriptorType;
 typedef enum bs_DescriptorTypeIndex bs_DescriptorTypeIndex;
 typedef enum bs_VkObjectType bs_VkObjectType;
 
+#ifdef _WIN32
+#define                                                              \
+    
+
+#else
+#endif
+
 #define BS_CONFIGURE_SOURCE(sources, index, count, ids)              \
     sources[index] = bs_configureSource(index, count, (const char* []) { ids(BS_STRING_GEN) })
 
@@ -413,15 +420,6 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 
 #define BS_MAX_NUM_QUEUES                                            \
     8
-
-#define BS_MAX_NUM_SUBPASSES                                         \
-    6
-
-#define BS_MAX_NUM_SUBPASS_DEPENDENCIES                              \
-    6
-
-#define BS_MAX_ATTACHMENTS_COUNT                                     \
-    12
 
 #define BS_TIMEOUT                                                   \
     60000000000000
@@ -2775,9 +2773,6 @@ struct bs_PipelineHash {
     bool skip_depth_write;
     bool disable_blend;
     bs_Shader* shaders[2];
-    struct {
-        bool skip_write;
-    } attachments[BS_MAX_ATTACHMENTS_COUNT];
 };
 
 struct bs_RayTracePipelineHash {
@@ -2860,13 +2855,10 @@ struct bs_RendererSwaps {
 struct bs_Renderer {
     bs_Header head;
     bs_RendererBits flags;
-    bs_Input* inputs;
-    bs_Output* outputs;
-    struct VkSubpassDependency* dependencies;
-    int num_inputs;
-    int num_outputs;
-    int num_subpasses;
-    int num_dependencies;
+    bs_List inputs;
+    bs_List outputs;
+    bs_List dependencies;
+    int subpasses_count;
     bs_ivec2 dim;
     bs_Queue* queue;
     bs_Context* context;

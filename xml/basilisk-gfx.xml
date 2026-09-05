@@ -56,7 +56,6 @@
 		<typedef><type>bs_U32</type><name>bsgfx_SpawnerFlags</name></typedef>
 
 		<typedef><type>void</type><name>(* PFN_bsgfx_TypeMapper)(void*, void*)</name></typedef>
-
 		<typedef><type>bool</type><name>(* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*)</name></typedef>
 
 		<typedef><type>struct bsgfx_InstanceHeader</type><name>bsgfx_InstanceHeader</name></typedef>
