@@ -9,7 +9,7 @@
     <xsl:variable name="functionPrefix" select="registry/functionPrefix"/>
     <xsl:variable name="functionPrefixCaps" select="registry/functionPrefixCaps"/>
 
-    <xsl:template match="ifdef|ifndef|elifdef">
+    <xsl:template match="define|ifdef|ifndef|elifdef">
         <xsl:text>#</xsl:text>
         <xsl:value-of select="name()"/>
         <xsl:text> </xsl:text>

@@ -48,6 +48,10 @@
 		</prevalidation>
 		<prevalidationHeader>
 			<include>bs_internal.h</include>
+			<ifdef cond="__linux__"/>
+			    <define cond="__USE_GNU"/>
+			    <include>dlfcn.h</include>
+			<endif/>
 		</prevalidationHeader>
 		<validationHeader>
 			<include>basilisk-core.h</include>
@@ -394,14 +398,6 @@
 	</enums>
 
     <macros>
-        <ifdef cond="_WIN32"/>
-		<macro>
-			<name>#define </name>
-			<line></line>
-		</macro>
-		<else/>
-		<endif/>
-
 		<macro>
 			<name>#define BS_CONFIGURE_SOURCE(sources, index, count, ids)</name>
 			<line>sources[index] = bs_configureSource(index, count, (const char* []) { ids(BS_STRING_GEN) })</line>
@@ -652,7 +648,7 @@
             <line>    declaration_name.batch = batch;</line>
             <line>    declaration_name.offset = offset_p;</line>
             <line>    if (!declaration_name.populated)</line>
-            <line>        bs_populateVertexDeclaration(&amp;declaration_name, batch-&gt;attributes, batch-&gt;attributes_count)</line>
+            <line>        bs_populateVertexDeclaration((bs_VertexDeclaration*)&amp;declaration_name, batch-&gt;attributes, batch-&gt;attributes_count)</line>
         </macro>
         <macro><name>#define BS_NUM_CUBE_VERTICES</name><line>36</line></macro>
         <macro><name>#define BS_NUM_CUBE_INDICES</name><line>36</line></macro>
@@ -1158,8 +1154,8 @@
 			<field><type>FILE*</type><name>handle</name></field>
 		</structure>
         <structure name="bs_PngData">
-            <field><type>int</type><name>width</name></field>
-            <field><type>int</type><name>height</name></field>
+            <field><type>bs_U32</type><name>width</name></field>
+            <field><type>bs_U32</type><name>height</name></field>
             <field><type>int</type><name>channels_count</name></field>
             <field><type>size_t</type><name>size</name></field>
             <field><type>unsigned char*</type><name>data</name></field>
@@ -1615,17 +1611,18 @@
             </structure>
             <field><type>void*</type><name>doc</name></field>
         </structure>
+        <structure name="bs_JsonValueUnion" type="union">
+            <field><type>bs_JsonArray</type><name>as_array</name></field>
+            <field><type>bs_JsonObject</type><name>as_object</name></field>
+            <field><type>bs_F64</type><name>as_number</name></field>
+            <field><type>const char*</type><name>as_string</name></field>
+            <field><type>bool</type><name>as_bool</name></field>
+        </structure>
         <structure name="bs_JsonValue">
             <field><type>bool</type><name>found</name></field>
             <field><type>bs_JsonType</type><name>type</name></field>
             <field><type>int</type><name>size</name></field>
-            <structure name="bs_JsonValueUnion" type="union">
-                <field><type>bs_JsonArray</type><name>as_array</name></field>
-                <field><type>bs_JsonObject</type><name>as_object</name></field>
-                <field><type>bs_F64</type><name>as_number</name></field>
-                <field><type>char*</type><name>as_string</name></field>
-                <field><type>bool</type><name>as_bool</name></field>
-            </structure>
+            <field><type>bs_JsonValueUnion</type><name>v</name></field>
         </structure>
         <structure name="bs_JsonEnumeration">
             <field><type>const char*</type><name>key</name></field>
@@ -1657,8 +1654,8 @@
             <field><type>int</type><name>bone_offset</name></field>
             <field><type>int</type><name>weight_offset</name></field>
             <field><type>int</type><name>index_offset</name></field>
-            <field><type>bs_U32</type><name>num_indices</name></field>
-            <field><type>bs_U32*</type><name>indices</name></field>
+            <field><type>int</type><name>num_indices</name></field>
+            <field><type>int*</type><name>indices</name></field>
             <field><type>int</type><name>material_id</name></field>
             <field><type>bs_Mesh*</type><name>parent</name></field>
             <field><type>bs_Aabb</type><name>aabb</name></field>
@@ -1825,8 +1822,13 @@
             <field><type>bs_Object*</type><name>object</name></field>
         </structure>
         <structure name="bs_IO">
-			<field><type>volatile bs_U32</type><name>input_down_events</name><size>BS_KEY_BYTES_COUNT</size></field>
-			<field><type>volatile bs_U32</type><name>input_up_events</name><size>BS_KEY_BYTES_COUNT</size></field>
+            <ifdef cond="_WIN32"/>
+    			<field><type>volatile bs_U32</type><name>input_down_events</name><size>BS_KEY_BYTES_COUNT</size></field>
+    			<field><type>volatile bs_U32</type><name>input_up_events</name><size>BS_KEY_BYTES_COUNT</size></field>
+            <else/>
+                <field><type>_Atomic bs_U32</type><name>input_down_events</name><size>BS_KEY_BYTES_COUNT</size></field>
+    			<field><type>_Atomic bs_U32</type><name>input_up_events</name><size>BS_KEY_BYTES_COUNT</size></field>
+            <endif/>
 
 			<field><type>bs_U32</type><name>inputs_up_once</name><size>BS_KEY_BYTES_COUNT</size></field>
 			<field><type>bs_U32</type><name>inputs_down_once</name><size>BS_KEY_BYTES_COUNT</size></field>
@@ -2249,7 +2251,7 @@
             <param><type>bs_mat4*</type><name>out</name></param>
             <body>    glm_look(eye->a, direction->a, up->a, out->a);</body>
         </function>
-
+<!--
         <function name="bs_v2CubicBezier">
             <return>void</return>
             <param><type>const bs_vec2*</type><name>p0</name></param>
@@ -2287,6 +2289,7 @@
             <param><type>bs_vec3*</type><name>out</name></param>
             <param><type>int</type><name>out_length</name></param>
         </function>
+-->
 
 		<function name="bs_rotateAabb">
             <return>void</return>
@@ -2759,8 +2762,8 @@
         </function>
         <function name="bs_batchVertex">
             <return>void</return>
-            <param><type>bs_VertexDeclaration*</type><name>declaration</name></param>
-            <param><type>const unsigned char*</type><name>src</name></param>
+            <param><type>void*</type><name>declaration</name></param>
+            <param><type>const void*</type><name>src</name></param>
         </function>
         <function name="bs_batchRange">
             <return>bs_Range</return>
@@ -3127,9 +3130,9 @@
             <return>bs_Result</return>
 			<param><type>bs_Queue*</type><name>queue</name></param>
             <param><type>bs_Object*</type><name>object</name></param>
-            <param><type>int</type><name>package_id</name></param>
-            <param><type>char*</type><name>resource_name</name></param>
-            <param><type>char*</type><name>data</name></param>
+            <param><type>bs_I32</type><name>package_id</name></param>
+            <param><type>bs_I8*</type><name>resource_name</name></param>
+            <param><type>bs_U8*</type><name>data</name></param>
             <param><type>bs_U32</type><name>flags</name></param>
         </function>
         <function name="bs_parseArgs">
@@ -3149,7 +3152,7 @@
             <param><type>bs_Procedure*</type><name>procedures</name></param>
             <param><type>int</type><name>count</name></param>
             <param><type>void*</type><name>dll_handle</name></param>
-            <param><type>unsigned char*</type><name>destination</name></param>
+            <param><type>void*</type><name>destination</name></param>
         </function>
 
         <function name="bs_queueSemaphore">
@@ -3172,7 +3175,7 @@
 		</function>
         <variadicStringTemplate name="bsi_nameHandle">
             <return>void</return>
-            <param><assert>handle != 0</assert><type>bs_U64</type><name>handle</name></param>
+            <param><type>bs_U64</type><name>handle</name></param>
             <param><type>bs_U32</type><name>type</name></param>
         </variadicStringTemplate>
         <function name="bs_beginEnumeration" section="bs_json.h">
@@ -3280,8 +3283,8 @@
         <function name="bs_jsonArray">
             <return>bs_JsonValue</return>
             <param><type>bs_JsonType</type><name>type</name></param>
-            <param><type>char*</type><name>data</name></param>
-            <param><assert>count &gt;= 0</assert><type>int</type><name>count</name></param>
+            <param><type>void*</type><name>data</name></param>
+            <param><type>int</type><name>count</name></param>
         </function>
         <function name="bs_jsonVec2">
             <return>bs_JsonValue</return>
@@ -3370,7 +3373,7 @@
         </function>
         <function name="bs_hash">
             <return>bs_U64</return>
-            <param><type>unsigned char*</type><name>data</name></param>
+            <param><type>void*</type><name>data</name></param>
             <param><assert>size &gt; 0</assert><type>size_t</type><name>size</name></param>
         </function>
         <function name="bs_stringHash">
@@ -3817,7 +3820,7 @@
         <function name="bs_queryResource">
             <return>bs_Result</return>
             <param><type>int</type><name>package_id</name></param>
-            <param><type>int</type><name>resource_type</name></param>
+            <param><type>bs_ResourceType</type><name>resource_type</name></param>
             <param><type>const char*</type><name>name</name></param>
             <param><type>bs_Resource**</type><name>out</name></param>
         </function>

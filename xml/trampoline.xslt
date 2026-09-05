@@ -5,7 +5,7 @@
     <xsl:include href="helpers.xsl"/>
 
     <xsl:output method="text"/>
-    
+
     <xsl:strip-space elements="*"/>
 
     <xsl:variable name="prefix" select="registry/prefix"/>

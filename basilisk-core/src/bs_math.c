@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,15 +21,15 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
  /**
   _bs_math.c
 
   Collection of math tools
 
-  CGLM wrapper functions such as vector and matrix operations are 
-  generated from basilisk-core.xml, cglm functions are called 
+  CGLM wrapper functions such as vector and matrix operations are
+  generated from basilisk-core.xml, cglm functions are called
   directly from the trampoline, see generated/basilisk-core.c
   */
 
@@ -117,9 +117,9 @@ BSAPI void _bs_qToEul(const bs_vec4* qp, bs_vec3* out) {
 
     float sinp = 2.0f * (q.w * q.y - q.z * q.x);
 
-    if (fabs(sinp) >= 1.0f) 
+    if (fabs(sinp) >= 1.0f)
         out->y = copysign(BS_PI / 2.0f, sinp);
-    else 
+    else
         out->y = asin(sinp);
 
     float siny_cosp = 2.0f * (q.w * q.z + q.x * q.y);
@@ -193,7 +193,7 @@ BSAPI bs_vec4 _bs_rgbUCharToV4(bs_RGBA value) {
   */
 BSAPI bs_vec3 _bs_hsvToRgb(const bs_vec3* hsv) {
     float r, g, b;
-    
+
     float h = hsv->x / 360;
     float s = hsv->y;
     float v = hsv->z;
@@ -263,6 +263,7 @@ BSAPI bs_vec3 _bs_rgbToHsv(const bs_vec3* rgb) {
    * Bezier Curves
    =============================================================================*/
 
+  /*
 static float _bs_cubicBezier(float p0, float p1, float p2, float p3, float t) {
     float curve;
 
@@ -279,32 +280,32 @@ static float _bs_quadBezier(float p0, float p1, float p2, float t) {
     return u * u * p0 + 2.0f * u * t * p1 + t * t * p2;
 }
 
-static void _bs_nCubicBezier(int n, const bs_vec4* p0, const bs_vec4* p1, const bs_vec4* p2, const bs_vec4* p3, bs_vec4* out, int out_length) {
+static void _bs_nCubicBezier(int n, const float* p0, const float* p1, const float* p2, const float* p3, float** out, int out_length) {
     float t = 0.0f;
     float incr = 1.0f / (float)out_length;
 
     for (int i = 0; i < out_length; i++, t += incr) {
         for (int j = 0; j < n; j++)
-            out[i].a[j] = _bs_cubicBezier(p0->a[j], p1->a[j], p2->a[j], p3->a[j], t);
+            out[i]->a[j] = _bs_cubicBezier(p0[j], p1[j], p2[j], p3[j], t);
     }
 }
 
-static void _bs_nQuadBezier(int n, const bs_vec4* p0, const bs_vec4* p1, const bs_vec4* p2, bs_vec4* out, int out_length) {
+static void _bs_nQuadBezier(int n, const float* p0, const float* p1, const float* p2, float** out, int out_length) {
     float t = 0.0;
     float incr = 1.0 / (float)out_length;
 
     for (int i = 0; i < out_length; i++, t += incr) {
         for (int j = 0; j < n; j++)
-            out[i].a[j] = _bs_quadBezier(p0->x, p1->x, p2->x, t);
+            out[i][j] = _bs_quadBezier(p0[j], p1[j], p2[j], t);
     }
 }
 
 BSAPI void _bs_v2CubicBezier(const bs_vec2* p0, const bs_vec2* p1, const bs_vec2* p2, const bs_vec2* p3, bs_vec2* out, int out_length) {
-    _bs_nCubicBezier(2, p0, p1, p2, p3, out, out_length);
+    _bs_nCubicBezier(2, p0->a, p1->a, p2->a, p3->a, out->v, out_length);
 }
 
 BSAPI void _bs_v2QuadBezier(const bs_vec2* p0, const bs_vec2* p1, const bs_vec2* p2, bs_vec2* out, int out_length) {
-    _bs_nQuadBezier(2, p0, p1, p2, out, out_length);
+    _bs_nQuadBezier(2, p0->a, p1->a, p2->a, out->a, out_length);
 }
 
 BSAPI void _bs_v3CubicBezier(const bs_vec3* p0, const bs_vec3* p1, const bs_vec3* p2, const bs_vec3* p3, bs_vec3* out, int out_length) {
@@ -314,6 +315,7 @@ BSAPI void _bs_v3CubicBezier(const bs_vec3* p0, const bs_vec3* p1, const bs_vec3
 BSAPI void _bs_v3QuadBezier(const bs_vec3* p0, const bs_vec3* p1, const bs_vec3* p2, bs_vec3* out, int out_length) {
     _bs_nQuadBezier(3, p0, p1, p2, out, out_length);
 }
+*/
 
 
 
@@ -447,7 +449,7 @@ BSAPI bool _bs_lineVsLine(const bs_vec2* l1_start, const bs_vec2* l1_end, const 
         .hit = true,
         .point = result,
     };
-    
+
 
     if (!isfinite(result.x) || !isfinite(result.y))
         return false;
@@ -459,7 +461,7 @@ BSAPI bool _bs_lineVsLine(const bs_vec2* l1_start, const bs_vec2* l1_end, const 
   Rectangle vs Point
   */
 BSAPI bool _bs_rectangleVsPoint(const bs_vec2* position, const bs_vec2* dimensions, const bs_vec2* point) {
-    bool hit = 
+    bool hit =
         position->x < point->x &&
         point->x < (position->x + dimensions->x) &&
         position->y < point->y &&
@@ -648,7 +650,7 @@ BSAPI bool _bs_sphereVsObbTest(const bs_vec3* center, float radius, const bs_vec
     bs_vec3 closest_point;
     float distance;
 
-    bool inside = bsi_sphereVsObb(center, radius, position, rotation, rotation, &transform, &closest_point);
+    bool inside = bsi_sphereVsObb(center, radius, position, rotation, scale, &transform, &closest_point);
     if (!inside)
         return false;
 
@@ -661,13 +663,13 @@ BSAPI bool _bs_sphereVsObb(const bs_vec3* center, float radius, const bs_vec3* p
     bs_mat4 transform;
     bs_vec3 closest_point;
 
-    bool inside = bsi_sphereVsObb(center, radius, position, rotation, rotation, &transform, &closest_point);
+    bool inside = bsi_sphereVsObb(center, radius, position, rotation, scale, &transform, &closest_point);
     if (!inside)
         return false;
 
     bs_m4MulV3(&transform, &closest_point, &result->point);
 
-    bs_v3Sub(&center, &result->point, &result->normal);
+    bs_v3Sub(center, &result->point, &result->normal);
     bs_v3Normalize(&result->normal, &result->normal);
 
     return result->hit = true;

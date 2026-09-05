@@ -53,7 +53,7 @@ add_dependencies(${PROJECT_NAME}
     basilisk-mod
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE 
+target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/
 )
 
@@ -61,7 +61,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     basilisk-core
     basilisk-gfx
     basilisk-mod
-    vulkan-1 
+    vulkan-1
     dwmapi
 )
 

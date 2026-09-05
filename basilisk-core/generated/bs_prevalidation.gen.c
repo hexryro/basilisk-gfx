@@ -104,40 +104,6 @@ BSAPI void _preval_bs_qToEul(const bs_vec4* q, bs_vec3* out) {
     next.bs_qToEul(q, out);
 }
 
-BSAPI void _preval_bs_v2CubicBezier(const bs_vec2* p0, const bs_vec2* p1, const bs_vec2* p2, const bs_vec2* p3, bs_vec2* out, int out_length) {
-    BS_VALIDATE(p0 != NULL, ,);
-    BS_VALIDATE(p1 != NULL, ,);
-    BS_VALIDATE(p2 != NULL, ,);
-    BS_VALIDATE(p3 != NULL, ,);
-    BS_VALIDATE(out != NULL, ,);
-    next.bs_v2CubicBezier(p0, p1, p2, p3, out, out_length);
-}
-
-BSAPI void _preval_bs_v2QuadBezier(const bs_vec2* p0, const bs_vec2* p1, const bs_vec2* p2, bs_vec2* out, int out_length) {
-    BS_VALIDATE(p0 != NULL, ,);
-    BS_VALIDATE(p1 != NULL, ,);
-    BS_VALIDATE(p2 != NULL, ,);
-    BS_VALIDATE(out != NULL, ,);
-    next.bs_v2QuadBezier(p0, p1, p2, out, out_length);
-}
-
-BSAPI void _preval_bs_v3CubicBezier(const bs_vec3* p0, const bs_vec3* p1, const bs_vec3* p2, const bs_vec3* p3, bs_vec3* out, int out_length) {
-    BS_VALIDATE(p0 != NULL, ,);
-    BS_VALIDATE(p1 != NULL, ,);
-    BS_VALIDATE(p2 != NULL, ,);
-    BS_VALIDATE(p3 != NULL, ,);
-    BS_VALIDATE(out != NULL, ,);
-    next.bs_v3CubicBezier(p0, p1, p2, p3, out, out_length);
-}
-
-BSAPI void _preval_bs_v3QuadBezier(const bs_vec3* p0, const bs_vec3* p1, const bs_vec3* p2, bs_vec3* out, int out_length) {
-    BS_VALIDATE(p0 != NULL, ,);
-    BS_VALIDATE(p1 != NULL, ,);
-    BS_VALIDATE(p2 != NULL, ,);
-    BS_VALIDATE(out != NULL, ,);
-    next.bs_v3QuadBezier(p0, p1, p2, out, out_length);
-}
-
 BSAPI void _preval_bs_rotateAabb(const bs_Aabb* aabb, const bs_mat3* rotation_matrix, bs_Aabb* out) {
     BS_VALIDATE(aabb != NULL, ,);
     BS_VALIDATE(rotation_matrix != NULL, ,);
@@ -584,7 +550,7 @@ BSAPI void _preval_bs_ensureBatchSize(bs_Batch* batch, bs_U32 num_indices, bs_U3
     next.bs_ensureBatchSize(batch, num_indices, num_vertices);
 }
 
-BSAPI void _preval_bs_batchVertex(bs_VertexDeclaration* declaration, const unsigned char* src) {
+BSAPI void _preval_bs_batchVertex(void* declaration, const void* src) {
     BS_VALIDATE(declaration != NULL, ,);
     BS_VALIDATE(src != NULL, ,);
     next.bs_batchVertex(declaration, src);
@@ -1168,7 +1134,7 @@ BSAPI void _preval_bs_destroyAtlas(bs_Atlas* atlas) {
     next.bs_destroyAtlas(atlas);
 }
 
-BSAPI bs_Result _preval_bs_loadAtlasMemory(bs_Queue* queue, bs_Object* object, int package_id, char* resource_name, char* data, bs_U32 flags) {
+BSAPI bs_Result _preval_bs_loadAtlasMemory(bs_Queue* queue, bs_Object* object, bs_I32 package_id, bs_I8* resource_name, bs_U8* data, bs_U32 flags) {
     BS_VALIDATE(queue != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(queue->head.type == BS_OBJECT_QUEUE, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(object != NULL, BS_RESULT_VALIDATION_ERROR,);
@@ -1190,7 +1156,7 @@ BSAPI void _preval_bs_ini() {
     next.bs_ini();
 }
 
-BSAPI void _preval_bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_handle, unsigned char* destination) {
+BSAPI void _preval_bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_handle, void* destination) {
     BS_VALIDATE(procedures != NULL, ,);
     BS_VALIDATE(dll_handle != NULL, ,);
     BS_VALIDATE(destination != NULL, ,);
@@ -1401,7 +1367,7 @@ BSAPI bs_JsonValue _preval_bs_jsonObject(bs_Json* json) {
     return next.bs_jsonObject(json);
 }
 
-BSAPI bs_JsonValue _preval_bs_jsonArray(bs_JsonType type, char* data, int count) {
+BSAPI bs_JsonValue _preval_bs_jsonArray(bs_JsonType type, void* data, int count) {
     BS_VALIDATE(data != NULL, (bs_JsonValue) { 0 },);
     return next.bs_jsonArray(type, data, count);
 }
@@ -1606,7 +1572,7 @@ BSAPI void _preval_bs_toLower(char* string, int len) {
     next.bs_toLower(string, len);
 }
 
-BSAPI bs_U64 _preval_bs_hash(unsigned char* data, size_t size) {
+BSAPI bs_U64 _preval_bs_hash(void* data, size_t size) {
     BS_VALIDATE(data != NULL, (bs_U64) { 0 },);
     return next.bs_hash(data, size);
 }
@@ -2175,7 +2141,7 @@ BSAPI void _preval_bs_destroyResource(bs_Resource* resource) {
     next.bs_destroyResource(resource);
 }
 
-BSAPI bs_Result _preval_bs_queryResource(int package_id, int resource_type, const char* name, bs_Resource** out) {
+BSAPI bs_Result _preval_bs_queryResource(int package_id, bs_ResourceType resource_type, const char* name, bs_Resource** out) {
     BS_VALIDATE(name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(out != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_queryResource(package_id, resource_type, name, out);
@@ -2786,10 +2752,6 @@ bs_FunctionTable* _preval_bs_getFunctionTable() {
     functions.bs_m4x3 = _preval_bs_m4x3;
     functions.bs_eulToQ = _preval_bs_eulToQ;
     functions.bs_qToEul = _preval_bs_qToEul;
-    functions.bs_v2CubicBezier = _preval_bs_v2CubicBezier;
-    functions.bs_v2QuadBezier = _preval_bs_v2QuadBezier;
-    functions.bs_v3CubicBezier = _preval_bs_v3CubicBezier;
-    functions.bs_v3QuadBezier = _preval_bs_v3QuadBezier;
     functions.bs_rotateAabb = _preval_bs_rotateAabb;
     functions.bs_fitAabb = _preval_bs_fitAabb;
     functions.bs_quad = _preval_bs_quad;

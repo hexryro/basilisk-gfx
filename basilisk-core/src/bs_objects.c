@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <stddef.h>
 #include <stdint.h>
@@ -143,13 +143,13 @@ BSAPI bs_Result _bs_loadResourceN(int package_id, bs_U32 flags, bs_ResourceType 
     if (ext) ext[0] = '\0';
 
     bs_Result result = _bs_loadFileChunkF(
-        existing->offset, 
-        existing->size, 
-        &existing->resource->data, 
-        "%s_%03d.bpak", 
+        existing->offset,
+        existing->size,
+        &existing->resource->data,
+        "%s_%03d.bpak",
         package->path, (existing->chunk + 1)
     );
-    
+
     if (ext) ext[0] = '.';
 
     if (result == BS_RESULT_OK) {
@@ -281,7 +281,7 @@ BSAPI bs_Result _bs_loadPackageN(int* out, char* path, int path_length) {
             .type = type,
             .name = strdup(resource_name),
         };
-        
+
         for (int j = 0; j < old_headers_count; j++) {
             bs_ResourceHeader* existing_header = old_headers + j;
             if (existing_header->name_hash == name_hash && existing_header->type == type) {
@@ -359,7 +359,7 @@ BSAPI bool _bs_exists(bs_U32 source_id, bs_U32 id) {
     return
         object &&
        // object->strikes == 0 &&
-        object->head != NULL && 
+        object->head != NULL &&
         object->head->id >= 0;
 }
 
@@ -482,9 +482,9 @@ static bs_Object* _bs_allocateObject(size_t size, size_t flexible_size, int flex
         heaps[heaps_count - 1].block = _bs_malloc(heap_size);
     }
 
-    unsigned char* result = (int*)(heaps[heaps_count - 1].block + heaps[heaps_count - 1].size);
+    unsigned char* result = (unsigned char*)(heaps[heaps_count - 1].block + heaps[heaps_count - 1].size);
     bs_Object object = {
-        .head = result + sizeof(bs_Object),
+        .head = (bs_Header*)(result + sizeof(bs_Object)),
         .flags = flags | BS_OBJECT_WAS_CREATED,
     };
 
@@ -494,7 +494,7 @@ static bs_Object* _bs_allocateObject(size_t size, size_t flexible_size, int flex
 
     heaps[heaps_count - 1].size += new_size;
 
-    return result;
+    return (bs_Object*)result;
 }
 
 static bs_Object* _bs_update(bs_U32 source_id, bs_U32 id, int size, int swap_size) {
@@ -583,15 +583,15 @@ BSAPI void _bs_resetObject(bs_Header* head, size_t size) {
 
 BSAPI void _bs_nameImage(bs_Object* object, const char* name) {
     for (int i = 0; i < object->image->head.swaps_count; i++) {
-        bsi_nameHandleF(object->image->_[i].vk_image, VK_OBJECT_TYPE_IMAGE, BS_PRINT_COLOR("%s", BS_PRINT_BLUE_BRIGHT), name);
-        bsi_nameHandleF(object->image->_[i].vk_image_view, VK_OBJECT_TYPE_IMAGE_VIEW, BS_PRINT_COLOR("%s (View)", BS_PRINT_BLUE_BRIGHT), name);
-        bsi_nameHandleF(object->image->_[i].vk_memory, VK_OBJECT_TYPE_DEVICE_MEMORY, BS_PRINT_COLOR("%s (Memory)", BS_PRINT_BLUE_BRIGHT), name);
+        bsi_nameHandleF((bs_U64)object->image->_[i].vk_image, VK_OBJECT_TYPE_IMAGE, BS_PRINT_COLOR("%s", BS_PRINT_BLUE_BRIGHT), name);
+        bsi_nameHandleF((bs_U64)object->image->_[i].vk_image_view, VK_OBJECT_TYPE_IMAGE_VIEW, BS_PRINT_COLOR("%s (View)", BS_PRINT_BLUE_BRIGHT), name);
+        bsi_nameHandleF((bs_U64)object->image->_[i].vk_memory, VK_OBJECT_TYPE_DEVICE_MEMORY, BS_PRINT_COLOR("%s (Memory)", BS_PRINT_BLUE_BRIGHT), name);
     }
 }
 
 BSAPI void _bs_nameSampler(bs_Object* object, const char* name) {
     int name_length = strlen(name);
     for (int i = 0; i < object->sampler->head.swaps_count; i++) {
-        bsi_nameHandleN(object->sampler->_[i].vk_sampler, VK_OBJECT_TYPE_SAMPLER, name, name_length);
+        bsi_nameHandleN((bs_U64)object->sampler->_[i].vk_sampler, VK_OBJECT_TYPE_SAMPLER, name, name_length);
     }
 }

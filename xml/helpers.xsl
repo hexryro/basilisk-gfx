@@ -2,6 +2,21 @@
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+    <xsl:template name="addDirectives">
+        <xsl:param name="indent" select="''"/>
+
+        <xsl:value-of select="$indent"/>
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="name()"/>
+
+        <xsl:if test="@cond">
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="@cond"/>
+        </xsl:if>
+
+        <xsl:text>&#xA;</xsl:text>
+    </xsl:template>
+
 	<xsl:template name="addFunctionTableSetter">
 		<xsl:param name="prefix"/>
 		<xsl:text>static </xsl:text>
@@ -79,10 +94,25 @@
 		<xsl:value-of select="registry/functionPrefix"/>
         <xsl:text>FunctionTable functions;&#xA;&#xA;</xsl:text>
 
+        <xsl:text>#ifdef _WIN32&#xA;</xsl:text>
+        <xsl:text>#define bs_getProcAddress(module, name) GetProcAddress(module, name)&#xA;</xsl:text>
+
         <xsl:text>    HMODULE module = NULL;&#xA;</xsl:text>
         <xsl:text>    GetModuleHandleExA(&#xA;        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,&#xA;        (LPCSTR)(&amp;</xsl:text>
         <xsl:value-of select="concat(concat($prefix, registry/functionPrefix), 'getFunctions')"/>
         <xsl:text>),&#xA;        &amp;module);&#xA;&#xA;</xsl:text>
+
+        <xsl:text>#else&#xA;</xsl:text>
+
+        <xsl:text>    Dl_info module_info;&#xA;</xsl:text>
+        <xsl:text>    void *module = NULL;&#xA;</xsl:text>
+        <xsl:text>    dladdr((void *)(&amp;</xsl:text>
+        <xsl:value-of select="concat(concat($prefix, registry/functionPrefix), 'getFunctions')"/>
+        <xsl:text>), &amp;module_info);&#xA;</xsl:text>
+        <xsl:text>    module = dlopen(module_info.dli_fname, RTLD_LAZY);&#xA;</xsl:text>
+        <xsl:text>#define bs_getProcAddress(module, name) dlsym(module, name)&#xA;</xsl:text>
+
+        <xsl:text>#endif&#xA;</xsl:text>
 
         <xsl:for-each select="registry/functions/function">
 			<xsl:if test="not(body) and not(@variadic)">
@@ -90,14 +120,20 @@
                 <xsl:value-of select="@name"/>
                 <xsl:text> = (PFN_</xsl:text>
                 <xsl:value-of select="@name"/>
-                <xsl:text>)GetProcAddress(module, "</xsl:text>
+                <xsl:text>)bs_getProcAddress(module, "</xsl:text>
                 <xsl:value-of select="$prefix"/>
                 <xsl:value-of select="@name"/>
                 <xsl:text>");&#xA;</xsl:text>
             </xsl:if>
         </xsl:for-each>
 
-        <xsl:text>&#xA;    return &amp;functions;&#xA;</xsl:text>
+        <xsl:text>&#xA;    #undef bs_getProcAddress&#xA;</xsl:text>
+
+        <xsl:text>#ifndef _WIN32&#xA;</xsl:text>
+        <xsl:text>    dlclose(module);&#xA;</xsl:text>
+        <xsl:text>#endif&#xA;</xsl:text>
+
+        <xsl:text>    return &amp;functions;&#xA;</xsl:text>
 
         <xsl:text>}&#xA;&#xA;</xsl:text>
     </xsl:template>

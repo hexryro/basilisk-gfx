@@ -19,7 +19,7 @@
 		<xsl:apply-templates select="registry/name"/>
 		<xsl:apply-templates select="registry/includes/trampolineHeader/include"/>
 		<xsl:text>&#xA;</xsl:text>
-		<xsl:apply-templates select="registry/structures/structure" mode="declaration"/>
+		<xsl:apply-templates select="registry/structures/*" mode="declaration"/>
         <xsl:text>&#xA;</xsl:text>
         <xsl:apply-templates select="registry/enums/enum" mode="declaration"/>
         <xsl:text>&#xA;</xsl:text>
@@ -69,24 +69,12 @@
         <xsl:text>;&#xA;</xsl:text>
     </xsl:template>
 
-    <xsl:template match="ifdef|ifndef|elifdef">
-        <xsl:text>#</xsl:text>
-        <xsl:value-of select="name()"/>
-        <xsl:text> </xsl:text>
-        <xsl:value-of select="@cond"/>
-        <xsl:text>&#xA;</xsl:text>
-        <xsl:apply-templates select="*"/>
+    <xsl:template match="define|ifdef|ifndef|elifdef|else|endif" mode="definition">
+        <xsl:call-template name="addDirectives"/>
     </xsl:template>
 
-    <xsl:template match="else">
-        <xsl:text>#</xsl:text>
-        <xsl:value-of select="name()"/>
-        <xsl:text>&#xA;</xsl:text>
-        <xsl:apply-templates select="*"/>
-    </xsl:template>
-
-    <xsl:template match="endif">
-        <xsl:text>#endif&#xA;&#xA;</xsl:text>
+    <xsl:template match="define|ifdef|ifndef|elifdef|else|endif">
+        <xsl:call-template name="addDirectives"/>
     </xsl:template>
 
     <xsl:template match="macro">
@@ -135,7 +123,7 @@
         </xsl:if>
         <xsl:text> {&#xA;</xsl:text>
 
-        <xsl:apply-templates select="field | structure | enum" mode="definition">
+        <xsl:apply-templates select="*" mode="definition">
             <xsl:with-param name="indent" select="concat($indent, '    ')"/>
         </xsl:apply-templates>
 

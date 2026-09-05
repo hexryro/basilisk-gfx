@@ -118,6 +118,7 @@ typedef struct bs_ShaderGroup bs_ShaderGroup;
 typedef struct bs_RayTracer bs_RayTracer;
 typedef union bs_JsonArray bs_JsonArray;
 typedef struct bs_Json bs_Json;
+typedef union bs_JsonValueUnion bs_JsonValueUnion;
 typedef struct bs_JsonValue bs_JsonValue;
 typedef struct bs_JsonEnumeration bs_JsonEnumeration;
 typedef struct bs_Material bs_Material;
@@ -208,13 +209,6 @@ typedef enum bs_ImageLayout bs_ImageLayout;
 typedef enum bs_DescriptorType bs_DescriptorType;
 typedef enum bs_DescriptorTypeIndex bs_DescriptorTypeIndex;
 typedef enum bs_VkObjectType bs_VkObjectType;
-
-#ifdef _WIN32
-#define                                                              \
-    
-
-#else
-#endif
 
 #define BS_CONFIGURE_SOURCE(sources, index, count, ids)              \
     sources[index] = bs_configureSource(index, count, (const char* []) { ids(BS_STRING_GEN) })
@@ -605,7 +599,7 @@ typedef enum bs_VkObjectType bs_VkObjectType;
         declaration_name.batch = batch;                              \
         declaration_name.offset = offset_p;                          \
         if (!declaration_name.populated)                             \
-            bs_populateVertexDeclaration(&declaration_name, batch->attributes, batch->attributes_count)
+            bs_populateVertexDeclaration((bs_VertexDeclaration*)&declaration_name, batch->attributes, batch->attributes_count)
 
 #define BS_NUM_CUBE_VERTICES                                         \
     36
@@ -785,7 +779,6 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 
 
 #endif
-
 #define BS_BLANK                                                     \
     (bs_RGBA) {   0,   0,   0,   0 }
 
@@ -2428,8 +2421,8 @@ struct bs_File {
 };
 
 struct bs_PngData {
-    int width;
-    int height;
+    bs_U32 width;
+    bs_U32 height;
     int channels_count;
     size_t size;
     unsigned char* data;
@@ -2941,17 +2934,19 @@ struct bs_Json {
     void* doc;
 };
 
+union bs_JsonValueUnion {
+    bs_JsonArray as_array;
+    bs_JsonObject as_object;
+    bs_F64 as_number;
+    const char* as_string;
+    bool as_bool;
+};
+
 struct bs_JsonValue {
     bool found;
     bs_JsonType type;
     int size;
-    union bs_JsonValueUnion {
-        bs_JsonArray as_array;
-        bs_JsonObject as_object;
-        bs_F64 as_number;
-        char* as_string;
-        bool as_bool;
-    };
+    bs_JsonValueUnion v;
 };
 
 struct bs_JsonEnumeration {
@@ -2986,8 +2981,8 @@ struct bs_Primitive {
     int bone_offset;
     int weight_offset;
     int index_offset;
-    bs_U32 num_indices;
-    bs_U32* indices;
+    int num_indices;
+    int* indices;
     int material_id;
     bs_Mesh* parent;
     bs_Aabb aabb;
@@ -3164,8 +3159,13 @@ struct bs_ObjectId {
 };
 
 struct bs_IO {
+#ifdef _WIN32
     volatile bs_U32 input_down_events[BS_KEY_BYTES_COUNT];
     volatile bs_U32 input_up_events[BS_KEY_BYTES_COUNT];
+#else
+    _Atomic bs_U32 input_down_events[BS_KEY_BYTES_COUNT];
+    _Atomic bs_U32 input_up_events[BS_KEY_BYTES_COUNT];
+#endif
     bs_U32 inputs_up_once[BS_KEY_BYTES_COUNT];
     bs_U32 inputs_down_once[BS_KEY_BYTES_COUNT];
     bs_U32 inputs_down[BS_KEY_BYTES_COUNT];
@@ -4241,74 +4241,6 @@ bs_look(
     bs_mat4* out);
 
  /**
-  @param p0
-  @param p1
-  @param p2
-  @param p3
-  @param out
-  @param out_length
-  @return void
-  */
-BSAPI void
-bs_v2CubicBezier(
-    const bs_vec2* p0,
-    const bs_vec2* p1,
-    const bs_vec2* p2,
-    const bs_vec2* p3,
-    bs_vec2* out,
-    int out_length);
-
- /**
-  @param p0
-  @param p1
-  @param p2
-  @param out
-  @param out_length
-  @return void
-  */
-BSAPI void
-bs_v2QuadBezier(
-    const bs_vec2* p0,
-    const bs_vec2* p1,
-    const bs_vec2* p2,
-    bs_vec2* out,
-    int out_length);
-
- /**
-  @param p0
-  @param p1
-  @param p2
-  @param p3
-  @param out
-  @param out_length
-  @return void
-  */
-BSAPI void
-bs_v3CubicBezier(
-    const bs_vec3* p0,
-    const bs_vec3* p1,
-    const bs_vec3* p2,
-    const bs_vec3* p3,
-    bs_vec3* out,
-    int out_length);
-
- /**
-  @param p0
-  @param p1
-  @param p2
-  @param out
-  @param out_length
-  @return void
-  */
-BSAPI void
-bs_v3QuadBezier(
-    const bs_vec3* p0,
-    const bs_vec3* p1,
-    const bs_vec3* p2,
-    bs_vec3* out,
-    int out_length);
-
- /**
   @param aabb
   @param rotation_matrix
   @param out
@@ -5247,8 +5179,8 @@ bs_ensureBatchSize(
   */
 BSAPI void
 bs_batchVertex(
-    bs_VertexDeclaration* declaration,
-    const unsigned char* src);
+    void* declaration,
+    const void* src);
 
  /**
   @param batch
@@ -6433,9 +6365,9 @@ BSAPI bs_Result
 bs_loadAtlasMemory(
     bs_Queue* queue,
     bs_Object* object,
-    int package_id,
-    char* resource_name,
-    char* data,
+    bs_I32 package_id,
+    bs_I8* resource_name,
+    bs_U8* data,
     bs_U32 flags);
 
  /**
@@ -6474,7 +6406,7 @@ bs_queryProcedures(
     bs_Procedure* procedures,
     int count,
     void* dll_handle,
-    unsigned char* destination);
+    void* destination);
 
  /**
   @param queue
@@ -6943,7 +6875,7 @@ bs_jsonObject(
 BSAPI bs_JsonValue
 bs_jsonArray(
     bs_JsonType type,
-    char* data,
+    void* data,
     int count);
 
  /**
@@ -7409,7 +7341,7 @@ bs_toLower(
   */
 BSAPI bs_U64
 bs_hash(
-    unsigned char* data,
+    void* data,
     size_t size);
 
  /**
@@ -7666,7 +7598,6 @@ bs_unwiden(
     bs_U32 dst_size);
 
 #endif
-
  /**
   @param format
   @param args
@@ -8611,7 +8542,7 @@ bs_destroyResource(
 BSAPI bs_Result
 bs_queryResource(
     int package_id,
-    int resource_type,
+    bs_ResourceType resource_type,
     const char* name,
     bs_Resource** out);
 

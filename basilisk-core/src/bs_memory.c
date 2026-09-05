@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <stddef.h>
 #include <stdint.h>
@@ -30,6 +30,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <ctype.h>
 #include <threads.h>
 
 #ifdef WIN32
@@ -37,7 +38,10 @@
 #include <io.h>
 #include <shlobj_core.h>
 #else
+#include <uuid/uuid.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #endif
 
 #include <basilisk-core.h>
@@ -246,12 +250,12 @@ BSAPI char* _bs_strndup(const char* s, size_t n) {
 
 BSAPI void* _bs_memmem(
     const void* haystack, bs_U32 haystack_len,
-    const void* const needle, const bs_U32 needle_len) 
+    const void* const needle, const bs_U32 needle_len)
 {
     for (const char *h = haystack; haystack_len >= needle_len;
-       ++h, --haystack_len) 
+       ++h, --haystack_len)
     {
-        if (memcmp(h, needle, needle_len) == 0) 
+        if (memcmp(h, needle, needle_len) == 0)
             return (void *)h;
     }
 
@@ -389,7 +393,7 @@ BSAPI bs_String* _bs_stringAlloc(bs_String* old, int len) {
             data = old;
         }
     }
-    else 
+    else
         data = _bs_malloc(sizeof(bs_String) + len + 1);
 
     memset(data, 0, sizeof(bs_String));
@@ -518,7 +522,7 @@ BSAPI bs_String* _bs_appendPath(bs_String* string, char* path, int path_len) {
 
 BSAPI void _bs_replaceCharOccurrences(char* string, int string_len, char a, char b) {
     for (int i = 0; i < string_len; i++) {
-        if (string[i] == a) 
+        if (string[i] == a)
             string[i] = b;
     }
 }
@@ -552,7 +556,8 @@ BSAPI void _bs_toUpper(char* string, int len) {
  /**
   Hashing
   */
-BSAPI bs_U64 _bs_hash(unsigned char* data, size_t size) {
+BSAPI bs_U64 _bs_hash(void* d, size_t size) {
+    unsigned char* data = d;
     bs_U64 hash = 0xcbf29ce484222325;
 
     for (int i = 0; i < size; i++) {
@@ -799,9 +804,9 @@ static inline bs_Result _bs_iterateDocuments(int is_file, bs_ForeachDocumentFunc
     }
 
     do {
-        if (is_file ? 
-            !(file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) : 
-            (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) 
+        if (is_file ?
+            !(file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) :
+            (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
         {
             if (file_data.cFileName[0] == '.') continue;
             strcpy(path + directory_length, file_data.cFileName);
@@ -833,9 +838,9 @@ BSAPI bs_Result _bs_foreachDirectoryN(bs_ForeachDocumentFunction x, void* param,
  /**
   Document counting
   */
-static inline bs_Result _bs_increment(bs_FileInfo info, void* i) { 
-    (*(int*)i)++; 
-    return BS_RESULT_OK; 
+static inline bs_Result _bs_increment(bs_FileInfo info, void* i) {
+    (*(int*)i)++;
+    return BS_RESULT_OK;
 }
 
 BSAPI int _bs_numFilesN(char* directory, int directory_length) {
@@ -851,8 +856,17 @@ BSAPI int _bs_numDirectoriesN(char* directory, int directory_length) {
 }
 
 #else
-BSAPI bs_Result _bs_foreachFile(bs_ForeachDocumentFunction x, const char* directory) { _bs_warnF("_bs_foreachFile not implemented on this platform"); return BS_RESULT_NOT_IMPLEMENTED; }
-BSAPI bs_Result _bs_foreachDirectory(bs_ForeachDocumentFunction x, const char* directory) { _bs_warnF("_bs_foreachDirectory not implemented on this platform"); return BS_RESULT_NOT_IMPLEMENTED; }
+
+BSAPI bs_Result _bs_foreachFileN(bs_ForeachDocumentFunction x, void* param, char* directory, int directory_length) {
+    bs_warnF("_bs_foreachFile not implemented on this platform");
+    return BS_RESULT_NOT_IMPLEMENTED;
+}
+
+BSAPI bs_Result _bs_foreachDirectoryN(bs_ForeachDocumentFunction x, void* param, char* directory, int directory_length) {
+    _bs_warnF("_bs_foreachDirectory not implemented on this platform");
+    return BS_RESULT_NOT_IMPLEMENTED;
+}
+
 #endif
 
    /**
@@ -1164,7 +1178,7 @@ BSAPI bs_Result _bs_loadFileChunkN(long offset, size_t size, bs_String** out, ch
         BS_WARN_ERRNO_PATH("fopen", path);
         return _bs_convertErrno();
     }
-    
+
     if (fseek(file, offset, SEEK_SET) != 0) {
         fclose(file);
         return _bs_convertErrno();
@@ -1300,7 +1314,8 @@ BSAPI void _bs_guidToString(bs_GUID* guid, char out[37]) {
         out[i - 1] = str[i];
     out[36] = '\0';
 #else
-    uuid_unparse_lower(guid, out);
+    assert(sizeof(bs_GUID) == sizeof(uuid_t));
+    uuid_unparse_lower((unsigned char*)guid, out);
 #endif
 }
 
@@ -1321,7 +1336,7 @@ BSAPI bs_GUID _bs_stringToGuid(const char* string) {
         return (bs_GUID) { 0 };
     }
 #else
-    if (uuid_parse(str, &guid) != 0) {
+    if (uuid_parse(string, (unsigned char*)&guid) != 0) {
         _bs_warnF("uuid_parse failed for string \"%s\"", string);
         return (bs_GUID) { 0 };
     }
@@ -1340,7 +1355,7 @@ BSAPI bs_GUID _bs_guid() {
         return (bs_GUID) { 0 };
     }
 #else
-    uuid_generate(&guid);
+    uuid_generate((unsigned char*)&guid);
 #endif
 
     return guid;
@@ -1358,11 +1373,11 @@ BSAPI bool _bs_sameGuid(bs_GUID* a, bs_GUID* b) {
 
 
   /*==============================================================================
-   * 
+   *
    *============================================================================*/
 
 BSAPI int _bs_numDigits(int n) {
-    if (n < 0) n = (n == INT_MIN) ? INT_MAX : -n;
+    if (n < 0) n = (n == BS_I32_MIN) ? BS_I32_MAX : -n;
     if (n < 10) return 1;
     if (n < 100) return 2;
     if (n < 1000) return 3;

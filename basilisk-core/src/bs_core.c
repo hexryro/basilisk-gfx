@@ -23,7 +23,13 @@
   SOFTWARE.
   */
 
+#include "basilisk-core.gen.h"
+#ifdef _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
+#elif defined(__linux__)
+#define VK_USE_PLATFORM_WAYLAND_KHR
+#endif
+
 #include <vulkan.h>
 #include <vulkan/vulkan_core.h>
 
@@ -88,10 +94,6 @@ BSAPI struct VkCommandBuffer_T* _bsi_fetchCommands(bs_Queue* queue) {
 
 BSAPI struct VkDevice_T* _bsi_fetchDevice() {
     return _bs_instance_->device;
-}
-
-BSAPI bs_Procedure* _bs_procedures() {
-    return &_bs_procs_;
 }
 
  /**
@@ -164,7 +166,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL _bs_debugCallback(
                 const VkDebugUtilsObjectNameInfoEXT* obj = &data->pObjects[i];
                 message = _bs_appendStringF(message, "Object %d:\n", i);
                 message = _bs_appendStringF(message, "  Handle: 0x%llx\n", (unsigned long long)obj->objectHandle);
-                message = _bs_appendStringF(message, "  Type:   %s\n", bs_serializeVkObjectType(obj->objectType));
+                message = _bs_appendStringF(message, "  Type:   %s\n", bs_serializeVkObjectType((bs_VkObjectType)obj->objectType));
                 if (obj->pObjectName)
                     message = _bs_appendStringF(message, "  Name:   %s\n", obj->pObjectName);
             }
@@ -258,8 +260,8 @@ static void _bs_prepareInstance() {
 #elif __linux__
     if (BS_ADD_INSTANCE_EXTENSION(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME))
         _bs_instance_->extensions.surface_type = BS_SURFACE_TYPE_WAYLAND;
-    else if (BS_ADD_INSTANCE_EXTENSION(VK_KHR_XLIB_SURFACE_EXTENSION_NAME))
-        _bs_instance_->extensions.surface_type = BS_SURFACE_TYPE_X11;
+    //else if (BS_ADD_INSTANCE_EXTENSION(VK_KHR_XLIB_SURFACE_EXTENSION_NAME))
+//        _bs_instance_->extensions.surface_type = BS_SURFACE_TYPE_X11;
 #endif
     else if (BS_ADD_INSTANCE_EXTENSION(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME)) {
         _bs_warnF("Only off-screen rendering is available");
@@ -324,8 +326,8 @@ static void _bs_prepareInstance() {
     PFN_vkCreateDebugUtilsMessengerEXT create_messenger =
         (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(_bs_instance_->instance, "vkCreateDebugUtilsMessengerEXT");
 
-    PFN_vkCreateDebugUtilsMessengerEXT create_reporter =
-        (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(_bs_instance_->instance, "vkCreateDebugReportCallbackEXT");
+    PFN_vkCreateDebugReportCallbackEXT create_reporter =
+        (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(_bs_instance_->instance, "vkCreateDebugReportCallbackEXT");
 
     if (create_messenger)
         create_messenger(_bs_instance_->instance, &debug_ci, NULL, &messenger);
@@ -457,7 +459,7 @@ static void _bs_nameBuffer(bs_Object* object, const char* name) {
     int name_length = strlen(name);
     object->buffer->flags |= BS_BUFFER_IS_NAMED;
     for (int i = 0; i < object->buffer->head.swaps_count; i++)
-        bsi_nameHandleN(object->buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
+        bsi_nameHandleN((bs_U64)object->buffer->_[i].vk_buffer, VK_OBJECT_TYPE_BUFFER, name, name_length);
 }
 
  /**
@@ -784,7 +786,9 @@ BSAPI void _bs_populateVertexDeclaration(bs_VertexDeclaration* declaration, bs_A
     //declaration->populated = true;
 }
 
-BSAPI void _bs_batchVertex(bs_VertexDeclaration* declaration, const unsigned char* src) {
+BSAPI void _bs_batchVertex(void* decl, const void* source) {
+    bs_VertexDeclaration* declaration = decl;
+    unsigned char* src = source;
     unsigned char* dst = declaration->batch->vertices.data + *declaration->offset * declaration->batch->vertices.unit_size;
 
     for (int i = 0; i < declaration->attributes_count; i++) {
@@ -1678,9 +1682,9 @@ BSAPI void _bs_destroyBatch(bs_Batch* batch) {
 static void _bs_nameRenderer(bs_Object* object, const char* name) {
     int name_length = strlen(name);
 
-    bsi_nameHandleN(object->renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, name, name_length);
+    bsi_nameHandleN((bs_U64)object->renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, name, name_length);
     for (int i = 0; i < object->renderer->head.swaps_count; i++) {
-        bsi_nameHandleN(object->renderer->_[i].framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, name, name_length);
+        bsi_nameHandleN((bs_U64)object->renderer->_[i].framebuffer, VK_OBJECT_TYPE_FRAMEBUFFER, name, name_length);
     }
 }
 
@@ -1695,7 +1699,7 @@ BSAPI void _bs_autoResizeRenderer(bs_Renderer* renderer, bs_Context* context) {
     renderer->context = context;
 }
 
-BSAPI bs_Result _bs_renderer(bs_Object* object, bs_Context* context, bs_RendererBits flags) {
+BSAPI bs_Result _bs_renderer(bs_Object* object, bs_RendererBits flags) {
     assert(object != NULL);
     bs_Renderer* renderer = object->renderer;
 
@@ -1763,21 +1767,27 @@ BSAPI void _bs_dependency(bs_Renderer* renderer, bs_U32 src_subpass, bs_U32 dst_
     });
 }
 
-static int _bs_sortInputs(const bs_Input* a, const bs_Input* b) {
-    if (a->subpass != b->subpass)
-        return (a->subpass < b->subpass) ? -1 : 1;
+static int _bs_sortInputs(const void* a, const void* b) {
+    bs_Input* input_a = (bs_Input*)a;
+    bs_Input* input_b = (bs_Input*)b;
+
+    if (input_a->subpass != input_b->subpass)
+        return (input_a->subpass < input_b->subpass) ? -1 : 1;
     else return 0;
 }
 
-static int _bs_sortOutputs(const bs_Output* a, const bs_Output* b) {
-    bool is_depth_a = _bs_isDepthFormat(a->image->format);
-    bool is_depth_b = _bs_isDepthFormat(b->image->format);
+static int _bs_sortOutputs(const void* a, const void* b) {
+    bs_Output* output_a = (bs_Output*)a;
+    bs_Output* output_b = (bs_Output*)b;
 
-    if (a->subpass != b->subpass)
-        return (a->subpass < b->subpass) ? -1 : 1;
+    bool is_depth_a = _bs_isDepthFormat(output_a->image->format);
+    bool is_depth_b = _bs_isDepthFormat(output_b->image->format);
+
+    if (output_a->subpass != output_b->subpass)
+        return (output_a->subpass < output_b->subpass) ? -1 : 1;
     else if (is_depth_a != is_depth_b)
         return is_depth_a ? 1 : -1;
-    else return (a->attachment < b->attachment) ? -1 : 1;
+    else return (output_a->attachment < output_b->attachment) ? -1 : 1;
 }
 
 BSAPI void _val_bs_renderPass(bs_Renderer* renderer) {
@@ -1871,7 +1881,7 @@ BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
         .subpassCount = renderer->subpasses_count,
         .pSubpasses = subpasses,
         .dependencyCount = renderer->dependencies.count,
-        .pDependencies = renderer->dependencies.data,
+        .pDependencies = (VkSubpassDependency*)renderer->dependencies.data,
     };
 
     VkResult result = vkCreateRenderPass(_bs_instance_->device, &render_pass_ci, NULL, &renderer->render_pass);
@@ -1883,7 +1893,7 @@ BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
 
     const char* id_name = renderer->head.id == 0 ? NULL : _bs_idName(renderer->head.source_id, renderer->head.id);
     if (id_name)
-        bsi_nameHandleF(renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, "(%d) renderer " BS_PRINT_CYAN "%s" BS_PRINT_RESET, renderer->head.id, id_name);
+        bsi_nameHandleF((bs_U64)renderer->render_pass, VK_OBJECT_TYPE_RENDER_PASS, "(%d) renderer " BS_PRINT_CYAN "%s" BS_PRINT_RESET, renderer->head.id, id_name);
 
     return BS_RESULT_OK;
 }
@@ -1975,7 +1985,7 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
         vkCmdBeginRenderPass(command_buffer, &render_pass_i, VK_SUBPASS_CONTENTS_INLINE);
     }
     else {
-        VkRenderingAttachmentInfo* attachments = _alloca(renderer->outputs.count * sizeof(VkRenderingAttachmentInfo));
+        VkRenderingAttachmentInfo* attachments = bs_alloca(renderer->outputs.count * sizeof(VkRenderingAttachmentInfo));
         VkRenderingAttachmentInfo* depth_attachment = NULL;
         int color_attachments_count = renderer->outputs.count;
 
@@ -2158,8 +2168,8 @@ BSAPI void _bs_dispatchAsync(bs_Queue* queue, bs_Pipeline* pipeline, bs_U32 x, b
 static void _bs_nameRayTracer(bs_Object* object, const char* name) {
     int name_length = strlen(name);
 
-    bsi_nameHandleN(object->ray_tracer->TLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
-    bsi_nameHandleN(object->ray_tracer->BLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+    bsi_nameHandleN((bs_U64)object->ray_tracer->TLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
+    bsi_nameHandleN((bs_U64)object->ray_tracer->BLAS, VK_OBJECT_TYPE_ACCELERATION_STRUCTURE_KHR, name, name_length);
 }
 
 BSAPI void _bs_rayTrace(bs_RayTracer* ray_tracer, bs_Pipeline* pipeline, bs_U32 width, bs_U32 height, bs_U32 depth) {
@@ -2262,7 +2272,7 @@ static bs_Result _bs_buildBLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
 
     _bs_stageList(staging_buffer, &tracer->aabbs);
     bs_Object* aabb_buffer = BS_BUFFER(-1, 0, 0);
-    result = _bs_buffer(aabb_buffer->buffer, tracer->aabbs.count * sizeof(VkAabbPositionsKHR),
+    result = _bs_buffer(aabb_buffer, tracer->aabbs.count * sizeof(VkAabbPositionsKHR),
         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 0);
 
@@ -2332,8 +2342,9 @@ static bs_Result _bs_buildBLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
         &aabb_range_info.primitiveCount,
         &size_info);
 
-    tracer->BLAS_buffer = BS_BUFFER(-1, 0, 0)->buffer;
-    result = _bs_buffer(tracer->BLAS_buffer, size_info.accelerationStructureSize,
+    bs_Object* BLAS_buffer_obj = BS_BUFFER(-1, 0, 0);
+    tracer->BLAS_buffer = BLAS_buffer_obj->buffer;
+    result = _bs_buffer(BLAS_buffer_obj, size_info.accelerationStructureSize,
         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         0);
@@ -2357,8 +2368,9 @@ static bs_Result _bs_buildBLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
         return result;
     }
 
-    tracer->BLAS_scratch_buffer = BS_BUFFER(-1, 0, 0)->buffer;
-    result = _bs_buffer(tracer->BLAS_scratch_buffer, size_info.buildScratchSize,
+    bs_Object* BLAS_scratch_buffer_obj = BS_BUFFER(-1, 0, 0);
+    tracer->BLAS_scratch_buffer = BLAS_scratch_buffer_obj->buffer;
+    result = _bs_buffer(BLAS_scratch_buffer_obj, size_info.buildScratchSize,
         VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         0);
@@ -2371,7 +2383,7 @@ static bs_Result _bs_buildBLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
     build_info.dstAccelerationStructure = tracer->BLAS;
     build_info.scratchData.deviceAddress = _bs_bufferAddress(tracer->BLAS_scratch_buffer->_->vk_buffer);
 
-    VkAccelerationStructureBuildRangeInfoKHR* pRangeInfo = &aabb_range_info;
+    const VkAccelerationStructureBuildRangeInfoKHR* pRangeInfo = &aabb_range_info;
 
     _bs_procs_.vkCmdBuildAccelerationStructuresKHR(_bsi_fetchCommands(queue), 1, &build_info, &pRangeInfo);
     queue->flags |= BS_QUEUE_SINGLE_TIMES_BIT;
@@ -2409,8 +2421,9 @@ static bs_Result _bs_buildTLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
         .primitiveCount = 1,
     };
 
-    bs_Buffer* instance_buffer = BS_BUFFER(-1, 0, 0)->buffer;
-    result = _bs_buffer(instance_buffer, sizeof(instance),
+    bs_Object* instance_buffer_obj = BS_BUFFER(-1, 0, 0);
+    bs_Buffer* instance_buffer = instance_buffer_obj->buffer;
+    result = _bs_buffer(instance_buffer_obj, sizeof(instance),
         VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         BS_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         0);
@@ -2469,8 +2482,9 @@ static bs_Result _bs_buildTLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
     _bs_procs_.vkGetAccelerationStructureBuildSizesKHR(_bs_instance_->device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &build_info,
         &range_info.primitiveCount, &size_info);
 
-    tracer->TLAS_buffer = BS_BUFFER(-1, 0, 0)->buffer;
-    result = _bs_buffer(tracer->TLAS_buffer, size_info.accelerationStructureSize,
+    bs_Object* TLAS_buffer_obj = BS_BUFFER(-1, 0, 0);
+    tracer->TLAS_buffer = TLAS_buffer_obj->buffer;
+    result = _bs_buffer(TLAS_buffer_obj, size_info.accelerationStructureSize,
         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         BS_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         0);
@@ -2496,9 +2510,10 @@ static bs_Result _bs_buildTLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
 
     build_info.dstAccelerationStructure = tracer->TLAS;
 
-    tracer->TLAS_scratch_buffer = BS_BUFFER(-1, 0, 0)->buffer;
+    bs_Object* TLAS_scratch_buffer_obj = BS_BUFFER(-1, 0, 0);
+    tracer->TLAS_scratch_buffer = TLAS_scratch_buffer_obj->buffer;
     result = _bs_buffer(
-        tracer->TLAS_scratch_buffer,
+        TLAS_scratch_buffer_obj,
         size_info.buildScratchSize,
         VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, BS_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         0);
@@ -2510,7 +2525,7 @@ static bs_Result _bs_buildTLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
 
     build_info.scratchData.deviceAddress = _bs_bufferAddress(tracer->TLAS_scratch_buffer->_->vk_buffer);
 
-    VkAccelerationStructureBuildRangeInfoKHR* p_range_info = &range_info;
+    const VkAccelerationStructureBuildRangeInfoKHR* p_range_info = &range_info;
 
     _bs_procs_.vkCmdBuildAccelerationStructuresKHR(_bsi_fetchCommands(queue), 1, &build_info, &p_range_info);
     queue->flags |= BS_QUEUE_SINGLE_TIMES_BIT;
@@ -2522,8 +2537,9 @@ static bs_Result _bs_buildTLAS(bs_Queue* queue, bs_RayTracer* tracer, bs_Buffer*
 }
 
 BSAPI bs_Result _bs_build(bs_Queue* queue, bs_RayTracer* tracer) {
-    bs_Buffer* staging_buffer = BS_BUFFER(-1, 0, 0)->buffer;
-    bs_Result result = _bs_buffer(staging_buffer, BS_MAX(sizeof(VkAccelerationStructureInstanceKHR), tracer->aabbs.count * sizeof(VkAabbPositionsKHR)),
+    bs_Object* staging_buffer_obj = BS_BUFFER(-1, 0, 0);
+    bs_Buffer* staging_buffer = staging_buffer_obj->buffer;
+    bs_Result result = _bs_buffer(staging_buffer_obj, BS_MAX(sizeof(VkAccelerationStructureInstanceKHR), tracer->aabbs.count * sizeof(VkAabbPositionsKHR)),
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         0);
@@ -2628,11 +2644,11 @@ static void _bs_nameQueue(bs_Object* object, const char* name) {
 
     for (int i = 0; i < object->queue->head.swaps_count; i++) {
         if (object->queue->_[i].fence)
-            bsi_nameHandleN(object->queue->_[i].fence, VK_OBJECT_TYPE_FENCE, name, name_length);
+            bsi_nameHandleN((bs_U64)object->queue->_[i].fence, VK_OBJECT_TYPE_FENCE, name, name_length);
         if (object->queue->_[i].semaphore)
-            bsi_nameHandleN(object->queue->_[i].semaphore, VK_OBJECT_TYPE_SEMAPHORE, name, name_length);
+            bsi_nameHandleN((bs_U64)object->queue->_[i].semaphore, VK_OBJECT_TYPE_SEMAPHORE, name, name_length);
         if (object->queue->_[i].command_buffer)
-            bsi_nameHandleN(object->queue->_[i].command_buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, name, name_length);
+            bsi_nameHandleN((bs_U64)object->queue->_[i].command_buffer, VK_OBJECT_TYPE_COMMAND_BUFFER, name, name_length);
     }
 }
 
@@ -2888,8 +2904,8 @@ BSAPI bs_Result _bs_pushQueue(bs_Queue* queue, int wait_semaphores_count, bs_Wai
     VkSemaphore* semaphores = NULL;
 
     if (wait_semaphores_count > 0) {
-        stages = _alloca(wait_semaphores_count * sizeof(VkPipelineStageFlags));
-        semaphores = _alloca(wait_semaphores_count * sizeof(VkSemaphore));
+        stages = bs_alloca(wait_semaphores_count * sizeof(VkPipelineStageFlags));
+        semaphores = bs_alloca(wait_semaphores_count * sizeof(VkSemaphore));
 
         for (int i = 0; i < wait_semaphores_count; i++) {
             semaphores[i] = wait_semaphores[i].semaphore;
@@ -3103,7 +3119,7 @@ BSAPI void _bs_present(bs_Queue* queue, bs_Queue* wait_queues[], int wait_queues
     VkSemaphore* wait_semaphores = NULL;
 
     if (wait_queues_count > 0) {
-        wait_semaphores = _alloca(wait_queues_count * sizeof(VkSemaphore));
+        wait_semaphores = bs_alloca(wait_queues_count * sizeof(VkSemaphore));
 
         for (int i = 0; i < wait_queues_count; i++) {
             bs_Queue* wait_queue = wait_queues[i];

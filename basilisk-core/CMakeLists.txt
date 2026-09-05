@@ -34,12 +34,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/vulkan
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE 
+target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    vulkan-1 
+    vulkan-1
     dwmapi
 )
 
@@ -56,6 +56,12 @@ IF (WIN32)
     )
 ENDIF ()
 
+IF (UNIX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        dl
+    )
+ENDIF ()
+
 SET(COPY_BASILISK_DLL_DEBUG ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build/basilisk-core/Debug/basilisk-core.dll" "${CMAKE_SOURCE_DIR}/build/${BS_APP_NAME}/Debug/")
 SET(COPY_BASILISK_DLL_RELEASE ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build/basilisk-core/Release/basilisk-core.dll" "${CMAKE_SOURCE_DIR}/build/${BS_APP_NAME}/Release")
 SET(COPY_BASILISK_DLL_RELEASE_DEBUG ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build/basilisk-core/RelWithDebInfo/basilisk-core.dll" "${CMAKE_SOURCE_DIR}/build/${BS_APP_NAME}/RelWithDebInfo")
@@ -65,7 +71,7 @@ SET(COPY_BASILISK_DLL_RELEASE_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_D
 SET(COPY_BASILISK_DLL_RELEASE_DEBUG_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build/basilisk-core/RelWithDebInfo/basilisk-core.dll" "${CMAKE_SOURCE_DIR}/build/basilisk-test-runner/RelWithDebInfo")
 
 #add_custom_command(
-#    TARGET ${PROJECT_NAME} 
+#    TARGET ${PROJECT_NAME}
 #    POST_BUILD
 #    COMMAND "$<$<CONFIG:Debug>:${COPY_BASILISK_DLL_DEBUG}>" COMMENT "POST_BUILD: Copying basilisk.dll/"
 #    COMMAND "$<$<CONFIG:Debug>:${COPY_BASILISK_DLL_DEBUG_TO_TEST}>" COMMENT "POST_BUILD: Copying basilisk.dll/ to test"
@@ -74,7 +80,7 @@ SET(COPY_BASILISK_DLL_RELEASE_DEBUG_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAKE_SO
 #)
 
 #add_custom_command(
-#    TARGET ${PROJECT_NAME} 
+#    TARGET ${PROJECT_NAME}
 #    POST_BUILD
 #    COMMAND "$<$<CONFIG:Release>:${COPY_BASILISK_DLL_RELEASE}>" COMMENT "POST_BUILD: Copying basilisk.dll/"
 #    COMMAND "$<$<CONFIG:Release>:${COPY_BASILISK_DLL_RELEASE_TO_TEST}>" COMMENT "POST_BUILD: Copying basilisk.dll/ to test"
@@ -83,7 +89,7 @@ SET(COPY_BASILISK_DLL_RELEASE_DEBUG_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAKE_SO
 #)
 
 #add_custom_command(
-#    TARGET ${PROJECT_NAME} 
+#    TARGET ${PROJECT_NAME}
 #    POST_BUILD
 #    COMMAND "$<$<CONFIG:RelWithDebInfo>:${COPY_BASILISK_DLL_RELEASE_DEBUG}>" COMMENT "POST_BUILD: Copying basilisk.dll/"
 #    COMMAND "$<$<CONFIG:RelWithDebInfo>:${COPY_BASILISK_DLL_RELEASE_DEBUG_TO_TEST}>" COMMENT "POST_BUILD: Copying basilisk.dll/ to test"

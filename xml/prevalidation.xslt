@@ -16,7 +16,7 @@
 		<xsl:call-template name="addFunctionTableSetter">
 			<xsl:with-param name="prefix" select="'_preval_'"/>
 		</xsl:call-template>
-		
+
         <xsl:apply-templates select="registry/functions/function" mode="validation"/>
 
         <xsl:value-of select="registry/functionPrefix"/>
@@ -146,7 +146,7 @@
                 <xsl:if test="not(position() = last())">
                     <xsl:text>, </xsl:text>
                 </xsl:if>
-            </xsl:for-each>           
+            </xsl:for-each>
             <xsl:text>);&#xA;}&#xA;</xsl:text>
 
             <xsl:text>&#xA;</xsl:text>

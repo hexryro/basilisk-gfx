@@ -13,10 +13,10 @@
 
 	<xsl:template match="/">
 		<xsl:call-template name="add-license"/>
-		
+
 		<xsl:apply-templates select="registry/includes/internal/include"/>
 		<xsl:text>&#xA;</xsl:text>
-		
+
 		<xsl:apply-templates select="registry/functions/*" mode="definition"/>
 
 	</xsl:template>

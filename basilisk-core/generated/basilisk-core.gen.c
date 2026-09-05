@@ -700,48 +700,6 @@ void bs_look(
     glm_look(eye->a, direction->a, up->a, out->a);
 }
 
-void bs_v2CubicBezier(
-    const bs_vec2* p0, 
-    const bs_vec2* p1, 
-    const bs_vec2* p2, 
-    const bs_vec2* p3, 
-    bs_vec2* out, 
-    int out_length)
-{
-    next.bs_v2CubicBezier(p0, p1, p2, p3, out, out_length);
-}
-
-void bs_v2QuadBezier(
-    const bs_vec2* p0, 
-    const bs_vec2* p1, 
-    const bs_vec2* p2, 
-    bs_vec2* out, 
-    int out_length)
-{
-    next.bs_v2QuadBezier(p0, p1, p2, out, out_length);
-}
-
-void bs_v3CubicBezier(
-    const bs_vec3* p0, 
-    const bs_vec3* p1, 
-    const bs_vec3* p2, 
-    const bs_vec3* p3, 
-    bs_vec3* out, 
-    int out_length)
-{
-    next.bs_v3CubicBezier(p0, p1, p2, p3, out, out_length);
-}
-
-void bs_v3QuadBezier(
-    const bs_vec3* p0, 
-    const bs_vec3* p1, 
-    const bs_vec3* p2, 
-    bs_vec3* out, 
-    int out_length)
-{
-    next.bs_v3QuadBezier(p0, p1, p2, out, out_length);
-}
-
 void bs_rotateAabb(
     const bs_Aabb* aabb, 
     const bs_mat3* rotation_matrix, 
@@ -1390,8 +1348,8 @@ void bs_ensureBatchSize(
 }
 
 void bs_batchVertex(
-    bs_VertexDeclaration* declaration, 
-    const unsigned char* src)
+    void* declaration, 
+    const void* src)
 {
     next.bs_batchVertex(declaration, src);
 }
@@ -2188,9 +2146,9 @@ void bs_destroyAtlas(
 bs_Result bs_loadAtlasMemory(
     bs_Queue* queue, 
     bs_Object* object, 
-    int package_id, 
-    char* resource_name, 
-    char* data, 
+    bs_I32 package_id, 
+    bs_I8* resource_name, 
+    bs_U8* data, 
     bs_U32 flags)
 {
     return next.bs_loadAtlasMemory(queue, object, package_id, resource_name, data, flags);
@@ -2218,7 +2176,7 @@ void bs_queryProcedures(
     bs_Procedure* procedures, 
     int count, 
     void* dll_handle, 
-    unsigned char* destination)
+    void* destination)
 {
     next.bs_queryProcedures(procedures, count, dll_handle, destination);
 }
@@ -2560,7 +2518,7 @@ bs_JsonValue bs_jsonObject(
 
 bs_JsonValue bs_jsonArray(
     bs_JsonType type, 
-    char* data, 
+    void* data, 
     int count)
 {
     return next.bs_jsonArray(type, data, count);
@@ -2918,7 +2876,7 @@ void bs_toLower(
 }
 
 bs_U64 bs_hash(
-    unsigned char* data, 
+    void* data, 
     size_t size)
 {
     return next.bs_hash(data, size);
@@ -3788,7 +3746,7 @@ void bs_destroyResource(
 
 bs_Result bs_queryResource(
     int package_id, 
-    int resource_type, 
+    bs_ResourceType resource_type, 
     const char* name, 
     bs_Resource** out)
 {

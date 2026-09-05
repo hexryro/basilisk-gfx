@@ -23,6 +23,7 @@
   SOFTWARE.
   */
 
+#include "basilisk-core.gen.h"
 #ifdef _WIN32
 #include <windows.h>
 #include <windowsx.h>
@@ -91,7 +92,8 @@ static void _bs_createSurface() {
     }
 }
 
-BSAPI void _bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_handle, unsigned char* destination) {
+BSAPI void _bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_handle, void* dst) {
+    unsigned char* destination = dst;
 #define BS_STRING_GEN_2(TYPE, FUNC, ...) { .size = sizeof(TYPE), .func = #FUNC, __VA_OPT__(.is_required = __VA_ARGS__) },
 #ifdef _WIN32
     for (int i = 0; i < count; i++) {
@@ -575,7 +577,7 @@ static void _bs_prepareSwapchain() {
         return;
     }
 
-    bsi_nameHandle(_bs_scope_.context->swapchain, VK_OBJECT_TYPE_SWAPCHAIN_KHR, _bs_scope_.context->title);
+    bsi_nameHandle((bs_U64)_bs_scope_.context->swapchain, VK_OBJECT_TYPE_SWAPCHAIN_KHR, _bs_scope_.context->title);
 
     /**
      Swapchain images
@@ -786,20 +788,9 @@ BSAPI bs_ivec2 _bs_windowPosition(bs_Context* context) {
 	};
 
 #elif defined(__linux__)
-    Window child;
-    int x, y;
-    XTranslateCoordinates(
-        _bs_scope_.context->display,
-        _bs_scope_.context->window,
-        DefaultRootWindow(_bs_scope_.context->display),
-        0, 0,
-        &x, &y,
-        &child
-    );
-
     return (bs_ivec2) {
-        .x = x,
-        .y = y
+        .x = 0,
+        .y = 0
     };
 
 #elif defined(__APPLE__)
@@ -818,7 +809,7 @@ BSAPI bs_ivec2 _bs_windowPosition(bs_Context* context) {
 
 const bool separate_message_thread = true; // temp
 
-
+#ifdef _WIN32
 static inline void bs_setBit(long A[], unsigned int k) {
     InterlockedOr(&A[k / 32U], 1L << (k % 32U));
 }
@@ -836,6 +827,32 @@ static inline int bs_testBit(long A[], unsigned int k) {
     long value = InterlockedCompareExchange(&A[k / 32U], 0, 0);
     return (value & (1L << (k % 32U))) != 0;
 }
+
+#define bs_atomicExchange(object, desired) InterlockedCompareExchange(object, desired)
+
+#elif defined(__linux__)
+#include <stdatomic.h>
+static inline void bs_setBit(bs_U32 A[], unsigned int k) {
+    atomic_fetch_or((_Atomic bs_U32 *)&A[k / 32U], 1L << (k % 32U));
+}
+
+static inline void bs_clearBit(bs_U32 A[], unsigned int k) {
+    atomic_fetch_and((_Atomic bs_U32 *)&A[k / 32U], ~(1L << (k % 32U)));
+}
+
+static inline int bs_getBit(bs_U32 A[], unsigned int k) {
+    bs_U32 value = atomic_load((_Atomic bs_U32 *)&A[k / 32U]);
+    return (value & (1L << (k % 32U))) != 0;
+}
+
+static inline int bs_testBit(bs_U32 A[], unsigned int k) {
+    bs_U32 value = atomic_load((_Atomic bs_U32 *)&A[k / 32U]);
+    return (value & (1L << (k % 32U))) != 0;
+}
+
+#define bs_atomicExchange(object, desired) atomic_exchange(object, desired)
+
+#endif
 
 /*
 static inline void bs_setBit(bs_I16 A[], unsigned int k) {
@@ -930,24 +947,25 @@ static void _bs_hideMenuWindows(bs_List* contexts) {
 }
 
 BSAPI void _bs_tickContext(bs_Context* context, bs_ContextTickFunction tick) {
-
    // if (bs_getBit(context->io.keys, BS_KEY_ALT) && bs_getBit(context->io.keys, BS_KEY_F4))
    //     _bs_exit();
 
+    #ifdef _WIN32
     context->active = context->hwnd == GetForegroundWindow();
 
     POINT p = { _bs_instance_->screen_cursor.x, _bs_instance_->screen_cursor.y };
     if (ScreenToClient(context->hwnd, &p))
         context->cursor = BS_V2(p.x, p.y);
+    #endif
 
     if (separate_message_thread) {
         for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
-            context->io.inputs_up_once[i] = InterlockedExchange(&context->io.input_up_events[i], 0);
+            context->io.inputs_up_once[i] = bs_atomicExchange(&context->io.input_up_events[i], 0);
         }
 
         for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
             context->io.inputs_down_last[i] = context->io.inputs_down[i];
-            context->io.inputs_down_once[i] = InterlockedExchange(&context->io.input_down_events[i], 0);
+            context->io.inputs_down_once[i] = bs_atomicExchange(&context->io.input_down_events[i], 0);
         }
 
     } else {
@@ -1009,10 +1027,12 @@ static void _bs_renderTick(bs_Callback fixed_tick) {
     _bs_instance_->delta_time = _bs_instance_->time - _bs_instance_->time_old;
     _bs_instance_->in_fixed = false;
 
+    #ifdef _WIN32
     POINT p;
     if (GetCursorPos(&p)) {
         _bs_instance_->screen_cursor = BS_V2(p.x, p.y);
     }
+    #endif
 
     /**
         Cache contexts
@@ -1047,10 +1067,12 @@ static void _bs_renderTick(bs_Callback fixed_tick) {
     }
     _bs_checkTimer(&_bs_instance_->timer);
 
+    #ifdef _WIN32
     while ((_bs_instance_->timer.seconds - frame_start) < _bs_instance_->target_frame_time) {
         Sleep(0);
         _bs_checkTimer(&_bs_instance_->timer);
     }
+    #endif
 }
 
 static void _bs_startRenderTick(bs_Callback fixed_tick) {
@@ -1059,6 +1081,7 @@ static void _bs_startRenderTick(bs_Callback fixed_tick) {
     }
 }
 
+#ifdef _WIN32
 static void _bs_handleMessageAtomic(bs_List* contexts, bs_Context* context, MSG msg) {
     switch (msg.message) {
     case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
@@ -1138,13 +1161,14 @@ static void _bs_handleMessageAtomic(bs_List* contexts, bs_Context* context, MSG 
     if (_hide_menu_windows_)
         _bs_hideMenuWindows(contexts);
 }
+#endif
 
 BSAPI void _bs_tick(bs_Callback fixed_tick) {
     _bs_instance_->alive = true;
     _bs_instance_->timer = _bs_timer();
 
     if (separate_message_thread)
-        bs_createThread(_bs_startRenderTick, fixed_tick);
+        bs_createThread((bs_ThreadFunction)_bs_startRenderTick, fixed_tick);
 
     while (_bs_instance_->alive) {
        /**
@@ -1171,6 +1195,7 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
        /**
         Message loop
         */
+       #ifdef _WIN32
         MSG msg;
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             _bs_scope_.context = NULL;
@@ -1197,6 +1222,7 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+        #endif
 
         if (!separate_message_thread) {
             _bs_renderTick(fixed_tick);
@@ -1216,12 +1242,15 @@ BSAPI void _bs_tick(bs_Callback fixed_tick) {
 }
 
 static void _bs_updateWindowDPI(bs_Context* context) {
+    #ifdef _WIN32
     UINT dpi = GetDpiForWindow(context->hwnd);
 
     context->border_size.x = GetSystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
     context->border_size.y = GetSystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
+    #endif
 }
 
+#ifdef _WIN32
 static LRESULT _bs_hitTestResize(bs_Context* context, bs_ivec2 pt, LRESULT fallback) {
     RECT rc;
     GetWindowRect(context->hwnd, &rc);
@@ -1354,10 +1383,13 @@ LRESULT CALLBACK _bs_windowProcedure(HWND hwnd, UINT msg, WPARAM w_param, LPARAM
     }
     return 0;
 }
+#endif
 
 BSAPI void _bs_moveWindow(bs_Context* context, int x, int y) {
     bs_ivec2 resolution = _bs_resolution(context);
+    #ifdef _WIN32
 	SetWindowPos(context->hwnd, HWND_TOP, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
+	#endif
 }
 
 BSAPI bs_Result _bs_window(
@@ -1380,6 +1412,7 @@ BSAPI bs_Result _bs_window(
     bs_Timer timer = _bs_timer();
     _bs_setTargetFramerate(120);
 
+    #ifdef _WIN32
     const char* class_name = title;
     HINSTANCE hinstance = GetModuleHandle(0);
 
@@ -1463,9 +1496,11 @@ BSAPI bs_Result _bs_window(
     HDC hdc = GetDC(context->hwnd);
     int pixel_format = ChoosePixelFormat(hdc, &pixel_format_descriptor);
     SetPixelFormat(hdc, pixel_format, &pixel_format_descriptor);
+#endif
 
     _bs_createSurface();
 
+    #ifdef _WIN32
     if (context->window_type == BS_WINDOW_NO_TITLE_BAR) {
         RECT rect;
         GetWindowRect(context->hwnd, &rect);
@@ -1491,6 +1526,7 @@ BSAPI bs_Result _bs_window(
     }
 
     _bs_updateWindowDPI(context);
+    #endif
 
     _bs_scope_.context = NULL;
 
