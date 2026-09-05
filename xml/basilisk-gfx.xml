@@ -18,7 +18,6 @@
 		<trampolineHeader>
 			<include>basilisk-core.h</include>
 			<include>../bsgfx_contracts.h</include>
-			<include>wtypes.h</include>
 			<include>assert.h</include>
 			<include>stdarg.h</include>
 			<include>string.h</include>
@@ -50,18 +49,18 @@
 
 		<typedef><type>bs_U32</type><name>bsgfx_ColliderFlags</name></typedef>
 
-		<typedef><type>void</type><name>(__stdcall* PFN_void)()</name></typedef>
-		<typedef><type>bs_Queue*</type><name>(__stdcall* PFN_bsgfx_onQueue)()</name></typedef>
+		<typedef><type>void</type><name>(* PFN_void)()</name></typedef>
+		<typedef><type>bs_Queue*</type><name>(* PFN_bsgfx_onQueue)()</name></typedef>
 
 		<typedef><type>bs_U32</type><name>bsgfx_PrimitiveFlags</name></typedef>
 		<typedef><type>bs_U32</type><name>bsgfx_SpawnerFlags</name></typedef>
 
-		<typedef><type>void</type><name>(__stdcall* PFN_bsgfx_TypeMapper)(void*, void*)</name></typedef>
-		
-		<typedef><type>bool</type><name>(__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*)</name></typedef>
+		<typedef><type>void</type><name>(* PFN_bsgfx_TypeMapper)(void*, void*)</name></typedef>
+
+		<typedef><type>bool</type><name>(* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*)</name></typedef>
 
 		<typedef><type>struct bsgfx_InstanceHeader</type><name>bsgfx_InstanceHeader</name></typedef>
-		
+
 		<typedef><type>bs_Range</type><name>bsgfx_Range</name></typedef>
 	</typedefs>
 
@@ -97,7 +96,7 @@
 			<line><name>BSGFX_FONT_FORCE_CREATE</name><value>1 &lt;&lt; 0</value></line>
 			<line><name>BSGFX_FONT_NO_CAPS</name><value>1 &lt;&lt; 1</value></line>
 		</enum>
-		
+
 		<enum name="bsgfx_InstanceSubtypeFlag">
 			<line><name>BSGFX_SUBTYPE_MANUAL_RESET</name><value>1 &lt;&lt; 0</value></line>
 		</enum>
@@ -216,7 +215,7 @@
 			<line><name>BSGFX_WIDGET_ADVANCE_APPLY_OFFSET</name><value>(BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_X | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Y | BSGFX_WIDGET_ADVANCE_APPLY_OFFSET_Z)</value></line>
 			<line><name>BSGFX_WIDGET_PLACEMENT_RIGHT</name><value>(1 &lt;&lt; 7)</value></line>
 		</enum>
-		
+
 		<enum name="bsgfx_Language">
 			<line><name>BS_LANGUAGE_DONT_KNOW</name><value>0</value></line>
 
@@ -908,7 +907,7 @@
 
     <macros>
 		<macro><name>#define BSGFX_FOURCC(A, B, C, D)</name><line>((bs_U32)(A) | ((bs_U32)(B) &lt;&lt; 8) | ((bs_U32)(C) &lt;&lt; 16) | ((bs_U32)(D) &lt;&lt; 24))</line></macro>
-		
+
         <macro><name>#define BSGFX_MODEL_PATH</name><line>"resources/models/"</line></macro>
         <macro><name>#define BSGFX_SHADER_PATH</name><line>"resources/shaders/"</line></macro>
         <macro><name>#define BSGFX_AUDIO_PATH</name><line>"resources/audio/"</line></macro>
@@ -1012,7 +1011,7 @@
 			<field><type>bsgfx_Range</type><name>instance_range</name></field>
 			<field><type>bsgfx_InstanceSubtype*</type><name>subtype</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_UIIcon">
 			<field><type>bs_vec2</type><name>size</name></field>
 			<field><type>bs_vec3</type><name>position</name></field>
@@ -1041,7 +1040,7 @@
 			</structure>
 			<field><type>int</type><name>material_id</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_Text">
 			<field><type>bs_vec4</type><name>position</name></field>
 			<field><type>float</type><name>scale</name></field>
@@ -1051,27 +1050,27 @@
 			<field><type>int</type><name>material_id</name></field>
 			<field><type>bs_RGBA</type><name>colors</name><size>8</size></field>
 		</structure>
-		
+
 		<structure name="bsgfx_MeshInstance">
 			<field><type>bs_mat4</type><name>transform</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_BoneInstance">
 			<field><type>bs_mat4</type><name>transform</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_QuadInstance">
 			<field><type>bs_mat4x3</type><name>transform</name></field>
 			<field><type>bs_vec2</type><name>coords</name></field>
 			<field><type>bs_vec2</type><name>offset</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_PointInstance">
 			<field><type>bs_vec3</type><name>coord</name></field>
 			<field><type>float</type><name>size</name></field>
 			<field><type>bs_vec4</type><name>color</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_LineInstance">
 			<field><type>bs_vec4</type><name>start</name></field>
 			<field><type>bs_vec4</type><name>end</name></field>
@@ -1187,7 +1186,7 @@
 			<field><type>bs_List</type><name>subtypes</name></field>
 			<field><type>bs_Buffer*</type><name>device_instances</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_InstanceSubtype">
 			<field><type>int</type><name>index_offset</name></field>
 			<field><type>int</type><name>index_count</name></field>
@@ -1198,7 +1197,7 @@
 			<field><type>bsgfx_InstanceType*</type><name>instance_type2</name></field>
 			<field><type>bs_List</type><name>host_instances</name></field>
 		</structure>
-		
+
 		<structure name="bsgfx_Type">
 			<field><type>int</type><name>version</name></field>
 			<field><type>int</type><name>capacity</name></field>
@@ -1426,14 +1425,14 @@
             <field><type>bs_U16</type><name>kerning_pair_start</name></field>
             <field><type>bs_U16</type><name>kerning_pair_count</name></field>
         </structure>
-		
+
 		<structure name="bsgfx_UnicodeBlock2">
             <field><type>bs_U32</type><name>offset</name></field>
             <field><type>bs_U16</type><name>count</name></field>
             <field><type>bs_U16</type><name>reserved</name></field>
             <field><type>bs_U32</type><name>glyphs_offset</name></field>
         </structure>
-				
+
 		<structure name="bsgfx_KerningPair">
 			<field><type>bs_U16</type><name>right</name></field>
 
@@ -1447,7 +1446,7 @@
 			<field><type>bs_I16</type><name>right_x_advance</name></field>
 			<field><type>bs_I16</type><name>right_y_advance</name></field>
         </structure>
-		
+
 		<structure name="bsgfx_Font">
             <field><type>int</type><name>blocks_count</name></field>
             <field><type>int</type><name>pt_sizes_count</name></field>
@@ -1464,7 +1463,7 @@
                 <field><type>void*</type><name>unused</name></field>
             </structure>
         </structure>
-		
+
 		<structure name="bsgfx_Widget">
 			<field><type>int</type><name>indent</name></field>
 			<field><type>int</type><name>id</name></field>
@@ -1691,11 +1690,11 @@
 		<function name="bsgfx_instanceTypes">
 			<return>bsgfx_InstanceType**</return>
 		</function>
-		
+
 		<function name="bsgfx_computeContextCamera">
 			<return>void</return>
 		</function>
-		
+
 		<function name="bsgfx_tickInstanceTypes">
 			<return>void</return>
 		</function>
@@ -1703,7 +1702,7 @@
 		<function name="bsgfx_resetInstanceTypes">
 			<return>void</return>
 		</function>
-		
+
 		<function name="bsgfx_textDimensions">
 			<return>void</return>
 			<param><type>bsgfx_Font*</type><name>font</name></param>
@@ -1721,7 +1720,7 @@
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
 			<param><type>bs_Queue*</type><name>queue</name></param>
 		</function>
-		
+
 		<function name="bsgfx_renderAtlasIcons">
 			<return>void</return>
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
@@ -1765,17 +1764,17 @@
 			<return>void</return>
 			<param><type>bs_PipelineHash*</type><name>inout</name></param>
 		</function>
-		
+
 		<function name="bsgfx_requiredForStencilShadows">
 			<return>void</return>
 			<param><type>bs_PipelineHash*</type><name>inout</name></param>
 		</function>
-		
+
 		<function name="bsgfx_requiredForTransparency">
 			<return>void</return>
 			<param><type>bs_PipelineHash*</type><name>inout</name></param>
 		</function>
-		
+
 		<function name="bsgfx_currentScene">
 			<return>bsgfx_Scene*</return>
 		</function>
@@ -1789,13 +1788,13 @@
 			<param><type>const char*</type><name>library_name</name></param>
 			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 		</function>
-		
+
 		<function name="bsgfx_validateInstanceType">
 			<return>bool</return>
 			<param><type>const char*</type><name>library_name</name></param>
 			<param><type>bsgfx_InstanceType*</type><name>instance_type</name></param>
 		</function>
-		
+
 		<function name="bsgfx_worldToScreen">
 			<return>void</return>
 			<param><type>const bs_vec3*</type><name>position</name></param>
@@ -1803,7 +1802,7 @@
 			<param><type>const bs_vec2*</type><name>resolution</name></param>
 			<param><type>bs_vec2*</type><name>out</name></param>
 		</function>
-		
+
 		<function name="bsgfx_materialCategoryName">
 			<return>const char*</return>
 			<param><type>bsgfx_MaterialCategory</type><name>category</name></param>
@@ -2080,7 +2079,7 @@
 			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>int</type><name>instance_id</name></param>
 		</function>
-		
+
 		<function name="bsgfx_matrix">
 			<return>bs_mat4x3</return>
 			<param><type>bs_vec3</type><name>position</name></param>
@@ -2180,13 +2179,13 @@
 			<return>void</return>
 			<param><type>bs_Queue*</type><name>queue</name></param>
 		</function>
-		
+
 		<function name="bsgfx_renderPrefabShadowVolumes">
 			<return>void</return>
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
 			<param><type>bs_Queue*</type><name>queue</name></param>
 		</function>
-		
+
 		<function name="bsgfx_prefabMetadata">
 			<return>bsgfx_PrefabMetadata*</return>
 			<param><type>int</type><name>mesh_id</name></param>
@@ -2389,7 +2388,7 @@
 			<param><type>bsgfx_UISolid</type><name>solid</name></param>
 			<param><type>bsgfx_UIElement*</type><name>element</name></param>
 		</function>
-		
+
 		<function name="bsgfx_instantiateAtlasIconUI">
 			<return>void</return>
 			<param><type>bsgfx_UIIcon</type><name>icon</name></param>
@@ -2405,7 +2404,7 @@
 			<param><type>bsgfx_UIIcon</type><name>icon</name></param>
 			<param><type>bsgfx_UIElement*</type><name>element</name></param>
 		</function>
-		
+
 		<function name="bsgfx_hoveringUIElement">
 			<return>bool</return>
 			<param><type>const bsgfx_UIElement*</type><name>element</name></param>
@@ -2415,7 +2414,7 @@
 			<param><type>const bsgfx_UIElement*</type><name>element</name></param>
 			<param><type>const bs_vec3*</type><name>position</name></param>
 		</function>
-		
+
 		<function name="bsgfx_renderColorPickers">
 			<return>void</return>
 			<param><type>bs_RendererScope*</type><name>scope</name></param>
@@ -2426,7 +2425,7 @@
 	<externs>
 		<extern><type>bsgfx_Scene</type><name>bsgfx_current_scene</name></extern>
 		<extern><type>bsgfx_Type</type><name>bsgfx_types</name><size>BSGFX_TYPE_COUNT</size></extern>
-		
+
 		<extern><type>const char*</type><name>bsgfx_material_categories</name><size>BSGFX_MATERIAL_CATEGORY_COUNT</size></extern>
 
 		<extern><type>bs_List</type><name>bsgfx_materials</name></extern>

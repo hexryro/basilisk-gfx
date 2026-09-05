@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,12 +21,16 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #ifndef BASILISK_CORE_H
 #define BASILISK_CORE_H
 
 #include <basilisk-core.gen.h>
+
+#ifdef __linux__
+#include <alloca.h>
+#endif
 
 #define BS_IV2(x, y) (bs_ivec2) { x, y }
 #define BS_IV3(x, y, z) (bs_ivec3) { x, y, z }
@@ -162,7 +166,7 @@
   /*==============================================================================
    * BBND Version 1
    *============================================================================*/
- 
+
  /**
   Binding header
   */
@@ -197,7 +201,7 @@
 #define BFNT_OFFSET_RESERVED                       22 // U16
 
  /**
-  Mapping all 355 codepoint blocks found in Unicode 18.0.0 to an 
+  Mapping all 355 codepoint blocks found in Unicode 18.0.0 to an
   index pointing to an element in the font specific codepoints
   */
 //#define BFNT_BLOCK_LOOKUP_OFFSET       24
@@ -225,7 +229,7 @@
 #define BFNT_BLOCK_SIZE                12
 
  /**
-  Rasterized glyphs 
+  Rasterized glyphs
   */
 
 #define BFNT_GLYPH_FLAG_SKIP_RENDER            (1 << 0) // Don't render certain characters like spaces ' '
@@ -263,7 +267,7 @@
 
   /*==============================================================================
    * Little endian
-   * 
+   *
    * Taken from Linux source code
    * https://github.com/torvalds/linux/blob/master/tools/include/tools/le_byteshift.h
    *============================================================================*/
@@ -332,7 +336,7 @@ static inline void bs_setLittleEndianF32(float f, void* p) {
 
   /*==============================================================================
    * Big endian
-   * 
+   *
    * Taken from Linux source code
    * https://github.com/torvalds/linux/blob/master/tools/include/tools/be_byteshift.h
    *============================================================================*/
@@ -397,4 +401,4 @@ static inline void bs_setBigEndianF32(float f, void* p) {
     bs_setBigEndian32(*(bs_U32*)&f, p);
 }
 
-#endif 
+#endif

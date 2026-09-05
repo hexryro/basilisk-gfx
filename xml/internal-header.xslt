@@ -9,6 +9,26 @@
     <xsl:variable name="functionPrefix" select="registry/functionPrefix"/>
     <xsl:variable name="functionPrefixCaps" select="registry/functionPrefixCaps"/>
 
+    <xsl:template match="ifdef|ifndef|elifdef">
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="name()"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="@cond"/>
+        <xsl:text>&#xA;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="else">
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="name()"/>
+        <xsl:text>&#xA;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="endif">
+        <xsl:text>#endif&#xA;&#xA;</xsl:text>
+    </xsl:template>
+
     <xsl:template match="/">
         <xsl:call-template name="add-license"/>
 
@@ -18,7 +38,7 @@
         <xsl:text>#define </xsl:text>
         <xsl:value-of select="$functionPrefixCaps"/>
         <xsl:text>INTERNAL_GEN_H&#xA;&#xA;</xsl:text>
-		
+
 		<xsl:apply-templates select="registry/includes/internalHeader/include"/>
 		<xsl:text>&#xA;</xsl:text>
 
@@ -38,7 +58,7 @@
 
 		<xsl:text>#endif&#xA;</xsl:text>
     </xsl:template>
-	
+
 	<xsl:template match="registry/includes/internalHeader/include">
         <xsl:text>#include &lt;</xsl:text>
         <xsl:value-of select="."/>
@@ -59,7 +79,7 @@
 		<xsl:if test="not(body) or @type = 'allowBody'">
 			<xsl:text>typedef </xsl:text>
             <xsl:value-of select="return"/>
-            <xsl:text>(__stdcall* PFN_</xsl:text>
+            <xsl:text>(* PFN_</xsl:text>
             <xsl:value-of select="@name"/>
             <xsl:text>)(</xsl:text>
 
@@ -77,7 +97,7 @@
 				    <xsl:value-of select="."/>
 				    <xsl:text>]</xsl:text>
 			    </xsl:for-each>
-				
+
                 <xsl:if test="position() != last()">
                     <xsl:text>, </xsl:text>
                 </xsl:if>

@@ -353,7 +353,7 @@
 #    endif
 #    include <windows.h>
      /* No need for _export, use ZLIB.DEF instead. */
-     /* For complete Windows compatibility, use WINAPI, not __stdcall. */
+     /* For complete Windows compatibility, use WINAPI, not . */
 #    define ZEXPORT WINAPI
 #    ifdef WIN32
 #      define ZEXPORTVA WINAPIV

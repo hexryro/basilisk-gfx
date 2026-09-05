@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
  /**
   This file was generated from basilisk-gfx.com
@@ -29,14 +29,13 @@
   It is not recommended to make changes to this file as it will be lost if
   the code is regenerated.
   */
-        
+
 
 #ifndef BASILISK_GFX_GEN_H
 #define BASILISK_GFX_GEN_H
 
 #include <basilisk-core.h>
 #include <../bsgfx_contracts.h>
-#include <wtypes.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <string.h>
@@ -269,12 +268,12 @@ typedef enum bsgfx_Language bsgfx_Language;
 
 typedef enum bsgfx_Id bsgfx_Id;
 typedef bs_U32 bsgfx_ColliderFlags;
-typedef void (__stdcall* PFN_void)();
-typedef bs_Queue* (__stdcall* PFN_bsgfx_onQueue)();
+typedef void (* PFN_void)();
+typedef bs_Queue* (* PFN_bsgfx_onQueue)();
 typedef bs_U32 bsgfx_PrimitiveFlags;
 typedef bs_U32 bsgfx_SpawnerFlags;
-typedef void (__stdcall* PFN_bsgfx_TypeMapper)(void*, void*);
-typedef bool (__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*);
+typedef void (* PFN_bsgfx_TypeMapper)(void*, void*);
+typedef bool (* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*);
 typedef struct bsgfx_InstanceHeader bsgfx_InstanceHeader;
 typedef bs_Range bsgfx_Range;
 enum bsgfx_MaterialCategory {

@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,31 +21,40 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #ifdef _WIN32
 #include <windows.h>
 #include <windowsx.h>
 #include <winuser.h>
 #include <dwmapi.h>
+#include <uxtheme.h>
+#include <vsstyle.h>
+#include <vssym32.h>
+#include <uiribbon.h>
 
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan.h>
+
+#elif defined(__linux__)
+
+#define VK_USE_PLATFORM_WAYLAND_KHR
+#include <vulkan.h>
+
 #endif
+
+#include <vulkan.h>
 
 #include <time.h>
 #include <assert.h>
 
 #include <basilisk-core.h>
 #include <bs_internal.h>
-#include <uxtheme.h>
-#include <vsstyle.h>
-#include <vssym32.h>
-#include <uiribbon.h>
 
 static void _bs_createSurface() {
     VkResult result = VK_SUCCESS;
 
+    #ifdef _WIN32
     if (_bs_instance_->extensions.surface_type == BS_SURFACE_TYPE_WIN32) {
         VkWin32SurfaceCreateInfoKHR ci = {
             .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
@@ -55,6 +64,17 @@ static void _bs_createSurface() {
 
         result = vkCreateWin32SurfaceKHR(_bs_instance_->instance, &ci, NULL, &_bs_scope_.context->surface);
     }
+    #elif defined(__linux__)
+    if (_bs_instance_->extensions.surface_type == BS_SURFACE_TYPE_WAYLAND) {
+        VkWaylandSurfaceCreateInfoKHR ci = {
+            .sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
+        };
+
+        result = vkCreateWaylandSurfaceKHR(_bs_instance_->instance, &ci, NULL, &_bs_scope_.context->surface);
+    }
+    #else
+    if (0) { }
+    #endif
     else if (_bs_instance_->extensions.surface_type == BS_SURFACE_TYPE_HEADLESS) {
         VkHeadlessSurfaceCreateInfoEXT ci = {
             .sType = VK_STRUCTURE_TYPE_HEADLESS_SURFACE_CREATE_INFO_EXT,
@@ -73,7 +93,7 @@ static void _bs_createSurface() {
 
 BSAPI void _bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_handle, unsigned char* destination) {
 #define BS_STRING_GEN_2(TYPE, FUNC, ...) { .size = sizeof(TYPE), .func = #FUNC, __VA_OPT__(.is_required = __VA_ARGS__) },
-
+#ifdef _WIN32
     for (int i = 0; i < count; i++) {
         void* data = dll_handle == 0 ?
             (void*)vkGetDeviceProcAddr(_bs_instance_->device, procedures[i].func) :
@@ -86,6 +106,9 @@ BSAPI void _bs_queryProcedures(bs_Procedure* procedures, int count, void* dll_ha
 
         destination += procedures[i].size;
     }
+#else
+    bs_log("_bs_queryProcedures not implemented");
+#endif
 }
 
 
@@ -119,8 +142,8 @@ static void _bs_logPhysicalDeviceInfo(bs_PhysicalDevice* physical_device) {
         _bs_logF("    Family %d queues count: %d ", i, family->queue_count);
         _bs_logF("Graphics %s, Compute %s, Transfer %s, Sparse binding %s\n",
             (family->queue_flags & VK_QUEUE_GRAPHICS_BIT) ? "[X]" : "[ ]",
-            (family->queue_flags & VK_QUEUE_COMPUTE_BIT) ? "[X]" : "[ ]", 
-            (family->queue_flags & VK_QUEUE_TRANSFER_BIT) ? "[X]" : "[ ]", 
+            (family->queue_flags & VK_QUEUE_COMPUTE_BIT) ? "[X]" : "[ ]",
+            (family->queue_flags & VK_QUEUE_TRANSFER_BIT) ? "[X]" : "[ ]",
             (family->queue_flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "[X]" : "[ ]"
         );
     }
@@ -128,7 +151,7 @@ static void _bs_logPhysicalDeviceInfo(bs_PhysicalDevice* physical_device) {
     for (int i = 0; i < physical_device->surface_formats.count; i++) {
         bs_SurfaceFormat* surface_format = _bs_fetchUnit(&physical_device->surface_formats, i);
 
-        _bs_logF("    Format %s color space %s\n", 
+        _bs_logF("    Format %s color space %s\n",
             bs_serializeFormat(surface_format->format),
             bs_serializeColorSpace(surface_format->color_space)
         );
@@ -203,7 +226,7 @@ static void _bs_readSurfaceFormats(bs_PhysicalDevice* physical_device, VkSurface
 // static void _bs_readMemoryTypes(bs_PhysicalDevice* physical_device) {
 //     VkPhysicalDeviceMemoryProperties props;
 //     vkGetPhysicalDeviceMemoryProperties(physical_device->vk_device, &props);
-// 
+//
 // }
 
 static void _bs_preparePhysicalDevice(bs_Context* context) {
@@ -224,7 +247,7 @@ static void _bs_preparePhysicalDevice(bs_Context* context) {
     assert(BS_MAX_PHYSICAL_DEVICE_NAME_SIZE == VK_MAX_PHYSICAL_DEVICE_NAME_SIZE);
 
     VkSurfaceKHR surface = context ? context->surface : VK_NULL_HANDLE;
-    
+
     int chosen = 0;
     for(int i = 0; i < num_devices; i++) {
         bs_PhysicalDevice* physical_device = _bs_pushBack(&_bs_physical_devices_, NULL);
@@ -253,7 +276,8 @@ static void _bs_preparePhysicalDevice(bs_Context* context) {
 }
 
 static void _bs_queryPhysicalDevice(VkQueueFlags required_flags, bool supports_present, bs_PhysicalDevice** out_device, bs_QueueFamily** out_queue_family) {
-    *out_device = *out_queue_family = NULL;
+    *out_device = NULL;
+    *out_queue_family = NULL;
 
     for (int i = 0; i < _bs_physical_devices_.count; i++) {
         bs_PhysicalDevice* physical_device = _bs_fetchUnit(&_bs_physical_devices_, i);
@@ -296,7 +320,7 @@ static void _bs_prepareLogicalDevice(bs_PhysicalDevice* physical_device) {
 
     VkDeviceDiagnosticsConfigCreateInfoNV aftermath_ci = {
         .sType = VK_STRUCTURE_TYPE_DEVICE_DIAGNOSTICS_CONFIG_CREATE_INFO_NV,
-        .flags = 
+        .flags =
             VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_AUTOMATIC_CHECKPOINTS_BIT_NV |
             VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_RESOURCE_TRACKING_BIT_NV |
             VK_DEVICE_DIAGNOSTICS_CONFIG_ENABLE_SHADER_DEBUG_INFO_BIT_NV |
@@ -393,7 +417,7 @@ static void _bs_prepareLogicalDevice(bs_PhysicalDevice* physical_device) {
     */
     if (_bs_config_.queues_count == 0)
         _bs_config_.queues_count = 1;
-    
+
     if (_bs_config_.queues_count > _bs_instance_->queue_family->queue_count) {
         bs_warnF("Requested %d queues, but queue family %d only has %d", _bs_config_.queues_count, _bs_instance_->queue_family->index, _bs_instance_->queue_family->queue_count);
         _bs_config_.queues_count = _bs_instance_->queue_family->queue_count;
@@ -550,7 +574,7 @@ static void _bs_prepareSwapchain() {
         _bs_warnF("Failed to create swapchain for window \"%s\"", _bs_scope_.context->title);
         return;
     }
-    
+
     bsi_nameHandle(_bs_scope_.context->swapchain, VK_OBJECT_TYPE_SWAPCHAIN_KHR, _bs_scope_.context->title);
 
     /**
@@ -915,7 +939,7 @@ BSAPI void _bs_tickContext(bs_Context* context, bs_ContextTickFunction tick) {
     POINT p = { _bs_instance_->screen_cursor.x, _bs_instance_->screen_cursor.y };
     if (ScreenToClient(context->hwnd, &p))
         context->cursor = BS_V2(p.x, p.y);
-    
+
     if (separate_message_thread) {
         for (int i = 0; i < BS_KEY_BYTES_COUNT; i++) {
             context->io.inputs_up_once[i] = InterlockedExchange(&context->io.input_up_events[i], 0);
@@ -1038,8 +1062,8 @@ static void _bs_startRenderTick(bs_Callback fixed_tick) {
 static void _bs_handleMessageAtomic(bs_List* contexts, bs_Context* context, MSG msg) {
     switch (msg.message) {
     case WM_QUIT: PostQuitMessage(0); _bs_instance_->alive = false; return;
- 
-    case WM_LBUTTONDOWN: 
+
+    case WM_LBUTTONDOWN:
         SetCapture(context->hwnd);
         bs_setBit(context->io.input_down_events, BS_LEFT_MOUSE_BUTTON);
 
@@ -1051,24 +1075,24 @@ static void _bs_handleMessageAtomic(bs_List* contexts, bs_Context* context, MSG 
         bs_setBit(context->io.input_up_events, BS_LEFT_MOUSE_BUTTON);
         break;
 
-    case WM_RBUTTONDOWN: 
+    case WM_RBUTTONDOWN:
         SetCapture(context->hwnd);
         bs_setBit(context->io.input_down_events, BS_RIGHT_MOUSE_BUTTON);
         if (context->window_type != BS_WINDOW_MENU)
             _hide_menu_windows_ = true;
         break;
-    case WM_RBUTTONUP: 
+    case WM_RBUTTONUP:
         ReleaseCapture();
         bs_setBit(context->io.input_up_events, BS_RIGHT_MOUSE_BUTTON);
         break;
 
-    case WM_MBUTTONDOWN: 
+    case WM_MBUTTONDOWN:
         SetCapture(context->hwnd);
         bs_setBit(context->io.input_down_events, BS_MIDDLE_MOUSE_BUTTON);
         if (context->window_type != BS_WINDOW_MENU)
             _hide_menu_windows_ = true;
         break;
-    case WM_MBUTTONUP: 
+    case WM_MBUTTONUP:
         ReleaseCapture();
         bs_setBit(context->io.input_up_events, BS_MIDDLE_MOUSE_BUTTON);
         break;
@@ -1337,13 +1361,13 @@ BSAPI void _bs_moveWindow(bs_Context* context, int x, int y) {
 }
 
 BSAPI bs_Result _bs_window(
-    bs_Context* context, 
-    bs_Context* parent, 
-    bs_ContextTickFunction tick, 
-    bs_U32 width, 
-    bs_U32 height, 
-    const char* title, 
-    bs_WindowType type) 
+    bs_Context* context,
+    bs_Context* parent,
+    bs_ContextTickFunction tick,
+    bs_U32 width,
+    bs_U32 height,
+    const char* title,
+    bs_WindowType type)
 {
     _bs_scope_.context = context;
 
@@ -1403,7 +1427,7 @@ BSAPI bs_Result _bs_window(
         style = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
         ex_style = WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW;
     }
-  
+
     context->hwnd = CreateWindowEx(
         ex_style,
         class_name,

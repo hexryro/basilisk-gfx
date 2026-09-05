@@ -47,13 +47,13 @@ import VULKAN_HPP_STD_MODULE;
 #  elif defined( _WIN32 ) && !defined( VULKAN_HPP_NO_WIN32_PROTOTYPES )
 using HINSTANCE = struct HINSTANCE__ *;
 #    if defined( _WIN64 )
-using FARPROC = int64_t( __stdcall * )();
+using FARPROC = int64_t(  * )();
 #    else
-using FARPROC = int( __stdcall * )();
+using FARPROC = int(  * )();
 #    endif
-extern "C" __declspec( dllimport ) HINSTANCE __stdcall LoadLibraryA( char const * lpLibFileName );
-extern "C" __declspec( dllimport ) int __stdcall FreeLibrary( HINSTANCE hLibModule );
-extern "C" __declspec( dllimport ) FARPROC __stdcall GetProcAddress( HINSTANCE hModule, const char * lpProcName );
+extern "C" __declspec( dllimport ) HINSTANCE  LoadLibraryA( char const * lpLibFileName );
+extern "C" __declspec( dllimport ) int  FreeLibrary( HINSTANCE hLibModule );
+extern "C" __declspec( dllimport ) FARPROC  GetProcAddress( HINSTANCE hModule, const char * lpProcName );
 #  endif
 #endif
 

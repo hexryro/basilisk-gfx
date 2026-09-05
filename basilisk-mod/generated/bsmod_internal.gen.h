@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
  /**
   This file was generated from basilisk-gfx.com
@@ -29,119 +29,119 @@
   It is not recommended to make changes to this file as it will be lost if
   the code is regenerated.
   */
-        
+
 #ifndef BSMOD_INTERNAL_GEN_H
 #define BSMOD_INTERNAL_GEN_H
 
 #include <basilisk-mod.h>
 #include <windows.h>
 
-typedef bsgfx_InstanceSubtype**(__stdcall* PFN_bsmod_subtypes)();
-typedef bsmod_Callbacks*(__stdcall* PFN_bsmod_callbacks)();
-typedef void(__stdcall* PFN_bsmod_copyHoveringDataToBuffer)();
-typedef bs_Queue*(__stdcall* PFN_bsmod_onQueue)();
-typedef void(__stdcall* PFN_bsmod_onIni)();
-typedef void(__stdcall* PFN_bsmod_onLateIni)();
-typedef void(__stdcall* PFN_bsmod_onCreateQuadSubtypes)(bs_Range range);
-typedef void(__stdcall* PFN_bsmod_onLoad)();
-typedef void(__stdcall* PFN_bsmod_bindAtlases)();
-typedef void(__stdcall* PFN_bsmod_onGfxRender)();
-typedef void(__stdcall* PFN_bsmod_onTick)();
-typedef void(__stdcall* PFN_bsmod_onMap)(bsgfx_TypeId type_id, int id);
-typedef void(__stdcall* PFN_bsmod_beginTrackChanges)();
-typedef void(__stdcall* PFN_bsmod_tickTracker)();
-typedef void(__stdcall* PFN_bsmod_onTrack)();
-typedef void(__stdcall* PFN_bsmod_onCompileShader)(bsmod_TrackParams params);
-typedef void(__stdcall* PFN_bsmod_onConvertFont)(bsmod_TrackParams params);
-typedef void(__stdcall* PFN_bsmod_onPackAtlas)(bsmod_TrackParams params);
-typedef void(__stdcall* PFN_bsmod_onPackModels)(bsmod_TrackParams params);
-typedef void(__stdcall* PFN_bsmod_onPackBinary)(bsmod_TrackParams params);
-typedef void(__stdcall* PFN_bsmod_onPackTextureArray)(bsmod_TrackParams params);
-typedef bs_Result(__stdcall* PFN_bsmod_packFont)(bsmod_RenderMode render_mode, char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length);
-typedef bsmod_TextureInfo*(__stdcall* PFN_bsmod_packAtlasTexture)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* name);
-typedef bsmod_TextureInfo*(__stdcall* PFN_bsmod_packAtlasTextureN)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* name, int name_length);
-typedef bsmod_TextureInfo*(__stdcall* PFN_bsmod_packAtlasTextureV)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* format, va_list args);
-typedef bsmod_TextureInfo*(__stdcall* PFN_bsmod_packAtlasTextureF)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* format, ...);
-typedef void(__stdcall* PFN_bsmod_destroyAtlasPacker)(bsmod_AtlasPacker* packer);
-typedef bs_Result(__stdcall* PFN_bsmod_packAtlas)(bsmod_AtlasPacker* packer, int width, int height, int channels_count, char* package, char* resource_name, bool allow_paging);
-typedef bsmod_AtlasPacker(__stdcall* PFN_bsmod_createAtlasPacker)();
-typedef bs_Result(__stdcall* PFN_bsmod_packImageDirectory)(char* directory_name, char* package_name, char* resource_name);
-typedef void(__stdcall* PFN_bsmod_scrollbar)(const int* scroll, bsgfx_Scrollbar* out);
-typedef void(__stdcall* PFN_bsmod_dividerWidget)(float width, int indent, bsgfx_Widget* out);
-typedef void(__stdcall* PFN_bsmod_iconWidget)(const bsgfx_AtlasCache* cache, float align_height, bs_vec3 offset, bs_U32 advance_flags, bsgfx_Widget* out);
-typedef bs_List*(__stdcall* PFN_bsmod_packages)();
-typedef bsmod_Package*(__stdcall* PFN_bsmod_queryPackage)(const char* path);
-typedef bsmod_Package*(__stdcall* PFN_bsmod_ensurePackage)(const char* path);
-typedef bsmod_Resource*(__stdcall* PFN_bsmod_queryResource)(bsmod_Package* package, bs_ResourceType type, const char* name);
-typedef bs_Result(__stdcall* PFN_bsmod_loadResource)(int type, int package_id, char* name);
-typedef bs_Result(__stdcall* PFN_bsmod_iniPackage)(int package_id);
-typedef bs_Result(__stdcall* PFN_bsmod_packResource)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name);
-typedef bs_Result(__stdcall* PFN_bsmod_packResourceN)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length);
-typedef bs_Result(__stdcall* PFN_bsmod_packResourceV)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, va_list args);
-typedef bs_Result(__stdcall* PFN_bsmod_packResourceF)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, ...);
-typedef bs_Result(__stdcall* PFN_bsmod_savePackage)(char* path);
-typedef bs_Result(__stdcall* PFN_bsmod_savePackageN)(char* path, int path_length);
-typedef bs_Result(__stdcall* PFN_bsmod_savePackageV)(char* format, va_list args);
-typedef bs_Result(__stdcall* PFN_bsmod_savePackageF)(char* format, ...);
-typedef void(__stdcall* PFN_bsmod_loadShaderReferences)();
-typedef void(__stdcall* PFN_bsmod_updateShaderReferences)();
-typedef void(__stdcall* PFN_bsmod_iniCompiler)();
-typedef bs_Result(__stdcall* PFN_bsmod_compileShader)(char* path, char* name, char* package);
-typedef void(__stdcall* PFN_bsmod_queueRasterize)(const char* package, const char* name, bs_Callback callback);
-typedef void(__stdcall* PFN_bsmod_pollRasterizer)();
-typedef void(__stdcall* PFN_bsmod_beginRasterize)(bs_ivec2 render_size, bs_ivec2 output_size);
-typedef void(__stdcall* PFN_bsmod_endRasterize)(bs_Queue* queue);
-typedef bs_Result(__stdcall* PFN_bsmod_rasterizeInstance)(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
-typedef void(__stdcall* PFN_bsmod_instanceTransform)();
-typedef void(__stdcall* PFN_bsmod_selectHoveringTypes)();
-typedef bsgfx_TypeId(__stdcall* PFN_bsmod_queryType)(const char* plural);
-typedef void(__stdcall* PFN_bsmod_delete)(bsgfx_TypeId type_id, int id);
-typedef void(__stdcall* PFN_bsmod_deleteSelected)(bsgfx_TypeId type_id);
-typedef bs_Result(__stdcall* PFN_bsmod_saveType)(bsgfx_TypeId id, char* value);
-typedef bs_Result(__stdcall* PFN_bsmod_saveTypeN)(bsgfx_TypeId id, char* value, int value_length);
-typedef bs_Result(__stdcall* PFN_bsmod_saveTypeV)(bsgfx_TypeId id, char* format, va_list args);
-typedef bs_Result(__stdcall* PFN_bsmod_saveTypeF)(bsgfx_TypeId id, char* format, ...);
-typedef void*(__stdcall* PFN_bsmod_add)(bsgfx_TypeId id, void* data);
-typedef bool(__stdcall* PFN_bsmod_isSelected)(bs_List* list, bsgfx_TypeId type, int id);
-typedef void(__stdcall* PFN_bsmod_select)(bs_List* list, bsgfx_TypeId type, int id);
-typedef void(__stdcall* PFN_bsmod_deselectAll)();
-typedef void(__stdcall* PFN_bsmod_deselectRange)(bs_List* list, int first, int count);
-typedef void(__stdcall* PFN_bsmod_deselectIndex)(bs_List* list, int id);
-typedef void(__stdcall* PFN_bsmod_deselect)(bs_List* list, int id);
-typedef int(__stdcall* PFN_bsmod_firstSelectedId)(bs_List* list);
-typedef int(__stdcall* PFN_bsmod_lastSelectedId)(bs_List* list);
-typedef void*(__stdcall* PFN_bsmod_removeFlexible)(bsgfx_TypeId type_id, int id);
-typedef void*(__stdcall* PFN_bsmod_addFlexible)(bsgfx_TypeId type_id, int id, void* data);
-typedef void(__stdcall* PFN_bsmod_readHoveringOutputs)();
-typedef void(__stdcall* PFN_bsmod_readHoveringInstanceData)();
-typedef void(__stdcall* PFN_bsmod_readHoveringVertex)();
-typedef void(__stdcall* PFN_bsmod_editSelectedType)();
-typedef void(__stdcall* PFN_bsmod_ensureTypeVersionsAreUpToDate)(int package_id);
-typedef void(__stdcall* PFN_bsmod_renderBillboards)();
-typedef void(__stdcall* PFN_bsmod_instanceUI)();
-typedef void(__stdcall* PFN_bsmod_pushVecNWidget)(bs_List* widgets, const char* name, bs_vec3 offset, float width, float* v, int n);
-typedef void(__stdcall* PFN_bsmod_pushInputWidget)(bs_List* widgets, void* value, bs_vec3 offset, float width, int name_padding, bool skip_advance, bool is_last, bool has_buttons, const char* name);
-typedef void(__stdcall* PFN_bsmod_instanceTileContextMenu)(bs_vec3 position, bs_vec2 size);
-typedef void(__stdcall* PFN_bsmod_instanceContextMenu)(bs_List* widgets, bs_vec3 position, bs_vec2 size);
-typedef void(__stdcall* PFN_bsmod_pushContextMenuButton)(bs_List* widgets, bs_vec2 menu_size, bs_vec3 icon_offset, bsgfx_AtlasCache* icon, const char* name, int indent, PFN_bsgfx_ButtonWidgetCallback action, bool expandable);
-typedef void(__stdcall* PFN_bsmod_instanceGridMenu)(bs_vec3 position, bs_vec2 dimensions);
-typedef void(__stdcall* PFN_bsmod_instanceLightBillboards)();
-typedef void(__stdcall* PFN_bsmod_pushMaterialWidgets)(bs_List* widgets, bs_vec2 background_size);
-typedef void(__stdcall* PFN_bsmod_onDragMaterial)(bsmod_DraggingParams params);
-typedef void(__stdcall* PFN_bsmod_onClickMaterialMenu)(bsmod_GridClickParams params);
-typedef void(__stdcall* PFN_bsmod_rasterizeMaterialIcons)();
-typedef void(__stdcall* PFN_bsmod_pushPrefabMenuWidgets)(bs_List* widgets, bs_vec2 background_size);
-typedef bool(__stdcall* PFN_bsmod_instancePrefabPreview)(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering);
-typedef void(__stdcall* PFN_bsmod_onDragPrefab)(bsmod_DraggingParams params);
-typedef void(__stdcall* PFN_bsmod_rasterizePrefabIcons)();
-typedef bool(__stdcall* PFN_bsmod_instancePrimitivePreview)(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering);
-typedef void(__stdcall* PFN_bsmod_onDragPrimitive)(bsmod_DraggingParams params);
-typedef void(__stdcall* PFN_bsmod_rasterizePrimitiveIcons)();
-typedef void(__stdcall* PFN_bsmod_setSideMenuTab)(int id, bsmod_GridClickParams params);
-typedef void(__stdcall* PFN_bsmod_instanceSideMenu)(bs_vec3 position, bs_vec2 dimensions);
-typedef void(__stdcall* PFN_bsmod_pushTileMenuWidgets)(bs_List* widgets, bs_vec2 background_size);
-typedef bool(__stdcall* PFN_bsmod_instanceTilePreview)(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering);
-typedef void(__stdcall* PFN_bsmod_onDragTile)(bsmod_DraggingParams params);
+typedef bsgfx_InstanceSubtype**(* PFN_bsmod_subtypes)();
+typedef bsmod_Callbacks*(* PFN_bsmod_callbacks)();
+typedef void(* PFN_bsmod_copyHoveringDataToBuffer)();
+typedef bs_Queue*(* PFN_bsmod_onQueue)();
+typedef void(* PFN_bsmod_onIni)();
+typedef void(* PFN_bsmod_onLateIni)();
+typedef void(* PFN_bsmod_onCreateQuadSubtypes)(bs_Range range);
+typedef void(* PFN_bsmod_onLoad)();
+typedef void(* PFN_bsmod_bindAtlases)();
+typedef void(* PFN_bsmod_onGfxRender)();
+typedef void(* PFN_bsmod_onTick)();
+typedef void(* PFN_bsmod_onMap)(bsgfx_TypeId type_id, int id);
+typedef void(* PFN_bsmod_beginTrackChanges)();
+typedef void(* PFN_bsmod_tickTracker)();
+typedef void(* PFN_bsmod_onTrack)();
+typedef void(* PFN_bsmod_onCompileShader)(bsmod_TrackParams params);
+typedef void(* PFN_bsmod_onConvertFont)(bsmod_TrackParams params);
+typedef void(* PFN_bsmod_onPackAtlas)(bsmod_TrackParams params);
+typedef void(* PFN_bsmod_onPackModels)(bsmod_TrackParams params);
+typedef void(* PFN_bsmod_onPackBinary)(bsmod_TrackParams params);
+typedef void(* PFN_bsmod_onPackTextureArray)(bsmod_TrackParams params);
+typedef bs_Result(* PFN_bsmod_packFont)(bsmod_RenderMode render_mode, char* package_name, char* ttf_path, bsmod_UnicodeBlockRange blocks[], int blocks_count, int pt_sizes[], int pt_sizes_count, char* resource_name, int resource_name_length);
+typedef bsmod_TextureInfo*(* PFN_bsmod_packAtlasTexture)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* name);
+typedef bsmod_TextureInfo*(* PFN_bsmod_packAtlasTextureN)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* name, int name_length);
+typedef bsmod_TextureInfo*(* PFN_bsmod_packAtlasTextureV)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* format, va_list args);
+typedef bsmod_TextureInfo*(* PFN_bsmod_packAtlasTextureF)(bsmod_AtlasPacker* packer, unsigned char* data, PFN_bsmod_getAtlasTextureData get_data, void* param, int width, int height, int category, int id, char* format, ...);
+typedef void(* PFN_bsmod_destroyAtlasPacker)(bsmod_AtlasPacker* packer);
+typedef bs_Result(* PFN_bsmod_packAtlas)(bsmod_AtlasPacker* packer, int width, int height, int channels_count, char* package, char* resource_name, bool allow_paging);
+typedef bsmod_AtlasPacker(* PFN_bsmod_createAtlasPacker)();
+typedef bs_Result(* PFN_bsmod_packImageDirectory)(char* directory_name, char* package_name, char* resource_name);
+typedef void(* PFN_bsmod_scrollbar)(const int* scroll, bsgfx_Scrollbar* out);
+typedef void(* PFN_bsmod_dividerWidget)(float width, int indent, bsgfx_Widget* out);
+typedef void(* PFN_bsmod_iconWidget)(const bsgfx_AtlasCache* cache, float align_height, bs_vec3 offset, bs_U32 advance_flags, bsgfx_Widget* out);
+typedef bs_List*(* PFN_bsmod_packages)();
+typedef bsmod_Package*(* PFN_bsmod_queryPackage)(const char* path);
+typedef bsmod_Package*(* PFN_bsmod_ensurePackage)(const char* path);
+typedef bsmod_Resource*(* PFN_bsmod_queryResource)(bsmod_Package* package, bs_ResourceType type, const char* name);
+typedef bs_Result(* PFN_bsmod_loadResource)(int type, int package_id, char* name);
+typedef bs_Result(* PFN_bsmod_iniPackage)(int package_id);
+typedef bs_Result(* PFN_bsmod_packResource)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name);
+typedef bs_Result(* PFN_bsmod_packResourceN)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length);
+typedef bs_Result(* PFN_bsmod_packResourceV)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, va_list args);
+typedef bs_Result(* PFN_bsmod_packResourceF)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, ...);
+typedef bs_Result(* PFN_bsmod_savePackage)(char* path);
+typedef bs_Result(* PFN_bsmod_savePackageN)(char* path, int path_length);
+typedef bs_Result(* PFN_bsmod_savePackageV)(char* format, va_list args);
+typedef bs_Result(* PFN_bsmod_savePackageF)(char* format, ...);
+typedef void(* PFN_bsmod_loadShaderReferences)();
+typedef void(* PFN_bsmod_updateShaderReferences)();
+typedef void(* PFN_bsmod_iniCompiler)();
+typedef bs_Result(* PFN_bsmod_compileShader)(char* path, char* name, char* package);
+typedef void(* PFN_bsmod_queueRasterize)(const char* package, const char* name, bs_Callback callback);
+typedef void(* PFN_bsmod_pollRasterizer)();
+typedef void(* PFN_bsmod_beginRasterize)(bs_ivec2 render_size, bs_ivec2 output_size);
+typedef void(* PFN_bsmod_endRasterize)(bs_Queue* queue);
+typedef bs_Result(* PFN_bsmod_rasterizeInstance)(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
+typedef void(* PFN_bsmod_instanceTransform)();
+typedef void(* PFN_bsmod_selectHoveringTypes)();
+typedef bsgfx_TypeId(* PFN_bsmod_queryType)(const char* plural);
+typedef void(* PFN_bsmod_delete)(bsgfx_TypeId type_id, int id);
+typedef void(* PFN_bsmod_deleteSelected)(bsgfx_TypeId type_id);
+typedef bs_Result(* PFN_bsmod_saveType)(bsgfx_TypeId id, char* value);
+typedef bs_Result(* PFN_bsmod_saveTypeN)(bsgfx_TypeId id, char* value, int value_length);
+typedef bs_Result(* PFN_bsmod_saveTypeV)(bsgfx_TypeId id, char* format, va_list args);
+typedef bs_Result(* PFN_bsmod_saveTypeF)(bsgfx_TypeId id, char* format, ...);
+typedef void*(* PFN_bsmod_add)(bsgfx_TypeId id, void* data);
+typedef bool(* PFN_bsmod_isSelected)(bs_List* list, bsgfx_TypeId type, int id);
+typedef void(* PFN_bsmod_select)(bs_List* list, bsgfx_TypeId type, int id);
+typedef void(* PFN_bsmod_deselectAll)();
+typedef void(* PFN_bsmod_deselectRange)(bs_List* list, int first, int count);
+typedef void(* PFN_bsmod_deselectIndex)(bs_List* list, int id);
+typedef void(* PFN_bsmod_deselect)(bs_List* list, int id);
+typedef int(* PFN_bsmod_firstSelectedId)(bs_List* list);
+typedef int(* PFN_bsmod_lastSelectedId)(bs_List* list);
+typedef void*(* PFN_bsmod_removeFlexible)(bsgfx_TypeId type_id, int id);
+typedef void*(* PFN_bsmod_addFlexible)(bsgfx_TypeId type_id, int id, void* data);
+typedef void(* PFN_bsmod_readHoveringOutputs)();
+typedef void(* PFN_bsmod_readHoveringInstanceData)();
+typedef void(* PFN_bsmod_readHoveringVertex)();
+typedef void(* PFN_bsmod_editSelectedType)();
+typedef void(* PFN_bsmod_ensureTypeVersionsAreUpToDate)(int package_id);
+typedef void(* PFN_bsmod_renderBillboards)();
+typedef void(* PFN_bsmod_instanceUI)();
+typedef void(* PFN_bsmod_pushVecNWidget)(bs_List* widgets, const char* name, bs_vec3 offset, float width, float* v, int n);
+typedef void(* PFN_bsmod_pushInputWidget)(bs_List* widgets, void* value, bs_vec3 offset, float width, int name_padding, bool skip_advance, bool is_last, bool has_buttons, const char* name);
+typedef void(* PFN_bsmod_instanceTileContextMenu)(bs_vec3 position, bs_vec2 size);
+typedef void(* PFN_bsmod_instanceContextMenu)(bs_List* widgets, bs_vec3 position, bs_vec2 size);
+typedef void(* PFN_bsmod_pushContextMenuButton)(bs_List* widgets, bs_vec2 menu_size, bs_vec3 icon_offset, bsgfx_AtlasCache* icon, const char* name, int indent, PFN_bsgfx_ButtonWidgetCallback action, bool expandable);
+typedef void(* PFN_bsmod_instanceGridMenu)(bs_vec3 position, bs_vec2 dimensions);
+typedef void(* PFN_bsmod_instanceLightBillboards)();
+typedef void(* PFN_bsmod_pushMaterialWidgets)(bs_List* widgets, bs_vec2 background_size);
+typedef void(* PFN_bsmod_onDragMaterial)(bsmod_DraggingParams params);
+typedef void(* PFN_bsmod_onClickMaterialMenu)(bsmod_GridClickParams params);
+typedef void(* PFN_bsmod_rasterizeMaterialIcons)();
+typedef void(* PFN_bsmod_pushPrefabMenuWidgets)(bs_List* widgets, bs_vec2 background_size);
+typedef bool(* PFN_bsmod_instancePrefabPreview)(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering);
+typedef void(* PFN_bsmod_onDragPrefab)(bsmod_DraggingParams params);
+typedef void(* PFN_bsmod_rasterizePrefabIcons)();
+typedef bool(* PFN_bsmod_instancePrimitivePreview)(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering);
+typedef void(* PFN_bsmod_onDragPrimitive)(bsmod_DraggingParams params);
+typedef void(* PFN_bsmod_rasterizePrimitiveIcons)();
+typedef void(* PFN_bsmod_setSideMenuTab)(int id, bsmod_GridClickParams params);
+typedef void(* PFN_bsmod_instanceSideMenu)(bs_vec3 position, bs_vec2 dimensions);
+typedef void(* PFN_bsmod_pushTileMenuWidgets)(bs_List* widgets, bs_vec2 background_size);
+typedef bool(* PFN_bsmod_instanceTilePreview)(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering);
+typedef void(* PFN_bsmod_onDragTile)(bsmod_DraggingParams params);
 
 typedef struct {
     PFN_bsmod_subtypes bsmod_subtypes;

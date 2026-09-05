@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
  /**
   This file was generated from basilisk-gfx.com
@@ -29,160 +29,160 @@
   It is not recommended to make changes to this file as it will be lost if
   the code is regenerated.
   */
-        
+
 #ifndef BSGFX_INTERNAL_GEN_H
 #define BSGFX_INTERNAL_GEN_H
 
 #include <basilisk-gfx.h>
 #include <windows.h>
 
-typedef void(__stdcall* PFN_bsgfx_test)();
-typedef bsgfx_InstanceSubtype**(__stdcall* PFN_bsgfx_subtypes)();
-typedef bsgfx_InstanceType**(__stdcall* PFN_bsgfx_instanceTypes)();
-typedef void(__stdcall* PFN_bsgfx_computeContextCamera)();
-typedef void(__stdcall* PFN_bsgfx_tickInstanceTypes)();
-typedef void(__stdcall* PFN_bsgfx_resetInstanceTypes)();
-typedef void(__stdcall* PFN_bsgfx_textDimensions)(bsgfx_Font* font, bs_vec2* out, char* name, int length);
-typedef bs_PipelineHash(__stdcall* PFN_bsgfx_defaultPipelineHash)();
-typedef void(__stdcall* PFN_bsgfx_renderTileIcons)(bs_RendererScope* scope, bs_Queue* queue);
-typedef void(__stdcall* PFN_bsgfx_renderAtlasIcons)(bs_RendererScope* scope, bs_Queue* queue);
-typedef void(__stdcall* PFN_bsgfx_renderLineModel)(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test);
-typedef void(__stdcall* PFN_bsgfx_renderLines)(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test);
-typedef void(__stdcall* PFN_bsgfx_renderPoints)(bs_RendererScope* scope, bs_Queue* queue);
-typedef void(__stdcall* PFN_bsgfx_renderAtlas)(bs_RendererScope* scope, bs_Queue* queue);
-typedef void(__stdcall* PFN_bsgfx_renderPrimitiveTiles)(bs_RendererScope* scope, bs_Queue* queue);
-typedef void(__stdcall* PFN_bsgfx_swapBufferBindings)();
-typedef void(__stdcall* PFN_bsgfx_requiredForShadowVolumes)(bs_PipelineHash* inout);
-typedef void(__stdcall* PFN_bsgfx_requiredForStencilShadows)(bs_PipelineHash* inout);
-typedef void(__stdcall* PFN_bsgfx_requiredForTransparency)(bs_PipelineHash* inout);
-typedef bsgfx_Scene*(__stdcall* PFN_bsgfx_currentScene)();
-typedef void(__stdcall* PFN_bsgfx_loadScene)(const char* name);
-typedef bool(__stdcall* PFN_bsgfx_validateSubtype)(const char* library_name, bsgfx_InstanceSubtype* subtype);
-typedef bool(__stdcall* PFN_bsgfx_validateInstanceType)(const char* library_name, bsgfx_InstanceType* instance_type);
-typedef void(__stdcall* PFN_bsgfx_worldToScreen)(const bs_vec3* position, const bs_mat4* camera, const bs_vec2* resolution, bs_vec2* out);
-typedef const char*(__stdcall* PFN_bsgfx_materialCategoryName)(bsgfx_MaterialCategory category);
-typedef bs_List*(__stdcall* PFN_bsgfx_materials)();
-typedef bsgfx_Material*(__stdcall* PFN_bsgfx_queryMaterialHash)(bs_U64 hash);
-typedef bsgfx_Material*(__stdcall* PFN_bsgfx_fetchMaterial)(int id);
-typedef bsgfx_Material*(__stdcall* PFN_bsgfx_queryMaterial)(const char* name);
-typedef void(__stdcall* PFN_bsgfx_loadMaterials)();
-typedef bsgfx_Material*(__stdcall* PFN_bsgfx_material)(char* name);
-typedef bsgfx_Material*(__stdcall* PFN_bsgfx_materialN)(char* name, int name_length);
-typedef bsgfx_Material*(__stdcall* PFN_bsgfx_materialV)(char* format, va_list args);
-typedef bsgfx_Material*(__stdcall* PFN_bsgfx_materialF)(char* format, ...);
-typedef void(__stdcall* PFN_bsgfx_highlightMaterial)(int material_id, bool auto_unhighlight);
-typedef void(__stdcall* PFN_bsgfx_unhighlightMaterial)(int material_id);
-typedef void(__stdcall* PFN_bsgfx_tickMaterials)();
-typedef void(__stdcall* PFN_bsgfx_sweepCollisions)(float sweep_radius, const bs_vec3* position);
-typedef bsgfx_Collider(__stdcall* PFN_bsgfx_collider)(bs_Aabb aabb, bs_vec3 scale, bs_ivec3 resolution, float sweep_radius);
-typedef void(__stdcall* PFN_bsgfx_applyCollisions)(bsgfx_Collider* collider, const bs_vec3* position, bs_vec3* velocity);
-typedef void(__stdcall* PFN_bsgfx_printCollisions)(bsgfx_Collider* collider);
-typedef void(__stdcall* PFN_bsgfx_instanceSweepCollisions)();
-typedef void(__stdcall* PFN_bsgfx_instanceCollider)(bsgfx_Collider* collider, const bs_vec3* position, bs_vec3* velocity);
-typedef int(__stdcall* PFN_bsgfx_skeleton)(bs_Armature* armature);
-typedef int(__stdcall* PFN_bsgfx_animationFrame)(bs_Animation* animation, float time, int num_frames);
-typedef int(__stdcall* PFN_bsgfx_animationFrameCount)(bs_Animation* animation, float time_scale);
-typedef void(__stdcall* PFN_bsgfx_applyAnimationVelocity)(bsgfx_Animator* animator, bs_vec3* velocity, bs_vec2 input);
-typedef void(__stdcall* PFN_bsgfx_queueAnimation)(bsgfx_Animator* animator, int animation_id);
-typedef void(__stdcall* PFN_bsgfx_runAnimator)(bsgfx_Animator* animator, bsgfx_AnimatorCallbacks callbacks);
-typedef bsgfx_Animator(__stdcall* PFN_bsgfx_animator)(bs_Armature* armature, int resting_animation_id, int animations_count);
-typedef bs_Result(__stdcall* PFN_bsgfx_ensureInstanceCount)(bsgfx_InstanceType* instance_type, bs_U32 instances_count, bs_U32 overhead_count);
-typedef bs_Result(__stdcall* PFN_bsgfx_instanceType)(size_t instance_size, int bind_set, int binding, bsgfx_InstanceType** out);
-typedef void(__stdcall* PFN_bsgfx_deleteSubtype)(bsgfx_InstanceSubtype* instance_subtype);
-typedef bs_Result(__stdcall* PFN_bsgfx_subtype)(bsgfx_InstanceType* instance_type, bs_Batch* batch, bs_U32 flags, bs_Range range, bsgfx_InstanceSubtype** out);
-typedef int(__stdcall* PFN_bsgfx_instantiate)(bsgfx_InstanceSubtype* instance_subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material);
-typedef void(__stdcall* PFN_bsgfx_tickInstanceType)(bsgfx_InstanceType* instance_type);
-typedef void(__stdcall* PFN_bsgfx_renderSubtype)(bs_Queue* queue, bsgfx_InstanceSubtype* instance_subtype, bs_Pipeline* pipeline);
-typedef void(__stdcall* PFN_bsgfx_resetInstanceType)(bsgfx_InstanceType* instance_type);
-typedef void(__stdcall* PFN_bsgfx_instanceHiResMesh)(bs_Mesh* mesh, const bs_vec3* position, const bs_vec4* rotation, float scale, int subtype_offset, bool origin_at_center);
-typedef int(__stdcall* PFN_bsgfx_instanceMesh)(bsgfx_InstanceSubtype* subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material);
-typedef int(__stdcall* PFN_bsgfx_instanceBoneMesh)(bsgfx_InstanceSubtype* subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material);
-typedef int(__stdcall* PFN_bsgfx_instanceDepthlessLine)(bs_vec3 start, bs_vec3 end, bs_RGBA color);
-typedef int(__stdcall* PFN_bsgfx_instanceLine)(bs_vec3 start, bs_vec3 end, bs_RGBA color);
-typedef int(__stdcall* PFN_bsgfx_instanceRay)(const bs_Ray* ray, bs_RGBA color);
-typedef void(__stdcall* PFN_bsgfx_instanceAabb)(const bs_Aabb* aabb, bs_RGBA color, bs_Range* out);
-typedef int(__stdcall* PFN_bsgfx_instanceSphere)(bs_vec3 position, float radius);
-typedef int(__stdcall* PFN_bsgfx_instanceCone)(bs_mat4 transform, float radius, bs_U32 flags, int id, int material);
-typedef int(__stdcall* PFN_bsgfx_instancePoint)(bs_vec3 position, bs_RGBA color, float size);
-typedef int(__stdcall* PFN_bsgfx_instantiateQuad)(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material);
-typedef void(__stdcall* PFN_bsgfx_instanceDepthlessCircle)(const bs_mat4* transform, int segments, float radius, bs_RGBA color, bs_Range* out);
-typedef int(__stdcall* PFN_bsgfx_instanceAtlas)(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
-typedef int(__stdcall* PFN_bsgfx_instanceAtlasFlipped)(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
-typedef float(__stdcall* PFN_bsgfx_fontHeight)(bsgfx_Font* font, int px_size);
-typedef bsgfx_Range(__stdcall* PFN_bsgfx_instantiateASCIIText)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* text);
-typedef bsgfx_Range(__stdcall* PFN_bsgfx_instantiateASCIITextN)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* text, int text_length);
-typedef bsgfx_Range(__stdcall* PFN_bsgfx_instantiateASCIITextV)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format, va_list args);
-typedef bsgfx_Range(__stdcall* PFN_bsgfx_instantiateASCIITextF)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format, ...);
-typedef bsgfx_InstanceHeader*(__stdcall* PFN_bsgfx_instanceHeader)(bsgfx_InstanceSubtype* subtype, int instance_id);
-typedef bsgfx_InstanceHeader*(__stdcall* PFN_bsgfx_instanceData)(bsgfx_InstanceSubtype* subtype, int instance_id);
-typedef bs_mat4x3(__stdcall* PFN_bsgfx_matrix)(bs_vec3 position, bs_vec3 scale);
-typedef void(__stdcall* PFN_bsgfx_renderFineShadowVolumes)();
-typedef void(__stdcall* PFN_bsgfx_renderShadowVolumes)();
-typedef void(__stdcall* PFN_bsgfx_computeShadowVolumes)();
-typedef bs_Model*(__stdcall* PFN_bsgfx_prefabModel)();
-typedef int(__stdcall* PFN_bsgfx_package)();
-typedef void(__stdcall* PFN_bsgfx_ini)(const char* name, bs_U32 width, bs_U32 height, bs_U32 window_flags, int argc, char* argv[]);
-typedef void(__stdcall* PFN_bsgfx_tick)();
-typedef bsgfx_Application*(__stdcall* PFN_bsgfx_app)();
-typedef bsgfx_Callbacks*(__stdcall* PFN_bsgfx_callbacks)();
-typedef bsgfx_Settings*(__stdcall* PFN_bsgfx_settings)();
-typedef void(__stdcall* PFN_bsgfx_setCamera)(const bs_mat4* proj, const bs_mat4* view);
-typedef void(__stdcall* PFN_bsgfx_type)(bsgfx_TypeId id, int package_id, int version, const char* plural, const char* singular, size_t unmapped_size, size_t mapped_size, PFN_bsgfx_TypeMapper mapper, size_t unmapped_flexible_offset, size_t mapped_flexible_offset, size_t unmapped_flexible_size, size_t mapped_flexible_size);
-typedef void(__stdcall* PFN_bsgfx_map)(bsgfx_TypeId type, int id);
-typedef void(__stdcall* PFN_bsgfx_remap)(bsgfx_TypeId type_id);
-typedef int(__stdcall* PFN_bsgfx_count)(bsgfx_TypeId type_id);
-typedef void*(__stdcall* PFN_bsgfx_get)(bsgfx_TypeId type_id, bs_U32 id);
-typedef bsgfx_Type*(__stdcall* PFN_bsgfx_getType)(bsgfx_TypeId type_id);
-typedef int(__stdcall* PFN_bsgfx_id)(bsgfx_TypeId type_id, unsigned char* p);
-typedef int(__stdcall* PFN_bsgfx_rawId)(bsgfx_TypeId type_id, unsigned char* p);
-typedef void*(__stdcall* PFN_bsgfx_getRaw)(bsgfx_TypeId type_id, int id);
-typedef int(__stdcall* PFN_bsgfx_flexibleCount)(bsgfx_TypeId type_id, int id);
-typedef void(__stdcall* PFN_bsgfx_loadLights)(int package_id);
-typedef void(__stdcall* PFN_bsgfx_computePrefabShadows)(bs_Queue* queue);
-typedef void(__stdcall* PFN_bsgfx_renderPrefabShadowVolumes)(bs_RendererScope* scope, bs_Queue* queue);
-typedef bsgfx_PrefabMetadata*(__stdcall* PFN_bsgfx_prefabMetadata)(int mesh_id);
-typedef void(__stdcall* PFN_bsgfx_loadPrefabs)(int package_id, bs_Model* model);
-typedef void(__stdcall* PFN_bsgfx_prefabTransform)(bsgfx_Prefab* prefab, bs_mat4* out);
-typedef int(__stdcall* PFN_bsgfx_instancePrefabModel)(int mesh_id, bs_mat4 transform, bsgfx_PrefabSubtype prefab_subtype, int material_id);
-typedef int(__stdcall* PFN_bsgfx_instancePrefab)(int id, bsgfx_PrefabSubtype prefab_subtype);
-typedef void(__stdcall* PFN_bsgfx_instancePrefabs)();
-typedef void(__stdcall* PFN_bsgfx_renderPrefabs)(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
-typedef void(__stdcall* PFN_bsgfx_renderPrefabPrimitives)(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
-typedef int(__stdcall* PFN_bsgfx_queryPrefabId)(const bs_GUID* guid);
-typedef int(__stdcall* PFN_bsgfx_closestPrefab)(bs_U64 mesh_name_hash, bs_vec3 position, float radius);
-typedef void(__stdcall* PFN_bsgfx_primitivePosition)(const bsgfx_RawPrimitive* primitive, bs_vec3* out);
-typedef void(__stdcall* PFN_bsgfx_loadPrimitives)(int package_id);
-typedef bsgfx_InstanceSubtype*(__stdcall* PFN_bsgfx_primitiveSubtype)(bsgfx_PrimitiveType type);
-typedef int(__stdcall* PFN_bsgfx_instancePrimitive)(bsgfx_InstanceSubtype* subtype, bs_mat4 transform, bs_U32 flags, int id, int material);
-typedef int(__stdcall* PFN_bsgfx_queryTilePrimitive)(int tile_id);
-typedef void(__stdcall* PFN_bsgfx_instancePrimitives)();
-typedef void(__stdcall* PFN_bsgfx_renderPrimitives)(bs_RendererScope* scope, bs_Queue* queue, bs_mat4 camera);
-typedef int(__stdcall* PFN_bsgfx_queryPrimitive)(bs_GUID* guid);
-typedef void(__stdcall* PFN_bsgfx_loadSpawners)(int package_id);
-typedef void(__stdcall* PFN_bsgfx_spawn)(bsgfx_Spawner* spawner);
-typedef void(__stdcall* PFN_bsgfx_loadTiles)(int package_id, bool force_destroy);
-typedef void(__stdcall* PFN_bsgfx_instanceTiles)();
-typedef void(__stdcall* PFN_bsgfx_pushTile)(const bs_Batch* batch, const bs_Quad* quad, bs_vec3 normal, bs_U32 index, int image_index, bs_Range* out_range);
-typedef void(__stdcall* PFN_bsgfx_batchTile)(const bs_Batch* batch, const bs_U32* offset, const bs_Quad* quad, bs_vec3 normal, bs_U32 index, int image_index);
-typedef const bsgfx_TileAxis*(__stdcall* PFN_bsgfx_tileAxes)();
-typedef void(__stdcall* PFN_bsgfx_tilePosition)(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_vec3* out);
-typedef void(__stdcall* PFN_bsgfx_tileRotation)(int axis, bs_vec4* out);
-typedef void(__stdcall* PFN_bsgfx_tileEulerRotation)(int axis, bs_vec3* out);
-typedef void(__stdcall* PFN_bsgfx_pushTileAt)(const bs_Batch* batch, const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32 index, int image_index, bs_U32* out);
-typedef void(__stdcall* PFN_bsgfx_tileCoordinate)(const bsgfx_Primitive* primitive, int axis, int index, bs_ivec2* out);
-typedef void(__stdcall* PFN_bsgfx_tileAxis)(const bsgfx_Primitive* primitive, int index, int* out);
-typedef void(__stdcall* PFN_bsgfx_tileIndex)(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32* out);
-typedef bool(__stdcall* PFN_bsgfx_instanceWidgets)(bsgfx_Menu menu, bsgfx_TitleBar* title_bar, bsgfx_MenuTabBar* tab_bar);
-typedef void(__stdcall* PFN_bsgfx_instantiateTextUI)(bsgfx_UIText text, bsgfx_UIElement* element);
-typedef void(__stdcall* PFN_bsgfx_instantiateSolidUI)(bsgfx_UISolid solid, bsgfx_UIElement* element);
-typedef void(__stdcall* PFN_bsgfx_instantiateSolidUIElement)(bsgfx_UISolid solid, const bsgfx_UIElement* element);
-typedef void(__stdcall* PFN_bsgfx_solidUIElement)(bsgfx_UISolid solid, bsgfx_UIElement* element);
-typedef void(__stdcall* PFN_bsgfx_instantiateAtlasIconUI)(bsgfx_UIIcon icon, bsgfx_UIElement* element);
-typedef void(__stdcall* PFN_bsgfx_instantiateAtlasIconUIElement)(bsgfx_UIIcon icon, const bsgfx_UIElement* element);
-typedef void(__stdcall* PFN_bsgfx_atlasIconUIElement)(bsgfx_UIIcon icon, bsgfx_UIElement* element);
-typedef bool(__stdcall* PFN_bsgfx_hoveringUIElement)(const bsgfx_UIElement* element);
-typedef void(__stdcall* PFN_bsgfx_translateUIElement)(const bsgfx_UIElement* element, const bs_vec3* position);
-typedef void(__stdcall* PFN_bsgfx_renderColorPickers)(bs_RendererScope* scope, bs_Queue* queue);
+typedef void(* PFN_bsgfx_test)();
+typedef bsgfx_InstanceSubtype**(* PFN_bsgfx_subtypes)();
+typedef bsgfx_InstanceType**(* PFN_bsgfx_instanceTypes)();
+typedef void(* PFN_bsgfx_computeContextCamera)();
+typedef void(* PFN_bsgfx_tickInstanceTypes)();
+typedef void(* PFN_bsgfx_resetInstanceTypes)();
+typedef void(* PFN_bsgfx_textDimensions)(bsgfx_Font* font, bs_vec2* out, char* name, int length);
+typedef bs_PipelineHash(* PFN_bsgfx_defaultPipelineHash)();
+typedef void(* PFN_bsgfx_renderTileIcons)(bs_RendererScope* scope, bs_Queue* queue);
+typedef void(* PFN_bsgfx_renderAtlasIcons)(bs_RendererScope* scope, bs_Queue* queue);
+typedef void(* PFN_bsgfx_renderLineModel)(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test);
+typedef void(* PFN_bsgfx_renderLines)(bs_RendererScope* scope, bs_Queue* queue, const bs_mat4* camera, bsgfx_InstanceSubtype* subtype, bool skip_depth_test);
+typedef void(* PFN_bsgfx_renderPoints)(bs_RendererScope* scope, bs_Queue* queue);
+typedef void(* PFN_bsgfx_renderAtlas)(bs_RendererScope* scope, bs_Queue* queue);
+typedef void(* PFN_bsgfx_renderPrimitiveTiles)(bs_RendererScope* scope, bs_Queue* queue);
+typedef void(* PFN_bsgfx_swapBufferBindings)();
+typedef void(* PFN_bsgfx_requiredForShadowVolumes)(bs_PipelineHash* inout);
+typedef void(* PFN_bsgfx_requiredForStencilShadows)(bs_PipelineHash* inout);
+typedef void(* PFN_bsgfx_requiredForTransparency)(bs_PipelineHash* inout);
+typedef bsgfx_Scene*(* PFN_bsgfx_currentScene)();
+typedef void(* PFN_bsgfx_loadScene)(const char* name);
+typedef bool(* PFN_bsgfx_validateSubtype)(const char* library_name, bsgfx_InstanceSubtype* subtype);
+typedef bool(* PFN_bsgfx_validateInstanceType)(const char* library_name, bsgfx_InstanceType* instance_type);
+typedef void(* PFN_bsgfx_worldToScreen)(const bs_vec3* position, const bs_mat4* camera, const bs_vec2* resolution, bs_vec2* out);
+typedef const char*(* PFN_bsgfx_materialCategoryName)(bsgfx_MaterialCategory category);
+typedef bs_List*(* PFN_bsgfx_materials)();
+typedef bsgfx_Material*(* PFN_bsgfx_queryMaterialHash)(bs_U64 hash);
+typedef bsgfx_Material*(* PFN_bsgfx_fetchMaterial)(int id);
+typedef bsgfx_Material*(* PFN_bsgfx_queryMaterial)(const char* name);
+typedef void(* PFN_bsgfx_loadMaterials)();
+typedef bsgfx_Material*(* PFN_bsgfx_material)(char* name);
+typedef bsgfx_Material*(* PFN_bsgfx_materialN)(char* name, int name_length);
+typedef bsgfx_Material*(* PFN_bsgfx_materialV)(char* format, va_list args);
+typedef bsgfx_Material*(* PFN_bsgfx_materialF)(char* format, ...);
+typedef void(* PFN_bsgfx_highlightMaterial)(int material_id, bool auto_unhighlight);
+typedef void(* PFN_bsgfx_unhighlightMaterial)(int material_id);
+typedef void(* PFN_bsgfx_tickMaterials)();
+typedef void(* PFN_bsgfx_sweepCollisions)(float sweep_radius, const bs_vec3* position);
+typedef bsgfx_Collider(* PFN_bsgfx_collider)(bs_Aabb aabb, bs_vec3 scale, bs_ivec3 resolution, float sweep_radius);
+typedef void(* PFN_bsgfx_applyCollisions)(bsgfx_Collider* collider, const bs_vec3* position, bs_vec3* velocity);
+typedef void(* PFN_bsgfx_printCollisions)(bsgfx_Collider* collider);
+typedef void(* PFN_bsgfx_instanceSweepCollisions)();
+typedef void(* PFN_bsgfx_instanceCollider)(bsgfx_Collider* collider, const bs_vec3* position, bs_vec3* velocity);
+typedef int(* PFN_bsgfx_skeleton)(bs_Armature* armature);
+typedef int(* PFN_bsgfx_animationFrame)(bs_Animation* animation, float time, int num_frames);
+typedef int(* PFN_bsgfx_animationFrameCount)(bs_Animation* animation, float time_scale);
+typedef void(* PFN_bsgfx_applyAnimationVelocity)(bsgfx_Animator* animator, bs_vec3* velocity, bs_vec2 input);
+typedef void(* PFN_bsgfx_queueAnimation)(bsgfx_Animator* animator, int animation_id);
+typedef void(* PFN_bsgfx_runAnimator)(bsgfx_Animator* animator, bsgfx_AnimatorCallbacks callbacks);
+typedef bsgfx_Animator(* PFN_bsgfx_animator)(bs_Armature* armature, int resting_animation_id, int animations_count);
+typedef bs_Result(* PFN_bsgfx_ensureInstanceCount)(bsgfx_InstanceType* instance_type, bs_U32 instances_count, bs_U32 overhead_count);
+typedef bs_Result(* PFN_bsgfx_instanceType)(size_t instance_size, int bind_set, int binding, bsgfx_InstanceType** out);
+typedef void(* PFN_bsgfx_deleteSubtype)(bsgfx_InstanceSubtype* instance_subtype);
+typedef bs_Result(* PFN_bsgfx_subtype)(bsgfx_InstanceType* instance_type, bs_Batch* batch, bs_U32 flags, bs_Range range, bsgfx_InstanceSubtype** out);
+typedef int(* PFN_bsgfx_instantiate)(bsgfx_InstanceSubtype* instance_subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material);
+typedef void(* PFN_bsgfx_tickInstanceType)(bsgfx_InstanceType* instance_type);
+typedef void(* PFN_bsgfx_renderSubtype)(bs_Queue* queue, bsgfx_InstanceSubtype* instance_subtype, bs_Pipeline* pipeline);
+typedef void(* PFN_bsgfx_resetInstanceType)(bsgfx_InstanceType* instance_type);
+typedef void(* PFN_bsgfx_instanceHiResMesh)(bs_Mesh* mesh, const bs_vec3* position, const bs_vec4* rotation, float scale, int subtype_offset, bool origin_at_center);
+typedef int(* PFN_bsgfx_instanceMesh)(bsgfx_InstanceSubtype* subtype, const bsgfx_MeshInstance* data, bs_U32 flags, int id, int material);
+typedef int(* PFN_bsgfx_instanceBoneMesh)(bsgfx_InstanceSubtype* subtype, const bsgfx_BoneInstance* data, bs_U32 flags, int id, int material);
+typedef int(* PFN_bsgfx_instanceDepthlessLine)(bs_vec3 start, bs_vec3 end, bs_RGBA color);
+typedef int(* PFN_bsgfx_instanceLine)(bs_vec3 start, bs_vec3 end, bs_RGBA color);
+typedef int(* PFN_bsgfx_instanceRay)(const bs_Ray* ray, bs_RGBA color);
+typedef void(* PFN_bsgfx_instanceAabb)(const bs_Aabb* aabb, bs_RGBA color, bs_Range* out);
+typedef int(* PFN_bsgfx_instanceSphere)(bs_vec3 position, float radius);
+typedef int(* PFN_bsgfx_instanceCone)(bs_mat4 transform, float radius, bs_U32 flags, int id, int material);
+typedef int(* PFN_bsgfx_instancePoint)(bs_vec3 position, bs_RGBA color, float size);
+typedef int(* PFN_bsgfx_instantiateQuad)(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, bs_vec4 coords, bs_U32 flags, int id, int material);
+typedef void(* PFN_bsgfx_instanceDepthlessCircle)(const bs_mat4* transform, int segments, float radius, bs_RGBA color, bs_Range* out);
+typedef int(* PFN_bsgfx_instanceAtlas)(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
+typedef int(* PFN_bsgfx_instanceAtlasFlipped)(bsgfx_InstanceSubtype* subtype, bs_mat4x3 transform, int texture, bs_U32 flags, int id, int material);
+typedef float(* PFN_bsgfx_fontHeight)(bsgfx_Font* font, int px_size);
+typedef bsgfx_Range(* PFN_bsgfx_instantiateASCIIText)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* text);
+typedef bsgfx_Range(* PFN_bsgfx_instantiateASCIITextN)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* text, int text_length);
+typedef bsgfx_Range(* PFN_bsgfx_instantiateASCIITextV)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format, va_list args);
+typedef bsgfx_Range(* PFN_bsgfx_instantiateASCIITextF)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format, ...);
+typedef bsgfx_InstanceHeader*(* PFN_bsgfx_instanceHeader)(bsgfx_InstanceSubtype* subtype, int instance_id);
+typedef bsgfx_InstanceHeader*(* PFN_bsgfx_instanceData)(bsgfx_InstanceSubtype* subtype, int instance_id);
+typedef bs_mat4x3(* PFN_bsgfx_matrix)(bs_vec3 position, bs_vec3 scale);
+typedef void(* PFN_bsgfx_renderFineShadowVolumes)();
+typedef void(* PFN_bsgfx_renderShadowVolumes)();
+typedef void(* PFN_bsgfx_computeShadowVolumes)();
+typedef bs_Model*(* PFN_bsgfx_prefabModel)();
+typedef int(* PFN_bsgfx_package)();
+typedef void(* PFN_bsgfx_ini)(const char* name, bs_U32 width, bs_U32 height, bs_U32 window_flags, int argc, char* argv[]);
+typedef void(* PFN_bsgfx_tick)();
+typedef bsgfx_Application*(* PFN_bsgfx_app)();
+typedef bsgfx_Callbacks*(* PFN_bsgfx_callbacks)();
+typedef bsgfx_Settings*(* PFN_bsgfx_settings)();
+typedef void(* PFN_bsgfx_setCamera)(const bs_mat4* proj, const bs_mat4* view);
+typedef void(* PFN_bsgfx_type)(bsgfx_TypeId id, int package_id, int version, const char* plural, const char* singular, size_t unmapped_size, size_t mapped_size, PFN_bsgfx_TypeMapper mapper, size_t unmapped_flexible_offset, size_t mapped_flexible_offset, size_t unmapped_flexible_size, size_t mapped_flexible_size);
+typedef void(* PFN_bsgfx_map)(bsgfx_TypeId type, int id);
+typedef void(* PFN_bsgfx_remap)(bsgfx_TypeId type_id);
+typedef int(* PFN_bsgfx_count)(bsgfx_TypeId type_id);
+typedef void*(* PFN_bsgfx_get)(bsgfx_TypeId type_id, bs_U32 id);
+typedef bsgfx_Type*(* PFN_bsgfx_getType)(bsgfx_TypeId type_id);
+typedef int(* PFN_bsgfx_id)(bsgfx_TypeId type_id, unsigned char* p);
+typedef int(* PFN_bsgfx_rawId)(bsgfx_TypeId type_id, unsigned char* p);
+typedef void*(* PFN_bsgfx_getRaw)(bsgfx_TypeId type_id, int id);
+typedef int(* PFN_bsgfx_flexibleCount)(bsgfx_TypeId type_id, int id);
+typedef void(* PFN_bsgfx_loadLights)(int package_id);
+typedef void(* PFN_bsgfx_computePrefabShadows)(bs_Queue* queue);
+typedef void(* PFN_bsgfx_renderPrefabShadowVolumes)(bs_RendererScope* scope, bs_Queue* queue);
+typedef bsgfx_PrefabMetadata*(* PFN_bsgfx_prefabMetadata)(int mesh_id);
+typedef void(* PFN_bsgfx_loadPrefabs)(int package_id, bs_Model* model);
+typedef void(* PFN_bsgfx_prefabTransform)(bsgfx_Prefab* prefab, bs_mat4* out);
+typedef int(* PFN_bsgfx_instancePrefabModel)(int mesh_id, bs_mat4 transform, bsgfx_PrefabSubtype prefab_subtype, int material_id);
+typedef int(* PFN_bsgfx_instancePrefab)(int id, bsgfx_PrefabSubtype prefab_subtype);
+typedef void(* PFN_bsgfx_instancePrefabs)();
+typedef void(* PFN_bsgfx_renderPrefabs)(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
+typedef void(* PFN_bsgfx_renderPrefabPrimitives)(bs_Queue* queue, bs_Pipeline* pipeline, int key_start);
+typedef int(* PFN_bsgfx_queryPrefabId)(const bs_GUID* guid);
+typedef int(* PFN_bsgfx_closestPrefab)(bs_U64 mesh_name_hash, bs_vec3 position, float radius);
+typedef void(* PFN_bsgfx_primitivePosition)(const bsgfx_RawPrimitive* primitive, bs_vec3* out);
+typedef void(* PFN_bsgfx_loadPrimitives)(int package_id);
+typedef bsgfx_InstanceSubtype*(* PFN_bsgfx_primitiveSubtype)(bsgfx_PrimitiveType type);
+typedef int(* PFN_bsgfx_instancePrimitive)(bsgfx_InstanceSubtype* subtype, bs_mat4 transform, bs_U32 flags, int id, int material);
+typedef int(* PFN_bsgfx_queryTilePrimitive)(int tile_id);
+typedef void(* PFN_bsgfx_instancePrimitives)();
+typedef void(* PFN_bsgfx_renderPrimitives)(bs_RendererScope* scope, bs_Queue* queue, bs_mat4 camera);
+typedef int(* PFN_bsgfx_queryPrimitive)(bs_GUID* guid);
+typedef void(* PFN_bsgfx_loadSpawners)(int package_id);
+typedef void(* PFN_bsgfx_spawn)(bsgfx_Spawner* spawner);
+typedef void(* PFN_bsgfx_loadTiles)(int package_id, bool force_destroy);
+typedef void(* PFN_bsgfx_instanceTiles)();
+typedef void(* PFN_bsgfx_pushTile)(const bs_Batch* batch, const bs_Quad* quad, bs_vec3 normal, bs_U32 index, int image_index, bs_Range* out_range);
+typedef void(* PFN_bsgfx_batchTile)(const bs_Batch* batch, const bs_U32* offset, const bs_Quad* quad, bs_vec3 normal, bs_U32 index, int image_index);
+typedef const bsgfx_TileAxis*(* PFN_bsgfx_tileAxes)();
+typedef void(* PFN_bsgfx_tilePosition)(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_vec3* out);
+typedef void(* PFN_bsgfx_tileRotation)(int axis, bs_vec4* out);
+typedef void(* PFN_bsgfx_tileEulerRotation)(int axis, bs_vec3* out);
+typedef void(* PFN_bsgfx_pushTileAt)(const bs_Batch* batch, const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32 index, int image_index, bs_U32* out);
+typedef void(* PFN_bsgfx_tileCoordinate)(const bsgfx_Primitive* primitive, int axis, int index, bs_ivec2* out);
+typedef void(* PFN_bsgfx_tileAxis)(const bsgfx_Primitive* primitive, int index, int* out);
+typedef void(* PFN_bsgfx_tileIndex)(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32* out);
+typedef bool(* PFN_bsgfx_instanceWidgets)(bsgfx_Menu menu, bsgfx_TitleBar* title_bar, bsgfx_MenuTabBar* tab_bar);
+typedef void(* PFN_bsgfx_instantiateTextUI)(bsgfx_UIText text, bsgfx_UIElement* element);
+typedef void(* PFN_bsgfx_instantiateSolidUI)(bsgfx_UISolid solid, bsgfx_UIElement* element);
+typedef void(* PFN_bsgfx_instantiateSolidUIElement)(bsgfx_UISolid solid, const bsgfx_UIElement* element);
+typedef void(* PFN_bsgfx_solidUIElement)(bsgfx_UISolid solid, bsgfx_UIElement* element);
+typedef void(* PFN_bsgfx_instantiateAtlasIconUI)(bsgfx_UIIcon icon, bsgfx_UIElement* element);
+typedef void(* PFN_bsgfx_instantiateAtlasIconUIElement)(bsgfx_UIIcon icon, const bsgfx_UIElement* element);
+typedef void(* PFN_bsgfx_atlasIconUIElement)(bsgfx_UIIcon icon, bsgfx_UIElement* element);
+typedef bool(* PFN_bsgfx_hoveringUIElement)(const bsgfx_UIElement* element);
+typedef void(* PFN_bsgfx_translateUIElement)(const bsgfx_UIElement* element, const bs_vec3* position);
+typedef void(* PFN_bsgfx_renderColorPickers)(bs_RendererScope* scope, bs_Queue* queue);
 
 typedef struct {
     PFN_bsgfx_test bsgfx_test;

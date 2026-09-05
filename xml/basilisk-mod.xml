@@ -40,10 +40,10 @@
 	</includes>
 
 	<typedefs>
-		<typedef><type>void</type><name>(__stdcall* PFN_void)()</name></typedef>
-		<typedef><type>unsigned char*</type><name>(__stdcall* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int)</name></typedef>
-		<typedef><type>const char*</type><name>(__stdcall* PFN_bsmod_GridMenu)(bs_List* widgets)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int)</name></typedef>
+		<typedef><type>void</type><name>(* PFN_void)()</name></typedef>
+		<typedef><type>unsigned char*</type><name>(* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int)</name></typedef>
+		<typedef><type>const char*</type><name>(* PFN_bsmod_GridMenu)(bs_List* widgets)</name></typedef>
+		<typedef><type>void</type><name>(* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int)</name></typedef>
 	</typedefs>
 
 	<enums>
@@ -78,7 +78,7 @@
 			<line><name>BSMOD_TAB_SETTINGS</name></line>
 			<line><name>BSMOD_TABS_COUNT</name></line>
 		</enum>
-		
+
 		<enum name="bsmod_UnicodeBlock">
 			<line comment="none"><name>BSMOD_UNICODE_BLOCK_NONE</name><value>0</value></line>
 			<line comment="0000"><name>BSMOD_UNICODE_BLOCK_BASIC_LATIN</name><value>1</value></line>
@@ -504,12 +504,12 @@
 			<field><type>bs_List</type><name>info</name></field>
 			<field><type>bs_List</type><name>rects</name></field>
 		</structure>
-		
+
 		<structure name="bsmod_GlyphInfo">
 			<field><type>int</type><name>page</name></field>
 			<field><type>unsigned int</type><name>glyph_id</name></field>
 		</structure>
-		
+
 		<structure name="bsmod_TextureInfo">
 			<field><type>char*</type><name>name</name></field>
 			<field><type>PFN_bsmod_getAtlasTextureData</type><name>get_data</name></field>
@@ -565,7 +565,7 @@
 			<field><type>void</type><name>(*push_widgets)(bs_List*, bs_vec2)</name></field>
 			<field><type>void</type><name>(*on_click)(bsmod_GridClickParams)</name></field>
 		</structure>
-		
+
 	</structures>
 
 	<externs>
@@ -582,11 +582,11 @@
 		<function name="bsmod_subtypes">
 			<return>bsgfx_InstanceSubtype**</return>
 		</function>
-		
+
 		<function name="bsmod_callbacks">
 			<return>bsmod_Callbacks*</return>
 		</function>
-		
+
 		<function name="bsmod_copyHoveringDataToBuffer">
 			<return>void</return>
 		</function>
@@ -628,7 +628,7 @@
 		<function name="bsmod_tickTracker">
 			<return>void</return>
 		</function>
-		
+
 		<function name="bsmod_onTrack">
 			<return>void</return>
 		</function>
@@ -705,20 +705,20 @@
 			<param><type>char*</type><name>package_name</name></param>
 			<param><type>char*</type><name>resource_name</name></param>
 		</function>
-	
+
 		<function name="bsmod_scrollbar">
 			<return>void</return>
 			<param><type>const int*</type><name>scroll</name></param>
 			<param><type>bsgfx_Scrollbar*</type><name>out</name></param>
 		</function>
-		
+
 		<function name="bsmod_dividerWidget">
 			<return>void</return>
 			<param><type>float</type><name>width</name></param>
 			<param><type>int</type><name>indent</name></param>
 			<param><type>bsgfx_Widget*</type><name>out</name></param>
 		</function>
-		
+
 		<function name="bsmod_iconWidget">
 			<return>void</return>
 			<param><type>const bsgfx_AtlasCache*</type><name>cache</name></param>
@@ -727,7 +727,7 @@
 			<param><type>bs_U32</type><name>advance_flags</name></param>
 			<param><type>bsgfx_Widget*</type><name>out</name></param>
 		</function>
-		
+
 		<function name="bsmod_packages">
 			<return>bs_List*</return>
 		</function>

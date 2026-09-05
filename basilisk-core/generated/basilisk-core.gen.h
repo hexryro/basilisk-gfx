@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
  /**
   This file was generated from basilisk-gfx.com
@@ -29,7 +29,7 @@
   It is not recommended to make changes to this file as it will be lost if
   the code is regenerated.
   */
-        
+
 
 #ifndef BASILISK_CORE_GEN_H
 #define BASILISK_CORE_GEN_H
@@ -174,6 +174,8 @@ typedef enum bs_TopologyType bs_TopologyType;
 typedef enum bs_PolygonType bs_PolygonType;
 typedef enum bs_StoreOp bs_StoreOp;
 typedef enum bs_LoadOp bs_LoadOp;
+typedef enum bs_ImageUsageFlags bs_ImageUsageFlags;
+typedef enum bs_ImageAspectFlags bs_ImageAspectFlags;
 typedef enum bs_ColliderType bs_ColliderType;
 typedef enum bs_ObjectFlag bs_ObjectFlag;
 typedef enum bs_ResourceType bs_ResourceType;
@@ -776,8 +778,15 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_QUERY_MODEL_KEEP_JSON                                     \
     (1 << 29)
 
+#ifdef _WIN32
 #define BSAPI                                                        \
     _declspec(dllexport)
+
+#else
+#define BSAPI                                                        \
+
+
+#endif
 
 #define BS_BLANK                                                     \
     (bs_RGBA) {   0,   0,   0,   0 }
@@ -1313,9 +1322,6 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_KEY_LAUNCH_APP2                                           \
     0xB7
 
-#define BS_KEY_LAUNCH_APP2                                           \
-    0xBA
-
 #define BS_KEY_OEM_1                                                 \
     0xBA
 
@@ -1460,18 +1466,17 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_KEY_OEM_CLEAR                                             \
     0xFE
 
-typedef void (__cdecl* bs_VoidFunction)();
-typedef int (__cdecl* bs_ThreadFunction)(void*);
-typedef bs_Result (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
-typedef void (__stdcall* bs_MessageFunction)(const bs_LogQueueItem*);
-typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
-typedef void (__stdcall* bs_ValidationErrorFunction)();
-typedef void (__stdcall* bs_ContextTickFunction)(bs_VoidFunction);
-typedef void (__stdcall* bs_ConfigureWindowFunction)(bs_Context*);
-typedef bs_NonClientArea (__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2);
-typedef void (__stdcall* bs_ResizeContextFunction)(bs_Context*);
-typedef void (__stdcall* bs_SubpassFunction)(bs_RendererScope*);
-typedef void (__stdcall* bs_ContextTickFunction)(bs_Context* context);
+typedef void (* bs_VoidFunction)();
+typedef int (* bs_ThreadFunction)(void*);
+typedef bs_Result (* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
+typedef void (* bs_MessageFunction)(const bs_LogQueueItem*);
+typedef void (* bs_NameObjectFunction)(bs_Object*, const char*);
+typedef void (* bs_ValidationErrorFunction)();
+typedef void (* bs_ConfigureWindowFunction)(bs_Context*);
+typedef bs_NonClientArea (* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2);
+typedef void (* bs_ResizeContextFunction)(bs_Context*);
+typedef void (* bs_SubpassFunction)(bs_RendererScope*);
+typedef void (* bs_ContextTickFunction)(bs_Context* context);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -1773,6 +1778,24 @@ enum bs_LoadOp {
     BS_ATTACHMENT_LOAD_OP_DONT_CARE = 2,
 };
 
+enum bs_ImageUsageFlags {
+    BS_IMAGE_USAGE_TRANSFER_SRC_BIT = 1 << 0,
+    BS_IMAGE_USAGE_TRANSFER_DST_BIT = 1 << 1,
+    BS_IMAGE_USAGE_SAMPLED_BIT = 1 << 2,
+    BS_IMAGE_USAGE_STORAGE_BIT = 1 << 3,
+    BS_IMAGE_USAGE_COLOR_ATTACHMENT_BIT = 1 << 4,
+    BS_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT = 1 << 5,
+    BS_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT = 1 << 6,
+    BS_IMAGE_USAGE_INPUT_ATTACHMENT_BIT = 1 << 7,
+};
+
+enum bs_ImageAspectFlags {
+    BS_IMAGE_ASPECT_COLOR_BIT = 1 << 0,
+    BS_IMAGE_ASPECT_DEPTH_BIT = 1 << 1,
+    BS_IMAGE_ASPECT_STENCIL_BIT = 1 << 2,
+    BS_IMAGE_ASPECT_METADATA_BIT = 1 << 3,
+};
+
 enum bs_ColliderType {
     BS_COLLIDER_NONE = 0,
     BS_COLLIDER_SPHERE = 1,
@@ -1809,10 +1832,7 @@ enum bs_ImageBit {
     BS_IMAGE_SHADER_ACCESSIBLE_BIT = 1 << 4,
     BS_IMAGE_ATTACHMENT_BIT = 1 << 5,
     BS_IMAGE_INPUT_ATTACHMENT_BIT = 1 << 6,
-    BS_IMAGE_USAGE_TRANSFER_DST_BIT = 1 << 7,
-    BS_IMAGE_USAGE_TRANSFER_SRC_BIT = 1 << 8,
     BS_IMAGE_IS_BOUND = 1 << 10,
-    BS_IMAGE_USAGE_STORAGE_BIT = 1 << 13,
 };
 
 enum bs_AtlasFlag {
@@ -2606,8 +2626,8 @@ struct bs_Image {
     int bind_set;
     int bind_point;
     bs_Format format;
-    enum VkImageUsageFlags usage_flags;
-    enum VkImageAspectFlags aspect_flags;
+    bs_ImageUsageFlags usage_flags;
+    bs_ImageAspectFlags aspect_flags;
     bs_ImageSwaps _[];
 };
 
@@ -3091,7 +3111,7 @@ struct bs_Descriptor {
         struct {
             struct VkSampler_T* vk_sampler;
             struct VkImageView_T* vk_image_view;
-            enum VkImageLayout vk_image_layout;
+            bs_ImageLayout vk_image_layout;
             bs_U32 padding;
             bs_Image* image;
             bs_Sampler* sampler;
@@ -7628,6 +7648,7 @@ bs_alignUp(
     bs_U32 value,
     bs_U32 alignment);
 
+#ifdef _WIN32
  /**
   @param src
   @param dst
@@ -7651,6 +7672,8 @@ bs_unwiden(
     wchar_t* src,
     char* dst,
     bs_U32 dst_size);
+
+#endif
 
  /**
   @param format

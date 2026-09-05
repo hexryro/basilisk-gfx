@@ -5,7 +5,7 @@
 	<prefix>BSAPI</prefix>
 	<functionPrefix>bs_</functionPrefix>
 	<functionPrefixCaps>BS_</functionPrefixCaps>
-	
+
 	<extensions>
 		<extension>VK_KHR_swapchain</extension>
 	</extensions>
@@ -39,7 +39,6 @@
 		</internal>
 		<internalHeader>
 			<include>basilisk-core.h</include>
-			<include>wtypes.h</include>
 			<include>vulkan.h</include>
 			<include>stdarg.h</include>
 		</internalHeader>
@@ -57,30 +56,29 @@
     </includes>
 
 	<typedefs>
-        <typedef><type>void</type><name>(__cdecl* bs_VoidFunction)()</name></typedef>
-        <typedef><type>int</type><name>(__cdecl* bs_ThreadFunction)(void*)</name></typedef>
-        <typedef><type>bs_Result</type><name>(__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_MessageFunction)(const bs_LogQueueItem*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorFunction)()</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_VoidFunction)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ConfigureWindowFunction)(bs_Context*)</name></typedef>
-		<typedef><type>bs_NonClientArea</type><name>(__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ResizeContextFunction)(bs_Context*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
-        <typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_Context* context)</name></typedef>
+        <typedef><type>void</type><name>(* bs_VoidFunction)()</name></typedef>
+        <typedef><type>int</type><name>(* bs_ThreadFunction)(void*)</name></typedef>
+        <typedef><type>bs_Result</type><name>(* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
+		<typedef><type>void</type><name>(* bs_MessageFunction)(const bs_LogQueueItem*)</name></typedef>
+		<typedef><type>void</type><name>(* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
+		<typedef><type>void</type><name>(* bs_ValidationErrorFunction)()</name></typedef>
+		<typedef><type>void</type><name>(* bs_ConfigureWindowFunction)(bs_Context*)</name></typedef>
+		<typedef><type>bs_NonClientArea</type><name>(* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2)</name></typedef>
+		<typedef><type>void</type><name>(* bs_ResizeContextFunction)(bs_Context*)</name></typedef>
+		<typedef><type>void</type><name>(* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
+        <typedef><type>void</type><name>(* bs_ContextTickFunction)(bs_Context* context)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
 		<typedef><type>short</type><name>bs_I16</name></typedef>
 		<typedef><type>char</type><name>bs_I8</name></typedef>
 		<typedef><type>void*</type><name>bs_JsonObject</name></typedef>
-		
+
 		<typedef><type>unsigned long long</type><name>bs_U64</name></typedef>
 		<typedef><type>unsigned int</type><name>bs_U32</name></typedef>
 		<typedef><type>unsigned short</type><name>bs_U16</name></typedef>
 		<typedef><type>unsigned char</type><name>bs_U8</name></typedef>
-	
+
 		<typedef><type>double</type><name>bs_F64</name></typedef>
 		<typedef><type>float</type><name>bs_F32</name></typedef>
 
@@ -108,7 +106,7 @@
 		<typedef><type>void</type><name>(*bs_Callback)()</name></typedef>
 		<typedef><type>BS_VERTEX_DECLARATION_STRUCTURE()</type><name>bs_VertexDeclaration</name></typedef>
 	</typedefs>
-	
+
 	<enums>
 		<enum name="bs_Library">
 			<line><name>BS_LIBRARY_UNDEFINED</name></line>
@@ -221,7 +219,7 @@
 			<line><name>BS_SLOT_30_BIT</name><value>1 &lt;&lt; 30</value></line>
 			<line><name>BS_SLOT_31_BIT</name><value>1 &lt;&lt; 31</value></line>
 		</enum>
-		
+
 		<serializableEnum name="ShaderType" deserialize="true" copyFrom="VkShaderStageFlagBits"/>
 		<enum name="bs_BufferUsageFlag" copyFrom="VkBufferUsageFlagBits"/>
 		<enum name="bs_MemoryPropertyFlag" copyFrom="VkMemoryPropertyFlagBits"/>
@@ -244,7 +242,8 @@
 		<enum name="bs_StoreOp" copyFrom="VkAttachmentStoreOp"/>
 		<enum name="bs_LoadOp" copyFrom="VkAttachmentLoadOp"/>
 		<serializableEnum name="VkObjectType" copyFrom="VkObjectType"/>
-
+		<enum name="bs_ImageUsageFlags" copyFrom="VkImageUsageFlagBits"/>
+		<enum name="bs_ImageAspectFlags" copyFrom="VkImageAspectFlagBits"/>
 		<enum name="bs_ColliderType">
 			<line><name>BS_COLLIDER_NONE</name><value>0</value></line>
 			<line><name>BS_COLLIDER_SPHERE</name><value>1</value></line>
@@ -267,12 +266,12 @@
 			<line><name>BS_RESOURCE_ATLAS</name><value>5</value></line>
 			<line><name>BS_RESOURCE_FONT</name><value>6</value></line>
 			<line><name>BS_RESOURCE_BINDING</name><value>7</value></line>
-			
+
 			<line><name>BSGFX_RESOURCE_PRIMITIVE</name><value>8</value></line>
 			<line><name>BSGFX_RESOURCE_PREFAB</name><value>9</value></line>
 			<line><name>BSGFX_RESOURCE_TILE</name><value>10</value></line>
 			<line><name>BSGFX_RESOURCE_LIGHT</name><value>11</value></line>
-			
+
 			<line><name>BS_RESOURCE_TYPE_COUNT</name><value>12</value></line>
 		</enum>
 		<enum name="bs_ImageBit">
@@ -280,10 +279,7 @@
 			<line><name>BS_IMAGE_SHADER_ACCESSIBLE_BIT</name><value>1 &lt;&lt; 4</value></line>
 			<line><name>BS_IMAGE_ATTACHMENT_BIT</name><value>1 &lt;&lt; 5</value></line>
 			<line><name>BS_IMAGE_INPUT_ATTACHMENT_BIT</name><value>1 &lt;&lt; 6</value></line>
-			<line><name>BS_IMAGE_USAGE_TRANSFER_DST_BIT</name><value>1 &lt;&lt; 7</value></line>
-			<line><name>BS_IMAGE_USAGE_TRANSFER_SRC_BIT</name><value>1 &lt;&lt; 8</value></line>
 			<line><name>BS_IMAGE_IS_BOUND</name><value>1 &lt;&lt; 10</value></line>
-			<line><name>BS_IMAGE_USAGE_STORAGE_BIT</name><value>1 &lt;&lt; 13</value></line>
 		</enum>
 		<enum name="bs_AtlasFlag">
 			<line><name>BS_ATLAS_FORCE_CREATE</name><value>1 &lt;&lt; 0</value></line>
@@ -379,7 +375,7 @@
 			<line><name>BS_OBJECT_RENDERER</name></line>
 			<line><name>BS_OBJECT_RAY_TRACER</name></line>
 			<line><name>BS_OBJECT_ATLAS</name></line>
-			
+
 			<line><name>BS_OBJECT_TYPE_COUNT</name></line>
 		</enum>
 		<enum name="bs_SurfaceType">
@@ -398,11 +394,19 @@
 	</enums>
 
     <macros>
+        <ifdef cond="_WIN32"/>
+		<macro>
+			<name>#define </name>
+			<line></line>
+		</macro>
+		<else/>
+		<endif/>
+
 		<macro>
 			<name>#define BS_CONFIGURE_SOURCE(sources, index, count, ids)</name>
 			<line>sources[index] = bs_configureSource(index, count, (const char* []) { ids(BS_STRING_GEN) })</line>
 		</macro>
-		
+
 		<macro>
 			<name>#define BS_RGBA(r, g, b, a)</name>
 			<line>(bs_RGBA) { r, g, b, a }</line>
@@ -414,28 +418,28 @@
         </macro>
 
         <macro><name>#define BPAK_MAGIC</name><line>0x6B617062</line></macro>
-		
+
         <macro><name>#define BS_BSHA_MAGIC</name><line>0x61687362</line></macro>
         <macro><name>#define BS_BBND_MAGIC</name><line>0x646E6262</line></macro>
         <macro><name>#define BS_BATL_MAGIC</name><line>0x6C746162</line></macro>
         <macro><name>#define BS_BIFF_MAGIC</name><line>0x66666962</line></macro>
         <macro><name>#define BFNT_MAGIC</name><line>0x746E6662</line></macro>
-		
+
         <macro><name>#define BS_CONSTANT_STRING(s)</name><line>s, sizeof(s) - 1</line></macro>
 
 		<macro><name>#define BS_MAX_PHYSICAL_DEVICE_NAME_SIZE</name><line>256U</line></macro>
-		
+
 		<macro><name>#define BS_PI</name><line>3.14159265359</line></macro>
 		<macro><name>#define BS_2PI</name><line>(3.14159265359 * 2.0)</line></macro>
 		<macro><name>#define BS_MIN(a, b)</name><line>(((a)&lt;(b))?(a):(b))</line></macro>
 		<macro><name>#define BS_MAX(a, b)</name><line>(((a)&gt;(b))?(a):(b))</line></macro>
-		
+
 		<macro><name>#define BS_ENUM_GEN(ENUM)</name><line>ENUM,</line></macro>
 		<macro><name>#define BS_STRING_GEN(STRING)</name><line>#STRING,</line></macro>
-		
+
 		<macro><name>#define BS_GENERATE_ENUM(ENUM)</name><line>enum { ENUM(BS_ENUM_GEN) }</line></macro>
 		<macro><name>#define BS_GENERATE_STRINGS(STRING)</name><line>(const char* []) { STRING(BS_STRING_GEN) }</line></macro>
-		
+
 		<macro comment="Count the number of variadic arguments in a macro\nUsed like __VA_NARG__(__VA_ARGS__)">
 			<name>#ifndef __VA_NARG__</name>
 		</macro>
@@ -497,7 +501,7 @@
 			<line>(action, __VA_ARGS__)</line>
 		</macro>
 		<macro><name>#endif</name></macro>
-		
+
 		<macro><name>#define FE2_0(WHAT)</name></macro>
 		<macro><name>#define FE2_2(WHAT, a, b)</name><line>WHAT(a, b)</line></macro>
         <macro><name>#define FE2_4(WHAT, a, b, ...)</name><line>WHAT(a, b) FE2_2(WHAT, __VA_ARGS__)</line></macro>
@@ -509,7 +513,7 @@
         <macro><name>#define FE2_16(WHAT, a, b, ...)</name><line>WHAT(a, b) FE2_14(WHAT, __VA_ARGS__)</line></macro>
 
         <macro><name>#define GET_FE2_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,NAME,...)</name><line>NAME</line></macro>
-		
+
 		<macro>
 			<name>#define __VA_FOR_2__(action, ...)</name>
             <line>GET_FE2_MACRO(__VA_ARGS__,</line>
@@ -524,19 +528,19 @@
             <line>FE2_0)</line>
             <line>(action, __VA_ARGS__)</line>
 		</macro>
-    
+
 		<macro><name>#define BS_MAX_NUM_BINDINGS</name><line>32</line></macro>
 		<macro><name>#define BS_MAX_NUM_BIND_SETS</name><line>32</line></macro>
 		<macro><name>#define BS_MAX_NUM_QUEUES</name><line>8</line></macro>
 		<macro><name>#define BS_MAX_NUM_SUBPASSES</name><line>6</line></macro>
 		<macro><name>#define BS_MAX_NUM_SUBPASS_DEPENDENCIES</name><line>6</line></macro>
 		<macro><name>#define BS_MAX_ATTACHMENTS_COUNT</name><line>12</line></macro>
-		
+
 		<macro comment="Amount of time in nanoseconds it takes for the GPU to timeout">
 			<name>#define BS_TIMEOUT</name>
 			<line>60000000000000</line>
 		</macro>
-		
+
 		<macro>
 			<name>#define BS_KEYS_COUNT</name>
 			<line>256</line>
@@ -585,7 +589,7 @@
 		<macro><name>#define BS_U16_MAX</name><line>(bs_U16)(0xffff)</line></macro>
 		<macro><name>#define BS_U32_MAX</name><line>(bs_U32)(0xffffffff)</line></macro>
 		<macro><name>#define BS_U64_MAX</name><line>(bs_U64)(0xffffffffffffffff)</line></macro>
-		
+
         <macro><name>#define BS_PRINT_BLACK</name><line>"\033[0;30m"</line></macro>
         <macro><name>#define BS_PRINT_RED</name><line>"\033[0;31m"</line></macro>
         <macro><name>#define BS_PRINT_RED_BRIGHT</name><line>"\033[1;31m"</line></macro>
@@ -752,12 +756,23 @@
         <macro><name>#define BS_PIPELINE(source_id, id, flags)</name><line>BS_OBJECT(bs_Pipeline, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_PIPELINE)</line></macro>
         <macro><name>#define BS_RAY_TRACER(source_id, id, flags)</name><line>BS_OBJECT(bs_RayTracer, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_RAY_TRACER)</line></macro>
         <macro><name>#define BS_ATLAS(source_id, id, flags)</name><line>BS_OBJECT(bs_Atlas, source_id, id, BS_SWAPS_COUNT(flags), flags, BS_OBJECT_ATLAS)</line></macro>
-		
+
         <macro><name>#define BS_NUM_STRIKES_RULE</name><line>(1)</line></macro>
         <macro><name>#define BS_QUERY_FORCE_CREATE</name><line>(1 &lt;&lt; 31)</line></macro>
         <macro><name>#define BS_QUERY_ALLOW_NULL</name><line>(1 &lt;&lt; 30)</line></macro>
         <macro><name>#define BS_QUERY_MODEL_KEEP_JSON</name><line>(1 &lt;&lt; 29)</line></macro>
-        <macro><name>#define BSAPI</name><line>_declspec(dllexport)</line></macro>
+
+        <ifdef cond="_WIN32"/>
+            <macro>
+                <name>#define BSAPI</name>
+                <line>_declspec(dllexport)</line>
+            </macro>
+        <else/>
+            <macro>
+                <name>#define BSAPI</name>
+            </macro>
+        <endif/>
+
         <macro><name>#define BS_BLANK</name><line>(bs_RGBA) {   0,   0,   0,   0 }</line></macro>
         <macro><name>#define BS_BLACK</name><line>(bs_RGBA) {   0,   0,   0, 255 }</line></macro>
         <macro><name>#define BS_RED</name><line>(bs_RGBA) { 255,   0,   0, 255 }</line></macro>
@@ -779,17 +794,17 @@
         </macro>
         <macro><name>#define BS_LEFT_MOUSE_BUTTON</name><line>0x01</line></macro>
         <macro><name>#define BS_RIGHT_MOUSE_BUTTON</name><line>0x02</line></macro>
-		
+
         <macro><name>#define BS_MIDDLE_MOUSE_BUTTON</name><line>0x04</line></macro>
         <macro><name>#define BS_THUMB_FORWARD</name><line>0x05</line></macro>
         <macro><name>#define BS_THUMB_BACK</name><line>0x06</line></macro>
-		
+
 		<macro><name>#define BS_KEY_BACKSPACE</name><line>0x08</line></macro>
         <macro><name>#define BS_KEY_TAB</name><line>0x09</line></macro>
-		
+
 		<macro><name>#define BS_KEY_CLEAR</name><line>0x0C</line></macro>
         <macro><name>#define BS_KEY_ENTER</name><line>0x0D</line></macro>
-		
+
 		<macro><name>#define BS_KEY_LEFT_SHIFT</name><line>0x10</line></macro>
         <macro><name>#define BS_KEY_LEFT_CONTROL</name><line>0x11</line></macro>
         <macro><name>#define BS_KEY_ALT</name><line>0x12</line></macro>
@@ -863,7 +878,7 @@
         <macro><name>#define BS_KEY_LEFT_WIN</name><line>0x5B</line></macro>
         <macro><name>#define BS_KEY_RIGHT_WIN</name><line>0x5C</line></macro>
         <macro><name>#define BS_KEY_APPS</name><line>0x5D</line></macro>
-		
+
 		<macro><name>#define BS_KEY_SLEEP</name><line>0x5F</line></macro>
         <macro><name>#define BS_KEY_NUMPAD0</name><line>0x60</line></macro>
         <macro><name>#define BS_KEY_NUMPAD1</name><line>0x61</line></macro>
@@ -905,7 +920,7 @@
         <macro><name>#define BS_KEY_F22</name><line>0x85</line></macro>
         <macro><name>#define BS_KEY_F23</name><line>0x86</line></macro>
         <macro><name>#define BS_KEY_F24</name><line>0x87</line></macro>
-		
+
 		<macro><name>#define BS_KEY_NAVIGATION_VIEW</name><line>0x88</line></macro>
         <macro><name>#define BS_KEY_NAVIGATION_MENU</name><line>0x89</line></macro>
         <macro><name>#define BS_KEY_NAVIGATION_UP</name><line>0x8A</line></macro>
@@ -945,7 +960,6 @@
         <macro><name>#define BS_KEY_LAUNCH_MEDIA_SELECT</name><line>0xB5</line></macro>
         <macro><name>#define BS_KEY_LAUNCH_APP1</name><line>0xB6</line></macro>
         <macro><name>#define BS_KEY_LAUNCH_APP2</name><line>0xB7</line></macro>
-        <macro><name>#define BS_KEY_LAUNCH_APP2</name><line>0xBA</line></macro>
         <macro><name>#define BS_KEY_OEM_1</name><line>0xBA</line></macro>
         <macro><name>#define BS_KEY_OEM_PLUS</name><line>0xBB</line></macro>
         <macro><name>#define BS_KEY_OEM_COMMA</name><line>0xBC</line></macro>
@@ -994,10 +1008,10 @@
         <macro><name>#define BS_KEY_NONAME</name><line>0xFC</line></macro>
         <macro><name>#define BS_KEY_PA1</name><line>0xFD</line></macro>
         <macro><name>#define BS_KEY_OEM_CLEAR</name><line>0xFE</line></macro>
-		
-		
+
+
 	</macros>
-	
+
     <structures>
         <structure type="union" name="bs_vec2">
             <field><type>float</type><name>a</name><size>2</size></field>
@@ -1319,8 +1333,8 @@
             <field><type>int</type><name>bind_set</name></field>
             <field><type>int</type><name>bind_point</name></field>
             <field><type>bs_Format</type><name>format</name></field>
-            <field><type>enum VkImageUsageFlags</type><name>usage_flags</name></field>
-            <field><type>enum VkImageAspectFlags</type><name>aspect_flags</name></field>
+            <field><type>bs_ImageUsageFlags</type><name>usage_flags</name></field>
+            <field><type>bs_ImageAspectFlags</type><name>aspect_flags</name></field>
 
             <field><type>bs_ImageSwaps</type><name>_</name><size></size></field>
         </structure>
@@ -1761,10 +1775,10 @@
                 <structure instance=" as_image">
                     <field><type>struct VkSampler_T*</type><name>vk_sampler</name></field>
                     <field><type>struct VkImageView_T*</type><name>vk_image_view</name></field>
-                    <field><type>enum VkImageLayout</type><name>vk_image_layout</name></field>
-					
+                    <field><type>bs_ImageLayout</type><name>vk_image_layout</name></field>
+
 				    <field><type>bs_U32</type><name>padding</name></field>
-					
+
 				    <field><type>bs_Image*</type><name>image</name></field>
                     <field><type>bs_Sampler*</type><name>sampler</name></field>
                 </structure>
@@ -1772,12 +1786,12 @@
                     <field><type>struct VkBuffer_T*</type><name>vk_buffer</name></field>
                     <field><type>bs_U64</type><name>vk_offset</name></field>
                     <field><type>bs_U64</type><name>vk_range</name></field>
-					
+
                     <field><type>bs_Buffer*</type><name>buffer</name></field>
                 </structure>
                 <structure instance=" as_texel_buffer">
                     <field><type>struct VkBufferView_T*</type><name>vk_buffer_view</name></field>
-					
+
                     <field><type>bs_Buffer*</type><name>buffer</name></field>
                 </structure>
             </structure>
@@ -1859,7 +1873,7 @@
             <field><type>bs_String*</type><name>cwd</name></field>
             <field><type>bs_String*</type><name>appdata</name></field>
             <field><type>bs_String*</type><name>log</name></field>
-			
+
             <structure instance="* descriptor_lookup">
                 <field><type>int*</type><name>bindings</name></field>
                 <field><type>int</type><name>bind_set</name></field>
@@ -1917,14 +1931,14 @@
             <field><type>bs_vec2</type><name>cursor</name></field>
             <field><type>bs_vec2</type><name>border_size</name></field>
             <field><type>bs_WindowType</type><name>window_type</name></field>
-			
+
             <field><type>bs_CursorIcon</type><name>cursor_icon</name></field>
 			<field><type>bs_ResizeContextFunction</type><name>resize</name></field>
 
 			<field><type>struct VkSurfaceKHR_T*</type><name>surface</name></field>
             <field><type>bs_SurfaceFormat</type><name>surface_format</name></field>
             <field><type>bs_PresentMode</type><name>present_mode</name></field>
-			
+
             <field><type>void*</type><name>user_data</name></field>
             <field><type>int</type><name>id</name></field>
             <field><type>int</type><name>frames_in_flight</name></field>
@@ -1938,7 +1952,7 @@
             <field><type>struct VkSwapchainKHR_T*</type><name>swapchain</name></field>
 
             <field><type>bs_IO</type><name>io</name></field>
-			 
+
             <structure instance="_[]">
                 <field><type>struct VkSemaphore_T*</type><name>semaphore</name></field>
             </structure>
@@ -1949,7 +1963,7 @@
 			<field><type>bs_Renderer*</type><name>renderer</name></field>
 			<field><type>int</type><name>subpass</name></field>
         </structure>
-		
+
         <structure name="bs_Args">
             <field><type>bool</type><name>use_validation_layers</name></field>
         </structure>
@@ -1962,7 +1976,7 @@
             <field><type>bs_U32</type><name>shader_group_base_alignment</name></field>
             <field><type>bs_U32</type><name>min_acceleration_structure_scratch_offset_alignment</name></field>
         </structure>
-		
+
 		<structure name="bs_Callbacks">
 			<field><type>bs_MessageFunction</type><name>log</name></field>
 			<field><type>bs_ValidationErrorFunction</type><name>error</name></field>
@@ -1993,22 +2007,22 @@
 		<extern><type>bs_List</type><name>bs_physical_devices</name></extern>
 		<extern><type>bs_Callbacks</type><name>bs_callbacks</name></extern>
 	</externs>
-	
+
     <functions>
 		<validationTemplate/>
 
 		<function name="bs_callbacks">
 			<return>bs_Callbacks*</return>
 		</function>
-		
+
 		<function name="bs_scope">
 			<return>bs_Scope*</return>
 		</function>
-		
+
 		<variadicStringTemplate name="bs_writeLogFile">
 			<return>void</return>
 		</variadicStringTemplate>
-		
+
         <vectorTemplate>
             <n>2</n>
             <components>
@@ -2199,7 +2213,7 @@
             <param><type>const bs_vec3*</type><name>eul</name></param>
             <param><type>bs_vec4*</type><name>out</name></param>
         </function>
-		
+
 		<function name="bs_qToEul" comment="Convert quaternion to euler angles (radians)">
             <return>void</return>
             <param><type>const bs_vec4*</type><name>q</name></param>
@@ -2298,43 +2312,43 @@
             <param><type>const bs_vec4*</type><name>rotation</name></param>
             <param><type>bs_mat4*</type><name>out</name></param>
         </function>
-		
+
         <function name="bs_round">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
             <body>    return roundf(v);</body>
         </function>
-		
+
         <function name="bs_abs">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
             <body>    return fabsf(v);</body>
         </function>
-		
+
 		<function name="bs_sqrt">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
             <body>    return sqrtf(v);</body>
         </function>
-		
+
 		<function name="bs_sin">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
             <body>    return sinf(v);</body>
         </function>
-		
+
 		<function name="bs_cos">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
             <body>    return cosf(v);</body>
         </function>
-		
+
 		<function name="bs_tan">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
             <body>    return tanf(v);</body>
         </function>
-		
+
 		<function name="bs_sign" comment="Returns -1 if the value is negative, 1 if positive, 0 if the value is 0">
             <return>int</return>
             <param><type>float</type><name>v</name></param>
@@ -2355,7 +2369,7 @@
             <param comment="Interpolant (amount) clamped between 0 and 1"><type>float</type><name>t</name></param>
             <body>    return glm_lerp(from, to, t);</body>
         </function>
-		
+
 		<function name="bs_degrees" comment="Convert radians to degrees">
             <return>float</return>
             <param><type>float</type><name>radians</name></param>
@@ -2367,13 +2381,13 @@
             <param><type>float</type><name>degrees</name></param>
 			<body>    return degrees * BS_PI / 180.0f;</body>
         </function>
-		
+
 		<function name="bs_ceil">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
             <body>    return ceilf(v);</body>
         </function>
-		
+
 		<function name="bs_floor">
             <return>float</return>
             <param><type>float</type><name>v</name></param>
@@ -2387,7 +2401,7 @@
             <param><type>float</type><name>max</name></param>
             <body>    return glm_clamp(v, min, max);</body>
         </function>
-		
+
         <function name="bs_linearTosRGB">
             <return>float</return>
             <param><type>float</type><name>value</name></param>
@@ -2397,7 +2411,7 @@
             <return>float</return>
             <param><type>float</type><name>value</name></param>
         </function>
-		
+
 		<function name="bs_linearV3TosRGB">
             <return>bs_vec3</return>
             <param><type>const bs_vec3*</type><name>value</name></param>
@@ -2407,22 +2421,22 @@
             <return>bs_vec3</return>
             <param><type>const bs_vec3*</type><name>value</name></param>
         </function>
-		
+
 		<function name="bs_rgbV4ToUChar">
             <return>bs_RGBA</return>
             <param><type>const bs_vec4*</type><name>value</name></param>
         </function>
-		
+
 	    <function name="bs_rgbUCharToV4">
             <return>bs_vec4</return>
             <param><type>bs_RGBA</type><name>value</name></param>
         </function>
-		
+
         <function name="bs_hsvToRgb">
             <return>bs_vec3</return>
             <param><type>const bs_vec3*</type><name>hsv</name></param>
         </function>
-		
+
 		<function name="bs_rgbToHsv">
             <return>bs_vec3</return>
             <param><type>const bs_vec3*</type><name>rgb</name></param>
@@ -3467,18 +3481,23 @@
             <param><type>bs_U32</type><name>value</name></param>
             <param><type>bs_U32</type><name>alignment</name></param>
         </function>
-        <function name="bs_widen">
-            <return>bs_Result</return>
-            <param><type>char*</type><name>src</name></param>
-            <param><type>wchar_t*</type><name>dst</name></param>
-            <param><type>bs_U32</type><name>dst_size</name></param>
-        </function>
-        <function name="bs_unwiden">
-            <return>bs_Result</return>
-            <param><type>wchar_t*</type><name>src</name></param>
-            <param><type>char*</type><name>dst</name></param>
-            <param><type>bs_U32</type><name>dst_size</name></param>
-        </function>
+
+        <ifdef cond="_WIN32"/>
+            <function name="bs_widen">
+                <return>bs_Result</return>
+                <param><type>char*</type><name>src</name></param>
+                <param><type>wchar_t*</type><name>dst</name></param>
+                <param><type>bs_U32</type><name>dst_size</name></param>
+            </function>
+
+            <function name="bs_unwiden">
+                <return>bs_Result</return>
+                <param><type>wchar_t*</type><name>src</name></param>
+                <param><type>char*</type><name>dst</name></param>
+                <param><type>bs_U32</type><name>dst_size</name></param>
+            </function>
+        <endif/>
+
 		<function name="bs_charStringV">
             <return>char*</return>
             <param><type>const char*</type><name>format</name></param>
@@ -4028,7 +4047,7 @@
             <return>bool</return>
             <param><type>unsigned char</type><name>c</name></param>
         </function>
-		
+
 		<function name="bs_contextInputDown">
             <return>bool</return>
             <param><type>bs_Context*</type><name>context</name></param>
@@ -4059,7 +4078,7 @@
             <param><type>bs_Context*</type><name>context</name></param>
             <param><type>unsigned char</type><name>c</name></param>
         </function>
-		
+
         <function name="bs_scroll">
             <return>int</return>
         </function>
@@ -4182,12 +4201,12 @@
             <param><type>const char*</type><name>mode</name></param>
             <param><type>bs_File*</type><name>out</name></param>
         </variadicStringTemplate>
-		
+
 		<function name="bs_closeFile">
 			<return>void</return>
             <param><type>bs_File*</type><name>file</name></param>
 		</function>
-		
+
         <variadicStringTemplate name="bs_loadFile" string="path">
             <return>bs_Result</return>
             <param><type>bs_String**</type><name>out</name></param>
@@ -4212,6 +4231,6 @@
             <return>bs_Result</return>
         </variadicStringTemplate>
 
-    
+
 </functions>
 </registry>

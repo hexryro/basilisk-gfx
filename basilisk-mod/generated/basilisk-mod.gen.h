@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
  /**
   This file was generated from basilisk-gfx.com
@@ -29,7 +29,7 @@
   It is not recommended to make changes to this file as it will be lost if
   the code is regenerated.
   */
-        
+
 
 #ifndef BASILISK_MOD_GEN_H
 #define BASILISK_MOD_GEN_H
@@ -111,10 +111,10 @@ typedef enum bsmod_UnicodeBlock bsmod_UnicodeBlock;
 #define BSMOD_TILE_IDS                                               \
     &_bsmod_.selected_tiles
 
-typedef void (__stdcall* PFN_void)();
-typedef unsigned char* (__stdcall* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int);
-typedef const char* (__stdcall* PFN_bsmod_GridMenu)(bs_List* widgets);
-typedef void (__stdcall* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int);
+typedef void (* PFN_void)();
+typedef unsigned char* (* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int);
+typedef const char* (* PFN_bsmod_GridMenu)(bs_List* widgets);
+typedef void (* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int);
 enum bsmod_RenderMode {
     BSMOD_RENDER_MODE_NORMAL,
     BSMOD_RENDER_MODE_LIGHT,

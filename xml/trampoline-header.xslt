@@ -38,7 +38,7 @@
 #define <xsl:value-of select="."/>
     <xsl:text>&#xA;&#xA;</xsl:text>
     </xsl:template>
-	
+
     <xsl:template match="registry/includes/trampolineHeader/include">
         <xsl:text>#include &lt;</xsl:text>
         <xsl:value-of select="."/>
@@ -67,6 +67,26 @@
         <xsl:text> </xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>;&#xA;</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="ifdef|ifndef|elifdef">
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="name()"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="@cond"/>
+        <xsl:text>&#xA;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="else">
+        <xsl:text>#</xsl:text>
+        <xsl:value-of select="name()"/>
+        <xsl:text>&#xA;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="endif">
+        <xsl:text>#endif&#xA;&#xA;</xsl:text>
     </xsl:template>
 
     <xsl:template match="macro">
