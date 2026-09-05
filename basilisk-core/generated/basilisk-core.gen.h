@@ -412,15 +412,6 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_MAX_NUM_QUEUES                                            \
     8
 
-#define BS_MAX_NUM_SUBPASSES                                         \
-    6
-
-#define BS_MAX_NUM_SUBPASS_DEPENDENCIES                              \
-    6
-
-#define BS_MAX_ATTACHMENTS_COUNT                                     \
-    12
-
 #define BS_TIMEOUT                                                   \
     60000000000000
 
@@ -1463,15 +1454,15 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 typedef void (__cdecl* bs_VoidFunction)();
 typedef int (__cdecl* bs_ThreadFunction)(void*);
 typedef bs_Result (__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*);
-typedef void (__stdcall* bs_MessageFunction)(const bs_LogQueueItem*);
-typedef void (__stdcall* bs_NameObjectFunction)(bs_Object*, const char*);
-typedef void (__stdcall* bs_ValidationErrorFunction)();
-typedef void (__stdcall* bs_ContextTickFunction)(bs_VoidFunction);
-typedef void (__stdcall* bs_ConfigureWindowFunction)(bs_Context*);
-typedef bs_NonClientArea (__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2);
-typedef void (__stdcall* bs_ResizeContextFunction)(bs_Context*);
-typedef void (__stdcall* bs_SubpassFunction)(bs_RendererScope*);
-typedef void (__stdcall* bs_ContextTickFunction)(bs_Context* context);
+typedef void (* bs_MessageFunction)(const bs_LogQueueItem*);
+typedef void (* bs_NameObjectFunction)(bs_Object*, const char*);
+typedef void (* bs_ValidationErrorFunction)();
+typedef void (* bs_ContextTickFunction)(bs_VoidFunction);
+typedef void (* bs_ConfigureWindowFunction)(bs_Context*);
+typedef bs_NonClientArea (* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2);
+typedef void (* bs_ResizeContextFunction)(bs_Context*);
+typedef void (* bs_SubpassFunction)(bs_RendererScope*);
+typedef void (* bs_ContextTickFunction)(bs_Context* context);
 typedef long long bs_I64;
 typedef int bs_I32;
 typedef short bs_I16;
@@ -2755,9 +2746,6 @@ struct bs_PipelineHash {
     bool skip_depth_write;
     bool disable_blend;
     bs_Shader* shaders[2];
-    struct {
-        bool skip_write;
-    } attachments[BS_MAX_ATTACHMENTS_COUNT];
 };
 
 struct bs_RayTracePipelineHash {
@@ -2840,13 +2828,10 @@ struct bs_RendererSwaps {
 struct bs_Renderer {
     bs_Header head;
     bs_RendererBits flags;
-    bs_Input* inputs;
-    bs_Output* outputs;
-    struct VkSubpassDependency* dependencies;
-    int num_inputs;
-    int num_outputs;
-    int num_subpasses;
-    int num_dependencies;
+    bs_List inputs;
+    bs_List outputs;
+    bs_List dependencies;
+    int subpasses_count;
     bs_ivec2 dim;
     bs_Queue* queue;
     bs_Context* context;

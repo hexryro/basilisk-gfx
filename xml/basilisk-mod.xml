@@ -40,10 +40,10 @@
 	</includes>
 
 	<typedefs>
-		<typedef><type>void</type><name>(__stdcall* PFN_void)()</name></typedef>
-		<typedef><type>unsigned char*</type><name>(__stdcall* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int)</name></typedef>
-		<typedef><type>const char*</type><name>(__stdcall* PFN_bsmod_GridMenu)(bs_List* widgets)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int)</name></typedef>
+		<typedef><type>void</type><name>(* PFN_void)()</name></typedef>
+		<typedef><type>unsigned char*</type><name>(* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int)</name></typedef>
+		<typedef><type>const char*</type><name>(* PFN_bsmod_GridMenu)(bs_List* widgets)</name></typedef>
+		<typedef><type>void</type><name>(* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int)</name></typedef>
 	</typedefs>
 
 	<enums>

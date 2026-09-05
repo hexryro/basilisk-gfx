@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-typedef void(__stdcall* PFN_bstest_func)();
+typedef void(* PFN_bstest_func)();
 
 static void bstest_ini() {
     bs_args()->send_bugs = false;

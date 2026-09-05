@@ -50,15 +50,15 @@
 
 		<typedef><type>bs_U32</type><name>bsgfx_ColliderFlags</name></typedef>
 
-		<typedef><type>void</type><name>(__stdcall* PFN_void)()</name></typedef>
-		<typedef><type>bs_Queue*</type><name>(__stdcall* PFN_bsgfx_onQueue)()</name></typedef>
+		<typedef><type>void</type><name>(* PFN_void)()</name></typedef>
+		<typedef><type>bs_Queue*</type><name>(* PFN_bsgfx_onQueue)()</name></typedef>
 
 		<typedef><type>bs_U32</type><name>bsgfx_PrimitiveFlags</name></typedef>
 		<typedef><type>bs_U32</type><name>bsgfx_SpawnerFlags</name></typedef>
 
-		<typedef><type>void</type><name>(__stdcall* PFN_bsgfx_TypeMapper)(void*, void*)</name></typedef>
+		<typedef><type>void</type><name>(* PFN_bsgfx_TypeMapper)(void*, void*)</name></typedef>
 		
-		<typedef><type>bool</type><name>(__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*)</name></typedef>
+		<typedef><type>bool</type><name>(* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*)</name></typedef>
 
 		<typedef><type>struct bsgfx_InstanceHeader</type><name>bsgfx_InstanceHeader</name></typedef>
 		

@@ -59,7 +59,7 @@
 		<xsl:if test="not(body) or @type = 'allowBody'">
 			<xsl:text>typedef </xsl:text>
             <xsl:value-of select="return"/>
-            <xsl:text>(__stdcall* PFN_</xsl:text>
+            <xsl:text>(* PFN_</xsl:text>
             <xsl:value-of select="@name"/>
             <xsl:text>)(</xsl:text>
 

@@ -269,12 +269,12 @@ typedef enum bsgfx_Language bsgfx_Language;
 
 typedef enum bsgfx_Id bsgfx_Id;
 typedef bs_U32 bsgfx_ColliderFlags;
-typedef void (__stdcall* PFN_void)();
-typedef bs_Queue* (__stdcall* PFN_bsgfx_onQueue)();
+typedef void (* PFN_void)();
+typedef bs_Queue* (* PFN_bsgfx_onQueue)();
 typedef bs_U32 bsgfx_PrimitiveFlags;
 typedef bs_U32 bsgfx_SpawnerFlags;
-typedef void (__stdcall* PFN_bsgfx_TypeMapper)(void*, void*);
-typedef bool (__stdcall* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*);
+typedef void (* PFN_bsgfx_TypeMapper)(void*, void*);
+typedef bool (* PFN_bsgfx_ButtonWidgetCallback)(const bsgfx_ButtonParams*);
 typedef struct bsgfx_InstanceHeader bsgfx_InstanceHeader;
 typedef bs_Range bsgfx_Range;
 enum bsgfx_MaterialCategory {

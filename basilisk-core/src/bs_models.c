@@ -486,31 +486,31 @@ BSAPI bs_Result _bs_loadAnimation(bs_Model* model, const char* name, bs_Animatio
         int node = _bs_fetchJsonN(&channel_json, BS_JSON_NUMBER, BS_CONSTANT_STRING("target.node")).as_number;
 
         //char* name = __bs_fetchJsonF(root, BS_JSON_STRING, "nodes[%d].name", node).as_string;
-        int num_inputs = 0, num_outputs = 0;
-        float* inputs = _bs_gltfFloatArray(model, root, input, &num_inputs, 1);
-        float* outputs = _bs_gltfFloatArray(model, root, output, &num_outputs, 1);
-        assert(num_inputs == num_outputs);
+        int inputs_count = 0, outputs_count = 0;
+        float* inputs = _bs_gltfFloatArray(model, root, input, &inputs_count, 1);
+        float* outputs = _bs_gltfFloatArray(model, root, output, &outputs_count, 1);
+        assert(inputs_count == outputs_count);
 
         if (last_node != -1 && last_node != node)
             animation.bones_count++;
         last_node = node;
         assert(animation.bones_count < animation.bones_allocated);
 
-        animation.frames_count = BS_MAX(animation.frames_count, num_inputs);
-        for (int j = 0; j < num_inputs; j++)
+        animation.frames_count = BS_MAX(animation.frames_count, inputs_count);
+        for (int j = 0; j < inputs_count; j++)
             animation.length = BS_MAX(animation.length, inputs[j]);
 
         int path_len = strlen(path);
         if ((sizeof("translation") - 1) == path_len && strncmp(path, "translation", path_len) == 0) {
-            for (int j = 0; j < num_inputs; j++)
+            for (int j = 0; j < inputs_count; j++)
                 _bs_keyframePosition(animation.bones + animation.bones_count, inputs[j], ((bs_vec3*)outputs)[j]);
         }
         else if ((sizeof("rotation") - 1) == path_len && strncmp(path, "rotation", path_len) == 0) {
-            for (int j = 0; j < num_inputs; j++)
+            for (int j = 0; j < inputs_count; j++)
                 _bs_keyframeRotation(animation.bones + animation.bones_count, inputs[j], ((bs_vec4*)outputs)[j]);
         }
         else if ((sizeof("scale") - 1) == path_len && strncmp(path, "scale", path_len) == 0) {
-            for (int j = 0; j < num_inputs; j++)
+            for (int j = 0; j < inputs_count; j++)
                 _bs_keyframeScale(animation.bones + animation.bones_count, inputs[j], ((bs_vec3*)outputs)[j]);
         }
         else {

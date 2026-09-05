@@ -1711,9 +1711,9 @@ BSAPI bs_Result _bs_renderer(bs_Object* object, bs_Context* context, bs_Renderer
         flags |= BSI_RENDERER_HAS_SWAPS_BIT;
 
     renderer->flags = flags;
-    renderer->inputs = _bs_malloc(BS_MAX_ATTACHMENTS_COUNT * sizeof(bs_Input));
-    renderer->outputs = _bs_malloc(BS_MAX_ATTACHMENTS_COUNT * sizeof(bs_Output));
-    renderer->dependencies = _bs_malloc(BS_MAX_NUM_SUBPASS_DEPENDENCIES * sizeof(VkSubpassDependency));
+    renderer->inputs = bs_list(sizeof(bs_Input), 8);
+    renderer->outputs = bs_list(sizeof(bs_Output), 8);
+    renderer->dependencies = bs_list(sizeof(VkSubpassDependency), 8);
 
     return BS_RESULT_OK;
 }
@@ -1722,40 +1722,37 @@ BSAPI bs_Result _bs_renderer(bs_Object* object, bs_Context* context, bs_Renderer
   Output 
   */
 BSAPI void _val_bs_output(bs_Renderer* renderer, bs_Output output) {
-    BS_VALIDATE(renderer->num_outputs < BS_MAX_ATTACHMENTS_COUNT, , );
     BS_VALIDATE(output.image->head.type == BS_OBJECT_IMAGE, , );
 
     _bs_output(renderer, output);
 }
 
 BSAPI void _bs_output(bs_Renderer* renderer, bs_Output output) {
-    renderer->outputs[renderer->num_outputs++] = output;
+    renderer->subpasses_count = BS_MAX(renderer->subpasses_count, output.subpass + 1);
+    _bs_pushBack(&renderer->outputs, &output);
 }
 
  /**
   Input
   */
 BSAPI void _val_bs_input(bs_Renderer* renderer, bs_Input input) {
-    BS_VALIDATE(renderer->num_inputs < BS_MAX_ATTACHMENTS_COUNT,,);
-
     _bs_input(renderer, input);
 }
 
 BSAPI void _bs_input(bs_Renderer* renderer, bs_Input input) {
-    renderer->inputs[renderer->num_inputs++] = input;
+    renderer->subpasses_count = BS_MAX(renderer->subpasses_count, input.subpass + 1);
+    _bs_pushBack(&renderer->inputs, &input);
 }
 
  /**
   Dependency
   */
 BSAPI void _val_bs_dependency(bs_Renderer* renderer, bs_U32 src_subpass, bs_U32 dst_subpass, bs_DependencyFlags flags, bs_PipelineStage src_stage, bs_PipelineStage dst_stage, bs_AccessMask src_access, bs_AccessMask dst_access) {
-    BS_VALIDATE(renderer->num_dependencies < BS_MAX_NUM_SUBPASS_DEPENDENCIES,,);
-
     _bs_dependency(renderer, src_subpass, dst_subpass, flags, src_stage, dst_stage, src_access, dst_access);
 }
 
 BSAPI void _bs_dependency(bs_Renderer* renderer, bs_U32 src_subpass, bs_U32 dst_subpass, bs_DependencyFlags flags, bs_PipelineStage src_stage, bs_PipelineStage dst_stage, bs_AccessMask src_access, bs_AccessMask dst_access) {
-    renderer->dependencies[renderer->num_dependencies++] = (VkSubpassDependency) {
+    _bs_pushBack(&renderer->dependencies, &(VkSubpassDependency) {
         .srcSubpass = src_subpass,
         .dstSubpass = dst_subpass,
         .srcStageMask = src_stage,
@@ -1763,7 +1760,7 @@ BSAPI void _bs_dependency(bs_Renderer* renderer, bs_U32 src_subpass, bs_U32 dst_
         .srcAccessMask = src_access,
         .dstAccessMask = dst_access,
         .dependencyFlags = flags
-    };
+    });
 }
 
 static int _bs_sortInputs(const bs_Input* a, const bs_Input* b) {
@@ -1790,23 +1787,26 @@ BSAPI void _val_bs_renderPass(bs_Renderer* renderer) {
 }
 
 BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
-    VkSubpassDescription subpasses[BS_MAX_NUM_SUBPASSES] = { 0 };
-    VkAttachmentDescription attachments[BS_MAX_ATTACHMENTS_COUNT] = { 0 };
+    qsort(renderer->inputs.data, renderer->inputs.count, sizeof(bs_Input), _bs_sortInputs);
+    qsort(renderer->outputs.data, renderer->outputs.count, sizeof(bs_Output), _bs_sortOutputs);
 
-    qsort(renderer->inputs, renderer->num_inputs, sizeof(bs_Input), _bs_sortInputs);
-    qsort(renderer->outputs, renderer->num_outputs, sizeof(bs_Output), _bs_sortOutputs);
+    const size_t subpasses_size = renderer->subpasses_count * sizeof(VkSubpassDescription);
+    const size_t attachments_size = renderer->outputs.count * sizeof(VkAttachmentDescription);
+    const size_t attachment_references_size = renderer->outputs.count * sizeof(VkAttachmentReference);
+    const size_t input_references_size = renderer->inputs.count * sizeof(VkAttachmentReference);
 
-    VkAttachmentReference attachment_references[BS_MAX_ATTACHMENTS_COUNT] = { 0 };
-    VkAttachmentReference input_references[BS_MAX_ATTACHMENTS_COUNT] = { 0 };
+    VkSubpassDescription* subpasses = bs_alloca(subpasses_size);
+    VkAttachmentDescription* attachments = bs_alloca(attachments_size);
+    VkAttachmentReference* attachment_references = bs_alloca(attachment_references_size);
+    VkAttachmentReference* input_references = bs_alloca(input_references_size);
 
-    for (int i = 0; i < renderer->num_outputs; i++) {
-        bs_Output* output = renderer->outputs + i;
-        renderer->num_subpasses = BS_MAX(renderer->num_subpasses, output->subpass);
+    memset(subpasses, 0, subpasses_size);
+
+    for (int i = 0; i < renderer->outputs.count; i++) {
+        bs_Output* output = _bs_fetchUnit(&renderer->outputs, i);
 
         bool is_stencil = _bs_isStencilFormat(output->image->format);
         bool is_depth = _bs_isDepthFormat(output->image->format);
-
-        assert(output->subpass < BS_MAX_NUM_SUBPASSES);
 
         attachments[i] = (VkAttachmentDescription) {
             .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -1845,15 +1845,17 @@ BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
         }
     }
 
-    for (int i = 0; i < renderer->num_inputs; i++) {
-        bs_Input* input = renderer->inputs + i;
-        renderer->num_subpasses = BS_MAX(renderer->num_subpasses, input->subpass);
+    for (int i = 0; i < renderer->inputs.count; i++) {
+        bs_Input* input = _bs_fetchUnit(&renderer->inputs, i);
 
         VkSubpassDescription* subpass = subpasses + input->subpass;
         VkAttachmentReference* reference = input_references + i;
+
+        bs_Output* output = _bs_fetchUnit(&renderer->outputs, input->attachment);
+
         *reference = (VkAttachmentReference) {
             .attachment = input->attachment,
-            .layout = input->subpass == renderer->outputs[input->attachment].subpass ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_GENERAL
+            .layout = input->subpass == output->subpass ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_GENERAL
         };
 
         if (!subpass->pInputAttachments)
@@ -1864,12 +1866,12 @@ BSAPI bs_Result _bs_renderPass(bs_Renderer* renderer) {
 
     VkRenderPassCreateInfo render_pass_ci = {
         .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-        .attachmentCount = renderer->num_outputs,
+        .attachmentCount = renderer->outputs.count,
         .pAttachments = attachments,
-        .subpassCount = ++renderer->num_subpasses,
+        .subpassCount = renderer->subpasses_count,
         .pSubpasses = subpasses,
-        .dependencyCount = renderer->num_dependencies,
-        .pDependencies = renderer->dependencies,
+        .dependencyCount = renderer->dependencies.count,
+        .pDependencies = renderer->dependencies.data,
     };
 
     VkResult result = vkCreateRenderPass(_bs_instance_->device, &render_pass_ci, NULL, &renderer->render_pass);
@@ -1896,12 +1898,12 @@ BSAPI void _val_bs_framebuffer(bs_Renderer* renderer, bs_ivec2 dim) {
 BSAPI bs_Result _bs_framebuffer(bs_Renderer* renderer, bs_ivec2 dim) {
     VkResult vk_result;
 
-    VkImageView vk_views[BS_MAX_ATTACHMENTS_COUNT] = { 0 };
+    VkImageView* vk_views = bs_alloca(renderer->outputs.count * sizeof(VkImageView));
     renderer->dim = dim;
 
     for (int i = 0; i < renderer->head.swaps_count; i++) {
-        for (int j = 0; j < renderer->num_outputs; j++) {
-            bs_Output* output = renderer->outputs + j;
+        for (int j = 0; j < renderer->outputs.count; j++) {
+            bs_Output* output = _bs_fetchUnit(&renderer->outputs, j);
 
             int swap = output->image->flags & BS_IMAGE_SWAPS_BIT ? i : 0;
             vk_views[j] = output->image->_[swap].vk_image_view;
@@ -1910,7 +1912,7 @@ BSAPI bs_Result _bs_framebuffer(bs_Renderer* renderer, bs_ivec2 dim) {
         VkFramebufferCreateInfo framebuf_ci = {
             .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
             .renderPass = renderer->render_pass,
-            .attachmentCount = renderer->num_outputs,
+            .attachmentCount = renderer->outputs.count,
             .pAttachments = vk_views,
             .width = renderer->dim.x,
             .height = renderer->dim.y,
@@ -1945,11 +1947,11 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
 
     VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
-    VkClearValue* clear_values = bs_alloca(renderer->num_outputs * sizeof(VkClearValue));
-    memset(clear_values, 0, renderer->num_outputs * sizeof(VkClearValue));
+    VkClearValue* clear_values = bs_alloca(renderer->outputs.count * sizeof(VkClearValue));
+    memset(clear_values, 0, renderer->outputs.count * sizeof(VkClearValue));
 
-    for (int i = 0; i < renderer->num_outputs; i++) {
-        bs_Output* output = renderer->outputs + i;
+    for (int i = 0; i < renderer->outputs.count; i++) {
+        bs_Output* output = _bs_fetchUnit(&renderer->outputs, i);
 
         if (_bs_isDepthFormat(output->image->format))
             clear_values[i].depthStencil.depth = 1.0;
@@ -1966,19 +1968,19 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
                 .width = renderer->dim.x,
                 .height = renderer->dim.y,
             },
-            .clearValueCount = renderer->num_outputs,
+            .clearValueCount = renderer->outputs.count,
             .pClearValues = clear_values,
         };
 
         vkCmdBeginRenderPass(command_buffer, &render_pass_i, VK_SUBPASS_CONTENTS_INLINE);
     }
     else {
-        VkRenderingAttachmentInfo* attachments = _alloca(renderer->num_outputs * sizeof(VkRenderingAttachmentInfo));
+        VkRenderingAttachmentInfo* attachments = _alloca(renderer->outputs.count * sizeof(VkRenderingAttachmentInfo));
         VkRenderingAttachmentInfo* depth_attachment = NULL;
-        int color_attachments_count = renderer->num_outputs;
+        int color_attachments_count = renderer->outputs.count;
 
-        for (int i = 0; i < renderer->num_outputs; i++) {
-            bs_Output* output = renderer->outputs + i;
+        for (int i = 0; i < renderer->outputs.count; i++) {
+            bs_Output* output = _bs_fetchUnit(&renderer->outputs, i);
 
             attachments[i] = (VkRenderingAttachmentInfo){
                 .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
@@ -1988,7 +1990,7 @@ BSAPI bs_RendererScope _bs_beginRender(bs_Queue* queue, bs_Renderer* renderer) {
                 .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
             };
 
-            if (_bs_isDepthFormat(renderer->outputs[i].image->format)) {
+            if (_bs_isDepthFormat(output->image->format)) {
                 depth_attachment = attachments + i; // should only be 1
                 color_attachments_count--;
             }
@@ -2054,7 +2056,7 @@ BSAPI void _bs_endRender(bs_Queue* queue, bs_Renderer* renderer) {
 }
 
 BSAPI void _val_bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassFunction subpasses[], int subpasses_count) {
-    BS_VALIDATE(subpasses_count <= renderer->num_subpasses,,);
+    BS_VALIDATE(subpasses_count <= renderer->subpasses_count,,);
 
     for (int i = 0; i < subpasses_count; i++) {
         BS_VALIDATE(subpasses[i] != NULL,,);
@@ -2068,7 +2070,7 @@ BSAPI void _bs_runPass(bs_Queue* queue, bs_Renderer* renderer, bs_SubpassFunctio
     VkCommandBuffer command_buffer = _bsi_fetchCommands(queue);
 
     if (renderer->render_pass) {
-        for (int i = 0; i < renderer->num_subpasses; i++) {
+        for (int i = 0; i < renderer->subpasses_count; i++) {
             bs_SubpassFunction callback = callbacks[i];
 
             if (i != 0) {
@@ -2105,8 +2107,8 @@ static void _bs_destroyFramebuffer(bs_Renderer* renderer) {
 }
 
 BSAPI void _bs_destroyRenderer(bs_Renderer* renderer) {
-    _bs_free(renderer->inputs);
-    _bs_free(renderer->outputs);
+    _bs_destroyList(&renderer->inputs);
+    _bs_destroyList(&renderer->outputs);
 
     vkDestroyRenderPass(_bs_instance_->device, renderer->render_pass, NULL);
     renderer->render_pass = 0;
@@ -2943,7 +2945,7 @@ static void _bs_destroySwapchain() {
     _bs_scope_.context->swapchain = 0;
 }
 
-typedef void(__stdcall* bs_AutoResizeFunction)(bs_Object*);
+typedef void(* bs_AutoResizeFunction)(bs_Object*);
 
 /*
 static void _bs_onAutoResizeImage(bs_Object* object) {
@@ -2964,11 +2966,12 @@ static void _bs_onAutoResizeRenderer(bs_Object* object) {
     if (renderer->context == _bs_scope_.context) {
         bs_ivec2 resolution = bs_resolution(_bs_scope_.context);
 
-        for (int i = 0; i < renderer->num_outputs; i++) {
-            bs_Image* image = renderer->outputs[i].image;
-            if (image != _bs_scope_.context->swapchain_image->image) {
+        for (int i = 0; i < renderer->outputs.count; i++) {
+            bs_Output* output = _bs_fetchUnit(&renderer->outputs, i);
+            bs_Image* image = output->image;
+
+            if (image != _bs_scope_.context->swapchain_image->image)
                 bs_resizeImage(image, resolution, image->num_indices);
-            }
         }
 
         _bs_resizeRenderer(renderer, resolution);

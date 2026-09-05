@@ -111,10 +111,10 @@ typedef enum bsmod_UnicodeBlock bsmod_UnicodeBlock;
 #define BSMOD_TILE_IDS                                               \
     &_bsmod_.selected_tiles
 
-typedef void (__stdcall* PFN_void)();
-typedef unsigned char* (__stdcall* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int);
-typedef const char* (__stdcall* PFN_bsmod_GridMenu)(bs_List* widgets);
-typedef void (__stdcall* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int);
+typedef void (* PFN_void)();
+typedef unsigned char* (* PFN_bsmod_getAtlasTextureData)(bsmod_AtlasPacker*, int);
+typedef const char* (* PFN_bsmod_GridMenu)(bs_List* widgets);
+typedef void (* PFN_bsmod_GridMenuCallback)(struct bsgfx_DebugMenuWidget*, int);
 enum bsmod_RenderMode {
     BSMOD_RENDER_MODE_NORMAL,
     BSMOD_RENDER_MODE_LIGHT,

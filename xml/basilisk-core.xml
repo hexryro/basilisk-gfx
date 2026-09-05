@@ -60,15 +60,15 @@
         <typedef><type>void</type><name>(__cdecl* bs_VoidFunction)()</name></typedef>
         <typedef><type>int</type><name>(__cdecl* bs_ThreadFunction)(void*)</name></typedef>
         <typedef><type>bs_Result</type><name>(__cdecl* bs_ForeachDocumentFunction)(bs_FileInfo, void*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_MessageFunction)(const bs_LogQueueItem*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ValidationErrorFunction)()</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_VoidFunction)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ConfigureWindowFunction)(bs_Context*)</name></typedef>
-		<typedef><type>bs_NonClientArea</type><name>(__stdcall* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_ResizeContextFunction)(bs_Context*)</name></typedef>
-		<typedef><type>void</type><name>(__stdcall* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
-        <typedef><type>void</type><name>(__stdcall* bs_ContextTickFunction)(bs_Context* context)</name></typedef>
+		<typedef><type>void</type><name>(* bs_MessageFunction)(const bs_LogQueueItem*)</name></typedef>
+		<typedef><type>void</type><name>(* bs_NameObjectFunction)(bs_Object*, const char*)</name></typedef>
+		<typedef><type>void</type><name>(* bs_ValidationErrorFunction)()</name></typedef>
+		<typedef><type>void</type><name>(* bs_ContextTickFunction)(bs_VoidFunction)</name></typedef>
+		<typedef><type>void</type><name>(* bs_ConfigureWindowFunction)(bs_Context*)</name></typedef>
+		<typedef><type>bs_NonClientArea</type><name>(* bs_NonClientAreaTickFunction)(bs_Context*, bs_ivec2)</name></typedef>
+		<typedef><type>void</type><name>(* bs_ResizeContextFunction)(bs_Context*)</name></typedef>
+		<typedef><type>void</type><name>(* bs_SubpassFunction)(bs_RendererScope*)</name></typedef>
+        <typedef><type>void</type><name>(* bs_ContextTickFunction)(bs_Context* context)</name></typedef>
 
 		<typedef><type>long long</type><name>bs_I64</name></typedef>
 		<typedef><type>int</type><name>bs_I32</name></typedef>
@@ -528,9 +528,6 @@
 		<macro><name>#define BS_MAX_NUM_BINDINGS</name><line>32</line></macro>
 		<macro><name>#define BS_MAX_NUM_BIND_SETS</name><line>32</line></macro>
 		<macro><name>#define BS_MAX_NUM_QUEUES</name><line>8</line></macro>
-		<macro><name>#define BS_MAX_NUM_SUBPASSES</name><line>6</line></macro>
-		<macro><name>#define BS_MAX_NUM_SUBPASS_DEPENDENCIES</name><line>6</line></macro>
-		<macro><name>#define BS_MAX_ATTACHMENTS_COUNT</name><line>12</line></macro>
 		
 		<macro comment="Amount of time in nanoseconds it takes for the GPU to timeout">
 			<name>#define BS_TIMEOUT</name>
@@ -1457,9 +1454,6 @@
             <field><type>bool</type><name>skip_depth_write</name></field>
             <field><type>bool</type><name>disable_blend</name></field>
             <field><type>bs_Shader*</type><name>shaders</name><size>2</size></field>
-            <structure instance=" attachments[BS_MAX_ATTACHMENTS_COUNT]">
-                <field><type>bool</type><name>skip_write</name></field>
-            </structure>
         </structure>
         <structure name="bs_RayTracePipelineHash">
             <field><type>bs_RayTracer*</type><name>ray_tracer</name></field>
@@ -1531,13 +1525,10 @@
         <structure name="bs_Renderer" object="BS_OBJECT_RENDERER">
             <field><type>bs_Header</type><name>head</name></field>
             <field><type>bs_RendererBits</type><name>flags</name></field>
-            <field><type>bs_Input*</type><name>inputs</name></field>
-            <field><type>bs_Output*</type><name>outputs</name></field>
-            <field><type>struct VkSubpassDependency*</type><name>dependencies</name></field>
-            <field><type>int</type><name>num_inputs</name></field>
-            <field><type>int</type><name>num_outputs</name></field>
-            <field><type>int</type><name>num_subpasses</name></field>
-            <field><type>int</type><name>num_dependencies</name></field>
+            <field><type>bs_List</type><name>inputs</name></field>
+            <field><type>bs_List</type><name>outputs</name></field>
+            <field><type>bs_List</type><name>dependencies</name></field>
+            <field><type>int</type><name>subpasses_count</name></field>
             <field><type>bs_ivec2</type><name>dim</name></field>
             <field><type>bs_Queue*</type><name>queue</name></field>
             <field><type>bs_Context*</type><name>context</name></field>
