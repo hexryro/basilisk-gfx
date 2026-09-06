@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,14 +21,17 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <basilisk-mod.h>
 #include <basilisk.h>
 #include <basilisk_pipeline.h>
 #include <bsgfx_cache.h>
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
+
 #include <stdio.h>
 #include <threads.h>
 
@@ -64,8 +67,6 @@ static void queryFonts() {
 				*table[i].destination = resource->font;
 		}
 	}
-
-	return NULL;
 }
 
 static void onLoadScene() {
@@ -167,7 +168,7 @@ int main(int argc, char* argv[]) {
 	bsgfx_enableValidation();
 	bsmod_enableValidation();
 
-	basilisk.main_thread_id = thrd_current()._Tid;
+	basilisk.main_thread_id = thrd_current();
 
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {
@@ -196,7 +197,7 @@ int main(int argc, char* argv[]) {
     1 for main thread, 1 for tracker thread
 	should probably be put in bsmod instead
     */
-	bs_configureQueuesCount(2); 
+	bs_configureQueuesCount(2);
 	bsgfx_ini("Basilisk", 1920, 1080, BS_WINDOW_NO_TITLE_BAR, argc, argv);
 
 	basilisk.context = bs_fetch(BSGFX_CONTEXTS, BSGFX_CONTEXT_MAIN)->context;

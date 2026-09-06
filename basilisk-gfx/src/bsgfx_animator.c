@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,8 +21,9 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
+#include "basilisk-core.gen.h"
 #include <bsgfx_internal.h>
 #include <assert.h>
 
@@ -69,7 +70,7 @@ BSGFXAPI void _bsgfx_applyAnimationVelocity(bsgfx_Animator* animator, bs_vec3* v
     int root_id = bs_queryBoneId(animator->armature, "Root");
     int frames_count = animation->frames_count - 1;
 
-    float mag = sqrt(input.x * input.x + input.y * input.y);
+    float mag = bs_sqrt(input.x * input.x + input.y * input.y);
     if (mag > 1.0f) {
         input.x /= mag;
         input.y /= mag;

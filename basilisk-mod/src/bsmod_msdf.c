@@ -34,7 +34,9 @@
 #include <freetype/ftimage.h>
 #include <freetype/ftoutln.h>
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 #ifdef RENDERDOC_PATH
 #include RENDERDOC_PATH
@@ -181,7 +183,7 @@ static inline vec2 mix(const vec2 a, const vec2 b, float weight) {
 }
 
 static inline vec2 subt(vec2 p1, vec2 p2) { return (vec2) { p1.x - p2.x, p1.y - p2.y }; }
-static inline float length(const vec2 v) { return (float)sqrt(v.x * v.x + v.y * v.y); }
+static inline float length(const vec2 v) { return (float)bs_sqrt(v.x * v.x + v.y * v.y); }
 
 static inline vec2 divide(const vec2 v, float f) { return (vec2) { v.x / f, v.y / f }; }
 
@@ -189,7 +191,7 @@ static inline float cross(vec2 a, vec2 b) { return a.x * b.y - a.y * b.x; }
 static inline float dot(vec2 a, vec2 b) { return a.x * b.x + a.y * b.y; }
 
 static bool is_corner(const vec2 a, const vec2 b, float cross_threshold) {
-    return dot(a, b) <= 0 || fabs(cross(a, b)) > cross_threshold;
+    return dot(a, b) <= 0 || bs_abs(cross(a, b)) > cross_threshold;
 }
 
 static inline vec2 normalize(vec2 v) { return divide(v, length(v)); }
@@ -307,7 +309,7 @@ int msdfgl_serialize_glyph(FT_Face face, bs_U32 codepoint, char* meta_buffer, fl
     }
 
     // Calculate coloring
-    float cross_threshold = (float)sin(3.0);
+    float cross_threshold = (float)bs_sin(3.0);
     unsigned long long seed = 0;
 
     meta_index = 0;
@@ -318,7 +320,7 @@ int msdfgl_serialize_glyph(FT_Face face, bs_U32 codepoint, char* meta_buffer, fl
 
     ncontours = meta_buffer[meta_index++];
     for (int i = 0; i < ncontours; ++i) {
-        meta_index++; // Winding 
+        meta_index++; // Winding
         int nsegments = meta_buffer[meta_index++];
         int _meta = meta_index;
         vec2* _point = point_ptr;
@@ -530,4 +532,3 @@ BSMODAPI void _bsmod_rasterizeGlyphAtlas() {
 static inline int _msdfgl_is_control(int32_t code) {
     return (code <= 31) || (code >= 128 && code <= 159);
 }
-

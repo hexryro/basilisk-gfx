@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,11 +21,12 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 static bs_List _bsmod_packages_ = { .unit_size = sizeof(bsmod_Package), .increment = 4 };
@@ -152,7 +153,7 @@ BSMODAPI bs_Result _bsmod_iniPackage(int package_id) {
 	}
 
 	for (int i = 0; i < package->chunks_count; i++) {
-		bs_String* chunk_bin; 
+		bs_String* chunk_bin;
 		char* ext = strrchr(package->path, '.');
 		if (bs_loadFileF(&chunk_bin, "%s/%s_%03d.bpak", package_metadata->directory, package_metadata->name, (i + 1)) != BS_RESULT_OK) {
 			continue;
@@ -194,7 +195,7 @@ static bsmod_Chunk* _bsmod_ensureChunk(bsmod_Package* package, int size) {
 	return chunk;
 }
 
-BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length) {
+BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length) {
 	bsmod_Package* package = _bsmod_ensurePackage(package_name);
 
 	/** Ensure package is loaded to not overwrite data */
@@ -213,11 +214,11 @@ BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* dat
 	resource->type = type;
 
 	bsmod_Chunk* chunk = bs_fetchUnit(&package->chunks, resource->chunk);
-	
+
 	if (resource->size != data_size) {
 		if (resource->size > 0) {
 			bs_infoF("Deleting old resource %s " BS_PRINT_COLOR("(-%d bytes)", BS_PRINT_RED) "\n", resource_name, resource->size);
-			
+
 			size_t remaining = chunk->bin.count - resource->offset;
 			BSMOD_VALIDATE(remaining >= resource->size, BS_RESULT_VALIDATION_ERROR,);
 
@@ -245,7 +246,7 @@ BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* dat
 		resource->type = type;
 		chunk->bin.count += data_size;
 		bs_infoF("Created resource %s " BS_PRINT_COLOR("(+%d bytes)", BS_PRINT_GREEN) "\n", resource_name, data_size);
-	} 
+	}
 	else
 		bs_infoF("Packed resource %s " BS_PRINT_COLOR("(+-0 bytes)", BS_PRINT_GRAY) "\n", resource_name);
 
@@ -261,7 +262,7 @@ BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* dat
 bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 	bs_Result result = BS_RESULT_OK;
 
-	bs_Resource* resource; 
+	bs_Resource* resource;
 	result = bs_queryResource(package_id, type, name, &resource);
 	if (result != BS_RESULT_OK)
 		return result;
@@ -315,7 +316,7 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 				bs_BindSet* bind_set = bs_instance()->bind_sets + i;
 				for (int j = 0; j < bind_set->bindings_count; j++) {
 					bs_Binding* binding = bind_set->bindings + j;
-					bs_Descriptor* descriptor = ((unsigned char*)bind_set->descriptors) + binding->location;
+					bs_Descriptor* descriptor = (bs_Descriptor*)(((unsigned char*)bind_set->descriptors) + binding->location);
 
 					bs_ImageDescriptor* new_descriptors = NULL;
 					int new_descriptors_count = 0;
@@ -324,11 +325,11 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 							continue;
 
 						if (descriptor->as_image.image == existing_image)
-							new_descriptors = _alloca(binding->descriptors_count * sizeof(bs_ImageDescriptor));
+							new_descriptors = bs_alloca(binding->descriptors_count * sizeof(bs_ImageDescriptor));
 					}
 
 					if (new_descriptors) {
-						descriptor = ((unsigned char*)bind_set->descriptors) + binding->location;
+						descriptor = (bs_Descriptor*)(((unsigned char*)bind_set->descriptors) + binding->location);
 						for (int k = 0; k < binding->descriptors_count; k++, descriptor++) {
 							assert(descriptor->object_type == BS_OBJECT_IMAGE);
 
@@ -374,7 +375,7 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 		}
 
 		if (existing_atlas) {
-			bs_Atlas* atlas_object = BS_ATLAS(existing_atlas->head.source_id, existing_atlas->head.id, BS_OBJECT_FORCE_DESTROY);
+			bs_Object* atlas_object = BS_ATLAS(existing_atlas->head.source_id, existing_atlas->head.id, BS_OBJECT_FORCE_DESTROY);
 			if (bs_loadAtlas(single_times_queue, atlas_object, package_id, 0, name) == BS_RESULT_OK) {
 				_bsmod_bindAtlases();
 				bs_pushDescriptors();
@@ -383,7 +384,7 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 		else {
 			bs_warnF("Could not reload resource \"%s\", object id could not be found\n", name);
 		}
-		
+
 		break;
 	case BS_RESOURCE_SHADER:
 		bs_Resource* existing_shader;
@@ -419,9 +420,12 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 	return result;
 }
 
-static int _bsmod_compareResource(const bsmod_Resource* a, const bsmod_Resource* b) {
-	if (a->type < b->type) return -1;
-	else if (a->type > b->type) return 1;
+static int _bsmod_compareResource(const void* a, const void* b) {
+    const bsmod_Resource* resource_a;
+    const bsmod_Resource* resource_b;
+
+	if (resource_a->type < resource_b->type) return -1;
+	else if (resource_a->type > resource_b->type) return 1;
 	return 0;
 }
 
@@ -454,7 +458,7 @@ BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length) {
 	/**
 	 Sort by type
 	 */
-	qsort(package->resources.data, package->resources.count, sizeof(bsmod_Resource), _bsmod_compareResource);
+	qsort((void*)package->resources.data, package->resources.count, sizeof(bsmod_Resource), _bsmod_compareResource);
 
 	/**
 	 Headers

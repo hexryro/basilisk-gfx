@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsgfx_internal.h>
 #include <../bsgfx_contracts.h>
@@ -37,7 +37,10 @@ BSGFXAPI void _bsgfx_primitivePosition(const bsgfx_RawPrimitive* primitive, bs_v
     bs_v3Add(&primitive->position, &rotated_scale, out);
 }
 
-static void _bsgfx_mapPrimitive(bsgfx_RawPrimitive* unmapped, bsgfx_Primitive* mapped) {
+static void _bsgfx_mapPrimitive(void* u, void* m) {
+    bsgfx_RawPrimitive* unmapped = u;
+    bsgfx_Primitive* mapped = m;
+
     mapped->collision = unmapped->collision;
     mapped->guid = unmapped->guid;
     mapped->scale = unmapped->scale;
@@ -92,7 +95,7 @@ BSGFXAPI bsgfx_InstanceSubtype* _bsgfx_primitiveSubtype(bsgfx_PrimitiveType type
     case BSGFX_PRIMITIVE_TYPE_SPHERE: return _bsgfx_subtypes_[BSGFX_SUBTYPE_PRIMITIVE_SPHERE];
     }
 
-    return -1;
+    return NULL;
 }
 
 BSGFXAPI int _bsgfx_instancePrimitive(bsgfx_InstanceSubtype* subtype, bs_mat4 transform, bs_U32 flags, int id, int material) {

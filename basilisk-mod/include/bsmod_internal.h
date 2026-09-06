@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #ifndef BSMOD_INTERNAL_H
 #define BSMOD_INTERNAL_H
@@ -98,7 +98,7 @@ typedef struct {
    // bs_Json bindings_json;
     bs_String* variadic;
     bs_List queue_load;
-    HMODULE module;
+    void* module;
 #ifdef RENDERDOC_PATH
     HMODULE renderdoc_module;
     RENDERDOC_API_1_6_0* renderdoc_api;
@@ -109,7 +109,7 @@ typedef struct {
 BSMODAPI extern Bsmod _bsmod_;
 
 static inline const char* _bsmod_applicationContentPath() {
-	return bs_fetchJsonN(&_bsmod_config_, BS_JSON_STRING, BS_CONSTANT_STRING("application.content_path")).as_string;
+	return bs_fetchJsonN(&_bsmod_config_, BS_JSON_STRING, BS_CONSTANT_STRING("application.content_path")).v.as_string;
 }
 
 #define BSMOD_WARN_SPVC_ERROR(function, code, format, ...)            \

@@ -219,6 +219,15 @@ typedef enum bs_VkObjectType bs_VkObjectType;
 #define BS_FLT_MAX                                                   \
     3.402823466e+38F
 
+#ifdef _WIN32
+#define bs_getProcAddress(module, name)                              \
+    GetProcAddress(module, name)
+
+#else
+#define bs_getProcAddress(module, name)                              \
+    dlsym(module, name)
+
+#endif
 #define BPAK_MAGIC                                                   \
     0x6B617062
 
@@ -2550,6 +2559,7 @@ struct bs_Resource {
     char* name;
     bs_String* data;
     union {
+        void* generic;
         bs_Model* model;
         bs_Shader* shader;
         bs_Sound* sound;
@@ -4948,9 +4958,9 @@ bs_bufferIsMapped(
 
  /**
   @param buffer
-  @return char*
+  @return void*
   */
-BSAPI char*
+BSAPI void*
 bs_bufferMap(
     bs_Buffer* buffer);
 
@@ -7882,7 +7892,7 @@ bs_fileName(
   */
 BSAPI bs_Result
 bs_appendFile(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* value);
 
@@ -7895,7 +7905,7 @@ bs_appendFile(
   */
 BSAPI bs_Result
 bs_appendFileN(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* value,
     int value_length);
@@ -7909,7 +7919,7 @@ bs_appendFileN(
   */
 BSAPI bs_Result
 bs_appendFileV(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* format,
     va_list args);
@@ -7923,7 +7933,7 @@ bs_appendFileV(
   */
 BSAPI bs_Result
 bs_appendFileF(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* format,
      ...);
@@ -7936,7 +7946,7 @@ bs_appendFileF(
   */
 BSAPI bs_Result
 bs_saveFile(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* path);
 
@@ -7949,7 +7959,7 @@ bs_saveFile(
   */
 BSAPI bs_Result
 bs_saveFileN(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* path,
     int path_length);
@@ -7963,7 +7973,7 @@ bs_saveFileN(
   */
 BSAPI bs_Result
 bs_saveFileV(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* format,
     va_list args);
@@ -7977,7 +7987,7 @@ bs_saveFileV(
   */
 BSAPI bs_Result
 bs_saveFileF(
-    char* data,
+    void* data,
     bs_U32 data_len,
     char* format,
      ...);

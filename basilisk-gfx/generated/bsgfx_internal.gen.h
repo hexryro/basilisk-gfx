@@ -34,7 +34,10 @@
 #define BSGFX_INTERNAL_GEN_H
 
 #include <basilisk-gfx.h>
+#ifdef _WIN32
 #include <windows.h>
+#endif
+
 
 typedef void(* PFN_bsgfx_test)();
 typedef bsgfx_InstanceSubtype**(* PFN_bsgfx_subtypes)();
@@ -90,7 +93,7 @@ typedef bs_Result(* PFN_bsgfx_ensureInstanceCount)(bsgfx_InstanceType* instance_
 typedef bs_Result(* PFN_bsgfx_instanceType)(size_t instance_size, int bind_set, int binding, bsgfx_InstanceType** out);
 typedef void(* PFN_bsgfx_deleteSubtype)(bsgfx_InstanceSubtype* instance_subtype);
 typedef bs_Result(* PFN_bsgfx_subtype)(bsgfx_InstanceType* instance_type, bs_Batch* batch, bs_U32 flags, bs_Range range, bsgfx_InstanceSubtype** out);
-typedef int(* PFN_bsgfx_instantiate)(bsgfx_InstanceSubtype* instance_subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material);
+typedef int(* PFN_bsgfx_instantiate)(bsgfx_InstanceSubtype* instance_subtype, const void* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material);
 typedef void(* PFN_bsgfx_tickInstanceType)(bsgfx_InstanceType* instance_type);
 typedef void(* PFN_bsgfx_renderSubtype)(bs_Queue* queue, bsgfx_InstanceSubtype* instance_subtype, bs_Pipeline* pipeline);
 typedef void(* PFN_bsgfx_resetInstanceType)(bsgfx_InstanceType* instance_type);
@@ -114,7 +117,7 @@ typedef bsgfx_Range(* PFN_bsgfx_instantiateASCIITextN)(bsgfx_InstanceSubtype* su
 typedef bsgfx_Range(* PFN_bsgfx_instantiateASCIITextV)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format, va_list args);
 typedef bsgfx_Range(* PFN_bsgfx_instantiateASCIITextF)(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format, ...);
 typedef bsgfx_InstanceHeader*(* PFN_bsgfx_instanceHeader)(bsgfx_InstanceSubtype* subtype, int instance_id);
-typedef bsgfx_InstanceHeader*(* PFN_bsgfx_instanceData)(bsgfx_InstanceSubtype* subtype, int instance_id);
+typedef void*(* PFN_bsgfx_instanceData)(bsgfx_InstanceSubtype* subtype, int instance_id);
 typedef bs_mat4x3(* PFN_bsgfx_matrix)(bs_vec3 position, bs_vec3 scale);
 typedef void(* PFN_bsgfx_renderFineShadowVolumes)();
 typedef void(* PFN_bsgfx_renderShadowVolumes)();
@@ -171,7 +174,7 @@ typedef void(* PFN_bsgfx_tileEulerRotation)(int axis, bs_vec3* out);
 typedef void(* PFN_bsgfx_pushTileAt)(const bs_Batch* batch, const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32 index, int image_index, bs_U32* out);
 typedef void(* PFN_bsgfx_tileCoordinate)(const bsgfx_Primitive* primitive, int axis, int index, bs_ivec2* out);
 typedef void(* PFN_bsgfx_tileAxis)(const bsgfx_Primitive* primitive, int index, int* out);
-typedef void(* PFN_bsgfx_tileIndex)(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32* out);
+typedef void(* PFN_bsgfx_tileIndex)(const bsgfx_Primitive* primitive, int axis, int x, int y, int* out);
 typedef bool(* PFN_bsgfx_instanceWidgets)(bsgfx_Menu menu, bsgfx_TitleBar* title_bar, bsgfx_MenuTabBar* tab_bar);
 typedef void(* PFN_bsgfx_instantiateTextUI)(bsgfx_UIText text, bsgfx_UIElement* element);
 typedef void(* PFN_bsgfx_instantiateSolidUI)(bsgfx_UISolid solid, bsgfx_UIElement* element);
@@ -388,7 +391,7 @@ BSGFXAPI bs_Result _bsgfx_ensureInstanceCount(bsgfx_InstanceType* instance_type,
 BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int binding, bsgfx_InstanceType** out);
 BSGFXAPI void _bsgfx_deleteSubtype(bsgfx_InstanceSubtype* instance_subtype);
 BSGFXAPI bs_Result _bsgfx_subtype(bsgfx_InstanceType* instance_type, bs_Batch* batch, bs_U32 flags, bs_Range range, bsgfx_InstanceSubtype** out);
-BSGFXAPI int _bsgfx_instantiate(bsgfx_InstanceSubtype* instance_subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material);
+BSGFXAPI int _bsgfx_instantiate(bsgfx_InstanceSubtype* instance_subtype, const void* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material);
 BSGFXAPI void _bsgfx_tickInstanceType(bsgfx_InstanceType* instance_type);
 BSGFXAPI void _bsgfx_renderSubtype(bs_Queue* queue, bsgfx_InstanceSubtype* instance_subtype, bs_Pipeline* pipeline);
 BSGFXAPI void _bsgfx_resetInstanceType(bsgfx_InstanceType* instance_type);
@@ -412,7 +415,7 @@ BSGFXAPI bsgfx_Range _bsgfx_instantiateASCIITextN(bsgfx_InstanceSubtype* subtype
 BSGFXAPI bsgfx_Range _bsgfx_instantiateASCIITextV(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format, va_list args);
 BSGFXAPI bsgfx_Range _bsgfx_instantiateASCIITextF(bsgfx_InstanceSubtype* subtype, bsgfx_Font* font, bs_vec3 position, int pt_size, int material_id, bs_vec2* out_size, char* format,  ...);
 BSGFXAPI bsgfx_InstanceHeader* _bsgfx_instanceHeader(bsgfx_InstanceSubtype* subtype, int instance_id);
-BSGFXAPI bsgfx_InstanceHeader* _bsgfx_instanceData(bsgfx_InstanceSubtype* subtype, int instance_id);
+BSGFXAPI void* _bsgfx_instanceData(bsgfx_InstanceSubtype* subtype, int instance_id);
 BSGFXAPI bs_mat4x3 _bsgfx_matrix(bs_vec3 position, bs_vec3 scale);
 BSGFXAPI void _bsgfx_renderFineShadowVolumes();
 BSGFXAPI void _bsgfx_renderShadowVolumes();
@@ -469,7 +472,7 @@ BSGFXAPI void _bsgfx_tileEulerRotation(int axis, bs_vec3* out);
 BSGFXAPI void _bsgfx_pushTileAt(const bs_Batch* batch, const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32 index, int image_index, bs_U32* out);
 BSGFXAPI void _bsgfx_tileCoordinate(const bsgfx_Primitive* primitive, int axis, int index, bs_ivec2* out);
 BSGFXAPI void _bsgfx_tileAxis(const bsgfx_Primitive* primitive, int index, int* out);
-BSGFXAPI void _bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32* out);
+BSGFXAPI void _bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, int* out);
 BSGFXAPI bool _bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* title_bar, bsgfx_MenuTabBar* tab_bar);
 BSGFXAPI void _bsgfx_instantiateTextUI(bsgfx_UIText text, bsgfx_UIElement* element);
 BSGFXAPI void _bsgfx_instantiateSolidUI(bsgfx_UISolid solid, bsgfx_UIElement* element);

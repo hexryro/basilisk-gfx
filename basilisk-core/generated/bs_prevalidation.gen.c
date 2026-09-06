@@ -41,8 +41,8 @@ const bs_FunctionTable* _preval_bs_setFunctions(const bs_FunctionTable* a, bs_Fu
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bs_FunctionTable); offset += sizeof(void*)) {
-        bs_Callback* f_a = ((unsigned char*)&next) + offset;
-        bs_Callback* f_b = ((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next) + offset;
+        void** f_b = (void**)((unsigned char*)b) + offset;
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -416,7 +416,7 @@ BSAPI bool _preval_bs_bufferIsMapped(bs_Buffer* buffer) {
     return next.bs_bufferIsMapped(buffer);
 }
 
-BSAPI char* _preval_bs_bufferMap(bs_Buffer* buffer) {
+BSAPI void* _preval_bs_bufferMap(bs_Buffer* buffer) {
     BS_VALIDATE(buffer != NULL, NULL,);
     BS_VALIDATE(buffer->head.type == BS_OBJECT_BUFFER, NULL,);
     return next.bs_bufferMap(buffer);
@@ -1851,37 +1851,37 @@ BSAPI char* _preval_bs_fileName(const char* path) {
     return next.bs_fileName(path);
 }
 
-BSAPI bs_Result _preval_bs_appendFile(char* data, bs_U32 data_len, char* value) {
+BSAPI bs_Result _preval_bs_appendFile(void* data, bs_U32 data_len, char* value) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_appendFile(data, data_len, value);
 }
 
-BSAPI bs_Result _preval_bs_appendFileN(char* data, bs_U32 data_len, char* value, int value_length) {
+BSAPI bs_Result _preval_bs_appendFileN(void* data, bs_U32 data_len, char* value, int value_length) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(value != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_appendFileN(data, data_len, value, value_length);
 }
 
-BSAPI bs_Result _preval_bs_appendFileV(char* data, bs_U32 data_len, char* format, va_list args) {
+BSAPI bs_Result _preval_bs_appendFileV(void* data, bs_U32 data_len, char* format, va_list args) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_appendFileV(data, data_len, format, args);
 }
 
-BSAPI bs_Result _preval_bs_saveFile(char* data, bs_U32 data_len, char* path) {
+BSAPI bs_Result _preval_bs_saveFile(void* data, bs_U32 data_len, char* path) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_saveFile(data, data_len, path);
 }
 
-BSAPI bs_Result _preval_bs_saveFileN(char* data, bs_U32 data_len, char* path, int path_length) {
+BSAPI bs_Result _preval_bs_saveFileN(void* data, bs_U32 data_len, char* path, int path_length) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(path != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_saveFileN(data, data_len, path, path_length);
 }
 
-BSAPI bs_Result _preval_bs_saveFileV(char* data, bs_U32 data_len, char* format, va_list args) {
+BSAPI bs_Result _preval_bs_saveFileV(void* data, bs_U32 data_len, char* format, va_list args) {
     BS_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BS_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bs_saveFileV(data, data_len, format, args);

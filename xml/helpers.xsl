@@ -38,8 +38,8 @@
 	if (!b) return &amp;next;
 
     for (size_t offset = 0; offset &lt; sizeof(</xsl:text><xsl:value-of select="registry/functionPrefix"/><xsl:text>FunctionTable); offset += sizeof(void*)) {
-        bs_Callback* f_a = ((unsigned char*)&amp;next) + offset;
-        bs_Callback* f_b = ((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&amp;next) + offset;
+        void** f_b = (void**)((unsigned char*)b) + offset;
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -95,7 +95,6 @@
         <xsl:text>FunctionTable functions;&#xA;&#xA;</xsl:text>
 
         <xsl:text>#ifdef _WIN32&#xA;</xsl:text>
-        <xsl:text>#define bs_getProcAddress(module, name) GetProcAddress(module, name)&#xA;</xsl:text>
 
         <xsl:text>    HMODULE module = NULL;&#xA;</xsl:text>
         <xsl:text>    GetModuleHandleExA(&#xA;        GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,&#xA;        (LPCSTR)(&amp;</xsl:text>
@@ -110,7 +109,6 @@
         <xsl:value-of select="concat(concat($prefix, registry/functionPrefix), 'getFunctions')"/>
         <xsl:text>), &amp;module_info);&#xA;</xsl:text>
         <xsl:text>    module = dlopen(module_info.dli_fname, RTLD_LAZY);&#xA;</xsl:text>
-        <xsl:text>#define bs_getProcAddress(module, name) dlsym(module, name)&#xA;</xsl:text>
 
         <xsl:text>#endif&#xA;</xsl:text>
 
@@ -127,9 +125,7 @@
             </xsl:if>
         </xsl:for-each>
 
-        <xsl:text>&#xA;    #undef bs_getProcAddress&#xA;</xsl:text>
-
-        <xsl:text>#ifndef _WIN32&#xA;</xsl:text>
+        <xsl:text>#ifdef __linux__&#xA;</xsl:text>
         <xsl:text>    dlclose(module);&#xA;</xsl:text>
         <xsl:text>#endif&#xA;</xsl:text>
 

@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,10 +21,12 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
 #include <bsmod_cache.h>
+#include <stddef.h>
+#include <math.h>
 
 #define BSGFX_AXIS_CLICK_SIZE (48)
 
@@ -184,7 +186,7 @@ static inline bs_vec3 _bsmod_worldToScreenCoords(bs_vec3 world_coords, float wid
 	bs_vec4 px;
 	bs_m4MulV4(&camera, &BS_V3_TO_V4(world_coords, 1.0), &px);
 
-	bs_vec3 px1; 
+	bs_vec3 px1;
 	bs_v3DivS(&px.xyz, px.w, &px1);
 
 	px1.x = (px1.x + 1.0f) * 0.5f * resolution.x - width / 2.0;
@@ -236,8 +238,8 @@ BSMODAPI void _bsmod_instanceTransform() {
 		int* id = bs_fetchUnit(&_bsmod_.selected_ids, i);
 		unsigned char* data = bsgfx_getRaw(type, *id);
 
-		bs_vec3* p = data + position_offset;
-		bs_vec3* r = data + rotation_offset;
+		bs_vec3* p = (bs_vec3*)(data + position_offset);
+		bs_vec3* r = (bs_vec3*)(data + rotation_offset);
 
 		bs_v3Add(&position, p, &position);
 
@@ -247,7 +249,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 			if (_bsmod_.selected_ids.count == 1)
 				bs_eulToQ(r, &rotation);
 		}
-			
+
 	}
 
 	bs_v3DivS(&position, _bsmod_.selected_ids.count, &position);
@@ -270,7 +272,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 	bs_vec3 origin;
 	bs_m4MulV3(&transform, &BS_V3(0.0, 0.0, 0.0), &origin);
 
-	bs_vec3 x, y, z; 
+	bs_vec3 x, y, z;
 	bs_m4MulV3(&transform, &BS_V3(axis_length, 0, 0), &x);
 	bs_m4MulV3(&transform, &BS_V3(0, axis_length, 0), &y);
 	bs_m4MulV3(&transform, &BS_V3(0, 0, axis_length), &z);
@@ -330,7 +332,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 	bs_vec2 click_size = { BSGFX_AXIS_CLICK_SIZE, BSGFX_AXIS_CLICK_SIZE };
 
 	// dux_atlasHiResInstance(atlas, xs, white, 0, click_size, BS_V4(1, 0, 0, 1), false);
-	// dux_atlasHiResInstance(atlas, ys, white, 0, click_size, 
+	// dux_atlasHiResInstance(atlas, ys, white, 0, click_size,
 	// BS_V4(0, 1, 0, 1), false);
 	// dux_atlasHiResInstance(atlas, zs, white, 0, click_size, BS_V4(0, 0, 1, 1), false);
 
@@ -410,7 +412,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 
 		float dot = bs_v2Dot(&up, &diff);
 		float cross = up.x * diff.y - up.y * diff.x;
-		last_angle = bs_degrees(atan2(cross, dot));
+		last_angle = bs_degrees(atan2f(cross, dot));
 		if (last_angle < 0.0)
 			last_angle += 360.0;
 
@@ -418,7 +420,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 			int* id = bs_fetchUnit(&_bsmod_.selected_ids, i);
 			unsigned char* data = bsgfx_getRaw(type, *id);
 
-			bs_vec3* r = data + rotation_offset;
+			bs_vec3* r = (bs_vec3*)(data + rotation_offset);
 
 			initial_values[i].rotation = r->a[_bsmod_.axis];
 		}
@@ -469,7 +471,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 				int* id = bs_fetchUnit(&_bsmod_.selected_ids, i);
 				unsigned char* data = bsgfx_getRaw(type, *id);
 
-				bs_vec3* r = data + rotation_offset;
+				bs_vec3* r = (bs_vec3*)(data + rotation_offset);
 
 				float* result = r->a + _bsmod_.axis;
 				*result = initial_values[i].rotation + delta_angle;
@@ -513,7 +515,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 					for (int i = 0; i < _bsmod_.selected_ids.count; i++) {
 						int* id = bs_fetchUnit(&_bsmod_.selected_ids, i);
 						unsigned char* data = bsgfx_getRaw(type, *id);
-						bs_vec3* p = data + position_offset;
+						bs_vec3* p = (bs_vec3*)(data + position_offset);
 
 						p->a[j] += 0.1 * move_tiles;
 						bsgfx_map(type, *id);
@@ -532,7 +534,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 						for (int i = 0; i < _bsmod_.selected_ids.count; i++) {
 							int* id = bs_fetchUnit(&_bsmod_.selected_ids, i);
 							unsigned char* data = bsgfx_getRaw(type, *id);
-							bs_vec3* s = data + scale_offset;
+							bs_vec3* s = (bs_vec3*)(data + scale_offset);
 
 							s->a[_bsmod_.axis] += half_tile_steps * 0.5;
 							bsgfx_map(type, *id);
@@ -552,7 +554,7 @@ BSMODAPI void _bsmod_instanceTransform() {
 							for (int i = 0; i < _bsmod_.selected_ids.count; i++) {
 								int* id = bs_fetchUnit(&_bsmod_.selected_ids, i);
 								unsigned char* data = bsgfx_getRaw(type, *id);
-								bs_vec3* p = data + position_offset;
+								bs_vec3* p = (bs_vec3*)(data + position_offset);
 
 								p->a[j] += half_tile_steps * 0.5;
 								p->a[j] = bs_round(p->a[j] * 2.0) * 0.5;

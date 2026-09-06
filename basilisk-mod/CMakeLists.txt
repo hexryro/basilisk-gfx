@@ -79,12 +79,16 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/freetype/include
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE 
+target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/
-    ${CMAKE_SOURCE_DIR}/external/glslang/build/glslang/Debug
+    ${CMAKE_SOURCE_DIR}/external/glslang/build/glslang/Debug #todo release
+    ${CMAKE_SOURCE_DIR}/external/glslang/build/glslang
     ${CMAKE_SOURCE_DIR}/external/glslang/build/SPIRV/Debug
+    ${CMAKE_SOURCE_DIR}/external/glslang/build/SPIRV
     ${CMAKE_SOURCE_DIR}/external/SPIRV-Cross/build/Debug
+    ${CMAKE_SOURCE_DIR}/external/SPIRV-Cross/build
     ${CMAKE_SOURCE_DIR}/external/freetype/objs
+    ${CMAKE_SOURCE_DIR}/external/freetype/objs/.libs
 )
 
 if (MSVC)
@@ -95,10 +99,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     basilisk-core
     basilisk-gfx
     #basilisk-steam
-    vulkan-1 
-    #steam_api64 
-    dwmapi
+    #steam_api64
     #GFSDK_Aftermath_Lib.x64
+    freetype
+)
+
+if (WIN32)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    vulkan-1
+    dwmapi
     GenericCodeGend
     glslangd optimized glslangd
     glslang-default-resource-limitsd optimized glslang-default-resource-limitsd
@@ -107,5 +116,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     spirv-cross-cd optimized spirv-cross-cd
     spirv-cross-cored optimized spirv-cross-cored
     spirv-cross-glsld optimized spirv-cross-glsld
-    freetype
 )
+else()
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    vulkan
+    GenericCodeGen
+    glslang
+    glslang-default-resource-limits
+    MachineIndependent
+    SPIRV
+    spirv-cross-c
+    spirv-cross-core
+    spirv-cross-glsl
+)
+endif()

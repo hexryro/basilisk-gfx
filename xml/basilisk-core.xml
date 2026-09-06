@@ -56,6 +56,10 @@
 		<validationHeader>
 			<include>basilisk-core.h</include>
 			<include>bs_internal.h</include>
+			<ifdef cond="__linux__"/>
+			    <define cond="__USE_GNU"/>
+			    <include>dlfcn.h</include>
+			<endif/>
 		</validationHeader>
     </includes>
 
@@ -412,6 +416,18 @@
             <name>#define BS_FLT_MAX</name>
             <line>3.402823466e+38F</line>
         </macro>
+
+        <ifdef cond="_WIN32"/>
+            <macro>
+                <name>#define bs_getProcAddress(module, name)</name>
+                <line>GetProcAddress(module, name)</line>
+            </macro>
+        <else/>
+            <macro>
+                <name>#define bs_getProcAddress(module, name)</name>
+                <line>dlsym(module, name)</line>
+            </macro>
+        <endif/>
 
         <macro><name>#define BPAK_MAGIC</name><line>0x6B617062</line></macro>
 
@@ -1265,6 +1281,7 @@
             <field><type>char*</type><name>name</name></field>
             <field><type>bs_String*</type><name>data</name></field>
             <structure type="union">
+                <field><type>void*</type><name>generic</name></field>
                 <field><type>bs_Model*</type><name>model</name></field>
                 <field><type>bs_Shader*</type><name>shader</name></field>
                 <field><type>bs_Sound*</type><name>sound</name></field>
@@ -2073,7 +2090,7 @@
             <param><type>const bs_mat3*</type><name>m</name></param>
             <param><type>const bs_vec3*</type><name>v</name></param>
             <param><type>bs_vec3*</type><name>out</name></param>
-            <body>    glm_mat3_mulv(m->v, v->a, out->a);</body>
+            <body>    glm_mat3_mulv(m->a, v->a, out->a);</body>
         </function>
 
         <matrixTemplate><rows>4</rows><columns>4</columns></matrixTemplate>
@@ -2088,7 +2105,7 @@
             <param><type>const bs_mat4*</type><name>m</name></param>
             <param><type>const bs_vec3*</type><name>v</name></param>
             <param><type>bs_vec3*</type><name>out</name></param>
-            <body>    glm_mat4_mulv3(m->v, v->a, 1.0, out->a);</body>
+            <body>    glm_mat4_mulv3(m->a, v->a, 1.0, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_m4MulV4">
@@ -2096,7 +2113,7 @@
             <param><type>const bs_mat4*</type><name>m</name></param>
             <param><type>const bs_vec4*</type><name>v</name></param>
             <param><type>bs_vec4*</type><name>out</name></param>
-            <body>    glm_mat4_mulv(m->v, v->a, out->a);</body>
+            <body>    glm_mat4_mulv(m->a, v->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_m4Translate">
@@ -2104,7 +2121,7 @@
             <param><type>const bs_mat4*</type><name>m</name></param>
             <param><type>const bs_vec3*</type><name>v</name></param>
             <param><type>bs_mat4*</type><name>out</name></param>
-            <body>    glm_translate_to(m->v, v->a, out->a);</body>
+            <body>    glm_translate_to(m->a, v->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_m4Rotate">
@@ -2112,7 +2129,7 @@
             <param><type>const bs_mat4*</type><name>m</name></param>
             <param><type>const bs_vec4*</type><name>q</name></param>
             <param><type>bs_mat4*</type><name>out</name></param>
-            <body>    glm_quat_rotate(m->v, q->a, out->a);</body>
+            <body>    glm_quat_rotate(m->a, q->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_m4Scale">
@@ -2120,35 +2137,35 @@
             <param><type>const bs_mat4*</type><name>m</name></param>
             <param><type>const bs_vec3*</type><name>v</name></param>
             <param><type>bs_mat4*</type><name>out</name></param>
-            <body>    glm_scale_to(m->v, v->a, out->a);</body>
+            <body>    glm_scale_to(m->a, v->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_m3ToQ">
             <return>void</return>
             <param><type>const bs_mat3*</type><name>m</name></param>
             <param><type>bs_vec4*</type><name>out</name></param>
-            <body>    glm_mat3_quat(m->v, out->a);</body>
+            <body>    glm_mat3_quat(m->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_m4ToQ">
             <return>void</return>
             <param><type>const bs_mat4*</type><name>m</name></param>
             <param><type>bs_vec4*</type><name>out</name></param>
-            <body>    glm_mat4_quat(m->v, out->a);</body>
+            <body>    glm_mat4_quat(m->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_qToM3">
             <return>void</return>
             <param><type>const bs_vec4*</type><name>q</name></param>
             <param><type>bs_mat3*</type><name>out</name></param>
-            <body>    glm_quat_mat3(q->a, out->v);</body>
+            <body>    glm_quat_mat3(q->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_qToM4">
             <return>void</return>
             <param><type>const bs_vec4*</type><name>q</name></param>
             <param><type>bs_mat4*</type><name>out</name></param>
-            <body>    glm_quat_mat4(q->a, out->v);</body>
+            <body>    glm_quat_mat4(q->a, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_qMulQ">
@@ -2221,7 +2238,7 @@
             <param><type>float</type><name>near_z</name></param>
             <param><type>float</type><name>far_z</name></param>
             <param><type>bs_mat4*</type><name>out</name></param>
-            <body>    glm_ortho(left, right, bottom, top, near_z, far_z, out->v);</body>
+            <body>    glm_ortho(left, right, bottom, top, near_z, far_z, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_perspective">
@@ -2231,7 +2248,7 @@
             <param><type>float</type><name>near_z</name></param>
             <param><type>float</type><name>far_z</name></param>
             <param><type>bs_mat4*</type><name>out</name></param>
-            <body>    glm_perspective(fov, aspect, near_z, far_z, out->v);</body>
+            <body>    glm_perspective(fov, aspect, near_z, far_z, out->a);</body>
         </function>
 
 		<function type="cglm" name="bs_lookAt">
@@ -2667,7 +2684,7 @@
             <param><type>bs_Buffer*</type><name>buffer</name></param>
         </function>
         <function name="bs_bufferMap">
-            <return>char*</return>
+            <return>void*</return>
             <param><type>bs_Buffer*</type><name>buffer</name></param>
         </function>
         <function name="bs_mapBuffer">
@@ -3620,12 +3637,12 @@
         </function>
 		<variadicStringTemplate name="bs_appendFile">
             <return>bs_Result</return>
-            <param><type>char*</type><name>data</name></param>
+            <param><type>void*</type><name>data</name></param>
             <param><type>bs_U32</type><name>data_len</name></param>
         </variadicStringTemplate>
         <variadicStringTemplate name="bs_saveFile" string="path">
             <return>bs_Result</return>
-            <param><type>char*</type><name>data</name></param>
+            <param><type>void*</type><name>data</name></param>
             <param><type>bs_U32</type><name>data_len</name></param>
         </variadicStringTemplate>
         <variadicStringTemplate name="bs_convertWin32Path" string="path">

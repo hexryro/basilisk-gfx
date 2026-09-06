@@ -701,7 +701,7 @@ bool _bs_directoryExistsF(
 }
 
 bs_Result _bs_appendFile(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* value)
 {
@@ -709,7 +709,7 @@ bs_Result _bs_appendFile(
 }
 
 bs_Result _bs_appendFileV(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     va_list args)
@@ -721,7 +721,7 @@ bs_Result _bs_appendFileV(
 }
 
 bs_Result _bs_appendFileF(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     ...)
@@ -734,7 +734,7 @@ bs_Result _bs_appendFileF(
 }
 
 bs_Result _bs_saveFile(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* path)
 {
@@ -742,7 +742,7 @@ bs_Result _bs_saveFile(
 }
 
 bs_Result _bs_saveFileV(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     va_list args)
@@ -754,7 +754,7 @@ bs_Result _bs_saveFileV(
 }
 
 bs_Result _bs_saveFileF(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     ...)

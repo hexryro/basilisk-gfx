@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
 #include "../bsgfx_contracts.h"
@@ -66,7 +66,7 @@ BSMODAPI void _bsmod_deleteSelected(bsgfx_TypeId type_id) {
 
 	bsgfx_Type* type = bsgfx_getType(type_id);
 	int count = _bsmod_.selected_ids.count;
-	int* ids = _bsmod_.selected_ids.data;
+	int* ids = (int*)_bsmod_.selected_ids.data;
 
 	for (int i = 0; i < count - 1; i++) {
 		for (int j = i + 1; j < count; j++) {
@@ -184,8 +184,8 @@ static void* _bsmod_shiftFlexible(bsgfx_TypeId type_id, int id, void* data) {
 	void* result = NULL;
 
 	for (int i = 0; i <= id; i++) {
-		int* unmapped_flexible_count = type->unmapped + unmapped_offset + type->unmapped_flexible_offset;
-		int* mapped_flexible_count = type->mapped + mapped_offset + type->mapped_flexible_offset;
+		int* unmapped_flexible_count = (int*)(type->unmapped + unmapped_offset + type->unmapped_flexible_offset);
+		int* mapped_flexible_count = (int*)(type->mapped + mapped_offset + type->mapped_flexible_offset);
 
 		unmapped_offset += type->unmapped_unit_size + *unmapped_flexible_count * type->unmapped_flexible_size;
 		mapped_offset += type->mapped_unit_size + *mapped_flexible_count * type->mapped_flexible_size;
@@ -401,7 +401,7 @@ BSMODAPI void _bsmod_deselect(bs_List* list, int id) {
 }
 
 BSMODAPI int _bsmod_firstSelectedId(bs_List* list) {
-	int* first = list->data;
+	int* first = (int*)list->data;
 	//	if (*first < 0 || (*first >= bsgfx_getType(_bsmod_.selected_type)->count))
 	//		return -1;
 
@@ -409,7 +409,7 @@ BSMODAPI int _bsmod_firstSelectedId(bs_List* list) {
 }
 
 BSMODAPI int _bsmod_lastSelectedId(bs_List* list) {
-	int* first = list->data;
+	int* first = (int*)list->data;
 	//	if (first < 0 || (_bsmod_.selected_ids.count - 1) >= bsgfx_getType(_bsmod_.selected_type)->count)
 	//		return -1;
 
@@ -427,13 +427,13 @@ BSMODAPI int _bsmod_lastSelectedId(bs_List* list) {
   Tile version converter
   */
 static void _bsmod_convertTileVersion1(bsgfx_TypeHeader* old_tiles, bsgfx_TypeHeader* new_tiles) {
-	unsigned char* old_data = old_tiles->accessors + old_tiles->count;
-	unsigned char* new_data = new_tiles->accessors + new_tiles->count;
+	unsigned char* old_data = (unsigned char*)(old_tiles->accessors + old_tiles->count);
+	unsigned char* new_data = (unsigned char*)(new_tiles->accessors + new_tiles->count);
 
 	size_t offset = 0;
 	for (int i = 0; i < old_tiles->count; i++) {
-		bsgfx_RawTileV1* old_tile = old_data + old_tiles->accessors[i];
-		bsgfx_RawTile* new_tile = new_data + offset;
+		bsgfx_RawTileV1* old_tile = (bsgfx_RawTileV1*)(old_data + old_tiles->accessors[i]);
+		bsgfx_RawTile* new_tile = (bsgfx_RawTile*)(new_data + offset);
 
 		*new_tile = (bsgfx_RawTile){
 			.axis = 0,
@@ -462,7 +462,7 @@ static bs_Result _bsmod_convertTileVersion(int package_id, bsgfx_Scene* scene) {
 	if (result != BS_RESULT_OK)
 		return result;
 
-	bsgfx_TypeHeader* old_tiles = tiles->data->value;
+	bsgfx_TypeHeader* old_tiles = (bsgfx_TypeHeader*)tiles->data->value;
 	if (old_tiles->version == BSGFX_TILE_VERSION) {
 		bs_infoF("Tiles are up to date.\n");
 		return BS_RESULT_OK;
@@ -504,7 +504,7 @@ BSMODAPI void _bsmod_ensureTypeVersionsAreUpToDate(int package_id) {
 	//bs_Resource* prefabs = bs_loadResource(package_id, (s = bs_stringF(s, "levels/%s_prefabs", scene->name))->value, 0);
 	//bs_except(0);
 
-	_bsmod_savePackage(package_id);
+	//_bsmod_savePackage(package_id);
 }
 
 
@@ -561,14 +561,14 @@ BSMODAPI void _bsmod_copyHoveringDataToBuffer() {
 
 			if (_bsmod_.queue.screenshot) {
 				bs_copyImageToBufferAsync(
-					single_times_queue, 
-					image, 
-					tile_read_buffer, 
-					0, 
+					single_times_queue,
+					image,
+					tile_read_buffer,
+					0,
 
-					BS_IMAGE_LAYOUT_GENERAL, 
-					pixel_resolution.x * pixel_resolution.y * i * 4, 
-					BS_IV2(0, 0), 
+					BS_IMAGE_LAYOUT_GENERAL,
+					pixel_resolution.x * pixel_resolution.y * i * 4,
+					BS_IV2(0, 0),
 					pixel_resolution
 				);
 			}

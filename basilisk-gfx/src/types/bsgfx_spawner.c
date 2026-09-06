@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsgfx_internal.h>
 
@@ -33,7 +33,10 @@ BSGFXAPI bs_vec3 _bsgfx_spawnPosition(bs_vec2 coords, float y) {
     };
 }
 
-static void _bsgfx_mapSpawner(bsgfx_RawSpawner* unmapped, bsgfx_Spawner* mapped) {
+static void _bsgfx_mapSpawner(void* u, void* m) {
+    bsgfx_RawSpawner* unmapped = u;
+    bsgfx_Spawner* mapped = m;
+
     *mapped = (bsgfx_Spawner){
         .position = unmapped->position,
         .spawn_type = unmapped->spawn_type,
@@ -50,15 +53,15 @@ static void _bsgfx_mapSpawner(bsgfx_RawSpawner* unmapped, bsgfx_Spawner* mapped)
 
 BSGFXAPI void _bsgfx_loadSpawners(int package_id) {
     _bsgfx_type(
-        BSGFX_TYPE_SPAWNER, 
-        package_id, 
+        BSGFX_TYPE_SPAWNER,
+        package_id,
         BSGFX_SPAWNER_VERSION,
         "spawners", "spawner",
-        sizeof(bsgfx_RawSpawner), sizeof(bsgfx_Spawner), 
-        _bsgfx_mapSpawner, 
-        0, 
-        0, 
-        0, 
+        sizeof(bsgfx_RawSpawner), sizeof(bsgfx_Spawner),
+        _bsgfx_mapSpawner,
+        0,
+        0,
+        0,
         0);
    // _bsgfx_onSelect(BSGFX_TYPE_SPAWNER, _bsgfx_onSelectSpawner);
 }
@@ -136,7 +139,7 @@ void _bsgfx_instanceSpawners() {
             // _bsgfx_obbInstance(&mesh->aabb, BS_BLACK, &transform);
             hovering = _bsgfx_instanceSpawner(spawner->position, i, "red");
             break;
-        case BSGFX_SPAWNER_ENTITY: 
+        case BSGFX_SPAWNER_ENTITY:
             bsgfx_Script* script = bs_queryHash(NULL, "lua", spawner->spawn_name, 0).data;
             bsgfx_Script* scripts = bs_resource(BSGFX_RESOURCE_SCRIPT, 0);
 
@@ -147,7 +150,7 @@ void _bsgfx_instanceSpawners() {
             hovering = _bsgfx_instanceSpawner(spawner->position, i, "green");
             break;
         }
-        
+
         if (hovering && !_bsgfx_app_.menu_blocked) {
             //if (!_bsgfx_quickMenuEnabled())
             //    _bsgfx_instanceHint(bs_windowCursorPosition(bs_scope()->context), name);

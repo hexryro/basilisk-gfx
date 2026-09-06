@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsgfx_internal.h>
 #include <bsgfx_cache.h>
@@ -150,14 +150,14 @@ BSGFXAPI void _bsgfx_tileAxis(const bsgfx_Primitive* primitive, int index, int* 
  /**
   Tile Index
   */
-BSGFXAPI void _val_bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32* out) {
+BSGFXAPI void _val_bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, int* out) {
     *out = 0;
     BSGFX_VALIDATE(axis < 6,,);
 
     _bsgfx_tileIndex(primitive, axis, x, y, out);
 }
 
-BSGFXAPI void _bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32* out) {
+BSGFXAPI void _bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, int* out) {
     float sx = primitive->scale.x;
     float sy = primitive->scale.y;
     float sz = primitive->scale.z;
@@ -287,7 +287,7 @@ BSGFXAPI void _bsgfx_pushTileAt(
     int x,
     int y,
     bs_U32 index,
-    int image_index, 
+    int image_index,
     bs_U32* out)
 {
     bsgfx_TileAxis* ax = &_bsgfx_tile_axes[axis];
@@ -379,8 +379,8 @@ static void _bsgfx_loadTileTextures(int package_id) {
     bs_Object* tile_image = BS_IMAGE(BSGFX_IMAGES, BSGFX_IMAGE_TILE, BS_OBJECT_FORCE_DESTROY);
     result = bs_loadImageN(
         queue,
-        tile_image, 
-        package_id, 
+        tile_image,
+        package_id,
         BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_DST_BIT,
         BS_CONSTANT_STRING("textureArrays/tiles")
     );
@@ -389,7 +389,7 @@ static void _bsgfx_loadTileTextures(int package_id) {
 
     // white image buffer
     bs_Object* staging_buffer = BS_BUFFER(-1, 0, 0);
-    result = bs_buffer(staging_buffer, 
+    result = bs_buffer(staging_buffer,
         BSGFX_TILE_SIZE.x * BSGFX_TILE_SIZE.y * 4,
         BS_BUFFER_USAGE_TRANSFER_SRC_BIT,
         BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -398,7 +398,7 @@ static void _bsgfx_loadTileTextures(int package_id) {
     if (result != BS_RESULT_OK)
         return;
 
-    result = bs_mapBuffer(staging_buffer, BS_U32_MAX);
+    result = bs_mapBuffer(staging_buffer->buffer, BS_U32_MAX);
     if (result != BS_RESULT_OK)
         return;
 
@@ -412,12 +412,15 @@ static void _bsgfx_loadTileTextures(int package_id) {
     if (result != BS_RESULT_OK)
         return;
 
-    bs_destroyBuffer(staging_buffer);
+    bs_destroyBuffer(staging_buffer->buffer);
 
     bs_infoN(BS_CONSTANT_STRING("Loaded tile textures\n"));
 }
 
-static void _bsgfx_mapTile(const bsgfx_RawTile* unmapped, bsgfx_Tile* mapped) {
+static void _bsgfx_mapTile(void* u, void* m) {
+    const bsgfx_RawTile* unmapped = u;
+    bsgfx_Tile* mapped = m;
+
     const int tile_count = _bsgfx_count(BSGFX_TYPE_TILE);
 
     bs_Image* image = bs_fetch(BSGFX_IMAGES, BSGFX_IMAGE_TILE)->image;
@@ -435,7 +438,7 @@ static void _bsgfx_mapTile(const bsgfx_RawTile* unmapped, bsgfx_Tile* mapped) {
     int primitive_id = _bsgfx_queryPrimitive(&unmapped->primitive);
     if (primitive_id >= 0) {
         bsgfx_RawPrimitive* raw_primitive = _bsgfx_getRaw(BSGFX_TYPE_PRIMITIVE, primitive_id);
-        bsgfx_RawPrimitive* primitive = _bsgfx_get(BSGFX_TYPE_PRIMITIVE, primitive_id);
+        bsgfx_Primitive* primitive = _bsgfx_get(BSGFX_TYPE_PRIMITIVE, primitive_id);
         _bsgfx_tileIndex(primitive, mapped->axis, mapped->coords.x, mapped->coords.y, &mapped->index);
     }
 }

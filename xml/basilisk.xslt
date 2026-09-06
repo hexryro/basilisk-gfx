@@ -10,7 +10,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<xsl:apply-templates select="@*|node()"/>
 		</xsl:copy>
     </xsl:template>
-	
+
     <xsl:template match="validationTemplate">
         <function name="{/registry/functionPrefix}enableValidation">
 			<return>void</return>
@@ -37,14 +37,14 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<xsl:text>val_definitions = _preval_</xsl:text>
 				<xsl:value-of select="/registry/functionPrefix"/>
 				<xsl:text>setFunctions(val_definitions, definitions);&#xA;</xsl:text>
-				
+
 				<xsl:text>    </xsl:text>
 				<xsl:text>preval_definitions = _</xsl:text>
 				<xsl:value-of select="/registry/functionPrefix"/>
 				<xsl:text>setFunctions(preval_definitions, val_definitions);</xsl:text>
 			</body>
         </function>
-		
+
         <function name="{/registry/functionPrefix}disableValidation">
 	        <return>void</return>
 	        <body>
@@ -95,7 +95,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				<line><name><xsl:value-of select="@count"/></name><value><xsl:value-of select="count(line)"/></value></line>
 			</xsl:if>
         </enum>
-					
+
 		<xsl:if test="@index = 'true'">
 			<enum name="bs_{@name}Index">
 				<xsl:for-each select="line">
@@ -146,7 +146,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
             </body>
         </function>
-		
+
         <xsl:if test="@deserialize = 'true'">
             <function name="{/registry/functionPrefix}deserialize{@name}">
                 <return><xsl:value-of select="/registry/functionPrefix"/><xsl:value-of select="@name"/></return>
@@ -184,7 +184,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<xsl:value-of select="/registry/functionPrefix"/>
 					<xsl:value-of select="@name"/>
 					<xsl:text> table[] = {</xsl:text>
-					
+
 					<xsl:for-each select="line">
 						<xsl:text>&#xA;        </xsl:text>
 						<xsl:value-of select="name"/>
@@ -195,7 +195,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			</function>
 		</xsl:if>
     </xsl:template>
-    
+
     <xsl:template match="matrixTemplate">
         <xsl:choose>
             <xsl:when test="rows = columns">
@@ -205,19 +205,19 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                     <param><type>const bs_mat<xsl:value-of select="$name"/>*</type><name>a</name></param>
                     <param><type>const bs_mat<xsl:value-of select="$name"/>*</type><name>b</name></param>
                     <param><type>const bs_mat<xsl:value-of select="$name"/>*</type><name>result</name></param>
-                    <body>    glm_mat<xsl:value-of select="$name"/>_mul(a->v, b->v, result->v);</body>
+                    <body>    glm_mat<xsl:value-of select="$name"/>_mul(a->a, b->a, result->a);</body>
                 </function>
 				<function type="cglm" name="bs_m{$name}Transpose">
                     <return>void</return>
                     <param><type>const bs_mat<xsl:value-of select="$name"/>*</type><name>m</name></param>
                     <param><type>const bs_mat<xsl:value-of select="$name"/>*</type><name>result</name></param>
-                    <body>    glm_mat<xsl:value-of select="$name"/>_transpose_to(m->v, result->v);</body>
+                    <body>    glm_mat<xsl:value-of select="$name"/>_transpose_to(m->a, result->a);</body>
                 </function>
 				<function type="cglm" name="bs_m{$name}Inverse">
                     <return>void</return>
                     <param><type>const bs_mat<xsl:value-of select="$name"/>*</type><name>m</name></param>
                     <param><type>const bs_mat<xsl:value-of select="$name"/>*</type><name>result</name></param>
-                    <body>    glm_mat<xsl:value-of select="$name"/>_inv(m->v, result->v);</body>
+                    <body>    glm_mat<xsl:value-of select="$name"/>_inv(m->a, result->a);</body>
                 </function>
             </xsl:when>
             <xsl:otherwise>

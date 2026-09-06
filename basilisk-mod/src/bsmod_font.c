@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
 
@@ -33,7 +33,7 @@
 #include <freetype/ftoutln.h>
 #include <freetype/ftmodapi.h>
 #include <freetype/ftdriver.h>
- 
+
 FT_Library _freetype_library = NULL;
 
 bs_Result _bsmod_convertFreetypeError(FT_Error error) {
@@ -318,9 +318,9 @@ static void _bsmod_parsePairAdjustment(bs_List* kerning_pairs, bsmod_AtlasPacker
 				if (!glyph)
 					continue;
 
-				unsigned char* glyph_u8 = glyph;
-				bs_U16* start_dst = glyph_u8 + offsetof_kern;
-				bs_U16* count_dst = start_dst + 1;
+				unsigned char* glyph_u8 = (unsigned char*)glyph;
+				bs_U16* start_dst = (bs_U16*)(glyph_u8 + offsetof_kern);
+				bs_U16* count_dst = (bs_U16*)(start_dst + 1);
 
 				*start_dst = kerning_pairs->count;
 
@@ -385,9 +385,9 @@ static void _bsmod_parsePairAdjustment(bs_List* kerning_pairs, bsmod_AtlasPacker
 					if (!glyph)
 						continue;
 
-					unsigned char* glyph_u8 = glyph;
-					bs_U16* start_dst = glyph_u8 + offsetof_kern;
-					bs_U16* count_dst = start_dst + 1;
+					unsigned char* glyph_u8 = (unsigned char*)glyph;
+					bs_U16* start_dst = (bs_U16*)(glyph_u8 + offsetof_kern);
+					bs_U16* count_dst = (bs_U16*)(start_dst + 1);
 
 					*start_dst = kerning_pairs->count;
 
@@ -598,7 +598,7 @@ static void _bsmod_renderGlyphsFreeType(
 
 				FT_Bitmap* bmp = &face->glyph->bitmap;
 				bs_ensureSize(get_data_param->bitmap, bmp->rows * bmp->width * channels_count);
-				
+
 				unsigned char* dst = get_data_param->bitmap->data + get_data_param->bitmap->count;
 				for (int y = 0; y < bmp->rows; y++) {
 					memcpy(dst + y * bmp->width * channels_count,
@@ -614,15 +614,15 @@ static void _bsmod_renderGlyphsFreeType(
 				//FT_Outline_Get_CBox(&face->glyph->outline, &box);
 
 				bsmod_TextureInfo* texture = bsmod_packAtlasTextureF(
-					packer, 
-					NULL, 
-					_bsmod_getFontTextureData, 
+					packer,
+					NULL,
+					_bsmod_getFontTextureData,
 					get_data_param,
-					bmp->width, 
-					bmp->rows, 
-					0, 
+					bmp->width,
+					bmp->rows,
+					0,
 					rasterized_glyph_id,
-					"%d", 
+					"%d",
 					glyph_id
 				);
 
@@ -667,8 +667,8 @@ static bs_Result _bsmod_renderGlyphsMSDF(const char* package_path, const char* r
     bs_Object* metadata_object = BS_BUFFER(-1, -1, 0);
 
     bs_buffer(
-        point_data_object, 
-        point_size_sum, 
+        point_data_object,
+        point_size_sum,
         BS_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT,
         BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         0);
@@ -789,11 +789,11 @@ static bs_Result _bsmod_renderGlyphsMSDF(const char* package_path, const char* r
 
 BSMODAPI bs_Result _bsmod_packFont(
 	bsmod_RenderMode render_mode,
-	char* package_path, 
-	char* ttf_path, 
-	bsmod_UnicodeBlockRange blocks[], 
-	int blocks_count, 
-	int pt_sizes[], 
+	char* package_path,
+	char* ttf_path,
+	bsmod_UnicodeBlockRange blocks[],
+	int blocks_count,
+	int pt_sizes[],
 	int pt_sizes_count,
 	char* resource_name,
 	int resource_name_length)
@@ -907,16 +907,16 @@ BSMODAPI bs_Result _bsmod_packFont(
 
 		_bsmod_renderGlyphsFreeType(
 			&get_data_param,
-			face, 
-			render_mode, 
-			blocks, 
-			blocks_count, 
-			pt_sizes, 
-			pt_sizes_count, 
-			&packer, 
+			face,
+			render_mode,
+			blocks,
+			blocks_count,
+			pt_sizes,
+			pt_sizes_count,
+			&packer,
 			channels_count
 		);
-		
+
 		result = _bsmod_packAtlas(&packer, 2048, 2048, 1, package_path, resource_name, true);
 		if (result != BS_RESULT_OK) {
 			// TODO: free
@@ -1028,7 +1028,7 @@ BSMODAPI bs_Result _bsmod_packFont(
 		bs_setLittleEndian32(glyph->x_advance, offset + BFNT_OFFSET_GLYPH_X_ADVANCE);
 		bs_setLittleEndian32(glyph->y_advance, offset + BFNT_OFFSET_GLYPH_Y_ADVANCE);
 	}
-	
+
    /**
     Kerning Pairs
     */
@@ -1061,7 +1061,7 @@ BSMODAPI bs_Result _bsmod_packFont(
     Pack Resource
     */
 	result = _bsmod_packResource(BS_RESOURCE_FONT, data, total_size, package_path, resource_name);
-	
+
 	_bsmod_destroyAtlasPacker(&packer);
 	bs_destroyList(&bitmap_data);
 	FT_Done_Face(face);

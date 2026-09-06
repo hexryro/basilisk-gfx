@@ -40,8 +40,8 @@ const bsmod_FunctionTable* _preval_bsmod_setFunctions(const bsmod_FunctionTable*
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bsmod_FunctionTable); offset += sizeof(void*)) {
-        bs_Callback* f_a = ((unsigned char*)&next) + offset;
-        bs_Callback* f_b = ((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next) + offset;
+        void** f_b = (void**)((unsigned char*)b) + offset;
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -233,21 +233,21 @@ BSMODAPI bs_Result _preval_bsmod_iniPackage(int package_id) {
     return next.bsmod_iniPackage(package_id);
 }
 
-BSMODAPI bs_Result _preval_bsmod_packResource(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name) {
+BSMODAPI bs_Result _preval_bsmod_packResource(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* resource_name) {
     BSMOD_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bsmod_packResource(type, data, data_size, package_name, resource_name);
 }
 
-BSMODAPI bs_Result _preval_bsmod_packResourceN(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length) {
+BSMODAPI bs_Result _preval_bsmod_packResourceN(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length) {
     BSMOD_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bsmod_packResourceN(type, data, data_size, package_name, resource_name, resource_name_length);
 }
 
-BSMODAPI bs_Result _preval_bsmod_packResourceV(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, va_list args) {
+BSMODAPI bs_Result _preval_bsmod_packResourceV(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* format, va_list args) {
     BSMOD_VALIDATE(data != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(format != NULL, BS_RESULT_VALIDATION_ERROR,);
@@ -307,7 +307,7 @@ BSMODAPI void _preval_bsmod_endRasterize(bs_Queue* queue) {
     next.bsmod_endRasterize(queue);
 }
 
-BSMODAPI bs_Result _preval_bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant) {
+BSMODAPI bs_Result _preval_bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, void* push_constant) {
     BSMOD_VALIDATE(queue != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(subtype != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(name != NULL, BS_RESULT_VALIDATION_ERROR,);

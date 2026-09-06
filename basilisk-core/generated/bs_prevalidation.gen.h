@@ -43,7 +43,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     static bs_FunctionTable functions;
 
 #ifdef _WIN32
-#define bs_getProcAddress(module, name) GetProcAddress(module, name)
     HMODULE module = NULL;
     GetModuleHandleExA(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
@@ -55,7 +54,6 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     void *module = NULL;
     dladdr((void *)(&_preval_bs_getFunctions), &module_info);
     module = dlopen(module_info.dli_fname, RTLD_LAZY);
-#define bs_getProcAddress(module, name) dlsym(module, name)
 #endif
     functions.bs_callbacks = (PFN_bs_callbacks)bs_getProcAddress(module, "_preval_bs_callbacks");
     functions.bs_scope = (PFN_bs_scope)bs_getProcAddress(module, "_preval_bs_scope");
@@ -449,9 +447,7 @@ static inline bs_FunctionTable* _preval_bs_getFunctions() {
     functions.bs_deleteFile = (PFN_bs_deleteFile)bs_getProcAddress(module, "_preval_bs_deleteFile");
     functions.bs_deleteDirectoryContents = (PFN_bs_deleteDirectoryContents)bs_getProcAddress(module, "_preval_bs_deleteDirectoryContents");
     functions.bs_deleteDirectory = (PFN_bs_deleteDirectory)bs_getProcAddress(module, "_preval_bs_deleteDirectory");
-
-    #undef bs_getProcAddress
-#ifndef _WIN32
+#ifdef __linux__
     dlclose(module);
 #endif
     return &functions;

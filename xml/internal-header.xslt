@@ -39,7 +39,7 @@
         <xsl:value-of select="$functionPrefixCaps"/>
         <xsl:text>INTERNAL_GEN_H&#xA;&#xA;</xsl:text>
 
-		<xsl:apply-templates select="registry/includes/internalHeader/include"/>
+		<xsl:apply-templates select="registry/includes/internalHeader/*"/>
 		<xsl:text>&#xA;</xsl:text>
 
 		<xsl:apply-templates select="registry/functions/function" mode="typedef"/>

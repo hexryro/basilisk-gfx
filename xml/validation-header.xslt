@@ -19,7 +19,7 @@
         <xsl:value-of select="$functionPrefixCaps"/>
         <xsl:text>VALIDATION_H&#xA;&#xA;</xsl:text>
 
-        <xsl:apply-templates select="registry/includes/validationHeader/include"/>
+        <xsl:apply-templates select="registry/includes/validationHeader/*"/>
         <xsl:text>&#xA;</xsl:text>
 
         <xsl:call-template name="addFunctionProcsGetter">
@@ -37,6 +37,14 @@
             -->
 		<xsl:text>#endif&#xA;</xsl:text>
 	</xsl:template>
+
+	<xsl:template match="define|ifdef|ifndef|elifdef|else|endif" mode="definition">
+        <xsl:call-template name="addDirectives"/>
+    </xsl:template>
+
+    <xsl:template match="define|ifdef|ifndef|elifdef|else|endif">
+        <xsl:call-template name="addDirectives"/>
+    </xsl:template>
 
 	<xsl:template match="registry/includes/validationHeader/include">
 		<xsl:text>#include &lt;</xsl:text>

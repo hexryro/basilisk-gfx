@@ -45,8 +45,8 @@ const bsgfx_FunctionTable* _bsgfx_setFunctions(const bsgfx_FunctionTable* a, bsg
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bsgfx_FunctionTable); offset += sizeof(void*)) {
-        bs_Callback* f_a = ((unsigned char*)&next) + offset;
-        bs_Callback* f_b = ((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next) + offset;
+        void** f_b = (void**)((unsigned char*)b) + offset;
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -437,7 +437,7 @@ bs_Result bsgfx_subtype(
 
 int bsgfx_instantiate(
     bsgfx_InstanceSubtype* instance_subtype, 
-    const char* data, 
+    const void* data, 
     int data_size, 
     bs_U32 flags, 
     unsigned int bone_index, 
@@ -666,7 +666,7 @@ bsgfx_InstanceHeader* bsgfx_instanceHeader(
     return next.bsgfx_instanceHeader(subtype, instance_id);
 }
 
-bsgfx_InstanceHeader* bsgfx_instanceData(
+void* bsgfx_instanceData(
     bsgfx_InstanceSubtype* subtype, 
     int instance_id)
 {
@@ -1074,7 +1074,7 @@ void bsgfx_tileIndex(
     int axis, 
     int x, 
     int y, 
-    bs_U32* out)
+    int* out)
 {
     next.bsgfx_tileIndex(primitive, axis, x, y, out);
 }

@@ -1268,7 +1268,7 @@ BSAPI bool _bs_directoryExistsN(char* path, int path_length) {
     Saving documents
     */
 
-static inline bs_Result _bs_writeFile(const char* mode, char* data, bs_U32 data_len, char* path, int path_length) {
+static inline bs_Result _bs_writeFile(const char* mode, void* data, bs_U32 data_len, char* path, int path_length) {
     FILE* file = fopen(path, mode);
     if (!file) {
         BS_WARN_ERRNO_PATH("fopen", path);
@@ -1283,11 +1283,11 @@ static inline bs_Result _bs_writeFile(const char* mode, char* data, bs_U32 data_
     return BS_RESULT_OK;
 }
 
-BSAPI bs_Result _bs_appendFileN(char* data, bs_U32 data_length, char* path, int path_length) {
+BSAPI bs_Result _bs_appendFileN(void* data, bs_U32 data_length, char* path, int path_length) {
     return _bs_writeFile("ab", data, data_length, path, path_length);
 }
 
-BSAPI bs_Result _bs_saveFileN(char* data, bs_U32 data_length, char* path, int path_length) {
+BSAPI bs_Result _bs_saveFileN(void* data, bs_U32 data_length, char* path, int path_length) {
     return _bs_writeFile("wb", data, data_length, path, path_length);
 }
 

@@ -34,12 +34,15 @@
 #define BSGFX_PREVALIDATION_H
 
 #include <basilisk-gfx.h>
+#ifdef __linux__
+#define __USE_GNU
+#include <dlfcn.h>
+#endif
 
 static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     static bsgfx_FunctionTable functions;
 
 #ifdef _WIN32
-#define bs_getProcAddress(module, name) GetProcAddress(module, name)
     HMODULE module = NULL;
     GetModuleHandleExA(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
@@ -51,7 +54,6 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     void *module = NULL;
     dladdr((void *)(&_preval_bsgfx_getFunctions), &module_info);
     module = dlopen(module_info.dli_fname, RTLD_LAZY);
-#define bs_getProcAddress(module, name) dlsym(module, name)
 #endif
     functions.bsgfx_test = (PFN_bsgfx_test)bs_getProcAddress(module, "_preval_bsgfx_test");
     functions.bsgfx_subtypes = (PFN_bsgfx_subtypes)bs_getProcAddress(module, "_preval_bsgfx_subtypes");
@@ -194,9 +196,7 @@ static inline bsgfx_FunctionTable* _preval_bsgfx_getFunctions() {
     functions.bsgfx_hoveringUIElement = (PFN_bsgfx_hoveringUIElement)bs_getProcAddress(module, "_preval_bsgfx_hoveringUIElement");
     functions.bsgfx_translateUIElement = (PFN_bsgfx_translateUIElement)bs_getProcAddress(module, "_preval_bsgfx_translateUIElement");
     functions.bsgfx_renderColorPickers = (PFN_bsgfx_renderColorPickers)bs_getProcAddress(module, "_preval_bsgfx_renderColorPickers");
-
-    #undef bs_getProcAddress
-#ifndef _WIN32
+#ifdef __linux__
     dlclose(module);
 #endif
     return &functions;

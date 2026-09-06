@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,23 +21,23 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
 #include <stb_rect_pack/stb_rect_pack.h>
 #include <string.h>
 
 BSMODAPI bsmod_TextureInfo* _bsmod_packAtlasTextureN(
-	bsmod_AtlasPacker* packer, 
-	unsigned char* data, 
+	bsmod_AtlasPacker* packer,
+	unsigned char* data,
 	PFN_bsmod_getAtlasTextureData get_data,
-	void* param, 
-	int width, 
-	int height, 
-	int category, 
+	void* param,
+	int width,
+	int height,
+	int category,
 	int id,
-	char* name, 
-	int name_length) 
+	char* name,
+	int name_length)
 {
 	bsmod_TextureInfo info = {
 		.name = strdup(name),
@@ -100,7 +100,7 @@ BSMODAPI bs_Result _bsmod_packAtlas(bsmod_AtlasPacker* packer, int width, int he
 
 	stbrp_node* nodes = bs_alloca(header.width * sizeof(stbrp_node));
 
-	stbrp_rect* original_rects = packer->rects.data;
+	stbrp_rect* original_rects = (stbrp_rect*)packer->rects.data;
 	stbrp_rect* remaining_rects = bs_alloca(header.images_count * sizeof(stbrp_rect));
 
 	memcpy(remaining_rects, packer->rects.data, header.images_count * sizeof(stbrp_rect));

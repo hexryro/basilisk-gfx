@@ -2315,7 +2315,7 @@ bsgfx_subtype(
 BSGFXAPI int
 bsgfx_instantiate(
     bsgfx_InstanceSubtype* instance_subtype,
-    const char* data,
+    const void* data,
     int data_size,
     bs_U32 flags,
     unsigned int bone_index,
@@ -2663,9 +2663,9 @@ bsgfx_instanceHeader(
  /**
   @param subtype
   @param instance_id
-  @return bsgfx_InstanceHeader*
+  @return void*
   */
-BSGFXAPI bsgfx_InstanceHeader*
+BSGFXAPI void*
 bsgfx_instanceData(
     bsgfx_InstanceSubtype* subtype,
     int instance_id);
@@ -3252,7 +3252,7 @@ bsgfx_tileIndex(
     int axis,
     int x,
     int y,
-    bs_U32* out);
+    int* out);
 
  /**
   @param menu
@@ -3374,7 +3374,6 @@ BSGFXAPI extern bsgfx_Settings _bsgfx_settings_;
 BSGFXAPI extern bsgfx_Application _bsgfx_app_;
 BSGFXAPI extern bs_Model* _bsgfx_prefab_model_;
 BSGFXAPI extern bsgfx_Callbacks _bsgfx_callbacks_;
-BSGFXAPI extern HINSTANCE _bsgfx_bsmod_dll_;
 BSGFXAPI extern bs_String* _bsgfx_variadic_;
 BSGFXAPI extern int _bsgfx_package_;
 BSGFXAPI extern bsgfx_PrefabMetadata* _bsgfx_prefabs_;

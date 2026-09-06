@@ -57,9 +57,15 @@ typedef enum bsmod_DraggingType bsmod_DraggingType;
 typedef enum bsmod_SideMenuTabId bsmod_SideMenuTabId;
 typedef enum bsmod_UnicodeBlock bsmod_UnicodeBlock;
 
+#ifdef _WIN32
 #define BSMODAPI                                                     \
     _declspec(dllexport)
 
+#else
+#define BSMODAPI                                                     \
+
+
+#endif
 #define BSMOD_CONTENT_PATH                                           \
     "content/bsmod.bpak"
 
@@ -76,7 +82,7 @@ typedef enum bsmod_UnicodeBlock bsmod_UnicodeBlock;
     +1
 
 #define BSMOD_BPAK_CHUNK_SIZE                                        \
-    100'000'000
+    100000000
 
 #define BSMOD_DEFAULT_RADIUS                                         \
     5.0
@@ -1037,7 +1043,7 @@ bsmod_iniPackage(
 BSMODAPI bs_Result
 bsmod_packResource(
     bs_ResourceType type,
-    unsigned char* data,
+    void* data,
     size_t data_size,
     const char* package_name,
     char* resource_name);
@@ -1054,7 +1060,7 @@ bsmod_packResource(
 BSMODAPI bs_Result
 bsmod_packResourceN(
     bs_ResourceType type,
-    unsigned char* data,
+    void* data,
     size_t data_size,
     const char* package_name,
     char* resource_name,
@@ -1072,7 +1078,7 @@ bsmod_packResourceN(
 BSMODAPI bs_Result
 bsmod_packResourceV(
     bs_ResourceType type,
-    unsigned char* data,
+    void* data,
     size_t data_size,
     const char* package_name,
     char* format,
@@ -1090,7 +1096,7 @@ bsmod_packResourceV(
 BSMODAPI bs_Result
 bsmod_packResourceF(
     bs_ResourceType type,
-    unsigned char* data,
+    void* data,
     size_t data_size,
     const char* package_name,
     char* format,
@@ -1226,7 +1232,7 @@ bsmod_rasterizeInstance(
     int width,
     int height,
     size_t push_constant_size,
-    unsigned char* push_constant);
+    void* push_constant);
 
  /**
   @return void

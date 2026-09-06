@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,12 +21,17 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <basilisk-gfx.h>
 #include <bsmod_internal.h>
 #include <bsmod_cache.h>
 #include <stdio.h>
+
+#ifdef __linux__
+#define __USE_GNU
+#include <dlfcn.h>
+#endif
 
 #ifdef RENDERDOC_PATH
 #include RENDERDOC_PATH
@@ -43,7 +48,7 @@ Bsmod _bsmod_ = {
     .selected_type = -1,
     .axis = -1,
     .dragging_id = -1,
-    .dragging_subtype = -1,
+    .dragging_subtype = NULL,
     .selected_ids = {.unit_size = sizeof(int), .increment = 32 },
     .selected_tiles = {.unit_size = sizeof(int), .increment = 32 },
 };
@@ -88,7 +93,7 @@ static void _bsmod_instanceAxisFace(
 
     bs_v3Add(&start, &primitive->position, &start);
 
-    bs_vec3 full_right, full_up; 
+    bs_vec3 full_right, full_up;
     bs_v3MulS(&right, (float)width, &full_right);
     bs_v3MulS(&up, (float)height, &full_up);
 
@@ -310,7 +315,7 @@ static void _bsmod_computeFlyCamera() {
     }
 
     bs_mat4 proj, view;
-    
+
     bs_perspective(
         bs_radians(50.0),
         resolution.x / resolution.y,
@@ -420,12 +425,19 @@ BSMODAPI void _bsmod_onIni() {
 
     _bsmod_iniRenderDoc();
 
+    #ifdef _WIN32
     GetModuleHandleExA(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
         (LPCSTR)(&_bsmod_onIni),
         &_bsmod_.module);
+    #else
+    Dl_info module_info;
+    void *module = NULL;
+    dladdr((void *)(&_bsmod_onIni), &module_info);
+    _bsmod_.module = dlopen(module_info.dli_fname, RTLD_LAZY);
+    #endif
     _bsmod_iniCompiler();
-    
+
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_IMAGE, BSMOD_IMAGES_COUNT, BSMOD_IMAGE_IDS);
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_SAMPLER, BSMOD_SAMPLERS_COUNT, BSMOD_SAMPLER_IDS);
     BS_CONFIGURE_SOURCE(_bsmod_sources_, BS_OBJECT_BUFFER, BSMOD_BUFFERS_COUNT, BSMOD_BUFFER_IDS);
@@ -570,7 +582,7 @@ BSMODAPI void _bsmod_onLoad() {
 
         // bs_U32 subpass, bs_Image* image, bs_ImageLayout old_layout, bs_ImageLayout new_layout, bs_OutputFlags flags
         bs_output(renderer_object->renderer, (bs_Output) {
-            .subpass = 0, 
+            .subpass = 0,
             .image = context->swapchain_image->image,
             .load_op = BS_ATTACHMENT_LOAD_OP_CLEAR,
             .store_op = BS_ATTACHMENT_STORE_OP_STORE,
@@ -611,7 +623,7 @@ BSMODAPI void _bsmod_onLoad() {
        // bs_Image* color = bs_image(BS_IMAGE(BSMOD_IMAGE_COLOR, 0), resolution, 0, BS_FORMAT_R8G8B8A8_UNORM, BS_IMAGE_ATTACHMENT_BIT | BS_IMAGE_USAGE_TRANSFER_SRC_BIT)->image;
 
         bs_output(renderer_3d->renderer, (bs_Output) {
-            .subpass = 0, 
+            .subpass = 0,
             .image = context->swapchain_image->image,
             .load_op = BS_ATTACHMENT_LOAD_OP_LOAD,
             .store_op = BS_ATTACHMENT_STORE_OP_STORE,
@@ -621,7 +633,7 @@ BSMODAPI void _bsmod_onLoad() {
 
         bs_transition(queue, depth->image, 0, BS_IMAGE_LAYOUT_UNDEFINED, BS_IMAGE_LAYOUT_GENERAL);
         bs_output(renderer_3d->renderer, (bs_Output) {
-            .subpass = 0, 
+            .subpass = 0,
             .image = depth->image,
             .load_op = BS_ATTACHMENT_LOAD_OP_LOAD,
             .store_op = BS_ATTACHMENT_STORE_OP_STORE,

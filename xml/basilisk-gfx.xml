@@ -30,17 +30,29 @@
 		</internal>
 		<internalHeader>
 			<include>basilisk-gfx.h</include>
-			<include>windows.h</include>
+			<ifdef cond="_WIN32"/>
+			    <include>windows.h</include>
+			<endif/>
 		</internalHeader>
 		<prevalidation>
 			<include>bsgfx_internal.h</include>
 		</prevalidation>
 		<prevalidationHeader>
 			<include>basilisk-gfx.h</include>
+			<ifdef cond="__linux__"/>
+			    <define cond="__USE_GNU"/>
+			    <include>dlfcn.h</include>
+			<endif/>
 		</prevalidationHeader>
 		<validationHeader>
 			<include>basilisk-gfx.h</include>
-			<include>windows.h</include>
+			<ifdef cond="_WIN32"/>
+			    <include>windows.h</include>
+			<endif/>
+			<ifdef cond="__linux__"/>
+			    <define cond="__USE_GNU"/>
+			    <include>dlfcn.h</include>
+			<endif/>
 		</validationHeader>
     </includes>
 
@@ -1929,7 +1941,7 @@
 		<function name="bsgfx_instantiate">
 			<return>int</return>
 			<param><type>bsgfx_InstanceSubtype*</type><name>instance_subtype</name></param>
-			<param><type>const char*</type><name>data</name></param>
+			<param><type>const void*</type><name>data</name></param>
 			<param><type>int</type><name>data_size</name></param>
 			<param><type>bs_U32</type><name>flags</name></param>
 			<param><type>unsigned int</type><name>bone_index</name></param>
@@ -2074,7 +2086,7 @@
 		</function>
 
 		<function name="bsgfx_instanceData">
-			<return>bsgfx_InstanceHeader*</return>
+			<return>void*</return>
 			<param><type>bsgfx_InstanceSubtype*</type><name>subtype</name></param>
 			<param><type>int</type><name>instance_id</name></param>
 		</function>
@@ -2356,7 +2368,7 @@
 			<param><type>int</type><name>axis</name></param>
 			<param><type>int</type><name>x</name></param>
 			<param><type>int</type><name>y</name></param>
-			<param><type>bs_U32*</type><name>out</name></param>
+			<param><type>int*</type><name>out</name></param>
 		</function>
 
 		<function name="bsgfx_instanceWidgets">
@@ -2435,7 +2447,6 @@
 		<extern><type>bsgfx_Application</type><name>bsgfx_app</name></extern>
 		<extern><type>bs_Model*</type><name>bsgfx_prefab_model</name></extern>
 		<extern><type>bsgfx_Callbacks</type><name>bsgfx_callbacks</name></extern>
-		<extern><type>HINSTANCE</type><name>bsgfx_bsmod_dll</name></extern>
 		<extern><type>bs_String*</type><name>bsgfx_variadic</name></extern>
 		<extern><type>int</type><name>bsgfx_package</name></extern>
 

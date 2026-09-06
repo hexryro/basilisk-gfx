@@ -26,16 +26,26 @@
 		</internal>
 		<internalHeader>
 			<include>basilisk-mod.h</include>
-			<include>windows.h</include>
+			<ifdef cond="_WIN32"/>
+			    <include>windows.h</include>
+			<endif/>
 		</internalHeader>
 		<prevalidation>
 			<include>bsmod_internal.h</include>
 		</prevalidation>
 		<prevalidationHeader>
 			<include>basilisk-mod.h</include>
+			<ifdef cond="__linux__"/>
+			    <define cond="__USE_GNU"/>
+			    <include>dlfcn.h</include>
+			<endif/>
 		</prevalidationHeader>
 		<validationHeader>
 			<include>basilisk-mod.h</include>
+			<ifdef cond="__linux__"/>
+			    <define cond="__USE_GNU"/>
+			    <include>dlfcn.h</include>
+			<endif/>
 		</validationHeader>
 	</includes>
 
@@ -442,7 +452,13 @@
 	</enums>
 
 	<macros>
-		<macro><name>#define BSMODAPI</name><line>_declspec(dllexport)</line></macro>
+        <ifdef cond="_WIN32"/>
+            <macro><name>#define BSMODAPI</name><line>_declspec(dllexport)</line></macro>
+        <else/>
+            <macro>
+                <name>#define BSMODAPI</name>
+            </macro>
+        <endif/>
 
 		<macro><name>#define BSMOD_CONTENT_PATH</name><line>"content/bsmod.bpak"</line></macro>
 		<macro><name>#define BSMOD_CONFIG_PATH</name><line>"project/bsmod_config.json"</line></macro>
@@ -452,7 +468,7 @@
 		<macro><name>#define BSMOD_STRUCT_GEN(TYPE, FUNC, ...)</name><line>TYPE FUNC;</line></macro>
 		<macro><name>#define BSMOD_COUNT_GEN(TYPE, FUNC, ...)</name><line>+1</line></macro>
 
-		<macro><name>#define BSMOD_BPAK_CHUNK_SIZE</name><line>100'000'000</line></macro>
+		<macro><name>#define BSMOD_BPAK_CHUNK_SIZE</name><line>100000000</line></macro>
 
 		<macro><name>#define BSMOD_DEFAULT_RADIUS</name><line>5.0</line></macro>
 		<macro><name>#define BSMOD_TAB_BAR_HEIGHT</name><line>20.0</line></macro>
@@ -758,7 +774,7 @@
 		<variadicStringTemplate name="bsmod_packResource" string="resource_name">
 			<return>bs_Result</return>
 			<param><type>bs_ResourceType</type><name>type</name></param>
-			<param><type>unsigned char*</type><name>data</name></param>
+			<param><type>void*</type><name>data</name></param>
 			<param><type>size_t</type><name>data_size</name></param>
 			<param><type>const char*</type><name>package_name</name></param>
 		</variadicStringTemplate>
@@ -811,7 +827,7 @@
 			<param><type>int</type><name>width</name></param>
 			<param><type>int</type><name>height</name></param>
 			<param><type>size_t</type><name>push_constant_size</name></param>
-			<param><type>unsigned char*</type><name>push_constant</name></param>
+			<param><type>void*</type><name>push_constant</name></param>
 		</function>
 
 		<function name="bsmod_instanceTransform">

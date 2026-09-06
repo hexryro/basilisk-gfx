@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */  
+  */
 
 #include <basilisk-mod.h>
 #include <bsmod_cache.h>
@@ -46,6 +46,7 @@ static bsgfx_Font* basilisk_title_bar_font;
 static bool basilisk_hovering_title_bar_buttons;
 
 bs_NonClientArea onClientAreaTick(bs_Context* context, bs_ivec2 pt) {
+    #ifdef _WIN32
     RECT rc;
     GetWindowRect(context->hwnd, &rc);
 
@@ -56,6 +57,7 @@ bs_NonClientArea onClientAreaTick(bs_Context* context, bs_ivec2 pt) {
 
     if (y >= 0 && y < BASILISK_TITLE_BAR_HEIGHT)
         return BS_NON_CLIENT_AREA_CAPTION;
+    #endif
 
     return BS_CLIENT_AREA;
 }
@@ -164,7 +166,7 @@ void basilisk_instantiateTitleBarUI() {
         .material_id = $title_bar_background()->id,
     }, element);
     position.z++;
-    
+
    /**
     Icon
     */
@@ -215,7 +217,7 @@ void basilisk_instantiateTitleBarUI() {
     if (hovering && bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
 
     }
-    
+
    /**
     Minimize button
     */
@@ -265,12 +267,12 @@ void basilisk_instantiateTitleBarUI() {
 
     element = bsgfx_instantiateSolidUI((bsgfx_UISolid) {
         .position = position,
-        // .color = 
+        // .color =
     });
     position = bsgfx_seekUIElementCenter(element, close_button_icon->size);
     element = bsgfx_instantiateIconUI((bsgfx_UIIcon) {
         .position = position,
-        //.cache = 
+        //.cache =
     });
 
     position.x -= element.width.x;
@@ -280,7 +282,7 @@ void basilisk_instantiateTitleBarUI() {
 
     element = bsgfx_instantiateIconUI((bsgfx_UIIcon) {
         .position = position,
-            //.cache = 
+            //.cache =
     });
 
     position.x -= element.width.x;
@@ -290,7 +292,7 @@ void basilisk_instantiateTitleBarUI() {
 
     element = bsgfx_instantiateIconUI((bsgfx_UIIcon) {
         .position = position,
-            //.cache = 
+            //.cache =
     });
 
     position.x -= element.width.x;

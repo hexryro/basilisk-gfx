@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
 #include <assert.h>
@@ -40,7 +40,7 @@ static spvc_context _bsmod_compiler_context_;
    *============================================================================*/
 
 static bs_U32 _bsmod_readPushConstantSize(spvc_compiler compiler, spvc_resources resources) {
-	spvc_reflected_resource* resource_list = NULL;
+	const spvc_reflected_resource* resource_list = NULL;
 	size_t resource_size = 0;
 	spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_PUSH_CONSTANT, &resource_list, &resource_size);
 
@@ -63,12 +63,12 @@ static bs_U32 _bsmod_readPushConstantSize(spvc_compiler compiler, spvc_resources
 static bs_U32 _bsmod_readBindSetFlags(spvc_compiler compiler, spvc_resources resources, spvc_resource_type type) {
 	bs_U32 bind_set_flags = 0;
 
-	spvc_reflected_resource* resource_list = NULL;
+	const spvc_reflected_resource* resource_list = NULL;
 	size_t resource_size = 0;
 	spvc_resources_get_resource_list_for_type(resources, type, &resource_list, &resource_size);
 
 	for (int i = 0; i < resource_size; i++) {
-		spvc_reflected_resource* data = resource_list + i;
+		const spvc_reflected_resource* data = resource_list + i;
 
 		int set = spvc_compiler_get_decoration(compiler, data->id, SpvDecorationDescriptorSet);
 		if (set >= BS_MAX_NUM_BIND_SETS) {
@@ -107,7 +107,7 @@ BSMODAPI bs_Result _bsmod_packShader(spvc_compiler compiler, spvc_resources reso
 	for (int i = 0; i < (sizeof(types) / sizeof(*types)); i++)
 		header.bind_set_flags |= _bsmod_readBindSetFlags(compiler, resources, types[i]);
 
-	spvc_reflected_resource* attributes_resource_list = NULL;
+	const spvc_reflected_resource* attributes_resource_list = NULL;
 	if (shader_type == BS_SHADER_STAGE_VERTEX_BIT) {
 		size_t attributes_count = 0;
 		spvc_resources_get_resource_list_for_type(resources, SPVC_RESOURCE_TYPE_STAGE_INPUT, &attributes_resource_list, &attributes_count);
@@ -120,7 +120,7 @@ BSMODAPI bs_Result _bsmod_packShader(spvc_compiler compiler, spvc_resources reso
 	unsigned char* bsha = bs_malloc(total_size);
 
 	for (int i = 0; i < header.attributes_count; i++) {
-		spvc_reflected_resource* data = attributes_resource_list + i;
+		const spvc_reflected_resource* data = attributes_resource_list + i;
 
 		spvc_type type = spvc_compiler_get_type_handle(compiler, data->base_type_id);
 		int num_units = spvc_type_get_vector_size(type);
@@ -158,7 +158,7 @@ static bs_DescriptorTypeIndex bsmod_convertBindType(spvc_compiler compiler, spvc
 	case SPVC_RESOURCE_TYPE_SEPARATE_IMAGE: return BS_DESCRIPTOR_TYPE_SAMPLED_IMAGE_INDEX;
 	case SPVC_RESOURCE_TYPE_SUBPASS_INPUT: return BS_DESCRIPTOR_TYPE_INPUT_ATTACHMENT_INDEX;
 	case SPVC_RESOURCE_TYPE_SEPARATE_SAMPLERS: return BS_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER_INDEX;
-	case SPVC_RESOURCE_TYPE_SAMPLED_IMAGE: 
+	case SPVC_RESOURCE_TYPE_SAMPLED_IMAGE:
 		spvc_type type = spvc_compiler_get_type_handle(compiler, base_type_id);
 		SpvDim dim = spvc_type_get_image_dimension(type);
 
@@ -304,7 +304,7 @@ BSMODAPI void _bsmod_onCompileShader(bsmod_TrackParams params) {
 			bs_infoF(BS_PRINT_CYAN "Compiling %d reference(s)\n" BS_PRINT_RESET, files.size);
 
 		for (int i = 0; i < files.size; i++) {
-			char* file = files.as_array.as_strings[i];
+			char* file = files.v.as_array.as_strings[i];
 
 			_bsmod_onCompileShader((bsmod_TrackParams) {
 				.prefix = params.prefix,
@@ -363,7 +363,7 @@ static void _bsmod_writeReferences(char* path, bs_String* glsl) {
 		bs_JsonValue existing = bs_fetchJsonF(&_bsmod_shader_references, BS_JSON_UNDEFINED, "%.*s", name_len, include_path->value);
 		int index = 99999;
 		for (int j = 0; j < existing.size; j++) {
-			if (strcmp(existing.as_array.as_strings[j], path) == 0)
+			if (strcmp(existing.v.as_array.as_strings[j], path) == 0)
 				goto next;
 		}
 
@@ -414,7 +414,7 @@ static void _bsmod_packBindings(spvc_compiler compiler, spvc_resources resources
 	spvc_result result;
 
 	size_t bindings_count = 0;
-	spvc_reflected_resource* resource_list = NULL;
+	const spvc_reflected_resource* resource_list = NULL;
 	result = spvc_resources_get_resource_list_for_type(resources, resource_type, &resource_list, &bindings_count);
 
 	if (result != SPVC_SUCCESS) {
@@ -424,7 +424,7 @@ static void _bsmod_packBindings(spvc_compiler compiler, spvc_resources resources
 
 	for (int i = 0; i < bindings_count; i++) {
 		spvc_reflected_resource* resource = resource_list + i;
-		
+
 		bs_DescriptorTypeIndex descriptor_type = bsmod_convertBindType(compiler, resource_type, resource->base_type_id);
 
 		_bsmod_packBinding(compiler, resource, package, descriptor_type, shader_type);
@@ -434,12 +434,12 @@ static void _bsmod_packBindings(spvc_compiler compiler, spvc_resources resources
 BSMODAPI bs_Result _bsmod_compileShader(char* path, char* name, char* package_name) {
 	bs_Result bs_result = BS_RESULT_OK;
 
-	bs_String* glsl; 
+	bs_String* glsl;
 	bs_result = bs_loadFile(&glsl, path);
 	if (bs_result != BS_RESULT_OK)
 		return bs_result;
 	//char* name = bs_fileName(path);
-	
+
 //	_bsmod_writeReferences(path, glsl);
 
 	glslang_stage_t stage;
@@ -450,7 +450,7 @@ BSMODAPI bs_Result _bsmod_compileShader(char* path, char* name, char* package_na
 	}
 
 	bsmod_Package* package = _bsmod_ensurePackage(package_name);
-	
+
 	const glslang_input_t input = {
 		.language = GLSLANG_SOURCE_GLSL,
 		.stage = stage,
@@ -499,7 +499,7 @@ BSMODAPI bs_Result _bsmod_compileShader(char* path, char* name, char* package_na
 	glslang_program_SPIRV_get(program, spirv);
 
 	const char* spirv_messages = glslang_program_SPIRV_get_messages(program);
-	if (spirv_messages) 
+	if (spirv_messages)
 		bs_warnF("%s\b", spirv_messages);
 
 	spvc_result result;

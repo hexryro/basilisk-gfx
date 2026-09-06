@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,8 +21,9 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
+#include "basilisk-core.gen.h"
 #include <bsgfx_internal.h>
 #include <bsgfx_cache.h>
 
@@ -81,10 +82,10 @@ BSGFXAPI void _bsgfx_instantiateAtlasIconUIElement(bsgfx_UIIcon icon, const bsgf
 	bs_m4Scale(&transform, &BS_V3(element->size.x, element->size.y, 0), &transform);
 
 	bs_vec4 coords = icon.cache->coords;
-	if (icon.flip) 
+	if (icon.flip)
 		coords = bs_flipUV(coords);
 
-	if (icon.mirror) 
+	if (icon.mirror)
 		coords = bs_mirrorUV(coords);
 
 	_bsgfx_instantiateQuad(icon.subtype, bs_m4x3(&transform), coords, 0, 0, icon.material_id);
@@ -354,7 +355,7 @@ static bool _bsgfx_instanceUrl(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alre
 	bs_vec2 cursor = bs_windowCursorPosition(bs_scope()->context);
 	bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
 	bsgfx_Font* font = widget->font ? widget->font : menu->font;
-	
+
 	bsgfx_AtlasCache* ui_copy = $BSGFX_ATLAS_ANY_ui_copy();
 
 	//if ((position->y - ui_copy_size.y) < menu->coords.y)
@@ -481,7 +482,7 @@ static bool _bsgfx_instanceSlider(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 	bs_v3Add(&copy_position, &bar_offset, &bar_position);
 
 	bs_mat4x3 m = _bsgfx_matrix(
-		BS_V3(copy_position.x, copy_position.y + bar_dimensions.y / 2.0, copy_position.z), 
+		BS_V3(copy_position.x, copy_position.y + bar_dimensions.y / 2.0, copy_position.z),
 		BS_V3(width, BSGFX_PIXEL_SCALE, 0.0)
 	);
 
@@ -491,7 +492,7 @@ static bool _bsgfx_instanceSlider(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 
 	static bool dragging;
 
-	if (!bs_leftClick())
+	if (!bs_inputDown(BS_LEFT_MOUSE_BUTTON))
 		dragging = false;
 
 	if (_bsgfx_rectangleVsPointExpand(&bar_position.xy, &bar_dimensions, &cursor, 0.0) && bs_inputDownOnce(BS_LEFT_MOUSE_BUTTON))
@@ -503,7 +504,7 @@ static bool _bsgfx_instanceSlider(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 
 		*widget->slider.value = widget->slider.min + scale * (widget->slider.max - widget->slider.min);
 		if (widget->slider.integer)
-			*widget->slider.value = roundf(*widget->slider.value);
+			*widget->slider.value = bs_round(*widget->slider.value);
 	}
 
 	copy_position.x += width + BSGFX_PIXEL_SCALE;
@@ -556,7 +557,7 @@ static bool _bsgfx_instanceButton(bsgfx_Menu* menu, bsgfx_Widget* widget, bool a
 		//_bsgfx_instanceText(menu->text_subtype, font, &text, &text_size, widget->button.name);
 
 	}
-	
+
 	if (widget->button.tick) {
 		hovering = widget->button.tick(&(bsgfx_ButtonParams) {
 			.menu = menu,
@@ -688,7 +689,7 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 	bs_vec4 border_radii = BS_V4(widget->color.border_radius, widget->color.border_radius, widget->color.border_radius, widget->color.border_radius);
 	bs_vec3 hue_position = BS_V3(position.x + widget->color.dimensions.x + widget->color.padding, position.y, position.z);
 	bs_vec3 alpha_position = BS_V3(hue_position.x + hue_dimensions.x + widget->color.padding, position.y, position.z);
-	
+
 	float z = 1.0;
 
 	 /**
@@ -696,7 +697,7 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 	  */
 	_bsgfx_instanceBackground(_bsgfx_subtypes_[BSGFX_SUBTYPE_UI_COLOR],
 		BS_V3(position.x, position.y, position.z + z),
-		widget->color.dimensions, 
+		widget->color.dimensions,
 		border_radii,
 		0,
 		widget->color.outline_material_id,
@@ -731,7 +732,7 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 		_bsgfx_roundedMatrix(position, BS_V3(widget->color.dimensions.x, widget->color.dimensions.y, 0.0), border_radii),
 		BS_V4(0, 0, 1, 1),
 		0, 0, widget->color.material_id);
-	
+
 	_bsgfx_instantiateQuad(
 		_bsgfx_subtypes_[BSGFX_SUBTYPE_COLOR_PICKER_HUE],
 		_bsgfx_roundedMatrix(hue_position, hue_dimensions, border_radii),
@@ -751,7 +752,7 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 		BS_V2(hue_dimensions.x, 1.0),
 		BS_V4(0.0, 0.0, 0.0, 0.0),
 		widget->color.background_material_id,
-		widget->color.outline_material_id, 
+		widget->color.outline_material_id,
 		0);
 
 	_bsgfx_instanceBackground(_bsgfx_subtypes_[BSGFX_SUBTYPE_UI_COLOR],
@@ -763,8 +764,8 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 		0);
 
 	bool hovering_picker = !already_hovering && bs_rectangleVsPoint(&position.xy, &widget->color.dimensions, &cursor);
-	bool hovering_hue = !already_hovering && bs_rectangleVsPoint(&hue_position.xy, &hue_dimensions, &cursor);
-	bool hovering_alpha = !already_hovering && bs_rectangleVsPoint(&alpha_position.xy, &alpha_dimensions, &cursor);
+	bool hovering_hue = !already_hovering && bs_rectangleVsPoint(&hue_position.xy, &hue_dimensions.xy, &cursor);
+	bool hovering_alpha = !already_hovering && bs_rectangleVsPoint(&alpha_position.xy, &alpha_dimensions.xy, &cursor);
 	bool changed = false;
 
 	static bool dragging_picker;
@@ -776,7 +777,7 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 		bs_v2Div(&relative, &widget->color.dimensions, &relative);
 		relative = BS_V2(bs_clamp(relative.x, 0.0, 1.0), bs_clamp(relative.y, 0.0, 1.0));
 
-		if (bs_leftClick()) {
+		if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
 			widget->color.hsva->y = relative.x;
 			widget->color.hsva->z = relative.y;
 			changed = true;
@@ -784,35 +785,35 @@ static bool _bsgfx_instanceColorPicker(bsgfx_Menu* menu, bsgfx_Widget* widget, b
 		}
 	}
 
-	if (!bs_leftClick())
+	if (!bs_inputDown(BS_LEFT_MOUSE_BUTTON))
 		dragging_picker = false;
 
 	if ((hovering_hue || dragging_hue) && !dragging_picker && !dragging_alpha) {
 		bs_vec2 relative = BS_V2(cursor.x - hue_position.x, cursor.y - hue_position.y);
-		bs_v2Div(&relative, &hue_dimensions, &relative);
+		bs_v2Div(&relative, &hue_dimensions.xy, &relative);
 
-		if (bs_leftClick()) {
+		if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
 			widget->color.hsva->x = bs_clamp(relative.y * 360.0, 0.0, 360.0);
 			changed = true;
 			dragging_hue = true;
 		}
 	}
 
-	if (!bs_leftClick())
+	if (!bs_inputDown(BS_LEFT_MOUSE_BUTTON))
 		dragging_hue = false;
 
 	if ((hovering_alpha || dragging_alpha) && !dragging_hue && !dragging_picker) {
 		bs_vec2 relative = BS_V2(cursor.x - alpha_position.x, cursor.y - alpha_position.y);
-		bs_v2Div(&relative, &alpha_dimensions, &relative);
+		bs_v2Div(&relative, &alpha_dimensions.xy, &relative);
 
-		if (bs_leftClick()) {
+		if (bs_inputDown(BS_LEFT_MOUSE_BUTTON)) {
 			widget->color.hsva->w = bs_clamp(relative.y, 0.0, 1.0);
 			changed = true;
 			dragging_alpha = true;
 		}
 	}
 
-	if (!bs_leftClick())
+	if (!bs_inputDown(BS_LEFT_MOUSE_BUTTON))
 		dragging_alpha = false;
 
 	if (changed) {
@@ -986,7 +987,7 @@ static bs_String* _bsgfx_serializeInputValue(bsgfx_Widget* widget, bs_String* st
 	case BSGFX_INPUT_INT: return bs_stringF(string, "%d", (int)*widget->input.as_int);
 	case BSGFX_INPUT_CHAR: return bs_stringF(string, "%d", (int)*widget->input.as_char);
 	case BSGFX_INPUT_UCHAR: return bs_stringF(string, "%d", (int)*widget->input.as_uchar);
-	case BSGFX_INPUT_STRING: 
+	case BSGFX_INPUT_STRING:
 		return *widget->input.as_string ? bs_stringN(string, (*widget->input.as_string)->value, (*widget->input.as_string)->len) : string;
 	default:
 		bs_warnF("Input type %d", widget->input.type); // TODO: bsgfx warn
@@ -1347,8 +1348,8 @@ static bool _bsgfx_instanceGrid(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alr
 	if (!widget->grid.always_active) {
 		hovering = !already_hovering && bs_rectangleVsPoint(&position.xy, &widget->grid.size, &cursor);
 		widget->grid.action(widget, (bsgfx_GridParams) {
-			.start = position.xy, 
-			.position = &grid_position, 
+			.start = position.xy,
+			.position = &grid_position,
 			.index = -1
 		});
 		grid_position.x += widget->grid.size.x;
@@ -1376,8 +1377,8 @@ static bool _bsgfx_instanceGrid(bsgfx_Menu* menu, bsgfx_Widget* widget, bool alr
 				goto end;
 
 			bool should_advance = widget->grid.action(widget, (bsgfx_GridParams) {
-				.start = position.xy, 
-				.position = &grid_position, 
+				.start = position.xy,
+				.position = &grid_position,
 				.index = index
 			});
 
@@ -1598,6 +1599,7 @@ static bool _bsgfx_instanceDebugSettingsMenu(bsgfx_Menu* menu, bsgfx_TitleBar* t
 }
 
 static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar) {
+    /*
 	const int x_indent = 0.0;
 	bsgfx_Font* font = menu->font;
 	bs_vec3 position = menu->position;
@@ -1652,7 +1654,7 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 					BS_V4(0, 0, 0, 0)
 				),
 				tab->icon_cache->coords,
-				0, 0, tab->icon_material_id); 
+				0, 0, tab->icon_material_id);
 
 			scale.x += tab->icon_cache->size.x;
 		}
@@ -1676,7 +1678,6 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 		if (tab->icon_cache)
 			position.x += tab->icon_cache->size.x;
 		position.x += name_dimensions.x + 4;
-		/*
 		_bsgfx_quadInstance(_bsgfx_subtypes_[BSGFX_SUBTYPE_UI],
 			_bsgfx_roundedMatrix(
 				bs_v3AddZ(position, 1.0),
@@ -1685,15 +1686,15 @@ static void _bsgfx_instanceMenuTabs(bsgfx_Menu* menu, bsgfx_MenuTabBar* tab_bar)
 			),
 			title_bar_close->coords,
 			0, 0, $white_material()->id);
-		*/
 		position.y = start.y;
 	}
+	*/
 }
 
 static void _bsgfx_instanceTitleBar(bsgfx_Menu* menu, bsgfx_TitleBar* title_bar, bs_vec3 position, bs_vec2 dimensions) {
 	bsgfx_Font* font = title_bar->font ? title_bar->font : menu->font;
 	bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
-	
+
 	bsgfx_AtlasCache* white = $BSGFX_ATLAS_ANY_white();
 
 	const int bar_padding = 8;
@@ -1841,7 +1842,7 @@ BSGFXAPI bool _bsgfx_instanceWidgets(bsgfx_Menu menu, bsgfx_TitleBar* title_bar,
 		case BSGFX_WIDGET_COLOR: hovering_widget = _bsgfx_instanceColorPicker(&menu, widget, hovering, menu.position, &widget_size); break;
 		case BSGFX_WIDGET_TABLE: hovering_widget = _bsgfx_instanceTable(&menu, widget, hovering, menu.position, &widget_size); break;
 		case BSGFX_WIDGET_MODEL: hovering_widget = _bsgfx_instanceModel(&menu, widget, hovering, menu.position, &widget_size); break;
-		case BSGFX_WIDGET_BACKGROUND: 
+		case BSGFX_WIDGET_BACKGROUND:
 			widget_size = widget->background.size;
 			_bsgfx_instanceBackground(widget->background.subtype,
 				BS_V3(menu.position.x, menu.position.y - widget->background.size.y, menu.position.z),

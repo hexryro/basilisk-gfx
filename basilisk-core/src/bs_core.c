@@ -598,13 +598,13 @@ BSAPI bs_Result _val_bs_buffer(bs_Object* object, size_t num_bytes, bs_BufferUsa
  /**
   Buffer Map
   */
-BSAPI char* _val_bs_bufferMap(bs_Buffer* buffer) {
+BSAPI void* _val_bs_bufferMap(bs_Buffer* buffer) {
     BS_VALIDATE(_bs_bufferIsMapped(buffer) == true, NULL,);
 
     return _bs_bufferMap(buffer);
 }
 
-BSAPI char* _bs_bufferMap(bs_Buffer* buffer) {
+BSAPI void* _bs_bufferMap(bs_Buffer* buffer) {
     int swap = (buffer->flags & BSI_BUFFER_SWAPS_BIT) ? _bs_scope_.context->frame : 0;
     return buffer->_[swap].data;
 }

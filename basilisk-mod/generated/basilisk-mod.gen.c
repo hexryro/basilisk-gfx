@@ -45,8 +45,8 @@ const bsmod_FunctionTable* _bsmod_setFunctions(const bsmod_FunctionTable* a, bsm
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bsmod_FunctionTable); offset += sizeof(void*)) {
-        bs_Callback* f_a = ((unsigned char*)&next) + offset;
-        bs_Callback* f_b = ((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next) + offset;
+        void** f_b = (void**)((unsigned char*)b) + offset;
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -357,7 +357,7 @@ bs_Result bsmod_iniPackage(
 
 bs_Result bsmod_packResource(
     bs_ResourceType type, 
-    unsigned char* data, 
+    void* data, 
     size_t data_size, 
     const char* package_name, 
     char* resource_name)
@@ -367,7 +367,7 @@ bs_Result bsmod_packResource(
 
 bs_Result bsmod_packResourceN(
     bs_ResourceType type, 
-    unsigned char* data, 
+    void* data, 
     size_t data_size, 
     const char* package_name, 
     char* resource_name, 
@@ -378,7 +378,7 @@ bs_Result bsmod_packResourceN(
 
 bs_Result bsmod_packResourceV(
     bs_ResourceType type, 
-    unsigned char* data, 
+    void* data, 
     size_t data_size, 
     const char* package_name, 
     char* format, 
@@ -389,7 +389,7 @@ bs_Result bsmod_packResourceV(
 
 bs_Result bsmod_packResourceF(
     bs_ResourceType type, 
-    unsigned char* data, 
+    void* data, 
     size_t data_size, 
     const char* package_name, 
     char* format, 
@@ -493,7 +493,7 @@ bs_Result bsmod_rasterizeInstance(
     int width, 
     int height, 
     size_t push_constant_size, 
-    unsigned char* push_constant)
+    void* push_constant)
 {
     return next.bsmod_rasterizeInstance(queue, pipeline_hash, subtype, instance_offset, instance_count, category, name, width, height, push_constant_size, push_constant);
 }

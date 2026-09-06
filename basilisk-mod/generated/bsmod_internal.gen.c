@@ -87,7 +87,7 @@ bsmod_TextureInfo* _bsmod_packAtlasTextureF(
 
 bs_Result _bsmod_packResource(
     bs_ResourceType type, 
-    unsigned char* data, 
+    void* data, 
     size_t data_size, 
     const char* package_name, 
     char* resource_name)
@@ -97,7 +97,7 @@ bs_Result _bsmod_packResource(
 
 bs_Result _bsmod_packResourceV(
     bs_ResourceType type, 
-    unsigned char* data, 
+    void* data, 
     size_t data_size, 
     const char* package_name, 
     char* format, 
@@ -111,7 +111,7 @@ bs_Result _bsmod_packResourceV(
 
 bs_Result _bsmod_packResourceF(
     bs_ResourceType type, 
-    unsigned char* data, 
+    void* data, 
     size_t data_size, 
     const char* package_name, 
     char* format, 

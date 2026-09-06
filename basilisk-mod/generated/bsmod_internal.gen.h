@@ -34,7 +34,10 @@
 #define BSMOD_INTERNAL_GEN_H
 
 #include <basilisk-mod.h>
+#ifdef _WIN32
 #include <windows.h>
+#endif
+
 
 typedef bsgfx_InstanceSubtype**(* PFN_bsmod_subtypes)();
 typedef bsmod_Callbacks*(* PFN_bsmod_callbacks)();
@@ -75,10 +78,10 @@ typedef bsmod_Package*(* PFN_bsmod_ensurePackage)(const char* path);
 typedef bsmod_Resource*(* PFN_bsmod_queryResource)(bsmod_Package* package, bs_ResourceType type, const char* name);
 typedef bs_Result(* PFN_bsmod_loadResource)(int type, int package_id, char* name);
 typedef bs_Result(* PFN_bsmod_iniPackage)(int package_id);
-typedef bs_Result(* PFN_bsmod_packResource)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name);
-typedef bs_Result(* PFN_bsmod_packResourceN)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length);
-typedef bs_Result(* PFN_bsmod_packResourceV)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, va_list args);
-typedef bs_Result(* PFN_bsmod_packResourceF)(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, ...);
+typedef bs_Result(* PFN_bsmod_packResource)(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* resource_name);
+typedef bs_Result(* PFN_bsmod_packResourceN)(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length);
+typedef bs_Result(* PFN_bsmod_packResourceV)(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* format, va_list args);
+typedef bs_Result(* PFN_bsmod_packResourceF)(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* format, ...);
 typedef bs_Result(* PFN_bsmod_savePackage)(char* path);
 typedef bs_Result(* PFN_bsmod_savePackageN)(char* path, int path_length);
 typedef bs_Result(* PFN_bsmod_savePackageV)(char* format, va_list args);
@@ -91,7 +94,7 @@ typedef void(* PFN_bsmod_queueRasterize)(const char* package, const char* name, 
 typedef void(* PFN_bsmod_pollRasterizer)();
 typedef void(* PFN_bsmod_beginRasterize)(bs_ivec2 render_size, bs_ivec2 output_size);
 typedef void(* PFN_bsmod_endRasterize)(bs_Queue* queue);
-typedef bs_Result(* PFN_bsmod_rasterizeInstance)(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
+typedef bs_Result(* PFN_bsmod_rasterizeInstance)(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, void* push_constant);
 typedef void(* PFN_bsmod_instanceTransform)();
 typedef void(* PFN_bsmod_selectHoveringTypes)();
 typedef bsgfx_TypeId(* PFN_bsmod_queryType)(const char* plural);
@@ -291,10 +294,10 @@ BSMODAPI bsmod_Package* _bsmod_ensurePackage(const char* path);
 BSMODAPI bsmod_Resource* _bsmod_queryResource(bsmod_Package* package, bs_ResourceType type, const char* name);
 BSMODAPI bs_Result _bsmod_loadResource(int type, int package_id, char* name);
 BSMODAPI bs_Result _bsmod_iniPackage(int package_id);
-BSMODAPI bs_Result _bsmod_packResource(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name);
-BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length);
-BSMODAPI bs_Result _bsmod_packResourceV(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format, va_list args);
-BSMODAPI bs_Result _bsmod_packResourceF(bs_ResourceType type, unsigned char* data, size_t data_size, const char* package_name, char* format,  ...);
+BSMODAPI bs_Result _bsmod_packResource(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* resource_name);
+BSMODAPI bs_Result _bsmod_packResourceN(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* resource_name, int resource_name_length);
+BSMODAPI bs_Result _bsmod_packResourceV(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* format, va_list args);
+BSMODAPI bs_Result _bsmod_packResourceF(bs_ResourceType type, void* data, size_t data_size, const char* package_name, char* format,  ...);
 BSMODAPI bs_Result _bsmod_savePackage(char* path);
 BSMODAPI bs_Result _bsmod_savePackageN(char* path, int path_length);
 BSMODAPI bs_Result _bsmod_savePackageV(char* format, va_list args);
@@ -307,7 +310,7 @@ BSMODAPI void _bsmod_queueRasterize(const char* package, const char* name, bs_Ca
 BSMODAPI void _bsmod_pollRasterizer();
 BSMODAPI void _bsmod_beginRasterize(bs_ivec2 render_size, bs_ivec2 output_size);
 BSMODAPI void _bsmod_endRasterize(bs_Queue* queue);
-BSMODAPI bs_Result _bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, unsigned char* push_constant);
+BSMODAPI bs_Result _bsmod_rasterizeInstance(bs_Queue* queue, bs_PipelineHash pipeline_hash, bsgfx_InstanceSubtype* subtype, int instance_offset, int instance_count, int category, char* name, int width, int height, size_t push_constant_size, void* push_constant);
 BSMODAPI void _bsmod_instanceTransform();
 BSMODAPI void _bsmod_selectHoveringTypes();
 BSMODAPI bsgfx_TypeId _bsmod_queryType(const char* plural);

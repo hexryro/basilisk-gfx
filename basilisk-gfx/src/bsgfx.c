@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,11 +21,14 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsgfx_internal.h>
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
+
 #include <complex.h>
 #include <math.h>
 #include <assert.h>
@@ -132,7 +135,7 @@ BSGFXAPI void _bsgfx_setCamera(const bs_mat4* proj, const bs_mat4* view) {
 
 BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, bs_U32 window_flags, int argc, char* argv[]) {
     for (int i = 0; i < BSGFX_SUBTYPE_COUNT; i++)
-        _bsgfx_subtypes_[i] = -1;
+        _bsgfx_subtypes_[i] = NULL;
 
     _bsgfx_app_.name = name;
 
@@ -142,7 +145,7 @@ BSGFXAPI void _bsgfx_ini(const char* name, bs_U32 width, bs_U32 height, bs_U32 w
     const char* args[] = { "--use-validation-layers", "--track-changes"};
     bs_parseArgs(sizeof(args) / sizeof(char*), args);
 #endif
-    
+
     _bsgfx_configure();
     bs_ini();
 

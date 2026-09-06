@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsgfx_internal.h>
 #include <bsgfx_cache.h>
@@ -30,23 +30,29 @@
 static bsgfx_PrefabMetadata* _bsgfx_prefabs = NULL;
 static int _bsgfx_prefabs_count = 0;
 
-static int bs_comparePrefabZ(const int* a_id, const int* b_id) {
-    bsgfx_Type* type = _bsgfx_types_ + BSGFX_TYPE_PREFAB;
-    bsgfx_Prefab* a = type->mapped + *a_id;
-    bsgfx_Prefab* b = type->mapped + *b_id;
+static int bs_comparePrefabZ(const void* a, const void* b) {
+    const int* id_a = a;
+    const int* id_b = b;
 
-    if (a->position.z == b->position.z) return 0;
-    else if (a->position.z < b->position.z) return -1;
+    bsgfx_Type* type = _bsgfx_types_ + BSGFX_TYPE_PREFAB;
+    bsgfx_Prefab* prefab_a = (void*)(type->mapped + *id_a);
+    bsgfx_Prefab* prefab_b = (void*)(type->mapped + *id_b);
+
+    if (prefab_a->position.z == prefab_b->position.z) return 0;
+    else if (prefab_a->position.z < prefab_b->position.z) return -1;
     else return 1;
 }
 
-static int bs_compareRawPrefabZ(const int* a_id, const int* b_id) {
-    bsgfx_Type* type = _bsgfx_types_ + BSGFX_TYPE_PREFAB;
-    bsgfx_RawPrefab* a = type->unmapped + *a_id;
-    bsgfx_RawPrefab* b = type->unmapped + *b_id;
+static int bs_compareRawPrefabZ(const void* a, const void* b) {
+    const int* id_a = a;
+    const int* id_b = b;
 
-    if (a->position.z == b->position.z) return 0;
-    else if (a->position.z < b->position.z) return -1;
+    bsgfx_Type* type = _bsgfx_types_ + BSGFX_TYPE_PREFAB;
+    bsgfx_Prefab* prefab_a = (bsgfx_Prefab*)(type->unmapped + *id_a);
+    bsgfx_Prefab* prefab_b = (bsgfx_Prefab*)(type->unmapped + *id_b);
+
+    if (prefab_a->position.z == prefab_b->position.z) return 0;
+    else if (prefab_a->position.z < prefab_b->position.z) return -1;
     else return 1;
 }
 
@@ -185,29 +191,32 @@ BSGFXAPI void _bsgfx_renderPrefabShadowVolumes(bs_RendererScope* scope, bs_Queue
     */
 }
 
-static void _bsgfx_mapPrefab(bsgfx_RawPrefab* unmapped, bsgfx_Prefab* mapped) {
+static void _bsgfx_mapPrefab(void* unmapped, void* mapped) {
+    bsgfx_RawPrefab* unmapped_prefab = unmapped;
+    bsgfx_Prefab* mapped_prefab = mapped;
+
     bs_Model* model = _bsgfx_prefab_model_;
-    bs_Mesh* mesh = bs_queryMeshHash(model, unmapped->name_hash);
+    bs_Mesh* mesh = bs_queryMeshHash(model, unmapped_prefab->name_hash);
 
     int mesh_id = mesh ? mesh - model->meshes : -1;
 
     bs_Atlas* atlas = bs_fetch(BSGFX_ATLASES, BSGFX_ATLAS_ANY)->atlas;
 
-    bsgfx_Material* material = unmapped->material_hash ? _bsgfx_queryMaterialHash(unmapped->material_hash) : 0;
+    bsgfx_Material* material = unmapped_prefab->material_hash ? _bsgfx_queryMaterialHash(unmapped_prefab->material_hash) : 0;
 
-    *mapped = (bsgfx_Prefab){
-        .position = unmapped->position,
+    *mapped_prefab = (bsgfx_Prefab) {
+        .position = unmapped_prefab->position,
         .material_id = material ? material->id : 0,
         .mesh_id = mesh_id,
-        .scale = unmapped->scale,
-        .guid = unmapped->guid,
-        .texture_id = unmapped->texture_hash ? bs_queryAtlasHash(atlas, unmapped->texture_hash) : -1,
-        .z_order = unmapped->z_order,
-        .flags = unmapped->flags,
+        .scale = unmapped_prefab->scale,
+        .guid = unmapped_prefab->guid,
+        .texture_id = unmapped_prefab->texture_hash ? bs_queryAtlasHash(atlas, unmapped_prefab->texture_hash) : -1,
+        .z_order = unmapped_prefab->z_order,
+        .flags = unmapped_prefab->flags,
         .shadow_subtype = -1,
     };
 
-    bs_eulToQ(&unmapped->rotation, &mapped->rotation);
+    bs_eulToQ(&unmapped_prefab->rotation, &mapped_prefab->rotation);
 }
 
 static void _bsgfx_destroyPrefabVarieties() {
@@ -307,25 +316,25 @@ BSGFXAPI void _bsgfx_loadPrefabs(int package_id, bs_Model* model) {
                 range.num += primitive_range.num;
 
                 primitive->extra = cached_subtypes + cached_subtype_offset++;
-                if (primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE] >= 0)
-                    _bsgfx_deleteSubtype(primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE]);
+                //if (primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE] >= 0)
+                //    _bsgfx_deleteSubtype(primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE]);
 
-                _bsgfx_subtype(static_mesh_instance_type, batch, 0, primitive_range, &primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE]);
+               // _bsgfx_subtype(static_mesh_instance_type, batch, 0, primitive_range, &primitive->extra[BSGFX_PREFAB_SUBTYPE_PRIMITIVE]);
             }
 
             mesh->extra = cached_subtypes + cached_subtype_offset;
             for (int j = 0; j < BSGFX_PREFAB_SUBTYPE_COUNT; j++) {
-                bsgfx_InstanceSubtype* subtype = mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH];
-                if (subtype != NULL)
-                    _bsgfx_deleteSubtype(subtype);
+                //bsgfx_InstanceSubtype* subtype = mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH];
+                //if (subtype != NULL)
+                //    _bsgfx_deleteSubtype(subtype);
             }
 
-            _bsgfx_subtype(static_mesh_instance_type, batch, BSGFX_SUBTYPE_HAS_SHADOWS, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH]);
-            _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_POLYGON_OUTLINE]);
-            _bsgfx_subtype(mesh_instance_type, batch, BSGFX_SUBTYPE_HAS_SHADOWS | BSGFX_SUBTYPE_HAS_FINE_SHADOWS, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_TEXTURED]);
-            _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_HI_RES_SCREEN]);
-            _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_LO_RES_SCREEN]);
-            _bsgfx_subtype(static_mesh_instance_type, volume_batch, 0, (bs_Range) { 0 }, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_VOLUME]);
+           // _bsgfx_subtype(static_mesh_instance_type, batch, BSGFX_SUBTYPE_HAS_SHADOWS, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH]);
+           // _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_POLYGON_OUTLINE]);
+           // _bsgfx_subtype(mesh_instance_type, batch, BSGFX_SUBTYPE_HAS_SHADOWS | BSGFX_SUBTYPE_HAS_FINE_SHADOWS, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_TEXTURED]);
+           // _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_HI_RES_SCREEN]);
+           // _bsgfx_subtype(mesh_instance_type, batch, 0, range, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_LO_RES_SCREEN]);
+           // _bsgfx_subtype(static_mesh_instance_type, volume_batch, 0, (bs_Range) { 0 }, mesh->extra[BSGFX_PREFAB_SUBTYPE_MESH_VOLUME]);
             cached_subtype_offset += BSGFX_PREFAB_SUBTYPE_COUNT;
 
         }
@@ -369,8 +378,9 @@ BSGFXAPI void _bsgfx_prefabTransform(bsgfx_Prefab* prefab, bs_mat4* out) {
 
 BSGFXAPI int _bsgfx_instancePrefabModel(int mesh_id, bs_mat4 transform, bsgfx_PrefabSubtype prefab_subtype, int material_id) {
     bs_Mesh* mesh = _bsgfx_prefab_model_->meshes + mesh_id;
-    bsgfx_InstanceSubtype* subtype = mesh->extra[prefab_subtype];
-    return _bsgfx_instantiate(subtype, &transform, sizeof(bs_mat4), BSGFX_ID_IS_PREFAB, 0, 0, material_id);
+    return 0;
+    //bsgfx_InstanceSubtype* subtype = mesh->extra[prefab_subtype];
+   // return _bsgfx_instantiate(subtype, &transform, sizeof(bs_mat4), BSGFX_ID_IS_PREFAB, 0, 0, material_id);
 }
 
  /**
@@ -385,6 +395,7 @@ BSGFXAPI int _val_bsgfx_instancePrefab(int id, bsgfx_PrefabSubtype prefab_subtyp
 }
 
 BSGFXAPI int _bsgfx_instancePrefab(int id, bsgfx_PrefabSubtype prefab_subtype) {
+    /*
     bsgfx_Prefab* prefab = _bsgfx_get(BSGFX_TYPE_PREFAB, id);
     bsgfx_RawPrefab* raw_prefab = _bsgfx_getRaw(BSGFX_TYPE_PREFAB, id);
 
@@ -429,6 +440,8 @@ BSGFXAPI int _bsgfx_instancePrefab(int id, bsgfx_PrefabSubtype prefab_subtype) {
     //if (_bsgfx_procs_.bsmod_isSelected && _bsgfx_procs_.bsmod_isSelected(BSGFX_TYPE_PREFAB, id))
     //    flags |= BSGFX_ID_SELECTED;
     return _bsgfx_instantiate(subtype, &transform, sizeof(bs_mat4), flags, quad_instance_offset, id, material);
+    */
+    return -1;
 }
 
 BSGFXAPI void _bsgfx_instancePrefabs() {
@@ -449,6 +462,7 @@ BSGFXAPI void _bsgfx_instancePrefabs() {
 }
 
 BSGFXAPI void _bsgfx_renderPrefabs(bs_Queue* queue, bs_Pipeline* pipeline, int key_start) {
+    /*
     assert(_bsgfx_prefab_model_);
     bs_Model* model = _bsgfx_prefab_model_;
 
@@ -459,6 +473,7 @@ BSGFXAPI void _bsgfx_renderPrefabs(bs_Queue* queue, bs_Pipeline* pipeline, int k
         bsgfx_InstanceSubtype* subtype = mesh->extra[key_start];
         _bsgfx_renderSubtype(queue, subtype, pipeline);
     }
+    */
 }
 
 /*
@@ -500,7 +515,7 @@ BSGFXAPI void _bsgfx_renderPrefabPrimitives(bs_Queue* queue, bs_Pipeline* pipeli
         return;
 
     bs_Model* model = _bsgfx_prefab_model_;
-
+/*
     for (int i = 0; i < model->meshes_count; i++) {
         bs_Mesh* mesh = model->meshes + i;
 
@@ -510,6 +525,7 @@ BSGFXAPI void _bsgfx_renderPrefabPrimitives(bs_Queue* queue, bs_Pipeline* pipeli
             _bsgfx_renderSubtype(queue, subtype, pipeline);
         }
     }
+    */
 }
 
 BSGFXAPI int _bsgfx_queryPrefabId(const bs_GUID* guid) {

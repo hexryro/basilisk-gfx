@@ -34,12 +34,15 @@
 #define BSMOD_PREVALIDATION_H
 
 #include <basilisk-mod.h>
+#ifdef __linux__
+#define __USE_GNU
+#include <dlfcn.h>
+#endif
 
 static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     static bsmod_FunctionTable functions;
 
 #ifdef _WIN32
-#define bs_getProcAddress(module, name) GetProcAddress(module, name)
     HMODULE module = NULL;
     GetModuleHandleExA(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
@@ -51,7 +54,6 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     void *module = NULL;
     dladdr((void *)(&_preval_bsmod_getFunctions), &module_info);
     module = dlopen(module_info.dli_fname, RTLD_LAZY);
-#define bs_getProcAddress(module, name) dlsym(module, name)
 #endif
     functions.bsmod_subtypes = (PFN_bsmod_subtypes)bs_getProcAddress(module, "_preval_bsmod_subtypes");
     functions.bsmod_callbacks = (PFN_bsmod_callbacks)bs_getProcAddress(module, "_preval_bsmod_callbacks");
@@ -147,9 +149,7 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_pushTileMenuWidgets = (PFN_bsmod_pushTileMenuWidgets)bs_getProcAddress(module, "_preval_bsmod_pushTileMenuWidgets");
     functions.bsmod_instanceTilePreview = (PFN_bsmod_instanceTilePreview)bs_getProcAddress(module, "_preval_bsmod_instanceTilePreview");
     functions.bsmod_onDragTile = (PFN_bsmod_onDragTile)bs_getProcAddress(module, "_preval_bsmod_onDragTile");
-
-    #undef bs_getProcAddress
-#ifndef _WIN32
+#ifdef __linux__
     dlclose(module);
 #endif
     return &functions;

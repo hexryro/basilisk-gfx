@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,13 +21,17 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
-#include <direct.h>
+#include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+
+#ifdef _WIN32
+#include <direct.h>
+#endif
 
 #define STB_RECT_PACK_IMPLEMENTATION
 #include <stb_rect_pack/stb_rect_pack.h>
@@ -64,30 +68,30 @@ static bs_List* _bsmod_loadHooks() {
 	//static bs_String* last_modified;
 
 	for (int i = 0; i < value.size; i++) {
-		bs_Json root = bs_jsonRoot(&json, value.as_array.as_objects[i]);
+		bs_Json root = bs_jsonRoot(&json, value.v.as_array.as_objects[i]);
 
 		//last_modified = bs_stringF(last_modified, "%02d-%02d-%02d %02d:%02d:%02d", m.years, m.months, m.days, m.hours, m.minutes, m.seconds);
 
-		char* prefix = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("prefix")).as_string;
+		const char* prefix = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("prefix")).v.as_string;
 		bsmod_Hook dir = {
-			.path = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("path")).as_string),
-			.function = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("function")).as_string),
-			.package = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("package")).as_string),
-			.call_once = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("callOnce")).as_bool,
+			.path = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("path")).v.as_string),
+			.function = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("function")).v.as_string),
+			.package = strdup(bs_fetchJsonN(&root, BS_JSON_STRING, BS_CONSTANT_STRING("package")).v.as_string),
+			.call_once = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("callOnce")).v.as_bool,
 			.prefix = prefix ? strdup(prefix) : "",
 			.entries = bs_list(sizeof(char*), 16),
 		};
 
 		bs_JsonValue entries = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("entries"));
 		for (int i = 0; i < entries.size; i++) {
-			char* string = entries.as_array.as_strings[i];
+			char* string = entries.v.as_array.as_strings[i];
 			string = bs_checkStringPool(&_bsmod_string_pool, string);
 			bs_pushBack(&dir.entries, &string);
 		}
 
 		bs_JsonValue last_modified = bs_fetchJsonN(&root, BS_JSON_UNDEFINED, BS_CONSTANT_STRING("lastModified"));
 		if (last_modified.found && last_modified.type == BS_JSON_STRING) {
-			sscanf(last_modified.as_string, "%u-%u-%u %u:%u:%u",
+			sscanf(last_modified.v.as_string, "%u-%u-%u %u:%u:%u",
 				&dir.last_modified.years, &dir.last_modified.months, &dir.last_modified.days,
 				&dir.last_modified.hours, &dir.last_modified.minutes, &dir.last_modified.seconds);
 		}
@@ -167,18 +171,20 @@ BSMODAPI void _bsmod_onConvertFont(bsmod_TrackParams params) {
 
 	bsmod_packFont(
 		BSMOD_RENDER_MODE_NORMAL,
-		params.package, 
-		params.path, 
-		ranges, 
-		ranges_count, 
-		pt_sizes, 
-		pt_sizes_count, 
-		params.path, 
+		params.package,
+		params.path,
+		ranges,
+		ranges_count,
+		pt_sizes,
+		pt_sizes_count,
+		params.path,
 		strlen(params.path)
 	);
 }
 
-static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* packer) {
+static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, void* param) {
+    bsmod_AtlasPacker* packer = param;
+
 	char* name = bs_fileName(info.path);
 	char* ext = bs_fileExtension(name);
 
@@ -189,12 +195,12 @@ static bs_Result _bsmod_onPackAtlasTexture(bs_FileInfo info, bsmod_AtlasPacker* 
 		ext[-1] = '\0';
 
 		_bsmod_packAtlasTexture(
-			packer, 
+			packer,
 			png_data.data,
 			NULL,
-			NULL, 
-			png_data.width, 
-			png_data.height, 
+			NULL,
+			png_data.width,
+			png_data.height,
 			0,
 			0,
 			name
@@ -240,13 +246,13 @@ BSMODAPI void _bsmod_onPackModels(bsmod_TrackParams params) {
 		gltf->len--; // null terminator TERMINATORRR
 
 		bs_Json json;
-		result = bs_json(&json, gltf->value, gltf->len);
+		result = bs_json(gltf->value, gltf->len, &json);
 		if (result != BS_RESULT_OK) {
 			bs_free(gltf);
 			return;
 		}
 
-		char* uri = bs_fetchJsonN(&json, BS_JSON_STRING, BS_CONSTANT_STRING("buffers[0].uri")).as_string;
+		char* uri = bs_fetchJsonN(&json, BS_JSON_STRING, BS_CONSTANT_STRING("buffers[0].uri")).v.as_string;
 
 		char* file_name = bs_fileName(params.path);
 		char* directory = "";
@@ -364,7 +370,8 @@ BSMODAPI void _bsmod_onPackTextureArray(bsmod_TrackParams params) {
    * Tracker
    *============================================================================*/
 
-static bs_Result _bsmod_findLastModifiedFile(bs_FileInfo info, struct { bs_DateTime original_date; bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*out) {
+static bs_Result _bsmod_findLastModifiedFile(bs_FileInfo info, void* param) {
+    struct { bs_DateTime original_date; bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*out = param;
 	bs_Result result;
 
 	bs_DateTime date_time;
@@ -386,7 +393,8 @@ static bs_Result _bsmod_findLastModifiedFile(bs_FileInfo info, struct { bs_DateT
 	return BS_RESULT_OK;
 }
 
-static bs_Result _bsmod_findLastModifiedDirectory(bs_FileInfo info, struct { bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*result) {
+static bs_Result _bsmod_findLastModifiedDirectory(bs_FileInfo info, void* param) {
+    struct { bs_DateTime date; const bs_List* added_entries; bs_List* changed_entries; bs_List* entries; }*result = param;
 	bs_foreachFile(_bsmod_findLastModifiedFile, result, info.path);
 	return BS_RESULT_OK;
 }
@@ -418,6 +426,7 @@ static bool _bsmod_isFile(const char* path) {
 	return true;
 }
 
+typedef void(* PFN_trackFunction)(bsmod_TrackParams params);
 BSMODAPI void _bsmod_onTrack() {
 	static bs_String* last;
 	bs_String* cwd = bs_workingDirectory();
@@ -445,7 +454,8 @@ BSMODAPI void _bsmod_onTrack() {
 			if (reload_all || bs_isLaterThan(&last_modified, &dir->last_modified)) {
 				dir->last_modified = last_modified;
 
-				FARPROC function = GetProcAddress(_bsmod_.module, dir->function);
+				PFN_trackFunction function = bs_getProcAddress(_bsmod_.module, dir->function);
+
 				if (function) {
 					function((bsmod_TrackParams) {
 						.path = dir->path,
@@ -490,7 +500,7 @@ BSMODAPI void _bsmod_onTrack() {
 			// TODO: this code is getting pretty ugly
 
 			if (reload_all) {
-				FARPROC function = GetProcAddress(_bsmod_.module, dir->function);
+				PFN_trackFunction function = bs_getProcAddress(_bsmod_.module, dir->function);
 				if (function) {
 					int count = dir->call_once ? bs_clamp(result.entries->count, 0, 1) : result.entries->count;
 
@@ -508,7 +518,8 @@ BSMODAPI void _bsmod_onTrack() {
 				dir->last_modified = result.date;
 				// dir->entries = result.entries->count;
 
-				FARPROC function = GetProcAddress(_bsmod_.module, dir->function);
+
+				PFN_trackFunction function = bs_getProcAddress(_bsmod_.module, dir->function);
 				if (function) {
 					int count = dir->call_once ? bs_clamp(result.changed_entries->count, 0, 1) : result.changed_entries->count;
 
@@ -574,6 +585,7 @@ BSMODAPI void _bsmod_onTrack() {
    * Auto Track
    *============================================================================*/
 
+#ifdef _WIN32
 static DWORD WINAPI _bsmod_tickAsync(void* param) {
 	while (1) {
 		_bsmod_onTrack();
@@ -581,12 +593,16 @@ static DWORD WINAPI _bsmod_tickAsync(void* param) {
 		Sleep(1000);
 	}
 }
+#endif
 
 BSMODAPI void _bsmod_beginTrackChanges() {
+#ifdef _WIN32
 	CreateThread(NULL, 0, _bsmod_tickAsync, NULL, 0, NULL);
+#endif
 }
 
 BSMODAPI void _bsmod_tickTracker() {
+    #ifdef _WIN32
 	if (InterlockedCompareExchange(&_bsmod_has_performed_tracked_changes_, 1, 1) == 1) {
 
 		for (int i = 0; i < _bsmod_packages()->count; i++) {
@@ -617,4 +633,5 @@ BSMODAPI void _bsmod_tickTracker() {
 
 		InterlockedExchange(&_bsmod_has_performed_tracked_changes_, 0);
 	}
+	#endif
 }

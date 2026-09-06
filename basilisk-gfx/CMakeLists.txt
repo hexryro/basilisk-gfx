@@ -65,19 +65,28 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/freetype/include
 )
 
-target_link_directories(${PROJECT_NAME} PRIVATE 
+target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/
     ${CMAKE_SOURCE_DIR}/external/freetype/objs
+    ${CMAKE_SOURCE_DIR}/external/freetype/objs/.libs
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     basilisk-core
-    #basilisk-steam
-    vulkan-1
-    dwmapi
     #GFSDK_Aftermath_Lib.x64
     freetype
 )
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        vulkan-1
+        dwmapi
+    )
+else()
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        vulkan
+    )
+endif()
 
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /wd6255 /wd4047 /wd4090 /wd4024 /wd4133)
@@ -92,7 +101,7 @@ SET(COPY_BASILISK_GFX_DLL_RELEASE_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAKE_SOUR
 SET(COPY_BASILISK_GFX_DLL_RELEASE_DEBUG_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build/basilisk-gfx/RelWithDebInfo/basilisk-gfx.dll" "${CMAKE_SOURCE_DIR}/build/basilisk-test-runner/RelWithDebInfo")
 
 #add_custom_command(
-#    TARGET ${PROJECT_NAME} 
+#    TARGET ${PROJECT_NAME}
 #    POST_BUILD
 #    COMMAND "$<$<CONFIG:Debug>:${COPY_BASILISK_GFX_DLL_DEBUG}>" COMMENT "POST_BUILD: Copying basilisk-gfx.dll/"
 #    COMMAND "$<$<CONFIG:Debug>:${COPY_BASILISK_GFX_DLL_DEBUG_TO_TEST}>" COMMENT "POST_BUILD: Copying basilisk-gfx.dll/ to test"
@@ -101,7 +110,7 @@ SET(COPY_BASILISK_GFX_DLL_RELEASE_DEBUG_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAK
 #)
 #
 #add_custom_command(
-#    TARGET ${PROJECT_NAME} 
+#    TARGET ${PROJECT_NAME}
 #    POST_BUILD
 #    COMMAND "$<$<CONFIG:Release>:${COPY_BASILISK_GFX_DLL_RELEASE}>" COMMENT "POST_BUILD: Copying basilisk-gfx.dll/"
 #    COMMAND "$<$<CONFIG:Release>:${COPY_BASILISK_GFX_DLL_RELEASE_TO_TEST}>" COMMENT "POST_BUILD: Copying basilisk-gfx.dll/ to test"
@@ -110,7 +119,7 @@ SET(COPY_BASILISK_GFX_DLL_RELEASE_DEBUG_TO_TEST ${CMAKE_COMMAND} -E copy "${CMAK
 #)
 #
 #add_custom_command(
-#    TARGET ${PROJECT_NAME} 
+#    TARGET ${PROJECT_NAME}
 #    POST_BUILD
 #    COMMAND "$<$<CONFIG:RelWithDebInfo>:${COPY_BASILISK_GFX_DLL_RELEASE_DEBUG}>" COMMENT "POST_BUILD: Copying basilisk-gfx.dll/"
 #    COMMAND "$<$<CONFIG:RelWithDebInfo>:${COPY_BASILISK_GFX_DLL_RELEASE_DEBUG_TO_TEST}>" COMMENT "POST_BUILD: Copying basilisk-gfx.dll/ to test"

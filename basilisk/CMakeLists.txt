@@ -12,6 +12,10 @@ file(GLOB PROJECT_FILES "./*" LIST_DIRECTORIES false)
 
 file(GLOB XML_FILES "../xml/*.*")
 
+if (UNIX)
+    add_compile_options(-Wno-discarded-qualifiers)
+endif()
+
 add_executable(${PROJECT_NAME}
     ${XML_FILES}
     ${UI_FILES}
@@ -61,9 +65,19 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     basilisk-core
     basilisk-gfx
     basilisk-mod
+)
+
+if (WIN32)
+target_link_libraries(${PROJECT_NAME} PRIVATE
     vulkan-1
     dwmapi
 )
+else()
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    vulkan
+)
+
+endif()
 
 set(PROJECT_LINK
     cmd.exe /c

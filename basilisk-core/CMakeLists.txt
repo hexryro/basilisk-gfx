@@ -19,6 +19,16 @@ add_library(${PROJECT_NAME} SHARED
     ${GENERATED_FILES}
 )
 
+if (UNIX)
+    add_definitions(-W)
+
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -Wno-discarded-qualifiers
+        -Wdiscarded-array-qualifiers
+        -Wsign-compare
+    )
+endif()
+
 source_group("External Files" FILES ${LODEPNG_FILES} ${YYJSON_FILES})
 source_group("Source Files" FILES ${SOURCE_FILES})
 source_group("Header Files" FILES ${HEADER_FILES})
@@ -38,29 +48,27 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/external/
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    vulkan-1
-    dwmapi
-)
-
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /wd6255 /wd4047 /wd4090 /wd4024 /wd4133)
 endif()
 
-IF (WIN32)
+if (WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE
+        vulkan-1
+        dwmapi
         winhttp
         httpapi
         ws2_32
         dbghelp
     )
-ENDIF ()
+endif ()
 
-IF (UNIX)
+if (UNIX)
     target_link_libraries(${PROJECT_NAME} PRIVATE
+        vulkan
         dl
     )
-ENDIF ()
+endif ()
 
 SET(COPY_BASILISK_DLL_DEBUG ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build/basilisk-core/Debug/basilisk-core.dll" "${CMAKE_SOURCE_DIR}/build/${BS_APP_NAME}/Debug/")
 SET(COPY_BASILISK_DLL_RELEASE ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/build/basilisk-core/Release/basilisk-core.dll" "${CMAKE_SOURCE_DIR}/build/${BS_APP_NAME}/Release")

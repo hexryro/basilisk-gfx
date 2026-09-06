@@ -52,8 +52,8 @@ const bs_FunctionTable* _bs_setFunctions(const bs_FunctionTable* a, bs_FunctionT
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bs_FunctionTable); offset += sizeof(void*)) {
-        bs_Callback* f_a = ((unsigned char*)&next) + offset;
-        bs_Callback* f_b = ((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next) + offset;
+        void** f_b = (void**)((unsigned char*)b) + offset;
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -476,21 +476,21 @@ void bs_m3Mul(
     const bs_mat3* b, 
     const bs_mat3* result)
 {
-    glm_mat3_mul(a->v, b->v, result->v);
+    glm_mat3_mul(a->a, b->a, result->a);
 }
 
 void bs_m3Transpose(
     const bs_mat3* m, 
     const bs_mat3* result)
 {
-    glm_mat3_transpose_to(m->v, result->v);
+    glm_mat3_transpose_to(m->a, result->a);
 }
 
 void bs_m3Inverse(
     const bs_mat3* m, 
     const bs_mat3* result)
 {
-    glm_mat3_inv(m->v, result->v);
+    glm_mat3_inv(m->a, result->a);
 }
 
 void bs_m3MulV3(
@@ -498,7 +498,7 @@ void bs_m3MulV3(
     const bs_vec3* v, 
     bs_vec3* out)
 {
-    glm_mat3_mulv(m->v, v->a, out->a);
+    glm_mat3_mulv(m->a, v->a, out->a);
 }
 
 void bs_m4Mul(
@@ -506,21 +506,21 @@ void bs_m4Mul(
     const bs_mat4* b, 
     const bs_mat4* result)
 {
-    glm_mat4_mul(a->v, b->v, result->v);
+    glm_mat4_mul(a->a, b->a, result->a);
 }
 
 void bs_m4Transpose(
     const bs_mat4* m, 
     const bs_mat4* result)
 {
-    glm_mat4_transpose_to(m->v, result->v);
+    glm_mat4_transpose_to(m->a, result->a);
 }
 
 void bs_m4Inverse(
     const bs_mat4* m, 
     const bs_mat4* result)
 {
-    glm_mat4_inv(m->v, result->v);
+    glm_mat4_inv(m->a, result->a);
 }
 
 bs_mat4x3 bs_m4x3(
@@ -534,7 +534,7 @@ void bs_m4MulV3(
     const bs_vec3* v, 
     bs_vec3* out)
 {
-    glm_mat4_mulv3(m->v, v->a, 1.0, out->a);
+    glm_mat4_mulv3(m->a, v->a, 1.0, out->a);
 }
 
 void bs_m4MulV4(
@@ -542,7 +542,7 @@ void bs_m4MulV4(
     const bs_vec4* v, 
     bs_vec4* out)
 {
-    glm_mat4_mulv(m->v, v->a, out->a);
+    glm_mat4_mulv(m->a, v->a, out->a);
 }
 
 void bs_m4Translate(
@@ -550,7 +550,7 @@ void bs_m4Translate(
     const bs_vec3* v, 
     bs_mat4* out)
 {
-    glm_translate_to(m->v, v->a, out->a);
+    glm_translate_to(m->a, v->a, out->a);
 }
 
 void bs_m4Rotate(
@@ -558,7 +558,7 @@ void bs_m4Rotate(
     const bs_vec4* q, 
     bs_mat4* out)
 {
-    glm_quat_rotate(m->v, q->a, out->a);
+    glm_quat_rotate(m->a, q->a, out->a);
 }
 
 void bs_m4Scale(
@@ -566,35 +566,35 @@ void bs_m4Scale(
     const bs_vec3* v, 
     bs_mat4* out)
 {
-    glm_scale_to(m->v, v->a, out->a);
+    glm_scale_to(m->a, v->a, out->a);
 }
 
 void bs_m3ToQ(
     const bs_mat3* m, 
     bs_vec4* out)
 {
-    glm_mat3_quat(m->v, out->a);
+    glm_mat3_quat(m->a, out->a);
 }
 
 void bs_m4ToQ(
     const bs_mat4* m, 
     bs_vec4* out)
 {
-    glm_mat4_quat(m->v, out->a);
+    glm_mat4_quat(m->a, out->a);
 }
 
 void bs_qToM3(
     const bs_vec4* q, 
     bs_mat3* out)
 {
-    glm_quat_mat3(q->a, out->v);
+    glm_quat_mat3(q->a, out->a);
 }
 
 void bs_qToM4(
     const bs_vec4* q, 
     bs_mat4* out)
 {
-    glm_quat_mat4(q->a, out->v);
+    glm_quat_mat4(q->a, out->a);
 }
 
 void bs_qMulQ(
@@ -669,7 +669,7 @@ void bs_orthographic(
     float far_z, 
     bs_mat4* out)
 {
-    glm_ortho(left, right, bottom, top, near_z, far_z, out->v);
+    glm_ortho(left, right, bottom, top, near_z, far_z, out->a);
 }
 
 void bs_perspective(
@@ -679,7 +679,7 @@ void bs_perspective(
     float far_z, 
     bs_mat4* out)
 {
-    glm_perspective(fov, aspect, near_z, far_z, out->v);
+    glm_perspective(fov, aspect, near_z, far_z, out->a);
 }
 
 void bs_lookAt(
@@ -1188,7 +1188,7 @@ bool bs_bufferIsMapped(
     return next.bs_bufferIsMapped(buffer);
 }
 
-char* bs_bufferMap(
+void* bs_bufferMap(
     bs_Buffer* buffer)
 {
     return next.bs_bufferMap(buffer);
@@ -3269,7 +3269,7 @@ char* bs_fileName(
 }
 
 bs_Result bs_appendFile(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* value)
 {
@@ -3277,7 +3277,7 @@ bs_Result bs_appendFile(
 }
 
 bs_Result bs_appendFileN(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* value, 
     int value_length)
@@ -3286,7 +3286,7 @@ bs_Result bs_appendFileN(
 }
 
 bs_Result bs_appendFileV(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     va_list args)
@@ -3295,7 +3295,7 @@ bs_Result bs_appendFileV(
 }
 
 bs_Result bs_appendFileF(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     ...)
@@ -3308,7 +3308,7 @@ bs_Result bs_appendFileF(
 }
 
 bs_Result bs_saveFile(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* path)
 {
@@ -3316,7 +3316,7 @@ bs_Result bs_saveFile(
 }
 
 bs_Result bs_saveFileN(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* path, 
     int path_length)
@@ -3325,7 +3325,7 @@ bs_Result bs_saveFileN(
 }
 
 bs_Result bs_saveFileV(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     va_list args)
@@ -3334,7 +3334,7 @@ bs_Result bs_saveFileV(
 }
 
 bs_Result bs_saveFileF(
-    char* data, 
+    void* data, 
     bs_U32 data_len, 
     char* format, 
     ...)

@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsgfx_cache.h>
 #include <bsgfx_internal.h>
@@ -109,7 +109,7 @@ BSGFXAPI bs_Result _bsgfx_instanceType(size_t instance_size, int bind_set, int p
 	instance_size += sizeof(bsgfx_InstanceHeader);
 
 	//bs_Buffer* instance_types = bs_fetch(BSGFX_BUFFERS, BSGFX_BUFFER_INSTANCE_TYPES)->buffer;
-	
+
 	bs_BufferUsageFlags usage_flags = 0;
 	bs_MemoryPropertyFlags memory_flags = BS_MEMORY_PROPERTY_HOST_VISIBLE_BIT | BS_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
@@ -259,7 +259,7 @@ BSGFXAPI void _bsgfx_renderSubtype(bs_Queue* queue, bsgfx_InstanceSubtype* subty
 BSGFXAPI void _val_bsgfx_resetSubtype(int subtype) {
 	if (!_bsgfx_validateSubtype("GFX", subtype))
 		return;
-	
+
 	_bsgfx_resetSubtype(subtype);
 }
 
@@ -297,7 +297,7 @@ BSGFXAPI void _bsgfx_resetSubtype(int subtype_id) {
  /**
   Create instance
   */
-BSGFXAPI int _val_bsgfx_instantiate(bsgfx_InstanceSubtype* subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
+BSGFXAPI int _val_bsgfx_instantiate(bsgfx_InstanceSubtype* subtype, const void* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
 	const int max_tick_count = 1000;
 
 	BSGFX_VALIDATE(flags <= BS_U16_MAX, 0,);
@@ -308,7 +308,7 @@ BSGFXAPI int _val_bsgfx_instantiate(bsgfx_InstanceSubtype* subtype, const char* 
 	return _bsgfx_instantiate(subtype, data, data_size, flags, bone_index, id, material);
 }
 
-BSGFXAPI int _bsgfx_instantiate(bsgfx_InstanceSubtype* subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
+BSGFXAPI int _bsgfx_instantiate(bsgfx_InstanceSubtype* subtype, const void* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
 	//int out_index = bsgfx_index(flags, instance_type->instance_count);
 
 	subtype->instance_type2->instance_count++;
@@ -339,13 +339,13 @@ BSGFXAPI void _bsgfx_tickInstanceType(bsgfx_InstanceType* type) {
 	if (type->instance_count <= 0)
 		return;
 
-	unsigned char* destination = bs_bufferMap(type->device_instances);
+	unsigned char* destination = (unsigned char*)bs_bufferMap(type->device_instances);
 
 	for (int j = 0, offset = 0; j < type->subtypes.count; j++) {
 		bsgfx_InstanceSubtype* subtype = bs_fetchUnit(&type->subtypes, j);
 
-		bsgfx_InstanceHeader* src_instance = subtype->host_instances.data;
-		bsgfx_InstanceHeader* dst_instance = destination + offset * type->instance_size;
+		bsgfx_InstanceHeader* src_instance = (bsgfx_InstanceHeader*)subtype->host_instances.data;
+		bsgfx_InstanceHeader* dst_instance = (bsgfx_InstanceHeader*)(destination + offset * type->instance_size);
 
 		memcpy(dst_instance, src_instance, subtype->host_instances.count * type->instance_size);
 
@@ -569,7 +569,7 @@ BSGFXAPI bsgfx_InstanceHeader* _bsgfx_instanceHeader(bsgfx_InstanceSubtype* subt
 	return header;
 }
 
-BSGFXAPI bsgfx_InstanceHeader* _bsgfx_instanceData(bsgfx_InstanceSubtype* subtype, int instance_id) {
+BSGFXAPI void* _bsgfx_instanceData(bsgfx_InstanceSubtype* subtype, int instance_id) {
 	bsgfx_InstanceHeader* header = _bsgfx_instanceHeader(subtype, instance_id);
-	return header + 1;
+	return (void*)(header + 1);
 }

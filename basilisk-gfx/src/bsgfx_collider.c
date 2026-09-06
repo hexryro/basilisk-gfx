@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
  /*
   _bsgfx_collider.c
@@ -87,13 +87,13 @@ static inline bs_Ray _bsgfx_descendSlopeRay(bsgfx_Collider* collider, bs_vec3* v
 }
 
 static bool _bsgfx_descendSlopeRayCast(
-	bsgfx_Collider* collider, 
-	bs_vec3* velocity, 
+	bsgfx_Collider* collider,
+	bs_vec3* velocity,
 	const bs_Ray* ray,
-	const bs_vec3* position, 
-	const bs_vec4* rotation, 
-	const bs_vec3* scale, 
-	int axis) 
+	const bs_vec3* position,
+	const bs_vec4* rotation,
+	const bs_vec3* scale,
+	int axis)
 {
 	//bs_Ray left_down_ray = _bsgfx_leftMaxSlopeRay(collider, velocity, p, axis);
 	//bs_Ray right_down_ray = _bsgfx_rightMaxSlopeRay(collider, velocity, p, axis);
@@ -207,9 +207,9 @@ static float _bsgfx_applyCollisionRaycast(bsgfx_Collider* collider, bs_vec3* vel
 
 			ray_length = distance;
 
-			if (axis == 0) 
+			if (axis == 0)
 				collider->collision |= (axis_direction == 1) ? BSGFX_COLLISION_RIGHT : BSGFX_COLLISION_LEFT;
-			else 
+			else
 				collider->collision |= (axis_direction == 1) ? BSGFX_COLLISION_FRONT : BSGFX_COLLISION_BACK;
 		}
 	}
@@ -336,17 +336,17 @@ static inline bs_vec3 _bsgfx_secondarySlopeRayStepped(bs_vec3* velocity, bs_vec3
 }
 
 static void _bsgfx_applySecondarySlopeRaycast(
-	bsgfx_Collider* collider, 
-	bs_vec3* velocity, 
-	bs_Ray* ray, 
-	const bs_vec3* position, 
-	const bs_vec4* rotation, 
-	const bs_vec3* scale, 
-	int axis, 
-	int axis_direction) 
+	bsgfx_Collider* collider,
+	bs_vec3* velocity,
+	bs_Ray* ray,
+	const bs_vec3* position,
+	const bs_vec4* rotation,
+	const bs_vec3* scale,
+	int axis,
+	int axis_direction)
 {
 	bs_RayVsObb result;
-	bs_rayVsObb(&ray, position, rotation, scale, &result);
+	bs_rayVsObb(ray, position, rotation, scale, &result);
 	if (!result.hit)
 		return;
 
@@ -566,7 +566,7 @@ BSGFXAPI void _bsgfx_instanceCollider(bsgfx_Collider* collider, const bs_vec3* p
 BSGFXAPI void _bsgfx_printCollisions(bsgfx_Collider* collider) {
 	bs_U32 c = collider->collision;
 
-	printf("%d, %d, %d (%d)\n", 
+	printf("%d, %d, %d (%d)\n",
 		c & BSGFX_COLLISION_LEFT ? -1 : (c & BSGFX_COLLISION_RIGHT ? 1 : 0),
 		c & BSGFX_COLLISION_BELOW ? -1 : (c & BSGFX_COLLISION_ABOVE ? 1 : 0),
 		c & BSGFX_COLLISION_BACK ? -1 : (c & BSGFX_COLLISION_FRONT ? 1 : 0),

@@ -40,8 +40,8 @@ const bsgfx_FunctionTable* _preval_bsgfx_setFunctions(const bsgfx_FunctionTable*
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bsgfx_FunctionTable); offset += sizeof(void*)) {
-        bs_Callback* f_a = ((unsigned char*)&next) + offset;
-        bs_Callback* f_b = ((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next) + offset;
+        void** f_b = (void**)((unsigned char*)b) + offset;
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -320,7 +320,7 @@ BSGFXAPI bs_Result _preval_bsgfx_subtype(bsgfx_InstanceType* instance_type, bs_B
     return next.bsgfx_subtype(instance_type, batch, flags, range, out);
 }
 
-BSGFXAPI int _preval_bsgfx_instantiate(bsgfx_InstanceSubtype* instance_subtype, const char* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
+BSGFXAPI int _preval_bsgfx_instantiate(bsgfx_InstanceSubtype* instance_subtype, const void* data, int data_size, bs_U32 flags, unsigned int bone_index, int id, int material) {
     BSGFX_VALIDATE(instance_subtype != NULL, 0,);
     BSGFX_VALIDATE(data != NULL, 0,);
     return next.bsgfx_instantiate(instance_subtype, data, data_size, flags, bone_index, id, material);
@@ -448,7 +448,7 @@ BSGFXAPI bsgfx_InstanceHeader* _preval_bsgfx_instanceHeader(bsgfx_InstanceSubtyp
     return next.bsgfx_instanceHeader(subtype, instance_id);
 }
 
-BSGFXAPI bsgfx_InstanceHeader* _preval_bsgfx_instanceData(bsgfx_InstanceSubtype* subtype, int instance_id) {
+BSGFXAPI void* _preval_bsgfx_instanceData(bsgfx_InstanceSubtype* subtype, int instance_id) {
     BSGFX_VALIDATE(subtype != NULL, NULL,);
     return next.bsgfx_instanceData(subtype, instance_id);
 }
@@ -720,7 +720,7 @@ BSGFXAPI void _preval_bsgfx_tileAxis(const bsgfx_Primitive* primitive, int index
     next.bsgfx_tileAxis(primitive, index, out);
 }
 
-BSGFXAPI void _preval_bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, bs_U32* out) {
+BSGFXAPI void _preval_bsgfx_tileIndex(const bsgfx_Primitive* primitive, int axis, int x, int y, int* out) {
     BSGFX_VALIDATE(primitive != NULL, ,);
     BSGFX_VALIDATE(out != NULL, ,);
     next.bsgfx_tileIndex(primitive, axis, x, y, out);

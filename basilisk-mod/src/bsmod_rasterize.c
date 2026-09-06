@@ -1,19 +1,19 @@
 
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
 #include <bsmod_internal.h>
 #include <bsmod_cache.h>
@@ -54,7 +54,7 @@ BSMODAPI void _bsmod_beginRasterize(bs_ivec2 _render_size, bs_ivec2 _output_size
     output_size = _output_size;
 
     bs_pushDescriptors();
-    bsgfx_resetInstanceType(BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD);
+    bsgfx_resetInstanceType(bsgfx_instanceTypes()[BSMOD_INSTANCE_TYPE_2_TRACKER_QUAD]);
     _bsmod_rasterizations.count = 0;
 }
 
@@ -68,7 +68,7 @@ static void _bsmod_destroyRasterizer(bsmod_Rasterization* rasterization) {
     if (rasterization->depth_image)
         bs_destroyImage(rasterization->depth_image);
     if (rasterization->buffer)
-        bs_destroyImage(rasterization->buffer);
+        bs_destroyBuffer(rasterization->buffer);
 }
 
  /**
@@ -85,7 +85,7 @@ BSMODAPI bs_Result _val_bsmod_rasterizeInstance(
     int width,
     int height,
     size_t push_constant_size,
-    unsigned char* push_constant) 
+    void* push_constant)
 {
     if (!bsgfx_validateSubtype("MOD", subtype))
         return BS_RESULT_VALIDATION_ERROR;
@@ -105,11 +105,11 @@ BSMODAPI bs_Result _bsmod_rasterizeInstance(
     int instance_offset,
     int instance_count,
     int category,
-    char* name, 
-    int width, 
-    int height, 
-    size_t push_constant_size, 
-    unsigned char* push_constant) 
+    char* name,
+    int width,
+    int height,
+    size_t push_constant_size,
+    void* push_constant)
 {
     bs_Result result;
 
@@ -207,13 +207,13 @@ BSMODAPI void _bsmod_endRasterize(bs_Queue* queue) {
         bs_render(queue, batch, pipeline, index_offset, index_count, rasterization->instance_offset, rasterization->instance_count);
 
         bs_endRender(queue, rasterization->renderer);
-        
+
         bs_blit(queue, (bs_BlitOperation) {
-            .source = rasterization->image, 
-            .source_layout = BS_IMAGE_LAYOUT_GENERAL, 
-            .source_scale = rasterization->image->dim, 
-            .destination = rasterization->scaled_image, 
-            .destination_layout = BS_IMAGE_LAYOUT_GENERAL, 
+            .source = rasterization->image,
+            .source_layout = BS_IMAGE_LAYOUT_GENERAL,
+            .source_scale = rasterization->image->dim,
+            .destination = rasterization->scaled_image,
+            .destination_layout = BS_IMAGE_LAYOUT_GENERAL,
             .destination_scale = rasterization->scaled_image->dim,
         });
 

@@ -1,19 +1,19 @@
 ﻿
  /**
   MIT License
-  
+
   Copyright (c) 2026 switch360hardflip <switch360hardflip@gmail.com>
-  
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the Software is
   furnished to do so, subject to the following conditions:
-  
+
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,8 +21,9 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  */ 
+  */
 
+#include "basilisk-core.gen.h"
 #include <basilisk-gfx.h>
 
 #include <ft2build.h>
@@ -102,7 +103,7 @@ _bsgfx_textSize(
     bsgfx_Font* font,
     int px_size,
     char* text,
-    int text_length) 
+    int text_length)
 {
     int pt_size_id = _bsgfx_queryPtSize(font, px_size);
     px_size = font->pt_sizes[pt_size_id];
@@ -158,16 +159,16 @@ _bsgfx_textSize(
     }
 }
 
-BSGFXAPI bs_Range 
+BSGFXAPI bs_Range
 _bsgfx_instantiateASCIITextN(
-    bsgfx_InstanceSubtype* subtype, 
-    bsgfx_Font* font, 
-    bs_vec3 position, 
-    int px_size, 
-    int material_id, 
+    bsgfx_InstanceSubtype* subtype,
+    bsgfx_Font* font,
+    bs_vec3 position,
+    int px_size,
+    int material_id,
     bs_vec2* out_size,
-    char* text, 
-    int text_length) 
+    char* text,
+    int text_length)
 {
     // TODO: check if basic latin block is available
     int pt_size_id = _bsgfx_queryPtSize(font, px_size);
@@ -265,7 +266,7 @@ _bsgfx_instantiateASCIITextN(
     }
 
     *out_size = BS_V2(
-        position.x - start.x, 
+        position.x - start.x,
         _bsgfx_fontHeight(font, px_size)
         //position.y - start.y
     );
@@ -324,7 +325,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
 
     bsgfx_Font* font = bs_calloc(1, sizeof(bsgfx_Font));
     font->atlas_object = atlas_object;
-    bfnt->model = font;
+    bfnt->generic = font;
 
     font->blocks_count = bs_getLittleEndian16(data + BFNT_OFFSET_BLOCKS_COUNT);
     font->pt_sizes_count = bs_getLittleEndian16(data + BFNT_OFFSET_PT_SIZES_COUNT);
@@ -379,7 +380,7 @@ BSGFXAPI bs_Result _bsgfx_loadFont(bs_Queue* queue, int package_id, const char* 
         bs_I32 x_offset = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_X_OFFSET);
         bs_I32 y_offset = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_Y_OFFSET);
         bs_I32 x_advance = bs_getLittleEndian32(glyphs_offset + BFNT_OFFSET_GLYPH_X_ADVANCE);
-        
+
         bs_U16 kern_start_pair = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_KERNING_START);
         bs_U16 kern_count_pair = bs_getLittleEndian16(glyphs_offset + BFNT_OFFSET_GLYPH_KERNING_COUNT);
 
@@ -449,7 +450,7 @@ BSGFXAPI void _bsgfx_test() {
     bs_Resource* resource;
     _bsgfx_loadFont(queue, package_id, "project/fonts/selawk.ttf", 0, &resource);
 
-    bsgfx_Font* font = resource->model;
+    bsgfx_Font* font = resource->generic;
     bs_bindImage(BSGFX_SET_FONTS, BSGFX_BINDING_FONTS, font->atlas_object->atlas->image, bs_fetch(BSGFX_SAMPLERS, BSGFX_SAMPLER_NEAREST)->sampler, BS_IMAGE_LAYOUT_GENERAL);
 
     //_bsgfx_loadFont(package_id, "")
