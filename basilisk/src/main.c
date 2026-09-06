@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 	bsgfx_enableValidation();
 	bsmod_enableValidation();
 
-	basilisk.main_thread_id = thrd_current();
+	basilisk.main_thread_id = thrd_current()._Tid;
 
 	bs_Callbacks* core_callbacks = bs_callbacks();
 	*core_callbacks = (bs_Callbacks) {

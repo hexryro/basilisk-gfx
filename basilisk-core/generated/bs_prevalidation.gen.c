@@ -41,8 +41,8 @@ const bs_FunctionTable* _preval_bs_setFunctions(const bs_FunctionTable* a, bs_Fu
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bs_FunctionTable); offset += sizeof(void*)) {
-        void** f_a = (void**)((unsigned char*)&next) + offset;
-        void** f_b = (void**)((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next + offset);
+        void** f_b = (void**)((unsigned char*)b + offset);
         if (!*f_a)
             *f_a = *f_b;
     }

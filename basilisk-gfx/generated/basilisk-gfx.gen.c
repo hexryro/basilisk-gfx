@@ -45,8 +45,8 @@ const bsgfx_FunctionTable* _bsgfx_setFunctions(const bsgfx_FunctionTable* a, bsg
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bsgfx_FunctionTable); offset += sizeof(void*)) {
-        void** f_a = (void**)((unsigned char*)&next) + offset;
-        void** f_b = (void**)((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next + offset);
+        void** f_b = (void**)((unsigned char*)b + offset);
         if (!*f_a)
             *f_a = *f_b;
     }

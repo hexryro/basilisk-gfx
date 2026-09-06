@@ -118,7 +118,6 @@ BSMODAPI void _bsmod_onTick() {
         _bsmod_readHoveringVertex();
     }
 
-    _bsmod_instanceUI();
     if (!_bsmod_.ui_blocked)
         _bsmod_instanceTransform();
     if (!_bsmod_.ui_blocked)

@@ -82,9 +82,6 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_packAtlas = (PFN_bsmod_packAtlas)bs_getProcAddress(module, "_preval_bsmod_packAtlas");
     functions.bsmod_createAtlasPacker = (PFN_bsmod_createAtlasPacker)bs_getProcAddress(module, "_preval_bsmod_createAtlasPacker");
     functions.bsmod_packImageDirectory = (PFN_bsmod_packImageDirectory)bs_getProcAddress(module, "_preval_bsmod_packImageDirectory");
-    functions.bsmod_scrollbar = (PFN_bsmod_scrollbar)bs_getProcAddress(module, "_preval_bsmod_scrollbar");
-    functions.bsmod_dividerWidget = (PFN_bsmod_dividerWidget)bs_getProcAddress(module, "_preval_bsmod_dividerWidget");
-    functions.bsmod_iconWidget = (PFN_bsmod_iconWidget)bs_getProcAddress(module, "_preval_bsmod_iconWidget");
     functions.bsmod_packages = (PFN_bsmod_packages)bs_getProcAddress(module, "_preval_bsmod_packages");
     functions.bsmod_queryPackage = (PFN_bsmod_queryPackage)bs_getProcAddress(module, "_preval_bsmod_queryPackage");
     functions.bsmod_ensurePackage = (PFN_bsmod_ensurePackage)bs_getProcAddress(module, "_preval_bsmod_ensurePackage");
@@ -124,31 +121,6 @@ static inline bsmod_FunctionTable* _preval_bsmod_getFunctions() {
     functions.bsmod_readHoveringVertex = (PFN_bsmod_readHoveringVertex)bs_getProcAddress(module, "_preval_bsmod_readHoveringVertex");
     functions.bsmod_editSelectedType = (PFN_bsmod_editSelectedType)bs_getProcAddress(module, "_preval_bsmod_editSelectedType");
     functions.bsmod_ensureTypeVersionsAreUpToDate = (PFN_bsmod_ensureTypeVersionsAreUpToDate)bs_getProcAddress(module, "_preval_bsmod_ensureTypeVersionsAreUpToDate");
-    functions.bsmod_renderBillboards = (PFN_bsmod_renderBillboards)bs_getProcAddress(module, "_preval_bsmod_renderBillboards");
-    functions.bsmod_instanceUI = (PFN_bsmod_instanceUI)bs_getProcAddress(module, "_preval_bsmod_instanceUI");
-    functions.bsmod_pushVecNWidget = (PFN_bsmod_pushVecNWidget)bs_getProcAddress(module, "_preval_bsmod_pushVecNWidget");
-    functions.bsmod_pushInputWidget = (PFN_bsmod_pushInputWidget)bs_getProcAddress(module, "_preval_bsmod_pushInputWidget");
-    functions.bsmod_instanceTileContextMenu = (PFN_bsmod_instanceTileContextMenu)bs_getProcAddress(module, "_preval_bsmod_instanceTileContextMenu");
-    functions.bsmod_instanceContextMenu = (PFN_bsmod_instanceContextMenu)bs_getProcAddress(module, "_preval_bsmod_instanceContextMenu");
-    functions.bsmod_pushContextMenuButton = (PFN_bsmod_pushContextMenuButton)bs_getProcAddress(module, "_preval_bsmod_pushContextMenuButton");
-    functions.bsmod_instanceGridMenu = (PFN_bsmod_instanceGridMenu)bs_getProcAddress(module, "_preval_bsmod_instanceGridMenu");
-    functions.bsmod_instanceLightBillboards = (PFN_bsmod_instanceLightBillboards)bs_getProcAddress(module, "_preval_bsmod_instanceLightBillboards");
-    functions.bsmod_pushMaterialWidgets = (PFN_bsmod_pushMaterialWidgets)bs_getProcAddress(module, "_preval_bsmod_pushMaterialWidgets");
-    functions.bsmod_onDragMaterial = (PFN_bsmod_onDragMaterial)bs_getProcAddress(module, "_preval_bsmod_onDragMaterial");
-    functions.bsmod_onClickMaterialMenu = (PFN_bsmod_onClickMaterialMenu)bs_getProcAddress(module, "_preval_bsmod_onClickMaterialMenu");
-    functions.bsmod_rasterizeMaterialIcons = (PFN_bsmod_rasterizeMaterialIcons)bs_getProcAddress(module, "_preval_bsmod_rasterizeMaterialIcons");
-    functions.bsmod_pushPrefabMenuWidgets = (PFN_bsmod_pushPrefabMenuWidgets)bs_getProcAddress(module, "_preval_bsmod_pushPrefabMenuWidgets");
-    functions.bsmod_instancePrefabPreview = (PFN_bsmod_instancePrefabPreview)bs_getProcAddress(module, "_preval_bsmod_instancePrefabPreview");
-    functions.bsmod_onDragPrefab = (PFN_bsmod_onDragPrefab)bs_getProcAddress(module, "_preval_bsmod_onDragPrefab");
-    functions.bsmod_rasterizePrefabIcons = (PFN_bsmod_rasterizePrefabIcons)bs_getProcAddress(module, "_preval_bsmod_rasterizePrefabIcons");
-    functions.bsmod_instancePrimitivePreview = (PFN_bsmod_instancePrimitivePreview)bs_getProcAddress(module, "_preval_bsmod_instancePrimitivePreview");
-    functions.bsmod_onDragPrimitive = (PFN_bsmod_onDragPrimitive)bs_getProcAddress(module, "_preval_bsmod_onDragPrimitive");
-    functions.bsmod_rasterizePrimitiveIcons = (PFN_bsmod_rasterizePrimitiveIcons)bs_getProcAddress(module, "_preval_bsmod_rasterizePrimitiveIcons");
-    functions.bsmod_setSideMenuTab = (PFN_bsmod_setSideMenuTab)bs_getProcAddress(module, "_preval_bsmod_setSideMenuTab");
-    functions.bsmod_instanceSideMenu = (PFN_bsmod_instanceSideMenu)bs_getProcAddress(module, "_preval_bsmod_instanceSideMenu");
-    functions.bsmod_pushTileMenuWidgets = (PFN_bsmod_pushTileMenuWidgets)bs_getProcAddress(module, "_preval_bsmod_pushTileMenuWidgets");
-    functions.bsmod_instanceTilePreview = (PFN_bsmod_instanceTilePreview)bs_getProcAddress(module, "_preval_bsmod_instanceTilePreview");
-    functions.bsmod_onDragTile = (PFN_bsmod_onDragTile)bs_getProcAddress(module, "_preval_bsmod_onDragTile");
 #ifdef __linux__
     dlclose(module);
 #endif

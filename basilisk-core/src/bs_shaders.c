@@ -570,7 +570,7 @@ BSAPI bs_Binding* _bs_queryBinding(const bs_BindSet* bind_set, bs_U32 id) {
   */
 static int _bs_compareBindings(const void* a, const void* b) {
     const bs_Binding* binding_a = (bs_Binding*)a;
-    const bs_Binding* binding_b = (bs_Binding*)a;
+    const bs_Binding* binding_b = (bs_Binding*)b;
 
     if (binding_a->set < binding_b->set) return -1;
     else if (binding_a->set > binding_b->set) return 1;
@@ -579,7 +579,7 @@ static int _bs_compareBindings(const void* a, const void* b) {
 
 static int _bs_compareBindSets(const void* a, const void* b) {
     const bs_BindSet* bind_set_a = (bs_BindSet*)a;
-    const bs_BindSet* bind_set_b = (bs_BindSet*)a;
+    const bs_BindSet* bind_set_b = (bs_BindSet*)b;
 
     if (bind_set_a->slot < bind_set_b->slot) return -1;
     else if (bind_set_a->slot > bind_set_b->slot) return 1;
@@ -867,8 +867,8 @@ BSAPI void _bs_configureAttribute(const char* name, bs_Format base_format) {
 }
 
 static int _bs_compareAttributes(const void* a, const void* b) {
-    const bs_Attribute* attribute_a;
-    const bs_Attribute* attribute_b;
+    const bs_Attribute *attribute_a = a;
+    const bs_Attribute *attribute_b = b;
 
     if      (attribute_a->location == attribute_b->location) return 0;
     else if (attribute_a->location <  attribute_b->location) return -1;

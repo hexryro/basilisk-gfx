@@ -34,6 +34,10 @@
 #define BS_INTERNAL_GEN_H
 
 #include <basilisk-core.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <vulkan.h>
 #include <stdarg.h>
 

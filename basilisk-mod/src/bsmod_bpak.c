@@ -421,8 +421,8 @@ bs_Result _bsmod_loadResource(int type, int package_id, char* name) {
 }
 
 static int _bsmod_compareResource(const void* a, const void* b) {
-    const bsmod_Resource* resource_a;
-    const bsmod_Resource* resource_b;
+	const bsmod_Resource *resource_a = a;
+	const bsmod_Resource *resource_b = b;
 
 	if (resource_a->type < resource_b->type) return -1;
 	else if (resource_a->type > resource_b->type) return 1;

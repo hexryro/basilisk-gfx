@@ -24,7 +24,9 @@
   */
 
 #include <bsmod_internal.h>
+#ifdef __linux__
 #include <dlfcn.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

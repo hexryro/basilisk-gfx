@@ -39,6 +39,9 @@
 		</internal>
 		<internalHeader>
 			<include>basilisk-core.h</include>
+			<ifdef cond="_WIN32"/>
+			    <include>windows.h</include>
+			<endif/>
 			<include>vulkan.h</include>
 			<include>stdarg.h</include>
 		</internalHeader>

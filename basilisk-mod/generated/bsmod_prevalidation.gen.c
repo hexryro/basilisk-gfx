@@ -40,8 +40,8 @@ const bsmod_FunctionTable* _preval_bsmod_setFunctions(const bsmod_FunctionTable*
 	if (!b) return &next;
 
     for (size_t offset = 0; offset < sizeof(bsmod_FunctionTable); offset += sizeof(void*)) {
-        void** f_a = (void**)((unsigned char*)&next) + offset;
-        void** f_b = (void**)((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&next + offset);
+        void** f_b = (void**)((unsigned char*)b + offset);
         if (!*f_a)
             *f_a = *f_b;
     }
@@ -185,23 +185,6 @@ BSMODAPI bs_Result _preval_bsmod_packImageDirectory(char* directory_name, char* 
     BSMOD_VALIDATE(package_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     BSMOD_VALIDATE(resource_name != NULL, BS_RESULT_VALIDATION_ERROR,);
     return next.bsmod_packImageDirectory(directory_name, package_name, resource_name);
-}
-
-BSMODAPI void _preval_bsmod_scrollbar(const int* scroll, bsgfx_Scrollbar* out) {
-    BSMOD_VALIDATE(scroll != NULL, ,);
-    BSMOD_VALIDATE(out != NULL, ,);
-    next.bsmod_scrollbar(scroll, out);
-}
-
-BSMODAPI void _preval_bsmod_dividerWidget(float width, int indent, bsgfx_Widget* out) {
-    BSMOD_VALIDATE(out != NULL, ,);
-    next.bsmod_dividerWidget(width, indent, out);
-}
-
-BSMODAPI void _preval_bsmod_iconWidget(const bsgfx_AtlasCache* cache, float align_height, bs_vec3 offset, bs_U32 advance_flags, bsgfx_Widget* out) {
-    BSMOD_VALIDATE(cache != NULL, ,);
-    BSMOD_VALIDATE(out != NULL, ,);
-    next.bsmod_iconWidget(cache, align_height, offset, advance_flags, out);
 }
 
 BSMODAPI bs_List* _preval_bsmod_packages() {
@@ -431,132 +414,6 @@ BSMODAPI void _preval_bsmod_ensureTypeVersionsAreUpToDate(int package_id) {
     next.bsmod_ensureTypeVersionsAreUpToDate(package_id);
 }
 
-BSMODAPI void _preval_bsmod_renderBillboards() {
-    next.bsmod_renderBillboards();
-}
-
-BSMODAPI void _preval_bsmod_instanceUI() {
-    next.bsmod_instanceUI();
-}
-
-BSMODAPI void _preval_bsmod_pushVecNWidget(bs_List* widgets, const char* name, bs_vec3 offset, float width, float* v, int n) {
-    BSMOD_VALIDATE(widgets != NULL, ,);
-    BSMOD_VALIDATE(widgets->unit_size > 0, ,);
-    BSMOD_VALIDATE(name != NULL, ,);
-    BSMOD_VALIDATE(v != NULL, ,);
-    next.bsmod_pushVecNWidget(widgets, name, offset, width, v, n);
-}
-
-BSMODAPI void _preval_bsmod_pushInputWidget(bs_List* widgets, void* value, bs_vec3 offset, float width, int name_padding, bool skip_advance, bool is_last, bool has_buttons, const char* name) {
-    BSMOD_VALIDATE(widgets != NULL, ,);
-    BSMOD_VALIDATE(widgets->unit_size > 0, ,);
-    BSMOD_VALIDATE(value != NULL, ,);
-    BSMOD_VALIDATE(name != NULL, ,);
-    next.bsmod_pushInputWidget(widgets, value, offset, width, name_padding, skip_advance, is_last, has_buttons, name);
-}
-
-BSMODAPI void _preval_bsmod_instanceTileContextMenu(bs_vec3 position, bs_vec2 size) {
-    next.bsmod_instanceTileContextMenu(position, size);
-}
-
-BSMODAPI void _preval_bsmod_instanceContextMenu(bs_List* widgets, bs_vec3 position, bs_vec2 size) {
-    BSMOD_VALIDATE(widgets != NULL, ,);
-    BSMOD_VALIDATE(widgets->unit_size > 0, ,);
-    next.bsmod_instanceContextMenu(widgets, position, size);
-}
-
-BSMODAPI void _preval_bsmod_pushContextMenuButton(bs_List* widgets, bs_vec2 menu_size, bs_vec3 icon_offset, bsgfx_AtlasCache* icon, const char* name, int indent, PFN_bsgfx_ButtonWidgetCallback action, bool expandable) {
-    BSMOD_VALIDATE(widgets != NULL, ,);
-    BSMOD_VALIDATE(widgets->unit_size > 0, ,);
-    BSMOD_VALIDATE(icon != NULL, ,);
-    BSMOD_VALIDATE(name != NULL, ,);
-    next.bsmod_pushContextMenuButton(widgets, menu_size, icon_offset, icon, name, indent, action, expandable);
-}
-
-BSMODAPI void _preval_bsmod_instanceGridMenu(bs_vec3 position, bs_vec2 dimensions) {
-    next.bsmod_instanceGridMenu(position, dimensions);
-}
-
-BSMODAPI void _preval_bsmod_instanceLightBillboards() {
-    next.bsmod_instanceLightBillboards();
-}
-
-BSMODAPI void _preval_bsmod_pushMaterialWidgets(bs_List* widgets, bs_vec2 background_size) {
-    BSMOD_VALIDATE(widgets != NULL, ,);
-    BSMOD_VALIDATE(widgets->unit_size > 0, ,);
-    next.bsmod_pushMaterialWidgets(widgets, background_size);
-}
-
-BSMODAPI void _preval_bsmod_onDragMaterial(bsmod_DraggingParams params) {
-    next.bsmod_onDragMaterial(params);
-}
-
-BSMODAPI void _preval_bsmod_onClickMaterialMenu(bsmod_GridClickParams params) {
-    next.bsmod_onClickMaterialMenu(params);
-}
-
-BSMODAPI void _preval_bsmod_rasterizeMaterialIcons() {
-    next.bsmod_rasterizeMaterialIcons();
-}
-
-BSMODAPI void _preval_bsmod_pushPrefabMenuWidgets(bs_List* widgets, bs_vec2 background_size) {
-    BSMOD_VALIDATE(widgets != NULL, ,);
-    BSMOD_VALIDATE(widgets->unit_size > 0, ,);
-    next.bsmod_pushPrefabMenuWidgets(widgets, background_size);
-}
-
-BSMODAPI bool _preval_bsmod_instancePrefabPreview(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering) {
-    BSMOD_VALIDATE(widget != NULL, false,);
-    BSMOD_VALIDATE(position != NULL, false,);
-    return next.bsmod_instancePrefabPreview(widget, position, id, hovering);
-}
-
-BSMODAPI void _preval_bsmod_onDragPrefab(bsmod_DraggingParams params) {
-    next.bsmod_onDragPrefab(params);
-}
-
-BSMODAPI void _preval_bsmod_rasterizePrefabIcons() {
-    next.bsmod_rasterizePrefabIcons();
-}
-
-BSMODAPI bool _preval_bsmod_instancePrimitivePreview(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering) {
-    BSMOD_VALIDATE(widget != NULL, false,);
-    BSMOD_VALIDATE(position != NULL, false,);
-    return next.bsmod_instancePrimitivePreview(widget, position, id, hovering);
-}
-
-BSMODAPI void _preval_bsmod_onDragPrimitive(bsmod_DraggingParams params) {
-    next.bsmod_onDragPrimitive(params);
-}
-
-BSMODAPI void _preval_bsmod_rasterizePrimitiveIcons() {
-    next.bsmod_rasterizePrimitiveIcons();
-}
-
-BSMODAPI void _preval_bsmod_setSideMenuTab(int id, bsmod_GridClickParams params) {
-    next.bsmod_setSideMenuTab(id, params);
-}
-
-BSMODAPI void _preval_bsmod_instanceSideMenu(bs_vec3 position, bs_vec2 dimensions) {
-    next.bsmod_instanceSideMenu(position, dimensions);
-}
-
-BSMODAPI void _preval_bsmod_pushTileMenuWidgets(bs_List* widgets, bs_vec2 background_size) {
-    BSMOD_VALIDATE(widgets != NULL, ,);
-    BSMOD_VALIDATE(widgets->unit_size > 0, ,);
-    next.bsmod_pushTileMenuWidgets(widgets, background_size);
-}
-
-BSMODAPI bool _preval_bsmod_instanceTilePreview(bsgfx_Widget* widget, bs_vec2* position, int id, bool hovering) {
-    BSMOD_VALIDATE(widget != NULL, false,);
-    BSMOD_VALIDATE(position != NULL, false,);
-    return next.bsmod_instanceTilePreview(widget, position, id, hovering);
-}
-
-BSMODAPI void _preval_bsmod_onDragTile(bsmod_DraggingParams params) {
-    next.bsmod_onDragTile(params);
-}
-
 bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     static bsmod_FunctionTable functions = { 0 };
 
@@ -589,9 +446,6 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_packAtlas = _preval_bsmod_packAtlas;
     functions.bsmod_createAtlasPacker = _preval_bsmod_createAtlasPacker;
     functions.bsmod_packImageDirectory = _preval_bsmod_packImageDirectory;
-    functions.bsmod_scrollbar = _preval_bsmod_scrollbar;
-    functions.bsmod_dividerWidget = _preval_bsmod_dividerWidget;
-    functions.bsmod_iconWidget = _preval_bsmod_iconWidget;
     functions.bsmod_packages = _preval_bsmod_packages;
     functions.bsmod_queryPackage = _preval_bsmod_queryPackage;
     functions.bsmod_ensurePackage = _preval_bsmod_ensurePackage;
@@ -637,31 +491,6 @@ bsmod_FunctionTable* _preval_bsmod_getFunctionTable() {
     functions.bsmod_readHoveringVertex = _preval_bsmod_readHoveringVertex;
     functions.bsmod_editSelectedType = _preval_bsmod_editSelectedType;
     functions.bsmod_ensureTypeVersionsAreUpToDate = _preval_bsmod_ensureTypeVersionsAreUpToDate;
-    functions.bsmod_renderBillboards = _preval_bsmod_renderBillboards;
-    functions.bsmod_instanceUI = _preval_bsmod_instanceUI;
-    functions.bsmod_pushVecNWidget = _preval_bsmod_pushVecNWidget;
-    functions.bsmod_pushInputWidget = _preval_bsmod_pushInputWidget;
-    functions.bsmod_instanceTileContextMenu = _preval_bsmod_instanceTileContextMenu;
-    functions.bsmod_instanceContextMenu = _preval_bsmod_instanceContextMenu;
-    functions.bsmod_pushContextMenuButton = _preval_bsmod_pushContextMenuButton;
-    functions.bsmod_instanceGridMenu = _preval_bsmod_instanceGridMenu;
-    functions.bsmod_instanceLightBillboards = _preval_bsmod_instanceLightBillboards;
-    functions.bsmod_pushMaterialWidgets = _preval_bsmod_pushMaterialWidgets;
-    functions.bsmod_onDragMaterial = _preval_bsmod_onDragMaterial;
-    functions.bsmod_onClickMaterialMenu = _preval_bsmod_onClickMaterialMenu;
-    functions.bsmod_rasterizeMaterialIcons = _preval_bsmod_rasterizeMaterialIcons;
-    functions.bsmod_pushPrefabMenuWidgets = _preval_bsmod_pushPrefabMenuWidgets;
-    functions.bsmod_instancePrefabPreview = _preval_bsmod_instancePrefabPreview;
-    functions.bsmod_onDragPrefab = _preval_bsmod_onDragPrefab;
-    functions.bsmod_rasterizePrefabIcons = _preval_bsmod_rasterizePrefabIcons;
-    functions.bsmod_instancePrimitivePreview = _preval_bsmod_instancePrimitivePreview;
-    functions.bsmod_onDragPrimitive = _preval_bsmod_onDragPrimitive;
-    functions.bsmod_rasterizePrimitiveIcons = _preval_bsmod_rasterizePrimitiveIcons;
-    functions.bsmod_setSideMenuTab = _preval_bsmod_setSideMenuTab;
-    functions.bsmod_instanceSideMenu = _preval_bsmod_instanceSideMenu;
-    functions.bsmod_pushTileMenuWidgets = _preval_bsmod_pushTileMenuWidgets;
-    functions.bsmod_instanceTilePreview = _preval_bsmod_instanceTilePreview;
-    functions.bsmod_onDragTile = _preval_bsmod_onDragTile;
 
     return &functions;
 }

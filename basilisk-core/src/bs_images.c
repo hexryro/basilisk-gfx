@@ -262,9 +262,8 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
         .samples = VK_SAMPLE_COUNT_1_BIT,
     };
-    bs_U32 num_swaps = image->flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
 
-    for (int i = 0; i < num_swaps; i++) {
+    for (int i = 0; i < image->head.swaps_count; i++) {
         vk_result = vkCreateImage(_bs_instance_->device, &image_ci, NULL, &image->_[i].vk_image);
         if (vk_result != VK_SUCCESS) {
             BS_WARN_VULKAN_ERROR("vkCreateImage", vk_result, "(%d, %d)", source_id, id);
@@ -291,7 +290,7 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
         .memoryTypeIndex = memory_type,
     };
 
-    for (int i = 0; i < num_swaps; i++) {
+    for (int i = 0; i < image->head.swaps_count; i++) {
         vk_result = vkAllocateMemory(_bs_instance_->device, &alloc_i, NULL, &image->_[i].vk_memory);
         if (vk_result != VK_SUCCESS) {
             BS_WARN_VULKAN_ERROR("vkAllocateMemory", result, "(%d, %d)", source_id, id);
@@ -337,8 +336,6 @@ static bs_Result _bs_prepareImage(bs_U32 source_id, bs_U32 id, bs_Image* image, 
 static bs_Result _bs_depthImage(bs_Object* object, bs_ivec2 dim, int num_indices, bs_Format format, bs_U32 flags) {
     bs_Image* image = object->image;
 
-    bs_U32 num_swaps = flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
-
     _bs_prepareImage(image->head.source_id, image->head.id, image,
         (flags & BS_IMAGE_ATTACHMENT_BIT       ? VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : 0) |
         (flags & BS_IMAGE_INPUT_ATTACHMENT_BIT ? VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT         : 0) |
@@ -378,7 +375,6 @@ BSAPI bs_Result _bs_image(bs_Object* object, bs_ivec2 dim, int num_indices, bs_F
     if (_bs_isDepthFormat(format))
         return _bs_depthImage(object, dim, num_indices, format, flags);
 
-    int num_swaps = flags & BS_IMAGE_SWAPS_BIT ? _bs_scope_.context->frames_in_flight : 1;
     _bs_prepareImage(image->head.source_id, image->head.id, image,
         (flags & BS_IMAGE_ATTACHMENT_BIT            ? VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT : 0) |
         (flags & BS_IMAGE_INPUT_ATTACHMENT_BIT      ? VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT : 0) |

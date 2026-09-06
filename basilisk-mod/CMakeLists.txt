@@ -8,8 +8,6 @@ file(GLOB SOURCE_FILES "src/*.c")
 
 file(GLOB TYPE_FILES "src/types/*.*")
 
-file(GLOB UI_FILES "src/ui/*.*")
-
 file(GLOB VS_SHADER_FILES "shaders/vert/*.*")
 file(GLOB FS_SHADER_FILES "shaders/frag/*.*")
 
@@ -21,8 +19,6 @@ add_library(${PROJECT_NAME} SHARED
     ${SOURCE_FILES}
     ${HEADER_FILES}
     ${GENERATE_FILES}
-
-    ${UI_FILES}
 
     ${VS_SHADER_FILES}
     ${FS_SHADER_FILES}
@@ -41,18 +37,6 @@ source_group("Source Files" FILES ${SOURCE_FILES})
 
 source_group("Shaders/vert" FILES ${VS_SHADER_FILES})
 source_group("Shaders/frag" FILES ${FS_SHADER_FILES})
-
-source_group("Source Files/UI" FILES ${UI_FILES})
-source_group("Source Files/UI/Prefab" FILES ${UI_PREFAB_FILES})
-source_group("Source Files/UI/Primitive" FILES ${UI_PRIMITIVE_FILES})
-source_group("Source Files/UI/Instance" FILES ${UI_INSTANCE_FILESs})
-source_group("Source Files/UI/Light" FILES ${UI_LIGHT_FILES})
-source_group("Source Files/UI/Tile" FILES ${UI_TILE_FILES})
-source_group("Source Files/UI/Type" FILES ${UI_TYPE_FILES})
-source_group("Source Files/UI/Material" FILES ${UI_MATERIAL_FILES})
-source_group("Source Files/UI/Context" FILES ${UI_CONTEXT_FILES})
-source_group("Source Files/UI/Grid" FILES ${UI_GRID_FILES})
-source_group("Source Files/UI/Side" FILES ${UI_SIDE_FILES})
 
 source_group("Source Files/Types" FILES ${TYPE_FILES})
 source_group("Project Files" FILES ${PROJECT_FILES})

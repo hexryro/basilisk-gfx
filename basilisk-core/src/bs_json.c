@@ -297,15 +297,17 @@ static inline void _bs_warnUnexpectedJsonType(bs_JsonType expect, const char* ac
 }
 
 static bs_JsonValue _bs_createJsonValue(bool is_mutable, void* root, char* name, bs_JsonType expect) {
-    yyjson_val_uni uni;
+	yyjson_val_uni uni = { 0 };
 	yyjson_type type;
 
 	if (is_mutable) {
-	    uni = ((yyjson_mut_val*)root)->uni;
-	    type = yyjson_mut_get_type(root);
+		if (root)
+			uni = ((yyjson_mut_val *)root)->uni;
+		type = yyjson_mut_get_type(root);
 	} else {
-        uni = ((yyjson_val*)root)->uni;
-        type = yyjson_get_type(root);
+		if (root)
+			uni = ((yyjson_val *)root)->uni;
+		type = yyjson_get_type(root);
 	}
 
 	if (type == YYJSON_TYPE_ARR) {

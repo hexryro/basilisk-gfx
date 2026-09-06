@@ -306,6 +306,7 @@ BSMODAPI bs_Queue* _bsmod_onQueue() {
     //if (result == BS_RESULT_DEVICE_LOST)
     //    bsgfx_onDeviceLost();
 
+    /*
     if (bs_inputDownOnce(BS_KEY_G))
         _bsmod_queueRasterize(BSMOD_CONTENT_PATH, "material_icons", _bsmod_rasterizeMaterialIcons);
 
@@ -314,7 +315,7 @@ BSMODAPI bs_Queue* _bsmod_onQueue() {
 
     if (bs_inputDownOnce(BS_KEY_L))
         _bsmod_queueRasterize(BSMOD_CONTENT_PATH, "prefab_icons", _bsmod_rasterizePrefabIcons);
-
+    */
     _bsmod_pollRasterizer();
 
     return queue;

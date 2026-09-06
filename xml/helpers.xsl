@@ -38,8 +38,8 @@
 	if (!b) return &amp;next;
 
     for (size_t offset = 0; offset &lt; sizeof(</xsl:text><xsl:value-of select="registry/functionPrefix"/><xsl:text>FunctionTable); offset += sizeof(void*)) {
-        void** f_a = (void**)((unsigned char*)&amp;next) + offset;
-        void** f_b = (void**)((unsigned char*)b) + offset;
+        void** f_a = (void**)((unsigned char*)&amp;next + offset);
+        void** f_b = (void**)((unsigned char*)b + offset);
         if (!*f_a)
             *f_a = *f_b;
     }

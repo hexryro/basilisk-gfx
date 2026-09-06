@@ -828,7 +828,7 @@ static inline int bs_testBit(long A[], unsigned int k) {
     return (value & (1L << (k % 32U))) != 0;
 }
 
-#define bs_atomicExchange(object, desired) InterlockedCompareExchange(object, desired)
+#define bs_atomicExchange(object, desired) InterlockedExchange(object, desired)
 
 #elif defined(__linux__)
 #include <stdatomic.h>
